@@ -76,7 +76,7 @@ class Piece_ORM_ConfigTestCase extends PHPUnit_TestCase
      * @access public
      */
 
-    function testNoConfiguration()
+    function testNoConfigurations()
     {
         $config = &new Piece_ORM_Config();
 
