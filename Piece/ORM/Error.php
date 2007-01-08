@@ -49,7 +49,6 @@ define('PIECE_ORM_ERROR_NOT_FOUND',         -2);
 define('PIECE_ORM_ERROR_NOT_READABLE',      -3);
 define('PIECE_ORM_ERROR_CANNOT_READ',       -4);
 define('PIECE_ORM_ERROR_CANNOT_WRITE',      -5);
-define('PIECE_ORM_ERROR_INVALID_OPERATION', -6);
 
 // }}}
 // {{{ Piece_ORM_Error
