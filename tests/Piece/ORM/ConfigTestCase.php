@@ -40,7 +40,6 @@
 
 require_once 'PHPUnit.php';
 require_once 'Piece/ORM/Config.php';
-require_once 'Piece/ORM/Error.php';
 
 // {{{ Piece_ORM_ConfigTestCase
 
@@ -77,48 +76,19 @@ class Piece_ORM_ConfigTestCase extends PHPUnit_TestCase
      * @access public
      */
 
-    function setUp()
-    {
-        Piece_ORM_Error::pushCallback(create_function('$error', 'var_dump($error); return ' . PEAR_ERRORSTACK_DIE . ';'));
-    }
-
-    function tearDown()
-    {
-        Piece_ORM_Error::clearErrors();
-        Piece_ORM_Error::popCallback();
-    }
-
     function testNoConfiguration()
     {
-        Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
-
         $config = &new Piece_ORM_Config();
-        $config->getDSN();
 
-        $this->assertTrue(Piece_ORM_Error::hasErrors('exception'));
-
-        $error = Piece_ORM_Error::pop();
-
-        $this->assertEquals(PIECE_ORM_ERROR_INVALID_OPERATION, $error['code']);
-
-        Piece_ORM_Error::popCallback();
+        $this->assertNull($config->getDSN());
     }
 
     function testConfigurationNotFound()
     {
-        Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
-
         $config = &new Piece_ORM_Config();
         $config->addDatabase('foo', 'bar');
-        $config->getDSN('baz');
 
-        $this->assertTrue(Piece_ORM_Error::hasErrors('exception'));
-
-        $error = Piece_ORM_Error::pop();
-
-        $this->assertEquals(PIECE_ORM_ERROR_NOT_FOUND, $error['code']);
-
-        Piece_ORM_Error::popCallback();
+        $this->assertNull($config->getDSN('baz'));
     }
 
     function testDefaultDatabase()

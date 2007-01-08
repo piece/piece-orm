@@ -81,15 +81,10 @@ class Piece_ORM_Config
      *
      * @param string $name
      * @return string
-     * @throws PIECE_ORM_ERROR_INVALID_OPERATION
-     * @throws PIECE_ORM_ERROR_NOT_FOUND
      */
     function getDSN($name = null)
     {
         if (!count($this->_databases)) {
-            Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_OPERATION,
-                                  'No database information in the current configuration.'
-                                  );
             return;
         }
 
@@ -98,9 +93,6 @@ class Piece_ORM_Config
         }
 
         if (!array_key_exists($name, $this->_databases)) {
-            Piece_ORM_Error::push(PIECE_ORM_ERROR_NOT_FOUND,
-                                  "The configuration for the database [ $name ] not found."
-                                  );
             return;
         }
 
@@ -115,15 +107,10 @@ class Piece_ORM_Config
      *
      * @param string $name
      * @return array
-     * @throws PIECE_ORM_ERROR_INVALID_OPERATION
-     * @throws PIECE_ORM_ERROR_NOT_FOUND
      */
     function getOptions($name = null)
     {
         if (!count($this->_databases)) {
-            Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_OPERATION,
-                                  'No database information in the current configuration.'
-                                  );
             return;
         }
 
@@ -132,9 +119,6 @@ class Piece_ORM_Config
         }
 
         if (!array_key_exists($name, $this->_databases)) {
-            Piece_ORM_Error::push(PIECE_ORM_ERROR_NOT_FOUND,
-                                  "The configuration for the database [ $name ] not found."
-                                  );
             return;
         }
 
