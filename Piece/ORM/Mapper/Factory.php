@@ -116,7 +116,7 @@ class Piece_ORM_Mapper_Factory
                 return $return;
             }
 
-            $mapperClass = "Piece_ORM_Mapper_$mapperID";
+            $mapperClass = Piece_ORM_Mapper_Factory::_getMapperClass($mapperID);
             $mapper = &new $mapperClass();
             if (!is_subclass_of($mapper, 'Piece_ORM_Mapper')) {
                 Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_MAPPER,
@@ -158,14 +158,13 @@ class Piece_ORM_Mapper_Factory
      * getting from a cache.
      *
      * @param string $mapperID
-     * @param string $mapperClass
      * @param string $configFile
      * @param string $cacheDirectory
      * @return string
      * @throws PIECE_ORM_ERROR_CANNOT_READ
      * @throws PIECE_ORM_ERROR_CANNOT_WRITE
      */
-    function _getMapperSource($mapperID, $mapperClass, $configFile, $cacheDirectory)
+    function _getMapperSource($mapperID, $configFile, $cacheDirectory)
     {
         $cache = &new Cache_Lite_File(array('cacheDir' => "$cacheDirectory/",
                                             'masterFile' => $configFile,
@@ -187,7 +186,7 @@ class Piece_ORM_Mapper_Factory
         }
 
         if (!$mapperSource) {
-            $mapperSource = Piece_ORM_Mapper_Factory::_generateMapperSource($mapperClass, $configFile);
+            $mapperSource = Piece_ORM_Mapper_Factory::_generateMapperSource($mapperID, $configFile);
             $result = $cache->save($mapperSource);
             if (PEAR::isError($result)) {
                 Piece_ORM_Error::push(PIECE_ORM_ERROR_CANNOT_WRITE,
@@ -207,13 +206,13 @@ class Piece_ORM_Mapper_Factory
     /**
      * Generates a mapper source from the given configuration file.
      *
-     * @param string $mapperClass
+     * @param string $mapperID
      * @param string $configFile
      * @return string
      */
-    function &_generateMapperSource($mapperClass, $configFile)
+    function &_generateMapperSource($mapperID, $configFile)
     {
-        $mapperSource = "class $mapperClass extends Piece_ORM_Mapper {}";
+        $mapperSource = 'class ' . Piece_ORM_Mapper_Factory::_getMapperClass($mapperID) . ' extends Piece_ORM_Mapper {}';
         $yaml = Spyc::YAMLLoad($configFile);
 
         return $mapperSource;
@@ -223,13 +222,15 @@ class Piece_ORM_Mapper_Factory
     // {{{ _loaded()
 
     /**
-     * Returns whether the given mapper class has already been loaded or not.
+     * Returns whether the mapper class for a given mapper ID has already
+     * been loaded or not.
      *
-     * @param string $mapperClass
+     * @param string $mapperID
      * @return boolean
      */
-    function _loaded($mapperClass)
+    function _loaded($mapperID)
     {
+        $mapperClass = Piece_ORM_Mapper_Factory::_getMapperClass($mapperID);
         if (version_compare(phpversion(), '5.0.0', '<')) {
             return class_exists($mapperClass);
         } else {
@@ -255,8 +256,7 @@ class Piece_ORM_Mapper_Factory
      */
     function _load($mapperID, $mapperName, $configDirectory, $cacheDirectory)
     {
-        $mapperClass = Piece_ORM_Mapper_Factory::_getMapperClass($mapperID);
-        if (Piece_ORM_Mapper_Factory::_loaded($mapperClass)) {
+        if (Piece_ORM_Mapper_Factory::_loaded($mapperID)) {
             return;
         }
 
@@ -310,14 +310,14 @@ class Piece_ORM_Mapper_Factory
             return;
         }
 
-        $mapperSource = Piece_ORM_Mapper_Factory::_getMapperSource($mapperID, $mapperClass, $configFile, $cacheDirectory);
+        $mapperSource = Piece_ORM_Mapper_Factory::_getMapperSource($mapperID, $configFile, $cacheDirectory);
         if (Piece_ORM_Error::hasErrors('exception')) {
             return;
         }
 
         eval($mapperSource);
 
-        if (!Piece_ORM_Mapper_Factory::_loaded($mapperClass)) {
+        if (!Piece_ORM_Mapper_Factory::_loaded($mapperID)) {
             Piece_ORM_Error::push(PIECE_ORM_ERROR_NOT_FOUND,
                                   "The mapper [ $mapperName ] not found."
                                   );
