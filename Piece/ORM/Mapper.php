@@ -40,6 +40,8 @@
 // {{{ Piece_ORM_Mapper
 
 /**
+ * The base class for mappers.
+ *
  * @package    Piece_ORM
  * @author     KUBO Atsuhiro <iteman@users.sourceforge.net>
  * @copyright  2007 KUBO Atsuhiro <iteman@users.sourceforge.net>
