@@ -114,7 +114,6 @@ class Piece_ORM_Config_Factory
         }
 
         $configFile = "$configDirectory/piece-orm-config.yaml";
-
         if (!file_exists($configFile)) {
             Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
             Piece_ORM_Error::push(PIECE_ORM_ERROR_NOT_FOUND,
