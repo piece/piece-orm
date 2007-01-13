@@ -205,6 +205,7 @@ class Piece_ORM_Context
             return $return;
         }
 
+        $dbh->setFetchMode(MDB2_FETCHMODE_OBJECT);
         return $dbh;
     }
 
