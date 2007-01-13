@@ -37,7 +37,7 @@
  * @since      File available since Release 0.1.0
  */
 
-// {{{ Piece_ORM_Mapper
+// {{{ Piece_ORM_Mapper_Common
 
 /**
  * The base class for mappers.
@@ -50,7 +50,7 @@
  * @link       http://piece-framework.com/piece-orm/
  * @since      Class available since Release 0.1.0
  */
-class Piece_ORM_Mapper
+class Piece_ORM_Mapper_Common
 {
 
     // {{{ properties
