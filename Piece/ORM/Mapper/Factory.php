@@ -108,7 +108,7 @@ class Piece_ORM_Mapper_Factory
     function &factory($mapperName, $configDirectory, $cacheDirectory)
     {
         $context = &Piece_ORM_Context::singleton();
-        $mapperID = sha1($context->getDSN() . ".$mapperName");
+        $mapperID = sha1($context->getDSN() . ".$mapperName.$configDirectory.$cacheDirectory");
         if (!array_key_exists($mapperID, $GLOBALS['PIECE_ORM_Mapper_Instances'])) {
             Piece_ORM_Mapper_Factory::_load($mapperID, $mapperName, $configDirectory, $cacheDirectory);
             if (Piece_ORM_Error::hasErrors('exception')) {
@@ -212,9 +212,19 @@ class Piece_ORM_Mapper_Factory
      */
     function &_generateMapperSource($mapperID, $configFile)
     {
-        $mapperSource = 'class ' . Piece_ORM_Mapper_Factory::_getMapperClass($mapperID) . ' extends Piece_ORM_Mapper_Common {}';
+        $mapperSource = 'class ' . Piece_ORM_Mapper_Factory::_getMapperClass($mapperID) . ' extends Piece_ORM_Mapper_Common
+{';
         $yaml = Spyc::YAMLLoad($configFile);
 
+        $mapperSource .= '
+    function &findById($id)
+    {
+        $object = &$this->_find(__FUNCTION__, $id);
+        return $object;
+    }
+';
+
+        $mapperSource .= '}';
         return $mapperSource;
     }
 

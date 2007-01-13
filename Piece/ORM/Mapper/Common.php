@@ -37,6 +37,8 @@
  * @since      File available since Release 0.1.0
  */
 
+require_once 'Piece/ORM/Context.php';
+
 // {{{ Piece_ORM_Mapper_Common
 
 /**
@@ -59,11 +61,15 @@ class Piece_ORM_Mapper_Common
      * @access public
      */
 
+    var $findbyid = 'SELECT * FROM person WHERE id = 1';
+
     /**#@-*/
 
     /**#@+
      * @access private
      */
+
+    var $_context;
 
     /**#@-*/
 
@@ -71,11 +77,30 @@ class Piece_ORM_Mapper_Common
      * @access public
      */
 
+    function Piece_ORM_Mapper_Common()
+    {
+        $this->_context = &Piece_ORM_Context::singleton();
+    }
+
     /**#@-*/
 
     /**#@+
      * @access private
      */
+
+    function &_find($methodName, $value)
+    {
+        $dbh = &$this->_context->getConnection();
+        if (Piece_ORM_Error::hasErrors('exception')) {
+            $return = null;
+            return $return;
+        }
+
+        $query = strtolower($methodName);
+        $result = $dbh->query($this->$query);
+        $object = &$result->fetchRow();
+        return $object;
+    }
 
     /**#@-*/
 

@@ -34,7 +34,7 @@
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License (revised)
  * @version    SVN: $Id$
  * @link       http://piece-framework.com/piece-orm/
- * @see        Piece_ORM_Mapper_Factory
+ * @see        Piece_ORM_Mapper_Common
  * @since      File available since Release 0.1.0
  */
 
@@ -45,7 +45,7 @@ require_once 'Cache/Lite.php';
 require_once 'Piece/ORM/Context.php';
 require_once 'Piece/ORM/Config.php';
 
-// {{{ Piece_ORM_Mapper_FactoryTestCase
+// {{{ Piece_ORM_Mapper_APITestCase
 
 /**
  * TestCase for Piece_ORM_Mapper_Factory
@@ -56,10 +56,10 @@ require_once 'Piece/ORM/Config.php';
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License (revised)
  * @version    Release: @package_version@
  * @link       http://piece-framework.com/piece-orm/
- * @see        Piece_ORM_Mapper_Factory
+ * @see        Piece_ORM_Mapper_Common
  * @since      Class available since Release 0.1.0
  */
-class Piece_ORM_Mapper_FactoryTestCase extends PHPUnit_TestCase
+class Piece_ORM_Mapper_APITestCase extends PHPUnit_TestCase
 {
 
     // {{{ properties
@@ -87,7 +87,7 @@ class Piece_ORM_Mapper_FactoryTestCase extends PHPUnit_TestCase
         Piece_ORM_Error::pushCallback(create_function('$error', 'var_dump($error); return ' . PEAR_ERRORSTACK_DIE . ';'));
         $this->_cacheDirectory = dirname(__FILE__) . '/' . basename(__FILE__, '.php');
         $config = &new Piece_ORM_Config();
-        $config->addDatabase('piece',
+        $config->addDatabase('person',
                              'pgsql://piece:piece@localhost/piece', 
                              array('debug' => 2, 'result_buffering' => false)
                              );
@@ -108,96 +108,12 @@ class Piece_ORM_Mapper_FactoryTestCase extends PHPUnit_TestCase
         Piece_ORM_Error::popCallback();
     }
 
-    function testConfigurationDirectoryNotSpecified()
-    {
-        Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
-
-        Piece_ORM_Mapper_Factory::factory('Person', null, null);
-
-        $this->assertTrue(Piece_ORM_Error::hasErrors('exception'));
-
-        $error = Piece_ORM_Error::pop();
-
-        $this->assertEquals(PIECE_ORM_ERROR_INVALID_OPERATION, $error['code']);
-
-        Piece_ORM_Error::popCallback();
-    }
-
-    function testConfigurationDirectoryNotFound()
-    {
-        Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
-
-        Piece_ORM_Mapper_Factory::factory('Person', dirname(__FILE__) . '/foo', null);
-
-        $this->assertTrue(Piece_ORM_Error::hasErrors('exception'));
-
-        $error = Piece_ORM_Error::pop();
-
-        $this->assertEquals(PIECE_ORM_ERROR_NOT_FOUND, $error['code']);
-
-        Piece_ORM_Error::popCallback();
-    }
-
-    function testCacheDirectoryNotSpecified()
-    {
-        Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
-
-        Piece_ORM_Mapper_Factory::factory('Person', $this->_cacheDirectory, null);
-
-        $this->assertTrue(Piece_ORM_Error::hasErrors('exception'));
-
-        $error = Piece_ORM_Error::pop();
-
-        $this->assertEquals(PIECE_ORM_ERROR_INVALID_OPERATION, $error['code']);
-
-        Piece_ORM_Error::popCallback();
-    }
-
-    function testCacheDirectoryNotFound()
-    {
-        Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
-
-        Piece_ORM_Mapper_Factory::factory('Person', $this->_cacheDirectory, dirname(__FILE__) . '/foo');
-
-        $this->assertTrue(Piece_ORM_Error::hasErrors('exception'));
-
-        $error = Piece_ORM_Error::pop();
-
-        $this->assertEquals(PIECE_ORM_ERROR_NOT_FOUND, $error['code']);
-
-        Piece_ORM_Error::popCallback();
-    }
-
-    function testConfigurationFileNotFound()
-    {
-        Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
-
-        Piece_ORM_Mapper_Factory::factory('Foo', $this->_cacheDirectory, $this->_cacheDirectory);
-
-        $this->assertTrue(Piece_ORM_Error::hasErrors('exception'));
-
-        $error = Piece_ORM_Error::pop();
-
-        $this->assertEquals(PIECE_ORM_ERROR_NOT_FOUND, $error['code']);
-
-        Piece_ORM_Error::popCallback();
-    }
-
-    function testFactory()
+    function testFindById()
     {
         $mapper = &Piece_ORM_Mapper_Factory::factory('Person', $this->_cacheDirectory, $this->_cacheDirectory);
+        $person = &$mapper->findById(1);
 
-        $this->assertTrue(is_subclass_of($mapper, 'Piece_ORM_Mapper_Common'));
-    }
-
-    function testInstanceCache()
-    {
-        $mapper1 = &Piece_ORM_Mapper_Factory::factory('Person', $this->_cacheDirectory, $this->_cacheDirectory);
-        $mapper1->foo = 'bar';
-        $mapper2 = &Piece_ORM_Mapper_Factory::factory('Person', $this->_cacheDirectory, $this->_cacheDirectory);
-
-        $this->assertTrue(array_key_exists('foo', $mapper2));
-        $this->assertEquals('bar', $mapper2->foo);
+        $this->assertEquals(strtolower('stdClass'), strtolower(get_class($person)));
     }
 
     /**#@-*/
