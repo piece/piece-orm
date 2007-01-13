@@ -187,14 +187,13 @@ class Piece_ORM_Mapper_FactoryTestCase extends PHPUnit_TestCase
     {
         $mapper = &Piece_ORM_Mapper_Factory::factory('Person', $this->_cacheDirectory, $this->_cacheDirectory);
 
-        $this->assertEquals(strtolower(get_parent_class($mapper)), strtolower('Piece_ORM_Mapper'));
+        $this->assertTrue(is_subclass_of($mapper, 'Piece_ORM_Mapper_Common'));
     }
 
     function testInstanceCache()
     {
         $mapper1 = &Piece_ORM_Mapper_Factory::factory('Person', $this->_cacheDirectory, $this->_cacheDirectory);
         $mapper1->foo = 'bar';
-
         $mapper2 = &Piece_ORM_Mapper_Factory::factory('Person', $this->_cacheDirectory, $this->_cacheDirectory);
 
         $this->assertTrue(array_key_exists('foo', $mapper2));

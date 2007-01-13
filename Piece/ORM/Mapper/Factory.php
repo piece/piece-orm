@@ -41,7 +41,7 @@ require_once 'Piece/ORM/Error.php';
 require_once 'PEAR.php';
 require_once 'Cache/Lite/File.php';
 require_once 'Piece/ORM/Context.php';
-require_once 'Piece/ORM/Mapper.php';
+require_once 'Piece/ORM/Mapper/Common.php';
 
 if (version_compare(phpversion(), '5.0.0', '<')) {
     require_once 'spyc.php';
@@ -118,7 +118,7 @@ class Piece_ORM_Mapper_Factory
 
             $mapperClass = Piece_ORM_Mapper_Factory::_getMapperClass($mapperID);
             $mapper = &new $mapperClass();
-            if (!is_subclass_of($mapper, 'Piece_ORM_Mapper')) {
+            if (!is_subclass_of($mapper, 'Piece_ORM_Mapper_Common')) {
                 Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_MAPPER,
                                       "The mapper class for [ $mapperName ] is invalid."
                                       );
@@ -212,7 +212,7 @@ class Piece_ORM_Mapper_Factory
      */
     function &_generateMapperSource($mapperID, $configFile)
     {
-        $mapperSource = 'class ' . Piece_ORM_Mapper_Factory::_getMapperClass($mapperID) . ' extends Piece_ORM_Mapper {}';
+        $mapperSource = 'class ' . Piece_ORM_Mapper_Factory::_getMapperClass($mapperID) . ' extends Piece_ORM_Mapper_Common {}';
         $yaml = Spyc::YAMLLoad($configFile);
 
         return $mapperSource;
