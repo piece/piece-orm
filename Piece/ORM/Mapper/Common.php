@@ -61,8 +61,6 @@ class Piece_ORM_Mapper_Common
      * @access public
      */
 
-    var $findbyid = 'SELECT * FROM person WHERE id = 1';
-
     /**#@-*/
 
     /**#@+
