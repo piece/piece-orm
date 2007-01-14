@@ -44,6 +44,11 @@ require_once 'Cache/Lite.php';
 require_once 'Piece/ORM/Context.php';
 require_once 'PEAR.php';
 
+// {{{ GLOBALS
+
+$GLOBALS['PIECE_ORM_Metadata_Instances'] = array();
+
+// }}}
 // {{{ Piece_ORM_Metadata_Factory
 
 /**
@@ -84,54 +89,76 @@ class Piece_ORM_Metadata_Factory
     /**
      * Creates a Piece_ORM_Metadata object for the given table.
      *
-     * @param string $table
+     * @param string $tableName
      * @param string $cacheDirectory
      * @return Piece_ORM_Metadata
      * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
      * @static
      */
-    function &factory($table, $cacheDirectory = null)
+    function &factory($tableName, $cacheDirectory = null)
     {
-        if (is_null($cacheDirectory)) {
-            $cacheDirectory = './cache';
-        }
+        $context = &Piece_ORM_Context::singleton();
+        $tableID = sha1($context->getDSN() . ".$tableName");
+        if (!array_key_exists($tableID, $GLOBALS['PIECE_ORM_Metadata_Instances'])) {
+            if (is_null($cacheDirectory)) {
+                $cacheDirectory = './cache';
+            }
 
-        if (!file_exists($cacheDirectory)) {
-            Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
-            Piece_ORM_Error::push(PIECE_ORM_ERROR_NOT_FOUND,
-                                  "The cache directory [ $cacheDirectory ] not found.",
-                                  'warning'
-                                  );
-            Piece_ORM_Error::popCallback();
+            if (!file_exists($cacheDirectory)) {
+                Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
+                Piece_ORM_Error::push(PIECE_ORM_ERROR_NOT_FOUND,
+                                      "The cache directory [ $cacheDirectory ] not found.",
+                                      'warning'
+                                      );
+                Piece_ORM_Error::popCallback();
 
-            $metadata = &Piece_ORM_Metadata_Factory::_getMetadataFromDatabase($table);
+                $metadata = &Piece_ORM_Metadata_Factory::_getMetadataFromDatabase($tableName);
+                if (Piece_ORM_Error::hasErrors('exception')) {
+                    $return = null;
+                    return $return;
+                }
+
+                return $metadata;
+            }
+
+            if (!is_readable($cacheDirectory) || !is_writable($cacheDirectory)) {
+                Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
+                Piece_ORM_Error::push(PIECE_ORM_ERROR_NOT_READABLE,
+                                      "The cache directory [ $cacheDirectory ] was not readable or writable.",
+                                      'warning'
+                                      );
+                Piece_ORM_Error::popCallback();
+
+                $metadata = &Piece_ORM_Metadata_Factory::_getMetadataFromDatabase($tableName);
+                if (Piece_ORM_Error::hasErrors('exception')) {
+                    $return = null;
+                    return $return;
+                }
+
+                return $metadata;
+            }
+
+            $metadata = &Piece_ORM_Metadata_Factory::_getMetadata($tableID, $tableName, $cacheDirectory);
             if (Piece_ORM_Error::hasErrors('exception')) {
                 $return = null;
                 return $return;
             }
 
-            return $metadata;
+            $GLOBALS['PIECE_ORM_Metadata_Instances'][$tableID] = &$metadata;
         }
 
-        if (!is_readable($cacheDirectory) || !is_writable($cacheDirectory)) {
-            Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
-            Piece_ORM_Error::push(PIECE_ORM_ERROR_NOT_READABLE,
-                                  "The cache directory [ $cacheDirectory ] was not readable or writable.",
-                                  'warning'
-                                  );
-            Piece_ORM_Error::popCallback();
+        return $GLOBALS['PIECE_ORM_Metadata_Instances'][$tableID];
+    }
 
-            $metadata = &Piece_ORM_Metadata_Factory::_getMetadataFromDatabase($table);
-            if (Piece_ORM_Error::hasErrors('exception')) {
-                $return = null;
-                return $return;
-            }
+    // }}}
+    // {{{ clearInstances()
 
-            return $metadata;
-        }
-
-        $metadata = &Piece_ORM_Metadata_Factory::_getMetadata($table, $cacheDirectory);
-        return $metadata;
+    /**
+     * Clears the Piece_ORM_Metadata instances.
+     */
+    function clearInstances()
+    {
+        $GLOBALS['PIECE_ORM_Metadata_Instances'] = array();
     }
 
     /**#@-*/
@@ -147,12 +174,13 @@ class Piece_ORM_Metadata_Factory
     /**
      * Gets a Piece_ORM_Metadata object from a database or a cache.
      *
-     * @param string $table
+     * @param string $tableID
+     * @param string $tableName
      * @param string $cacheDirectory
      * @return Piece_ORM_Metadata
      * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
      */
-    function &_getMetadata($table, $cacheDirectory)
+    function &_getMetadata($tableID, $tableName, $cacheDirectory)
     {
         $cache = &new Cache_Lite(array('cacheDir' => "$cacheDirectory/",
                                        'automaticSerialization' => true,
@@ -163,8 +191,7 @@ class Piece_ORM_Metadata_Factory
          * The Cache_Lite class always specifies PEAR_ERROR_RETURN when
          * calling PEAR::raiseError in default.
          */
-        $context = &Piece_ORM_Context::singleton();
-        $metadata = $cache->get($context->getDSN() . ".$table");
+        $metadata = $cache->get($tableID);
         if (PEAR::isError($metadata)) {
             Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
             Piece_ORM_Error::push(PIECE_ORM_ERROR_CANNOT_READ,
@@ -173,7 +200,7 @@ class Piece_ORM_Metadata_Factory
                                   );
             Piece_ORM_Error::popCallback();
 
-            $metadata = &Piece_ORM_Metadata_Factory::_getMetadataFromDatabase($table);
+            $metadata = &Piece_ORM_Metadata_Factory::_getMetadataFromDatabase($tableName);
             if (Piece_ORM_Error::hasErrors('exception')) {
                 $return = null;
                 return $return;
@@ -183,7 +210,7 @@ class Piece_ORM_Metadata_Factory
         }
 
         if (!$metadata) {
-            $metadata = &Piece_ORM_Metadata_Factory::_getMetadataFromDatabase($table);
+            $metadata = &Piece_ORM_Metadata_Factory::_getMetadataFromDatabase($tableName);
             if (Piece_ORM_Error::hasErrors('exception')) {
                 $return = null;
                 return $return;
@@ -209,11 +236,11 @@ class Piece_ORM_Metadata_Factory
     /**
      * Gets a Piece_ORM_Metadata object from a database.
      *
-     * @param string $table
+     * @param string $tableName
      * @return Piece_ORM_Metadata
      * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
      */
-    function &_getMetadataFromDatabase($table)
+    function &_getMetadataFromDatabase($tableName)
     {
         $context = &Piece_ORM_Context::singleton();
         $dbh = &$context->getConnection();
@@ -235,7 +262,7 @@ class Piece_ORM_Metadata_Factory
         }
 
         PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
-        $tableInfo = $reverse->tableInfo($table);
+        $tableInfo = $reverse->tableInfo($tableName);
         PEAR::staticPopErrorHandling();
         if (MDB2::isError($tableInfo)) {
             Piece_ORM_Error::pushPEARError($tableInfo,

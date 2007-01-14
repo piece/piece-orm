@@ -97,6 +97,7 @@ class Piece_ORM_Metadata_FactoryTestCase extends PHPUnit_TestCase
 
     function tearDown()
     {
+        Piece_ORM_Metadata_Factory::clearInstances();
         Piece_ORM_Context::clear();
         $cache = &new Cache_Lite(array('cacheDir' => "{$this->_cacheDirectory}/",
                                        'automaticSerialization' => true,
@@ -113,6 +114,16 @@ class Piece_ORM_Metadata_FactoryTestCase extends PHPUnit_TestCase
 
         $this->assertEquals(strtolower('Piece_ORM_Metadata'), strtolower(get_class($metadata)));
         $this->assertEquals('person', $metadata->_table);
+    }
+
+    function testInstanceCache()
+    {
+        $metadata1 = &Piece_ORM_Metadata_Factory::factory('person', $this->_cacheDirectory);
+        $metadata1->foo = 'bar';
+        $metadata2 = &Piece_ORM_Metadata_Factory::factory('person', $this->_cacheDirectory);
+
+        $this->assertTrue(array_key_exists('foo', $metadata2));
+        $this->assertEquals('bar', $metadata2->foo);
     }
 
     /**#@-*/
