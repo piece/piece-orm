@@ -43,10 +43,12 @@ require_once 'Piece/ORM/Error.php';
 require_once 'Cache/Lite.php';
 require_once 'Piece/ORM/Context.php';
 require_once 'PEAR.php';
+require_once 'Piece/ORM/Word.php';
 
 // {{{ GLOBALS
 
 $GLOBALS['PIECE_ORM_Metadata_Instances'] = array();
+$GLOBALS['PIECE_ORM_Metadata_CacheDirectory'] = null;
 
 // }}}
 // {{{ Piece_ORM_Metadata_Factory
@@ -90,16 +92,17 @@ class Piece_ORM_Metadata_Factory
      * Creates a Piece_ORM_Metadata object for the given table.
      *
      * @param string $tableName
-     * @param string $cacheDirectory
      * @return Piece_ORM_Metadata
      * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
      * @static
      */
-    function &factory($tableName, $cacheDirectory = null)
+    function &factory($tableName)
     {
+        $tableName = Piece_ORM_Word::underscore($tableName);
         $context = &Piece_ORM_Context::singleton();
         $tableID = sha1($context->getDSN() . ".$tableName");
         if (!array_key_exists($tableID, $GLOBALS['PIECE_ORM_Metadata_Instances'])) {
+            $cacheDirectory = $GLOBALS['PIECE_ORM_Metadata_CacheDirectory'];
             if (is_null($cacheDirectory)) {
                 $cacheDirectory = './cache';
             }
@@ -159,6 +162,22 @@ class Piece_ORM_Metadata_Factory
     function clearInstances()
     {
         $GLOBALS['PIECE_ORM_Metadata_Instances'] = array();
+    }
+
+    // }}}
+    // {{{ setCacheDirectory()
+
+    /**
+     * Sets a cache directory.
+     *
+     * @param string $directory
+     * @return string
+     */
+    function setCacheDirectory($directory)
+    {
+        $oldDirectory = $GLOBALS['PIECE_ORM_Metadata_CacheDirectory'];
+        $GLOBALS['PIECE_ORM_Metadata_CacheDirectory'] = $directory;
+        return $oldDirectory;
     }
 
     /**#@-*/
