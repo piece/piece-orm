@@ -37,6 +37,9 @@
  * @since      File available since Release 0.1.0
  */
 
+require_once 'Piece/ORM/Metadata/Factory.php';
+require_once 'Piece/ORM/Word.php';
+
 // {{{ Piece_ORM_Mapper_Generator
 
 /**
@@ -69,6 +72,7 @@ class Piece_ORM_Mapper_Generator
     var $_mapperClass;
     var $_mapperName;
     var $_config;
+    var $_mapperSource;
 
     /**#@-*/
 
@@ -99,16 +103,16 @@ class Piece_ORM_Mapper_Generator
      */
     function generate()
     {
-        $mapperSource = '
-    function &findById($id)
-    {
-        $object = &$this->_find(__FUNCTION__, $id);
-        return $object;
-    }
-';
-        $mapperSource = "class {$this->_mapperClass} extends Piece_ORM_Mapper_Common
-{" . "$mapperSource}";
-        return $mapperSource;
+        $metadata = &Piece_ORM_Metadata_Factory::factory($this->_mapperName);
+        foreach ($metadata->getFieldNames() as $fieldName) {
+            $datatype = $metadata->getDatatype($fieldName);
+            if ($datatype == 'integer' || $datatype == 'text') {
+                $this->_addFind($fieldName, 'SELECT * FROM ' . $metadata->getTableName() . " WHERE $fieldName = 1");
+            }
+        }
+
+        return "class {$this->_mapperClass} extends Piece_ORM_Mapper_Common
+{" . $this->_mapperSource . '}';
     }
 
     /**#@-*/
@@ -116,6 +120,31 @@ class Piece_ORM_Mapper_Generator
     /**#@+
      * @access private
      */
+
+    // }}}
+    // {{{ _addFind()
+
+    /**
+     * Adds a findByXXX method and its query to the mapper source.
+     *
+     * @param string $fieldName
+     * @param string $query
+     */
+    function _addFind($fieldName, $query)
+    {
+        $fieldName = Piece_ORM_Word::camelize($fieldName);
+        $methodName = "findBy$fieldName";
+        $propertyName = strtolower($methodName);
+        $arg = strtolower(substr($fieldName, 0, 1)) . substr($fieldName, 1);
+        $this->_mapperSource .= "
+    var \${$propertyName} = '$query';
+    function &$methodName(\${$arg})
+    {
+        \$object = &\$this->_find(__FUNCTION__, \${$arg});
+        return \$object;
+    }
+";
+    }
 
     /**#@-*/
 
