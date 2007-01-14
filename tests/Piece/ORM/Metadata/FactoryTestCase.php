@@ -117,7 +117,7 @@ class Piece_ORM_Metadata_FactoryTestCase extends PHPUnit_TestCase
         $metadata = &Piece_ORM_Metadata_Factory::factory('person');
 
         $this->assertEquals(strtolower('Piece_ORM_Metadata'), strtolower(get_class($metadata)));
-        $this->assertEquals('person', $metadata->_table);
+        $this->assertEquals('person', $metadata->getTableName());
     }
 
     function testInstanceCache()

@@ -63,8 +63,8 @@ class Piece_ORM_Metadata
      * @access private
      */
 
-    var $_table;
-    var $_info = array();
+    var $_tableName;
+    var $_tableInfo = array();
 
     /**#@-*/
 
@@ -82,10 +82,50 @@ class Piece_ORM_Metadata
      */
     function Piece_ORM_Metadata($tableInfo)
     {
-        $this->_table = $tableInfo[0]['table'];
+        $this->_tableName = $tableInfo[0]['table'];
         foreach ($tableInfo as $fieldInfo) {
-            $this->_info[ $fieldInfo['name'] ] = $fieldInfo;
+            $this->_tableInfo[ $fieldInfo['name'] ] = $fieldInfo;
         }
+    }
+
+    // }}}
+    // {{{ getDatatype()
+
+    /**
+     * Gets the datatype for the given field name.
+     *
+     * @param string $fieldName
+     * @return string
+     */
+    function getDatatype($fieldName)
+    {
+        return $this->_tableInfo[ $fieldName ]['mdb2type'];
+    }
+
+    // }}}
+    // {{{ getFieldNames()
+
+    /**
+     * Gets the field names of the table as an array.
+     *
+     * @return array
+     */
+    function getFieldNames()
+    {
+        return array_keys($this->_tableInfo);
+    }
+
+    // }}}
+    // {{{ getTableName()
+
+    /**
+     * Gets the table name.
+     *
+     * @return string
+     */
+    function getTableName()
+    {
+        return $this->_tableName;
     }
 
     /**#@-*/
