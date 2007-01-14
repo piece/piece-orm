@@ -75,6 +75,7 @@ class Piece_ORM_Metadata_FactoryTestCase extends PHPUnit_TestCase
      */
 
     var $_cacheDirectory;
+    var $_oldCacheDirectory;
 
     /**#@-*/
 
@@ -86,6 +87,7 @@ class Piece_ORM_Metadata_FactoryTestCase extends PHPUnit_TestCase
     {
         Piece_ORM_Error::pushCallback(create_function('$error', 'var_dump($error); return ' . PEAR_ERRORSTACK_DIE . ';'));
         $this->_cacheDirectory = dirname(__FILE__) . '/' . basename(__FILE__, '.php');
+
         $config = &new Piece_ORM_Config();
         $config->addDatabase('person',
                              'pgsql://piece:piece@localhost/piece', 
@@ -93,10 +95,12 @@ class Piece_ORM_Metadata_FactoryTestCase extends PHPUnit_TestCase
                              );
         $context = &Piece_ORM_Context::singleton();
         $context->setConfiguration($config);
+        $this->_oldCacheDirectory = Piece_ORM_Metadata_Factory::setCacheDirectory($this->_cacheDirectory);
     }
 
     function tearDown()
     {
+        Piece_ORM_Metadata_Factory::setCacheDirectory($this->_oldCacheDirectory);
         Piece_ORM_Metadata_Factory::clearInstances();
         Piece_ORM_Context::clear();
         $cache = &new Cache_Lite(array('cacheDir' => "{$this->_cacheDirectory}/",
@@ -110,7 +114,7 @@ class Piece_ORM_Metadata_FactoryTestCase extends PHPUnit_TestCase
 
     function testFactory()
     {
-        $metadata = &Piece_ORM_Metadata_Factory::factory('person', $this->_cacheDirectory);
+        $metadata = &Piece_ORM_Metadata_Factory::factory('person');
 
         $this->assertEquals(strtolower('Piece_ORM_Metadata'), strtolower(get_class($metadata)));
         $this->assertEquals('person', $metadata->_table);
@@ -118,9 +122,9 @@ class Piece_ORM_Metadata_FactoryTestCase extends PHPUnit_TestCase
 
     function testInstanceCache()
     {
-        $metadata1 = &Piece_ORM_Metadata_Factory::factory('person', $this->_cacheDirectory);
+        $metadata1 = &Piece_ORM_Metadata_Factory::factory('person');
         $metadata1->foo = 'bar';
-        $metadata2 = &Piece_ORM_Metadata_Factory::factory('person', $this->_cacheDirectory);
+        $metadata2 = &Piece_ORM_Metadata_Factory::factory('person');
 
         $this->assertTrue(array_key_exists('foo', $metadata2));
         $this->assertEquals('bar', $metadata2->foo);
