@@ -77,6 +77,12 @@ class Piece_ORM_Mapper_Common
      * @access public
      */
 
+    // }}}
+    // {{{ constructor
+
+    /**
+     * Sets the Piece_ORM_Context object as a property.
+     */
     function Piece_ORM_Mapper_Common()
     {
         $this->_context = &Piece_ORM_Context::singleton();
@@ -88,6 +94,16 @@ class Piece_ORM_Mapper_Common
      * @access private
      */
 
+    // }}}
+    // {{{ _find()
+
+    /**
+     * Finds an object with an appropriate SQL query.
+     *
+     * @param string $methodName
+     * @param string $value
+     * @return stdClass
+     */
     function &_find($methodName, $value)
     {
         $dbh = &$this->_context->getConnection();
