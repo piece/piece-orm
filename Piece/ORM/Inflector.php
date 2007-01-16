@@ -79,14 +79,14 @@ class Piece_ORM_Inflector
      * Camelizes a word.
      *
      * @param string  $word
-     * @param boolean $uppercaseFirstLetter
+     * @param boolean $lowercaseFirstLetter
      * @return string
      * @link http://www.zend.com/codex.php?id=1564&single=1
      */
-    function camelize($word, $uppercaseFirstLetter = true)
+    function camelize($word, $lowercaseFirstLetter = false)
     {
         $camelizedWord = str_replace(' ', '', ucwords(preg_replace('/[^A-Z^a-z^0-9]+/', ' ', $word)));
-        if ($uppercaseFirstLetter) {
+        if (!$lowercaseFirstLetter) {
             return $camelizedWord;
         } else {
             return strtolower(substr($camelizedWord, 0, 1)) . substr($camelizedWord, 1);
