@@ -107,7 +107,7 @@ class Piece_ORM_Mapper_Generator
         foreach ($metadata->getFieldNames() as $fieldName) {
             $datatype = $metadata->getDatatype($fieldName);
             if ($datatype == 'integer' || $datatype == 'text') {
-                $this->_addFind($fieldName, 'SELECT * FROM ' . $metadata->getTableName() . " WHERE $fieldName = 1");
+                $this->_addFind($fieldName, 'SELECT * FROM ' . $metadata->getTableName() . " WHERE $fieldName = ?");
             }
         }
 
@@ -135,7 +135,7 @@ class Piece_ORM_Mapper_Generator
         $fieldName = Piece_ORM_Word::camelize($fieldName);
         $methodName = "findBy$fieldName";
         $propertyName = strtolower($methodName);
-        $arg = strtolower(substr($fieldName, 0, 1)) . substr($fieldName, 1);
+        $arg = Piece_ORM_Word::camelize($fieldName, false);
         $this->_mapperSource .= "
     var \${$propertyName} = '$query';
     function &$methodName(\${$arg})
