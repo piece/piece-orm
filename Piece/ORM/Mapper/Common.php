@@ -38,6 +38,7 @@
  */
 
 require_once 'Piece/ORM/Context.php';
+require_once 'Piece/ORM/Inflector.php';
 
 // {{{ Piece_ORM_Mapper_Common
 
@@ -110,8 +111,13 @@ class Piece_ORM_Mapper_Common
             return $return;
         }
 
+        $propertyName = Piece_ORM_Inflector::lowercaseFirstLetter(substr($methodName, 6));
+        $criteria = &new stdClass();
+        $criteria->$propertyName = $value;
+        extract((array)$criteria);
         $query = strtolower($methodName);
-        $result = $dbh->query($this->$query);
+        eval("\$query = \"{$this->$query}\";");
+        $result = $dbh->query($query);
         $object = &$result->fetchRow();
         return $object;
     }
