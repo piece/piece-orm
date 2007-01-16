@@ -89,7 +89,7 @@ class Piece_ORM_Inflector
         if (!$lowercaseFirstLetter) {
             return $camelizedWord;
         } else {
-            return strtolower(substr($camelizedWord, 0, 1)) . substr($camelizedWord, 1);
+            return Piece_ORM_Inflector::lowercaseFirstLetter($camelizedWord);
         }
     }
 
@@ -108,6 +108,20 @@ class Piece_ORM_Inflector
         return strtolower(preg_replace('/[^A-Z^a-z^0-9]+/', '_',
                                        preg_replace('/([a-zd])([A-Z])/', '\1_\2',
                                                     preg_replace('/([A-Z]+)([A-Z][a-z])/', '\1_\2', $word))));
+    }
+
+    // }}}
+    // {{{ lowercaseFirstLetter()
+
+    /**
+     * Lowercases the first letter in a word.
+     *
+     * @param string $word
+     * @return string
+     */
+    function lowercaseFirstLetter($word)
+    {
+        return strtolower(substr($word, 0, 1)) . substr($word, 1);
     }
 
     /**#@-*/
