@@ -78,13 +78,19 @@ class Piece_ORM_Word
     /**
      * Camelizes a word.
      *
-     * @param string $word
+     * @param string  $word
+     * @param boolean $uppercaseFirstLetter
      * @return string
      * @link http://www.zend.com/codex.php?id=1564&single=1
      */
-    function camelize($word)
+    function camelize($word, $uppercaseFirstLetter = true)
     {
-        return str_replace(' ', '', ucwords(preg_replace('/[^A-Z^a-z^0-9]+/', ' ', $word)));
+        $camelizedWord = str_replace(' ', '', ucwords(preg_replace('/[^A-Z^a-z^0-9]+/', ' ', $word)));
+        if ($uppercaseFirstLetter) {
+            return $camelizedWord;
+        } else {
+            return strtolower(substr($camelizedWord, 0, 1)) . substr($camelizedWord, 1);
+        }
     }
 
     // }}}
