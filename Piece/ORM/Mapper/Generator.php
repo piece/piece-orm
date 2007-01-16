@@ -38,7 +38,7 @@
  */
 
 require_once 'Piece/ORM/Metadata/Factory.php';
-require_once 'Piece/ORM/Word.php';
+require_once 'Piece/ORM/Inflector.php';
 
 // {{{ Piece_ORM_Mapper_Generator
 
@@ -132,10 +132,10 @@ class Piece_ORM_Mapper_Generator
      */
     function _addFind($fieldName, $query)
     {
-        $fieldName = Piece_ORM_Word::camelize($fieldName);
+        $fieldName = Piece_ORM_Inflector::camelize($fieldName);
         $methodName = "findBy$fieldName";
         $propertyName = strtolower($methodName);
-        $arg = Piece_ORM_Word::camelize($fieldName, false);
+        $arg = Piece_ORM_Inflector::camelize($fieldName, false);
         $this->_mapperSource .= "
     var \${$propertyName} = '$query';
     function &$methodName(\${$arg})

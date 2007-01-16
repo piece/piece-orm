@@ -37,7 +37,7 @@
  * @since      File available since Release 0.1.0
  */
 
-// {{{ Piece_ORM_Word
+// {{{ Piece_ORM_Inflector
 
 /**
  * A utility class for words operation.
@@ -50,7 +50,7 @@
  * @link       http://piece-framework.com/piece-orm/
  * @since      Class available since Release 0.1.0
  */
-class Piece_ORM_Word
+class Piece_ORM_Inflector
 {
 
     // {{{ properties

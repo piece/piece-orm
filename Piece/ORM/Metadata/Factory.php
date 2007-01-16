@@ -43,7 +43,7 @@ require_once 'Piece/ORM/Error.php';
 require_once 'Cache/Lite.php';
 require_once 'Piece/ORM/Context.php';
 require_once 'PEAR.php';
-require_once 'Piece/ORM/Word.php';
+require_once 'Piece/ORM/Inflector.php';
 
 // {{{ GLOBALS
 
@@ -98,7 +98,7 @@ class Piece_ORM_Metadata_Factory
      */
     function &factory($tableName)
     {
-        $tableName = Piece_ORM_Word::underscore($tableName);
+        $tableName = Piece_ORM_Inflector::underscore($tableName);
         $context = &Piece_ORM_Context::singleton();
         $tableID = sha1($context->getDSN() . ".$tableName");
         if (!array_key_exists($tableID, $GLOBALS['PIECE_ORM_Metadata_Instances'])) {
