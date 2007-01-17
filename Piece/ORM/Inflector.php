@@ -148,4 +148,3 @@ class Piece_ORM_Inflector
  * End:
  */
 ?>
-
