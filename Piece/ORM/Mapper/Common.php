@@ -86,10 +86,11 @@ class Piece_ORM_Mapper_Common
      *
      * @param Piece_ORM_Context  &$context
      * @param Piece_ORM_Metadata &$metadata
+     * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
      */
     function Piece_ORM_Mapper_Common(&$context, &$metadata)
     {
-        $this->_context  = &$context;
+        $this->_context = &$context;
         $this->_metadata = &$metadata;
         $this->_dbh = &$this->_context->getConnection();
     }
@@ -126,8 +127,9 @@ class Piece_ORM_Mapper_Common
         $criteria->$propertyName = $value;
 
         $query = $this->_buildQuery($methodName, $criteria);
-        $result = $this->_dbh->query($query);
-        $object = &$result->fetchRow();
+        $result = &$this->_dbh->query($query);
+        $row = &$result->fetchRow();
+        $object = &$this->_load($row);
         return $object;
     }
 
@@ -151,6 +153,30 @@ class Piece_ORM_Mapper_Common
         $query = strtolower($methodName);
         eval("\$query = \"{$this->$query}\";");
         return $query;
+    }
+
+    // }}}
+    // {{{ _load()
+
+    /**
+     * Loads an object with a row.
+     *
+     * @param array $row
+     * @return stdClass
+     */
+    function &_load($row)
+    {
+        if (is_null($row)) {
+            return $row;
+        }
+
+        $object = &new stdClass();
+        foreach ($row as $key => $value) {
+            $propertyName = Piece_ORM_Inflector::camelize($key, true);
+            $object->$propertyName = $value;
+        }
+
+        return $object;
     }
 
     /**#@-*/
