@@ -37,7 +37,6 @@
  * @since      File available since Release 0.1.0
  */
 
-require_once 'Piece/ORM/Context.php';
 require_once 'Piece/ORM/Inflector.php';
 
 // {{{ Piece_ORM_Mapper_Common
@@ -69,6 +68,7 @@ class Piece_ORM_Mapper_Common
      */
 
     var $_context;
+    var $_metadata;
 
     /**#@-*/
 
@@ -80,11 +80,16 @@ class Piece_ORM_Mapper_Common
     // {{{ constructor
 
     /**
-     * Sets the Piece_ORM_Context object as a property.
+     * Sets the Piece_ORM_Context object and a Piece_ORM_Metadata object as
+     * property.
+     *
+     * @param Piece_ORM_Context  &$context
+     * @param Piece_ORM_Metadata &$metadata
      */
-    function Piece_ORM_Mapper_Common()
+    function Piece_ORM_Mapper_Common(&$context, &$metadata)
     {
-        $this->_context = &Piece_ORM_Context::singleton();
+        $this->_context  = &$context;
+        $this->_metadata = &$metadata;
     }
 
     /**#@-*/

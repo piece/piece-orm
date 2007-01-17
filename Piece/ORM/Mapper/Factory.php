@@ -43,6 +43,7 @@ require_once 'Cache/Lite/File.php';
 require_once 'Piece/ORM/Context.php';
 require_once 'Piece/ORM/Mapper/Common.php';
 require_once 'Piece/ORM/Mapper/Generator.php';
+require_once 'Piece/ORM/Metadata/Factory.php';
 
 if (version_compare(phpversion(), '5.0.0', '<')) {
     require_once 'spyc.php';
@@ -106,6 +107,7 @@ class Piece_ORM_Mapper_Factory
      * @throws PIECE_ORM_ERROR_CANNOT_READ
      * @throws PIECE_ORM_ERROR_CANNOT_WRITE
      * @throws PIECE_ORM_ERROR_INVALID_MAPPER
+     * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
      */
     function &factory($mapperName, $configDirectory, $cacheDirectory)
     {
@@ -118,8 +120,14 @@ class Piece_ORM_Mapper_Factory
                 return $return;
             }
 
+            $metadata = &Piece_ORM_Metadata_Factory::factory($mapperName);
+            if (Piece_ORM_Error::hasErrors('exception')) {
+                $return = null;
+                return $return;
+            }
+
             $mapperClass = Piece_ORM_Mapper_Factory::_getMapperClass($mapperID);
-            $mapper = &new $mapperClass();
+            $mapper = &new $mapperClass($context, $metadata);
             if (!is_subclass_of($mapper, 'Piece_ORM_Mapper_Common')) {
                 Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_MAPPER,
                                       "The mapper class for [ $mapperName ] is invalid."
@@ -166,6 +174,7 @@ class Piece_ORM_Mapper_Factory
      * @return string
      * @throws PIECE_ORM_ERROR_CANNOT_READ
      * @throws PIECE_ORM_ERROR_CANNOT_WRITE
+     * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
      */
     function _getMapperSource($mapperID, $mapperName, $configFile, $cacheDirectory)
     {
@@ -190,6 +199,11 @@ class Piece_ORM_Mapper_Factory
 
         if (!$mapperSource) {
             $mapperSource = Piece_ORM_Mapper_Factory::_generateMapperSource($mapperID, $mapperName, $configFile);
+            if (Piece_ORM_Error::hasErrors('exception')) {
+                $return = null;
+                return $return;
+            }
+
             $result = $cache->save($mapperSource);
             if (PEAR::isError($result)) {
                 Piece_ORM_Error::push(PIECE_ORM_ERROR_CANNOT_WRITE,
@@ -213,10 +227,17 @@ class Piece_ORM_Mapper_Factory
      * @param string $mapperName
      * @param string $configFile
      * @return string
+     * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
      */
     function _generateMapperSource($mapperID, $mapperName, $configFile)
     {
-        $generator = &new Piece_ORM_Mapper_Generator(Piece_ORM_Mapper_Factory::_getMapperClass($mapperID), $mapperName, Spyc::YAMLLoad($configFile));
+        $metadata = &Piece_ORM_Metadata_Factory::factory($mapperName);
+        if (Piece_ORM_Error::hasErrors('exception')) {
+            $return = null;
+            return $return;
+        }
+
+        $generator = &new Piece_ORM_Mapper_Generator(Piece_ORM_Mapper_Factory::_getMapperClass($mapperID), $mapperName, Spyc::YAMLLoad($configFile), $metadata);
         return $generator->generate();
     }
 
@@ -255,6 +276,7 @@ class Piece_ORM_Mapper_Factory
      * @throws PIECE_ORM_ERROR_NOT_READABLE
      * @throws PIECE_ORM_ERROR_CANNOT_READ
      * @throws PIECE_ORM_ERROR_CANNOT_WRITE
+     * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
      */
     function _load($mapperID, $mapperName, $configDirectory, $cacheDirectory)
     {

@@ -37,7 +37,6 @@
  * @since      File available since Release 0.1.0
  */
 
-require_once 'Piece/ORM/Metadata/Factory.php';
 require_once 'Piece/ORM/Inflector.php';
 
 // {{{ Piece_ORM_Mapper_Generator
@@ -73,6 +72,7 @@ class Piece_ORM_Mapper_Generator
     var $_mapperName;
     var $_config;
     var $_mapperSource;
+    var $_metadata;
 
     /**#@-*/
 
@@ -85,12 +85,18 @@ class Piece_ORM_Mapper_Generator
 
     /**
      * Initializes the properties with the arguments.
+     *
+     * @param string             $mapperClass
+     * @param string             $mapperName
+     * @param array              $config
+     * @param Piece_ORM_Metadata &$metadata
      */
-    function Piece_ORM_Mapper_Generator($mapperClass, $mapperName, $config)
+    function Piece_ORM_Mapper_Generator($mapperClass, $mapperName, $config, &$metadata)
     {
         $this->_mapperClass = $mapperClass;
         $this->_mapperName  = $mapperName;
         $this->_config      = $config;
+        $this->_metadata    = &$metadata;
     }
 
     // }}}
@@ -103,12 +109,11 @@ class Piece_ORM_Mapper_Generator
      */
     function generate()
     {
-        $metadata = &Piece_ORM_Metadata_Factory::factory($this->_mapperName);
-        foreach ($metadata->getFieldNames() as $fieldName) {
-            $datatype = $metadata->getDatatype($fieldName);
+        foreach ($this->_metadata->getFieldNames() as $fieldName) {
+            $datatype = $this->_metadata->getDatatype($fieldName);
             if ($datatype == 'integer' || $datatype == 'text') {
                 
-                $this->_addFind($fieldName, 'SELECT * FROM ' . $metadata->getTableName() . " WHERE $fieldName = \$" . Piece_ORM_Inflector::camelize($fieldName, true));
+                $this->_addFind($fieldName, 'SELECT * FROM ' . $this->_metadata->getTableName() . " WHERE $fieldName = \$" . Piece_ORM_Inflector::camelize($fieldName, true));
             }
         }
 
