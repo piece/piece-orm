@@ -51,6 +51,7 @@ define('PIECE_ORM_ERROR_CANNOT_READ',       -4);
 define('PIECE_ORM_ERROR_CANNOT_WRITE',      -5);
 define('PIECE_ORM_ERROR_INVALID_OPERATION', -6);
 define('PIECE_ORM_ERROR_INVALID_MAPPER',    -7);
+define('PIECE_ORM_ERROR_UNEXPECTED_VALUE',  -8);
 
 // }}}
 // {{{ Piece_ORM_Error
