@@ -111,12 +111,46 @@ class Piece_ORM_Mapper_APITestCase extends PHPUnit_TestCase
         Piece_ORM_Error::popCallback();
     }
 
-    function testFindById()
+    function testFind()
     {
         $mapper = &Piece_ORM_Mapper_Factory::factory('Person', $this->_cacheDirectory, $this->_cacheDirectory);
         $person = &$mapper->findById(1);
 
         $this->assertEquals(strtolower('stdClass'), strtolower(get_class($person)));
+        $this->assertTrue(array_key_exists('id', $person));
+        $this->assertTrue(array_key_exists('firstName', $person));
+        $this->assertTrue(array_key_exists('lastName', $person));
+        $this->assertTrue(array_key_exists('version', $person));
+        $this->assertTrue(array_key_exists('rdate', $person));
+        $this->assertTrue(array_key_exists('mdate', $person));
+    }
+
+    function testFindWithNull()
+    {
+        Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
+
+        $mapper = &Piece_ORM_Mapper_Factory::factory('Person', $this->_cacheDirectory, $this->_cacheDirectory);
+        $person = &$mapper->findById(null);
+
+        $this->assertTrue(Piece_ORM_Error::hasErrors('exception'));
+
+        $error = Piece_ORM_Error::pop();
+
+        $this->assertEquals(PIECE_ORM_ERROR_UNEXPECTED_VALUE, $error['code']);
+
+        Piece_ORM_Error::popCallback();
+    }
+
+    function testGeneratedMethods()
+    {
+        $mapper = &Piece_ORM_Mapper_Factory::factory('Person', $this->_cacheDirectory, $this->_cacheDirectory);
+
+        $this->assertTrue(method_exists($mapper, 'findById'));
+        $this->assertTrue(method_exists($mapper, 'findByFirstName'));
+        $this->assertTrue(method_exists($mapper, 'findByLastName'));
+        $this->assertTrue(method_exists($mapper, 'findByVersion'));
+        $this->assertFalse(method_exists($mapper, 'findByRdate'));
+        $this->assertFalse(method_exists($mapper, 'findByMdate'));
     }
 
     /**#@-*/
