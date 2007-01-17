@@ -69,6 +69,7 @@ class Piece_ORM_Mapper_Common
 
     var $_context;
     var $_metadata;
+    var $_dbh;
 
     /**#@-*/
 
@@ -90,6 +91,7 @@ class Piece_ORM_Mapper_Common
     {
         $this->_context  = &$context;
         $this->_metadata = &$metadata;
+        $this->_dbh = &$this->_context->getConnection();
     }
 
     /**#@-*/
@@ -107,11 +109,14 @@ class Piece_ORM_Mapper_Common
      * @param string $methodName
      * @param string $value
      * @return stdClass
+     * @throws PIECE_ORM_ERROR_UNEXPECTED_VALUE
      */
     function &_find($methodName, $value)
     {
-        $dbh = &$this->_context->getConnection();
-        if (Piece_ORM_Error::hasErrors('exception')) {
+        if (is_null($value)) {
+            Piece_ORM_Error::push(PIECE_ORM_ERROR_UNEXPECTED_VALUE,
+                                  "An unexpected value detected. $methodName() cannot receive null."
+                                  );
             $return = null;
             return $return;
         }
@@ -119,12 +124,33 @@ class Piece_ORM_Mapper_Common
         $propertyName = Piece_ORM_Inflector::lowercaseFirstLetter(substr($methodName, 6));
         $criteria = &new stdClass();
         $criteria->$propertyName = $value;
+
+        $query = $this->_buildQuery($methodName, $criteria);
+        $result = $this->_dbh->query($query);
+        $object = &$result->fetchRow();
+        return $object;
+    }
+
+    // }}}
+    // {{{ _buildQuery()
+
+    /**
+     * Builds a query based on a query source and criteria.
+     *
+     * @param string   $methodName
+     * @param stdClass $criteria
+     * @return string
+     */
+    function _buildQuery($methodName, $criteria)
+    {
+        foreach ($criteria as $key => $value) {
+            $criteria->$key = $this->_dbh->quote($value, $this->_metadata->getDatatype(Piece_ORM_Inflector::underscore($key)));
+        }
+
         extract((array)$criteria);
         $query = strtolower($methodName);
         eval("\$query = \"{$this->$query}\";");
-        $result = $dbh->query($query);
-        $object = &$result->fetchRow();
-        return $object;
+        return $query;
     }
 
     /**#@-*/
