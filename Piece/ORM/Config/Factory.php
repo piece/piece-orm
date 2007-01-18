@@ -241,8 +241,8 @@ class Piece_ORM_Config_Factory
     {
         $config = &new Piece_ORM_Config();
         $yaml = Spyc::YAMLLoad($file);
-        foreach ($yaml as $database) {
-            $config->addDatabase($database['name'], $database['dsn'], $database['options']);
+        foreach ($yaml as $configuration) {
+            $config->addConfiguration($configuration['name'], $configuration['dsn'], $configuration['options']);
         }
 
         return $config;
