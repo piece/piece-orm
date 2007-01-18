@@ -38,6 +38,9 @@
  */
 
 require_once 'Piece/ORM/Config/Factory.php';
+require_once 'Piece/ORM/Mapper/Factory.php';
+require_once 'Piece/ORM/Metadata/Factory.php';
+require_once 'Piece/ORM/Context.php';
 
 // {{{ Piece_ORM
 
@@ -113,6 +116,32 @@ class Piece_ORM
 
         $context = &Piece_ORM_Context::singleton();
         $context->setConfiguration($config);
+
+        Piece_ORM_Mapper_Factory::setConfigDirectory($mapperConfigDirectory);
+        Piece_ORM_Mapper_Factory::setCacheDirectory($mapperCacheDirectory);
+        Piece_ORM_Metadata_Factory::setCacheDirectory($metadataCacheDirectory);
+    }
+
+    // }}}
+    // {{{ getMapper()
+
+    /**
+     * Gets a mapper object for a given mapper name.
+     *
+     * @param string $mapperName
+     * @return mixed
+     * @throws PIECE_ORM_ERROR_INVALID_OPERATION
+     * @throws PIECE_ORM_ERROR_NOT_FOUND
+     * @throws PIECE_ORM_ERROR_NOT_READABLE
+     * @throws PIECE_ORM_ERROR_CANNOT_READ
+     * @throws PIECE_ORM_ERROR_CANNOT_WRITE
+     * @throws PIECE_ORM_ERROR_INVALID_MAPPER
+     * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
+     */
+    function &getMapper($mapperName)
+    {
+        $mapper = &Piece_ORM_Mapper_Factory::factory($mapperName);
+        return $mapper;
     }
 
     /**#@-*/
