@@ -76,6 +76,7 @@ class Piece_ORM_Mapper_APITestCase extends PHPUnit_TestCase
 
     var $_cacheDirectory;
     var $_oldCacheDirectory;
+    var $_oldMetadataCacheDirectory;
 
     /**#@-*/
 
@@ -96,12 +97,12 @@ class Piece_ORM_Mapper_APITestCase extends PHPUnit_TestCase
         $context->setConfiguration($config);
         $this->_oldCacheDirectory = Piece_ORM_Mapper_Factory::setConfigDirectory($this->_cacheDirectory);
         Piece_ORM_Mapper_Factory::setCacheDirectory($this->_cacheDirectory);
-        Piece_ORM_Metadata_Factory::setCacheDirectory($this->_cacheDirectory);
+        $this->_oldMetadataCacheDirectory = Piece_ORM_Metadata_Factory::setCacheDirectory($this->_cacheDirectory);
     }
 
     function tearDown()
     {
-        Piece_ORM_Metadata_Factory::setCacheDirectory($this->_oldCacheDirectory);
+        Piece_ORM_Metadata_Factory::setCacheDirectory($this->_oldMetadataCacheDirectory);
         Piece_ORM_Metadata_Factory::clearInstances();
         Piece_ORM_Mapper_Factory::setCacheDirectory($this->_oldCacheDirectory);
         Piece_ORM_Mapper_Factory::setConfigDirectory($this->_oldCacheDirectory);
