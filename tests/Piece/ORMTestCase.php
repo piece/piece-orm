@@ -83,8 +83,6 @@ class Piece_ORMTestCase extends PHPUnit_TestCase
      */
 
     var $_cacheDirectory;
-    var $_oldCacheDirectory;
-    var $_oldMetadataCacheDirectory;
 
     /**#@-*/
 
@@ -96,17 +94,11 @@ class Piece_ORMTestCase extends PHPUnit_TestCase
     {
         Piece_ORM_Error::pushCallback(create_function('$error', 'var_dump($error); return ' . PEAR_ERRORSTACK_DIE . ';'));
         $this->_cacheDirectory = dirname(__FILE__) . '/' . basename(__FILE__, '.php');
-        $this->_oldCacheDirectory = Piece_ORM_Mapper_Factory::setConfigDirectory($this->_cacheDirectory);
-        Piece_ORM_Mapper_Factory::setCacheDirectory($this->_cacheDirectory);
-        $this->_oldMetadataCacheDirectory = Piece_ORM_Metadata_Factory::setCacheDirectory($this->_cacheDirectory);
     }
 
     function tearDown()
     {
-        Piece_ORM_Metadata_Factory::setCacheDirectory($this->_oldMetadataCacheDirectory);
         Piece_ORM_Metadata_Factory::clearInstances();
-        Piece_ORM_Mapper_Factory::setCacheDirectory($this->_oldCacheDirectory);
-        Piece_ORM_Mapper_Factory::setConfigDirectory($this->_oldCacheDirectory);
         Piece_ORM_Mapper_Factory::clearInstances();
         Piece_ORM_Context::clear();
         $cache = &new Cache_Lite(array('cacheDir' => "{$this->_cacheDirectory}/",
@@ -138,6 +130,10 @@ class Piece_ORMTestCase extends PHPUnit_TestCase
             $this->assertEquals($configuration['dsn'], $config->getDSN($configuration['name']));
             $this->assertEquals($configuration['options'], $config->getOptions($configuration['name']));
         }
+
+        $this->assertEquals($this->_cacheDirectory, Piece_ORM_Mapper_Factory::setConfigDirectory('./foo'));
+        $this->assertEquals($this->_cacheDirectory, Piece_ORM_Mapper_Factory::setCacheDirectory('./bar'));
+        $this->assertEquals($this->_cacheDirectory, Piece_ORM_Metadata_Factory::setCacheDirectory('./baz'));
     }
 
     function testDynamicConfiguration()
@@ -177,6 +173,20 @@ class Piece_ORMTestCase extends PHPUnit_TestCase
         $this->assertEquals($yaml[1]['options'], $config->getOptions('database2'));
         $this->assertEquals('pgsql://piece:piece@localhost/piece', $config->getDSN('piece'));
         $this->assertEquals(array('debug' => 0, 'result_buffering' => false), $config->getOptions('piece'));
+    }
+
+    function testGetMapper()
+    {
+        Piece_ORM::configure($this->_cacheDirectory,
+                             $this->_cacheDirectory,
+                             null,
+                             $this->_cacheDirectory,
+                             $this->_cacheDirectory,
+                             $this->_cacheDirectory
+                             );
+        $mapper = &Piece_ORM::getMapper('person');
+
+        $this->assertTrue(is_subclass_of($mapper, 'Piece_ORM_Mapper_Common'));
     }
 
     /**#@-*/
