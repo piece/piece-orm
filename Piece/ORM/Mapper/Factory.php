@@ -97,7 +97,7 @@ class Piece_ORM_Mapper_Factory
     // {{{ factory()
 
     /**
-     * Creates a mapper object based on the given information.
+     * Creates a mapper object for a given mapper name.
      *
      * @param string $mapperName
      * @return mixed
