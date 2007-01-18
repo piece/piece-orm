@@ -86,22 +86,22 @@ class Piece_ORM_ConfigTestCase extends PHPUnit_TestCase
     function testConfigurationNotFound()
     {
         $config = &new Piece_ORM_Config();
-        $config->addDatabase('foo', 'bar');
+        $config->addConfiguration('foo', 'bar');
 
         $this->assertNull($config->getDSN('baz'));
     }
 
-    function testDefaultDatabase()
+    function testDefaultConfiguration()
     {
         $config = &new Piece_ORM_Config();
-        $config->addDatabase('foo', 'bar');
-        $config->addDatabase('baz', 'qux');
+        $config->addConfiguration('foo', 'bar');
+        $config->addConfiguration('baz', 'qux');
 
         $this->assertEquals('bar', $config->getDSN());
 
         $config = &new Piece_ORM_Config();
-        $config->addDatabase('baz', 'qux');
-        $config->addDatabase('foo', 'bar');
+        $config->addConfiguration('baz', 'qux');
+        $config->addConfiguration('foo', 'bar');
 
         $this->assertEquals('qux', $config->getDSN());
     }
