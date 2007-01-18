@@ -48,7 +48,7 @@ require_once 'Piece/ORM/Inflector.php';
 // {{{ GLOBALS
 
 $GLOBALS['PIECE_ORM_Metadata_Instances'] = array();
-$GLOBALS['PIECE_ORM_Metadata_CacheDirectory'] = null;
+$GLOBALS['PIECE_ORM_Metadata_CacheDirectory'] = './cache';
 
 // }}}
 // {{{ Piece_ORM_Metadata_Factory
@@ -102,15 +102,10 @@ class Piece_ORM_Metadata_Factory
         $context = &Piece_ORM_Context::singleton();
         $tableID = sha1($context->getDSN() . ".$tableName");
         if (!array_key_exists($tableID, $GLOBALS['PIECE_ORM_Metadata_Instances'])) {
-            $cacheDirectory = $GLOBALS['PIECE_ORM_Metadata_CacheDirectory'];
-            if (is_null($cacheDirectory)) {
-                $cacheDirectory = './cache';
-            }
-
-            if (!file_exists($cacheDirectory)) {
+            if (!file_exists($GLOBALS['PIECE_ORM_Metadata_CacheDirectory'])) {
                 Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
                 Piece_ORM_Error::push(PIECE_ORM_ERROR_NOT_FOUND,
-                                      "The cache directory [ $cacheDirectory ] not found.",
+                                      "The cache directory [ {$GLOBALS['PIECE_ORM_Metadata_CacheDirectory']} ] not found.",
                                       'warning'
                                       );
                 Piece_ORM_Error::popCallback();
@@ -124,10 +119,10 @@ class Piece_ORM_Metadata_Factory
                 return $metadata;
             }
 
-            if (!is_readable($cacheDirectory) || !is_writable($cacheDirectory)) {
+            if (!is_readable($GLOBALS['PIECE_ORM_Metadata_CacheDirectory']) || !is_writable($GLOBALS['PIECE_ORM_Metadata_CacheDirectory'])) {
                 Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
                 Piece_ORM_Error::push(PIECE_ORM_ERROR_NOT_READABLE,
-                                      "The cache directory [ $cacheDirectory ] was not readable or writable.",
+                                      "The cache directory [ {$GLOBALS['PIECE_ORM_Metadata_CacheDirectory']} ] was not readable or writable.",
                                       'warning'
                                       );
                 Piece_ORM_Error::popCallback();
@@ -141,7 +136,7 @@ class Piece_ORM_Metadata_Factory
                 return $metadata;
             }
 
-            $metadata = &Piece_ORM_Metadata_Factory::_getMetadata($tableID, $tableName, $cacheDirectory);
+            $metadata = &Piece_ORM_Metadata_Factory::_getMetadata($tableID, $tableName);
             if (Piece_ORM_Error::hasErrors('exception')) {
                 $return = null;
                 return $return;
@@ -173,11 +168,11 @@ class Piece_ORM_Metadata_Factory
      * @param string $directory
      * @return string
      */
-    function setCacheDirectory($directory)
+    function setCacheDirectory($cacheDirectory)
     {
-        $oldDirectory = $GLOBALS['PIECE_ORM_Metadata_CacheDirectory'];
-        $GLOBALS['PIECE_ORM_Metadata_CacheDirectory'] = $directory;
-        return $oldDirectory;
+        $oldCacheDirectory = $GLOBALS['PIECE_ORM_Metadata_CacheDirectory'];
+        $GLOBALS['PIECE_ORM_Metadata_CacheDirectory'] = $cacheDirectory;
+        return $oldCacheDirectory;
     }
 
     /**#@-*/
@@ -195,13 +190,12 @@ class Piece_ORM_Metadata_Factory
      *
      * @param string $tableID
      * @param string $tableName
-     * @param string $cacheDirectory
      * @return Piece_ORM_Metadata
      * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
      */
-    function &_getMetadata($tableID, $tableName, $cacheDirectory)
+    function &_getMetadata($tableID, $tableName)
     {
-        $cache = &new Cache_Lite(array('cacheDir' => "$cacheDirectory/",
+        $cache = &new Cache_Lite(array('cacheDir' => "{$GLOBALS['PIECE_ORM_Metadata_CacheDirectory']}/",
                                        'automaticSerialization' => true,
                                        'errorHandlingAPIBreak' => true)
                                  );
@@ -214,7 +208,7 @@ class Piece_ORM_Metadata_Factory
         if (PEAR::isError($metadata)) {
             Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
             Piece_ORM_Error::push(PIECE_ORM_ERROR_CANNOT_READ,
-                                  "Cannot read the cache file in the directory [ $cacheDirectory ].",
+                                  "Cannot read the cache file in the directory [ {$GLOBALS['PIECE_ORM_Metadata_CacheDirectory']} ].",
                                   'warning'
                                   );
             Piece_ORM_Error::popCallback();
@@ -239,7 +233,7 @@ class Piece_ORM_Metadata_Factory
             if (PEAR::isError($result)) {
                 Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
                 Piece_ORM_Error::push(PIECE_ORM_ERROR_CANNOT_WRITE,
-                                      "Cannot write the Piece_ORM_Metadata object to the cache file in the directory [ $cacheDirectory ].",
+                                      "Cannot write the Piece_ORM_Metadata object to the cache file in the directory [ {$GLOBALS['PIECE_ORM_Metadata_CacheDirectory']} ].",
                                       'warning'
                                       );
                 Piece_ORM_Error::popCallback();
