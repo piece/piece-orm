@@ -151,9 +151,9 @@ class Piece_ORM_Config_FactoryTestCase extends PHPUnit_TestCase
 
         $this->assertTrue(count($yaml));
 
-        foreach ($yaml as $database) {
-            $this->assertEquals($database['dsn'], $config->getDSN($database['name']));
-            $this->assertEquals($database['options'], $config->getOptions($database['name']));
+        foreach ($yaml as $configuration) {
+            $this->assertEquals($configuration['dsn'], $config->getDSN($configuration['name']));
+            $this->assertEquals($configuration['options'], $config->getOptions($configuration['name']));
         }
     }
 

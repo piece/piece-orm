@@ -89,10 +89,10 @@ class Piece_ORM_Mapper_FactoryTestCase extends PHPUnit_TestCase
         Piece_ORM_Error::pushCallback(create_function('$error', 'var_dump($error); return ' . PEAR_ERRORSTACK_DIE . ';'));
         $this->_cacheDirectory = dirname(__FILE__) . '/' . basename(__FILE__, '.php');
         $config = &new Piece_ORM_Config();
-        $config->addDatabase('piece',
-                             'pgsql://piece:piece@localhost/piece', 
-                             array('debug' => 2, 'result_buffering' => false)
-                             );
+        $config->addConfiguration('piece',
+                                  'pgsql://piece:piece@localhost/piece', 
+                                  array('debug' => 2, 'result_buffering' => false)
+                                  );
         $context = &Piece_ORM_Context::singleton();
         $context->setConfiguration($config);
         $this->_oldCacheDirectory = Piece_ORM_Mapper_Factory::setConfigDirectory($this->_cacheDirectory);
