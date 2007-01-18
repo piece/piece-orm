@@ -65,7 +65,7 @@ class Piece_ORM_Config
      * @access private
      */
 
-    var $_databases = array();
+    var $_configurations = array();
 
     /**#@-*/
 
@@ -77,69 +77,110 @@ class Piece_ORM_Config
     // {{{ getDSN()
 
     /**
-     * Gets the DSN for the given name.
+     * Gets the DSN for the given configuration name.
      *
-     * @param string $name
+     * @param string $configurationName
      * @return string
      */
-    function getDSN($name = null)
+    function getDSN($configurationName = null)
     {
-        if (!count($this->_databases)) {
+        if (!count($this->_configurations)) {
             return;
         }
 
-        if (is_null($name)) {
-            $name = key($this->_databases);
+        if (is_null($configurationName)) {
+            $configurationName = key($this->_configurations);
         }
 
-        if (!array_key_exists($name, $this->_databases)) {
+        if (!array_key_exists($configurationName, $this->_configurations)) {
             return;
         }
 
-        return $this->_databases[$name]['dsn'];
+        return $this->_configurations[$configurationName]['dsn'];
     }
 
     // }}}
     // {{{ getOptions()
 
     /**
-     * Gets the options for the given name.
+     * Gets the options for the given configuration name.
      *
-     * @param string $name
+     * @param string $configurationName
      * @return array
      */
-    function getOptions($name = null)
+    function getOptions($configurationName = null)
     {
-        if (!count($this->_databases)) {
+        if (!count($this->_configurations)) {
             return;
         }
 
-        if (is_null($name)) {
-            $name = key($this->_databases);
+        if (is_null($configurationName)) {
+            $configurationName = key($this->_configurations);
         }
 
-        if (!array_key_exists($name, $this->_databases)) {
+        if (!array_key_exists($configurationName, $this->_configurations)) {
             return;
         }
 
-        return $this->_databases[$name]['options'];
+        return $this->_configurations[$configurationName]['options'];
     }
 
     // }}}
-    // {{{ addDatabase()
+    // {{{ addConfiguration()
 
     /**
-     * Adds a database to the current configuration.
+     * Adds a database configuration.
      *
-     * @param string $name
+     * @param string $configurationName
      * @param string $dsn
      * @param array  $options
      */
-    function addDatabase($name, $dsn, $options = false)
+    function addConfiguration($configurationName, $dsn, $options = false)
     {
-        $this->_databases[$name] = array('dsn' => $dsn,
-                                         'options' => $options
-                                         );
+        $this->_configurations[$configurationName] = array('dsn' => $dsn,
+                                                           'options' => $options
+                                                           );
+    }
+
+    // }}}
+    // {{{ getConfigurations()
+
+    /**
+     * Gets the array of the configurations.
+     *
+     * @return array
+     */
+    function getConfigurations()
+    {
+        return $this->_configurations;
+    }
+
+    // }}}
+    // {{{ merge()
+
+    /**
+     * Merges the given configuretion into the existing configuration.
+     *
+     * @param Piece_ORM_Config &$config
+     */
+    function merge(&$config)
+    {
+        $configurations = $config->getConfigurations();
+        array_walk($configurations, array(&$this, 'mergeConfigurations'));
+    }
+
+    // }}}
+    // {{{ mergeConfigurations()
+
+    /**
+     * A callback that will be called by array_walk() function in merge().
+     *
+     * @param array $configuration
+     * @param string $configurationName
+     */
+    function mergeConfigurations($configuration, $configurationName)
+    {
+        $this->addConfiguration($configurationName, $configuration['dsn'], $configuration['options']);
     }
 
     /**#@-*/
