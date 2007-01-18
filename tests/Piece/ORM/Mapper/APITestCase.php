@@ -88,18 +88,23 @@ class Piece_ORM_Mapper_APITestCase extends PHPUnit_TestCase
         Piece_ORM_Error::pushCallback(create_function('$error', 'var_dump($error); return ' . PEAR_ERRORSTACK_DIE . ';'));
         $this->_cacheDirectory = dirname(__FILE__) . '/' . basename(__FILE__, '.php');
         $config = &new Piece_ORM_Config();
-        $config->addDatabase('person',
+        $config->addDatabase('piece',
                              'pgsql://piece:piece@localhost/piece', 
                              array('debug' => 2, 'result_buffering' => false)
                              );
         $context = &Piece_ORM_Context::singleton();
         $context->setConfiguration($config);
-        $this->_oldCacheDirectory = Piece_ORM_Metadata_Factory::setCacheDirectory($this->_cacheDirectory);
+        $this->_oldCacheDirectory = Piece_ORM_Mapper_Factory::setConfigDirectory($this->_cacheDirectory);
+        Piece_ORM_Mapper_Factory::setCacheDirectory($this->_cacheDirectory);
+        Piece_ORM_Metadata_Factory::setCacheDirectory($this->_cacheDirectory);
     }
 
     function tearDown()
     {
         Piece_ORM_Metadata_Factory::setCacheDirectory($this->_oldCacheDirectory);
+        Piece_ORM_Metadata_Factory::clearInstances();
+        Piece_ORM_Mapper_Factory::setCacheDirectory($this->_oldCacheDirectory);
+        Piece_ORM_Mapper_Factory::setConfigDirectory($this->_oldCacheDirectory);
         Piece_ORM_Mapper_Factory::clearInstances();
         Piece_ORM_Context::clear();
         $cache = &new Cache_Lite(array('cacheDir' => "{$this->_cacheDirectory}/",
@@ -113,7 +118,7 @@ class Piece_ORM_Mapper_APITestCase extends PHPUnit_TestCase
 
     function testFind()
     {
-        $mapper = &Piece_ORM_Mapper_Factory::factory('Person', $this->_cacheDirectory, $this->_cacheDirectory);
+        $mapper = &Piece_ORM_Mapper_Factory::factory('Person');
         $person = &$mapper->findById(1);
 
         $this->assertEquals(strtolower('stdClass'), strtolower(get_class($person)));
@@ -129,7 +134,7 @@ class Piece_ORM_Mapper_APITestCase extends PHPUnit_TestCase
     {
         Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
 
-        $mapper = &Piece_ORM_Mapper_Factory::factory('Person', $this->_cacheDirectory, $this->_cacheDirectory);
+        $mapper = &Piece_ORM_Mapper_Factory::factory('Person');
         $person = &$mapper->findById(null);
 
         $this->assertTrue(Piece_ORM_Error::hasErrors('exception'));
@@ -143,7 +148,7 @@ class Piece_ORM_Mapper_APITestCase extends PHPUnit_TestCase
 
     function testGeneratedMethods()
     {
-        $mapper = &Piece_ORM_Mapper_Factory::factory('Person', $this->_cacheDirectory, $this->_cacheDirectory);
+        $mapper = &Piece_ORM_Mapper_Factory::factory('Person');
 
         $this->assertTrue(method_exists($mapper, 'findById'));
         $this->assertTrue(method_exists($mapper, 'findByFirstName'));

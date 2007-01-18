@@ -94,12 +94,17 @@ class Piece_ORM_Mapper_FactoryTestCase extends PHPUnit_TestCase
                              );
         $context = &Piece_ORM_Context::singleton();
         $context->setConfiguration($config);
-        $this->_oldCacheDirectory = Piece_ORM_Metadata_Factory::setCacheDirectory($this->_cacheDirectory);
+        $this->_oldCacheDirectory = Piece_ORM_Mapper_Factory::setConfigDirectory($this->_cacheDirectory);
+        Piece_ORM_Mapper_Factory::setCacheDirectory($this->_cacheDirectory);
+        Piece_ORM_Metadata_Factory::setCacheDirectory($this->_cacheDirectory);
     }
 
     function tearDown()
     {
         Piece_ORM_Metadata_Factory::setCacheDirectory($this->_oldCacheDirectory);
+        Piece_ORM_Metadata_Factory::clearInstances();
+        Piece_ORM_Mapper_Factory::setCacheDirectory($this->_oldCacheDirectory);
+        Piece_ORM_Mapper_Factory::setConfigDirectory($this->_oldCacheDirectory);
         Piece_ORM_Mapper_Factory::clearInstances();
         Piece_ORM_Context::clear();
         $cache = &new Cache_Lite(array('cacheDir' => "{$this->_cacheDirectory}/",
@@ -114,8 +119,9 @@ class Piece_ORM_Mapper_FactoryTestCase extends PHPUnit_TestCase
     function testConfigurationDirectoryNotSpecified()
     {
         Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
+        $oldConfigDirectory = Piece_ORM_Mapper_Factory::setConfigDirectory(null);
 
-        Piece_ORM_Mapper_Factory::factory('Person', null, null);
+        Piece_ORM_Mapper_Factory::factory('Person');
 
         $this->assertTrue(Piece_ORM_Error::hasErrors('exception'));
 
@@ -123,14 +129,16 @@ class Piece_ORM_Mapper_FactoryTestCase extends PHPUnit_TestCase
 
         $this->assertEquals(PIECE_ORM_ERROR_INVALID_OPERATION, $error['code']);
 
+        Piece_ORM_Mapper_Factory::setConfigDirectory($oldConfigDirectory);
         Piece_ORM_Error::popCallback();
     }
 
     function testConfigurationDirectoryNotFound()
     {
         Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
+        $oldConfigDirectory = Piece_ORM_Mapper_Factory::setConfigDirectory(dirname(__FILE__) . '/foo');
 
-        Piece_ORM_Mapper_Factory::factory('Person', dirname(__FILE__) . '/foo', null);
+        Piece_ORM_Mapper_Factory::factory('Person');
 
         $this->assertTrue(Piece_ORM_Error::hasErrors('exception'));
 
@@ -138,14 +146,16 @@ class Piece_ORM_Mapper_FactoryTestCase extends PHPUnit_TestCase
 
         $this->assertEquals(PIECE_ORM_ERROR_NOT_FOUND, $error['code']);
 
+        Piece_ORM_Mapper_Factory::setConfigDirectory($oldConfigDirectory);
         Piece_ORM_Error::popCallback();
     }
 
     function testCacheDirectoryNotSpecified()
     {
         Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
+        $oldCacheDirectory = Piece_ORM_Mapper_Factory::setCacheDirectory(null);
 
-        Piece_ORM_Mapper_Factory::factory('Person', $this->_cacheDirectory, null);
+        Piece_ORM_Mapper_Factory::factory('Person');
 
         $this->assertTrue(Piece_ORM_Error::hasErrors('exception'));
 
@@ -153,14 +163,16 @@ class Piece_ORM_Mapper_FactoryTestCase extends PHPUnit_TestCase
 
         $this->assertEquals(PIECE_ORM_ERROR_INVALID_OPERATION, $error['code']);
 
+        Piece_ORM_Mapper_Factory::setCacheDirectory($oldCacheDirectory);
         Piece_ORM_Error::popCallback();
     }
 
     function testCacheDirectoryNotFound()
     {
         Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
+        $oldCacheDirectory = Piece_ORM_Mapper_Factory::setCacheDirectory(dirname(__FILE__) . '/foo');
 
-        Piece_ORM_Mapper_Factory::factory('Person', $this->_cacheDirectory, dirname(__FILE__) . '/foo');
+        Piece_ORM_Mapper_Factory::factory('Person');
 
         $this->assertTrue(Piece_ORM_Error::hasErrors('exception'));
 
@@ -168,6 +180,7 @@ class Piece_ORM_Mapper_FactoryTestCase extends PHPUnit_TestCase
 
         $this->assertEquals(PIECE_ORM_ERROR_NOT_FOUND, $error['code']);
 
+        Piece_ORM_Mapper_Factory::setCacheDirectory($oldCacheDirectory);
         Piece_ORM_Error::popCallback();
     }
 
@@ -175,7 +188,7 @@ class Piece_ORM_Mapper_FactoryTestCase extends PHPUnit_TestCase
     {
         Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
 
-        Piece_ORM_Mapper_Factory::factory('Foo', $this->_cacheDirectory, $this->_cacheDirectory);
+        Piece_ORM_Mapper_Factory::factory('Foo');
 
         $this->assertTrue(Piece_ORM_Error::hasErrors('exception'));
 
@@ -188,16 +201,16 @@ class Piece_ORM_Mapper_FactoryTestCase extends PHPUnit_TestCase
 
     function testFactory()
     {
-        $mapper = &Piece_ORM_Mapper_Factory::factory('Person', $this->_cacheDirectory, $this->_cacheDirectory);
+        $mapper = &Piece_ORM_Mapper_Factory::factory('Person');
 
         $this->assertTrue(is_subclass_of($mapper, 'Piece_ORM_Mapper_Common'));
     }
 
     function testInstanceCache()
     {
-        $mapper1 = &Piece_ORM_Mapper_Factory::factory('Person', $this->_cacheDirectory, $this->_cacheDirectory);
+        $mapper1 = &Piece_ORM_Mapper_Factory::factory('Person');
         $mapper1->foo = 'bar';
-        $mapper2 = &Piece_ORM_Mapper_Factory::factory('Person', $this->_cacheDirectory, $this->_cacheDirectory);
+        $mapper2 = &Piece_ORM_Mapper_Factory::factory('Person');
 
         $this->assertTrue(array_key_exists('foo', $mapper2));
         $this->assertEquals('bar', $mapper2->foo);

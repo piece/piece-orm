@@ -54,6 +54,8 @@ if (version_compare(phpversion(), '5.0.0', '<')) {
 // {{{ GLOBALS
 
 $GLOBALS['PIECE_ORM_Mapper_Instances'] = array();
+$GLOBALS['PIECE_ORM_Mapper_ConfigDirectory'] = null;
+$GLOBALS['PIECE_ORM_Mapper_CacheDirectory'] = null;
 
 // }}}
 // {{{ Piece_ORM_Mapper_Factory
@@ -98,8 +100,6 @@ class Piece_ORM_Mapper_Factory
      * Creates a mapper object based on the given information.
      *
      * @param string $mapperName
-     * @param string $configDirectory
-     * @param string $cacheDirectory
      * @return mixed
      * @throws PIECE_ORM_ERROR_INVALID_OPERATION
      * @throws PIECE_ORM_ERROR_NOT_FOUND
@@ -109,12 +109,12 @@ class Piece_ORM_Mapper_Factory
      * @throws PIECE_ORM_ERROR_INVALID_MAPPER
      * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
      */
-    function &factory($mapperName, $configDirectory, $cacheDirectory)
+    function &factory($mapperName)
     {
         $context = &Piece_ORM_Context::singleton();
-        $mapperID = sha1($context->getDSN() . ".$mapperName.$configDirectory");
+        $mapperID = sha1($context->getDSN() . ".$mapperName.{$GLOBALS['PIECE_ORM_Mapper_ConfigDirectory']}");
         if (!array_key_exists($mapperID, $GLOBALS['PIECE_ORM_Mapper_Instances'])) {
-            Piece_ORM_Mapper_Factory::_load($mapperID, $mapperName, $configDirectory, $cacheDirectory);
+            Piece_ORM_Mapper_Factory::_load($mapperID, $mapperName);
             if (Piece_ORM_Error::hasErrors('exception')) {
                 $return = null;
                 return $return;
@@ -158,6 +158,38 @@ class Piece_ORM_Mapper_Factory
         $GLOBALS['PIECE_ORM_Mapper_Instances'] = array();
     }
 
+    // }}}
+    // {{{ setConfigDirectory()
+
+    /**
+     * Sets a config directory.
+     *
+     * @param string $configDirectory
+     * @return string
+     */
+    function setConfigDirectory($configDirectory)
+    {
+        $oldConfigDirectory = $GLOBALS['PIECE_ORM_Mapper_ConfigDirectory'];
+        $GLOBALS['PIECE_ORM_Mapper_ConfigDirectory'] = $configDirectory;
+        return $oldConfigDirectory;
+    }
+
+    // }}}
+    // {{{ setCacheDirectory()
+
+    /**
+     * Sets a cache directory.
+     *
+     * @param string $cacheDirectory
+     * @return string
+     */
+    function setCacheDirectory($cacheDirectory)
+    {
+        $oldCacheDirectory = $GLOBALS['PIECE_ORM_Mapper_CacheDirectory'];
+        $GLOBALS['PIECE_ORM_Mapper_CacheDirectory'] = $cacheDirectory;
+        return $oldCacheDirectory;
+    }
+
     /**#@-*/
 
     /**#@+
@@ -175,15 +207,14 @@ class Piece_ORM_Mapper_Factory
      * @param string $mapperID
      * @param string $mapperName
      * @param string $configFile
-     * @param string $cacheDirectory
      * @return string
      * @throws PIECE_ORM_ERROR_CANNOT_READ
      * @throws PIECE_ORM_ERROR_CANNOT_WRITE
      * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
      */
-    function _getMapperSource($mapperID, $mapperName, $configFile, $cacheDirectory)
+    function _getMapperSource($mapperID, $mapperName, $configFile)
     {
-        $cache = &new Cache_Lite_File(array('cacheDir' => "$cacheDirectory/",
+        $cache = &new Cache_Lite_File(array('cacheDir' => "{$GLOBALS['PIECE_ORM_Mapper_CacheDirectory']}/",
                                             'masterFile' => $configFile,
                                             'automaticSerialization' => true,
                                             'errorHandlingAPIBreak' => true)
@@ -196,7 +227,7 @@ class Piece_ORM_Mapper_Factory
         $mapperSource = $cache->get($mapperID);
         if (PEAR::isError($mapperSource)) {
             Piece_ORM_Error::push(PIECE_ORM_ERROR_CANNOT_READ,
-                                  "Cannot read the mapper source file in the directory [ $cacheDirectory ]."
+                                  "Cannot read the mapper source file in the directory [ {$GLOBALS['PIECE_ORM_Mapper_CacheDirectory']} ]."
                                   );
             $return = null;
             return $return;
@@ -212,7 +243,7 @@ class Piece_ORM_Mapper_Factory
             $result = $cache->save($mapperSource);
             if (PEAR::isError($result)) {
                 Piece_ORM_Error::push(PIECE_ORM_ERROR_CANNOT_WRITE,
-                                      "Cannot write the mapper source to the cache file in the directory [ $cacheDirectory ]."
+                                      "Cannot write the mapper source to the cache file in the directory [ {$GLOBALS['PIECE_ORM_Mapper_CacheDirectory']} ]."
                                       );
                 $return = null;
                 return $return;
@@ -274,8 +305,6 @@ class Piece_ORM_Mapper_Factory
      *
      * @param string $mapperID
      * @param string $mapperName
-     * @param string $configDirectory
-     * @param string $cacheDirectory
      * @throws PIECE_ORM_ERROR_INVALID_OPERATION
      * @throws PIECE_ORM_ERROR_NOT_FOUND
      * @throws PIECE_ORM_ERROR_NOT_READABLE
@@ -283,48 +312,48 @@ class Piece_ORM_Mapper_Factory
      * @throws PIECE_ORM_ERROR_CANNOT_WRITE
      * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
      */
-    function _load($mapperID, $mapperName, $configDirectory, $cacheDirectory)
+    function _load($mapperID, $mapperName)
     {
         if (Piece_ORM_Mapper_Factory::_loaded($mapperID)) {
             return;
         }
 
-        if (is_null($configDirectory)) {
+        if (is_null($GLOBALS['PIECE_ORM_Mapper_ConfigDirectory'])) {
             Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_OPERATION,
                                   'The configuration directory must be specified.'
                                   );
             return;
         }
 
-        if (!file_exists($configDirectory)) {
+        if (!file_exists($GLOBALS['PIECE_ORM_Mapper_ConfigDirectory'])) {
             Piece_ORM_Error::push(PIECE_ORM_ERROR_NOT_FOUND,
-                                  "The configuration directory [ $configDirectory ] not found."
+                                  "The configuration directory [ {$GLOBALS['PIECE_ORM_Mapper_ConfigDirectory']} ] not found."
                                   );
             return;
         }
 
-        if (is_null($cacheDirectory)) {
+        if (is_null($GLOBALS['PIECE_ORM_Mapper_CacheDirectory'])) {
             Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_OPERATION,
                                   'The cache directory must be specified.'
                                   );
             return;
         }
 
-        if (!file_exists($cacheDirectory)) {
+        if (!file_exists($GLOBALS['PIECE_ORM_Mapper_CacheDirectory'])) {
             Piece_ORM_Error::push(PIECE_ORM_ERROR_NOT_FOUND,
-                                  "The cache directory [ $cacheDirectory ] not found."
+                                  "The cache directory [ {$GLOBALS['PIECE_ORM_Mapper_CacheDirectory']} ] not found."
                                   );
             return;
         }
 
-        if (!is_readable($cacheDirectory) || !is_writable($cacheDirectory)) {
+        if (!is_readable($GLOBALS['PIECE_ORM_Mapper_CacheDirectory']) || !is_writable($GLOBALS['PIECE_ORM_Mapper_CacheDirectory'])) {
             Piece_ORM_Error::push(PIECE_ORM_ERROR_NOT_READABLE,
-                                  "The cache directory [ $cacheDirectory ] was not readable or writable."
+                                  "The cache directory [ {$GLOBALS['PIECE_ORM_Mapper_CacheDirectory']} ] was not readable or writable."
                                   );
             return;
         }
 
-        $configFile = "$configDirectory/$mapperName.yaml";
+        $configFile = "{$GLOBALS['PIECE_ORM_Mapper_ConfigDirectory']}/$mapperName.yaml";
         if (!file_exists($configFile)) {
             Piece_ORM_Error::push(PIECE_ORM_ERROR_NOT_FOUND,
                                   "The configuration file [ $configFile ] not found."
@@ -339,7 +368,7 @@ class Piece_ORM_Mapper_Factory
             return;
         }
 
-        $mapperSource = Piece_ORM_Mapper_Factory::_getMapperSource($mapperID, $mapperName, $configFile, $cacheDirectory);
+        $mapperSource = Piece_ORM_Mapper_Factory::_getMapperSource($mapperID, $mapperName, $configFile);
         if (Piece_ORM_Error::hasErrors('exception')) {
             return;
         }
