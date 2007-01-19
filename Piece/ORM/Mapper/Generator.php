@@ -71,8 +71,8 @@ class Piece_ORM_Mapper_Generator
     var $_mapperClass;
     var $_mapperName;
     var $_config;
-    var $_mapperSource;
     var $_metadata;
+    var $_methodDefinitions = array();
 
     /**#@-*/
 
@@ -124,7 +124,7 @@ class Piece_ORM_Mapper_Generator
         }
 
         return "class {$this->_mapperClass} extends Piece_ORM_Mapper_Common
-{" . $this->_mapperSource . '}';
+{" . implode("\n", $this->_methodDefinitions) . "\n}";
     }
 
     /**#@-*/
@@ -145,14 +145,13 @@ class Piece_ORM_Mapper_Generator
     function _addFind($methodName, $query)
     {
         $propertyName = strtolower($methodName);
-        $this->_mapperSource .= "
+        $this->_methodDefinitions[$methodName] = "
     var \${$propertyName} = '$query';
     function &$methodName(\$criteria)
     {
         \$object = &\$this->_find(__FUNCTION__, \$criteria);
         return \$object;
-    }
-";
+    }";
     }
 
     /**#@-*/
