@@ -115,11 +115,12 @@ class Piece_ORM_Mapper_Common
     /**
      * Inserts an object to a table.
      *
-     * @param mixed &$subject
+     * @param mixed $subject
      * @return integer
      * @throws PIECE_ORM_ERROR_UNEXPECTED_VALUE
+     * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
      */
-    function insert(&$subject)
+    function insert($subject)
     {
         if (is_null($subject)) {
             Piece_ORM_Error::push(PIECE_ORM_ERROR_UNEXPECTED_VALUE,
@@ -135,11 +136,23 @@ class Piece_ORM_Mapper_Common
             return;
         }
 
-        $query = $this->_buildQuery('insert', $subject);
-        $this->_dbh->query($query);
-        $this->_lastQuery = $this->_dbh->last_query;
+        $this->_executeQuery('insert', $subject);
+        if (Piece_ORM_Error::hasErrors('exception')) {
+            return;
+        }
 
-        return $this->_dbh->lastInsertID($this->_metadata->getTableName(), 'id');
+        PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
+        $id = $this->_dbh->lastInsertID($this->_metadata->getTableName(), 'id');
+        PEAR::staticPopErrorHandling();
+        if (MDB2::isError($id)) {
+            Piece_ORM_Error::pushPEARError($id,
+                                           PIECE_ORM_ERROR_INVOCATION_FAILED,
+                                           'Failed to invoke MDB2_Driver_' . $this->_getDriverName() . '::lastInsertID() for any reasons.'
+                                           );
+            return;
+        }
+
+        return $id;
     }
 
     /**#@-*/
@@ -158,6 +171,7 @@ class Piece_ORM_Mapper_Common
      * @param mixed  $criteria
      * @return stdClass
      * @throws PIECE_ORM_ERROR_UNEXPECTED_VALUE
+     * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
      */
     function &_find($methodName, $criteria)
     {
@@ -180,10 +194,24 @@ class Piece_ORM_Mapper_Common
             $criteria->$propertyName = $criterion;
         }
 
-        $query = $this->_buildQuery($methodName, $criteria);
-        $result = &$this->_dbh->query($query);
-        $this->_lastQuery = $this->_dbh->last_query;
+        $result = &$this->_executeQuery($methodName, $criteria);
+        if (Piece_ORM_Error::hasErrors('exception')) {
+            $return = null;
+            return $return;
+        }
+
+        PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
         $row = &$result->fetchRow();
+        PEAR::staticPopErrorHandling();
+        if (MDB2::isError($row)) {
+            Piece_ORM_Error::pushPEARError($row,
+                                           PIECE_ORM_ERROR_INVOCATION_FAILED,
+                                           'Failed to invoke MDB2_Driver_' . $this->_getDriverName() . '::fetchRow() for any reasons.'
+                                           );
+            $return = null;
+            return $return;
+        }
+
         $object = &$this->_load($row);
         return $object;
     }
@@ -232,6 +260,50 @@ class Piece_ORM_Mapper_Common
         }
 
         return $object;
+    }
+
+    // }}}
+    // {{{ _executeQuery()
+
+    /**
+     * Executes a query.
+     *
+     * @param string   $methodName
+     * @param stdClass $criteria
+     * @return mixed
+     * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
+     */
+    function &_executeQuery($methodName, $criteria)
+    {
+        $query = $this->_buildQuery($methodName, $criteria);
+
+        PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
+        $result = &$this->_dbh->query($query);
+        PEAR::staticPopErrorHandling();
+        $this->_lastQuery = $this->_dbh->last_query;
+        if (MDB2::isError($result)) {
+            Piece_ORM_Error::pushPEARError($result,
+                                           PIECE_ORM_ERROR_INVOCATION_FAILED,
+                                           'Failed to invoke MDB2_Driver_' . $this->_getDriverName() . '::query() for any reasons.'
+                                           );
+            $return = null;
+            return $return;
+        }
+
+        return $result;
+    }
+
+    // }}}
+    // {{{ _getDriverName()
+
+    /**
+     * Gets the driver name of the database handle for this mapper.
+     *
+     * @return string
+     */
+    function _getDriverName()
+    {
+        return substr(strrchr(get_class($this->_dbh), '_'), 1);
     }
 
     /**#@-*/
