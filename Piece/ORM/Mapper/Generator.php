@@ -113,9 +113,9 @@ class Piece_ORM_Mapper_Generator
             $datatype = $this->_metadata->getDatatype($fieldName);
             if ($datatype == 'integer' || $datatype == 'text') {
                 
-                $fieldName = Piece_ORM_Inflector::camelize($fieldName);
-                $methodName = "findBy$fieldName";
-                $this->_addFind($methodName, 'SELECT * FROM ' . $this->_metadata->getTableName() . " WHERE $fieldName = \$" . Piece_ORM_Inflector::lowerCaseFirstLetter($fieldName));
+                $camelizedFieldName = Piece_ORM_Inflector::camelize($fieldName);
+                $methodName = "findBy$camelizedFieldName";
+                $this->_addFind($methodName, 'SELECT * FROM ' . $this->_metadata->getTableName() . " WHERE $fieldName = \$" . Piece_ORM_Inflector::lowerCaseFirstLetter($camelizedFieldName));
             }
         }
 
