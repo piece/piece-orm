@@ -113,8 +113,14 @@ class Piece_ORM_Mapper_Generator
             $datatype = $this->_metadata->getDatatype($fieldName);
             if ($datatype == 'integer' || $datatype == 'text') {
                 
-                $this->_addFind($fieldName, 'SELECT * FROM ' . $this->_metadata->getTableName() . " WHERE $fieldName = \$" . Piece_ORM_Inflector::camelize($fieldName, true));
+                $fieldName = Piece_ORM_Inflector::camelize($fieldName);
+                $methodName = "findBy$fieldName";
+                $this->_addFind($methodName, 'SELECT * FROM ' . $this->_metadata->getTableName() . " WHERE $fieldName = \$" . Piece_ORM_Inflector::lowerCaseFirstLetter($fieldName));
             }
+        }
+
+        foreach ($this->_config as $method) {
+            $this->_addFind($method['name'], $method['query']);
         }
 
         return "class {$this->_mapperClass} extends Piece_ORM_Mapper_Common
@@ -133,20 +139,17 @@ class Piece_ORM_Mapper_Generator
     /**
      * Adds a findByXXX method and its query to the mapper source.
      *
-     * @param string $fieldName
+     * @param string $methodName
      * @param string $query
      */
-    function _addFind($fieldName, $query)
+    function _addFind($methodName, $query)
     {
-        $fieldName = Piece_ORM_Inflector::camelize($fieldName);
-        $methodName = "findBy$fieldName";
         $propertyName = strtolower($methodName);
-        $arg = Piece_ORM_Inflector::camelize($fieldName, true);
         $this->_mapperSource .= "
     var \${$propertyName} = '$query';
-    function &$methodName(\${$arg})
+    function &$methodName(\$criteria)
     {
-        \$object = &\$this->_find(__FUNCTION__, \${$arg});
+        \$object = &\$this->_find(__FUNCTION__, \$criteria);
         return \$object;
     }
 ";

@@ -147,7 +147,7 @@ class Piece_ORM_Mapper_APITestCase extends PHPUnit_TestCase
         Piece_ORM_Error::popCallback();
     }
 
-    function testGeneratedMethods()
+    function testBuiltinMethods()
     {
         $mapper = &Piece_ORM_Mapper_Factory::factory('Person');
 
@@ -171,6 +171,23 @@ class Piece_ORM_Mapper_APITestCase extends PHPUnit_TestCase
         {
             $this->assertEquals($value, $personWithCriteria->$key);
         }
+    }
+
+    function testFindWithUserDefineMethod()
+    {
+        $criteria = &new stdClass();
+        $criteria->id = 1;
+        $criteria->serviceId = 2;
+        $mapper = &Piece_ORM_Mapper_Factory::factory('Person');
+        $person = &$mapper->findByIdAndServiceId($criteria);
+
+        $this->assertEquals(strtolower('stdClass'), strtolower(get_class($person)));
+        $this->assertTrue(array_key_exists('id', $person));
+        $this->assertTrue(array_key_exists('firstName', $person));
+        $this->assertTrue(array_key_exists('lastName', $person));
+        $this->assertTrue(array_key_exists('version', $person));
+        $this->assertTrue(array_key_exists('rdate', $person));
+        $this->assertTrue(array_key_exists('mdate', $person));
     }
 
     /**#@-*/
