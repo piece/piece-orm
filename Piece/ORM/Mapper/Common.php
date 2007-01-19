@@ -70,6 +70,7 @@ class Piece_ORM_Mapper_Common
     var $_context;
     var $_metadata;
     var $_dbh;
+    var $_lastQuery;
 
     /**#@-*/
 
@@ -93,6 +94,19 @@ class Piece_ORM_Mapper_Common
         $this->_context = &$context;
         $this->_metadata = &$metadata;
         $this->_dbh = &$this->_context->getConnection();
+    }
+
+    // }}}
+    // {{{ getLastQuery()
+
+    /**
+     * Gets the last query of this mapper.
+     *
+     * @return string
+     */
+    function getLastQuery()
+    {
+        return $this->_lastQuery;
     }
 
     /**#@-*/
@@ -135,6 +149,7 @@ class Piece_ORM_Mapper_Common
 
         $query = $this->_buildQuery($methodName, $criteria);
         $result = &$this->_dbh->query($query);
+        $this->_lastQuery = $this->_dbh->last_query;
         $row = &$result->fetchRow();
         $object = &$this->_load($row);
         return $object;
