@@ -4,6 +4,7 @@ CREATE TABLE person (
   id serial,
   first_name varchar(255) NOT NULL,
   last_name varchar(255) NOT NULL,
+  service_id int4 NOT NULL,
   version int4 NOT NULL DEFAULT '0',
   rdate timestamp with time zone NOT NULL DEFAULT current_timestamp,
   mdate timestamp with time zone NOT NULL DEFAULT current_timestamp,
