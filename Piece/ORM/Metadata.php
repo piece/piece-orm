@@ -65,6 +65,7 @@ class Piece_ORM_Metadata
 
     var $_tableName;
     var $_tableInfo = array();
+    var $_aliases = array();
 
     /**#@-*/
 
@@ -85,6 +86,7 @@ class Piece_ORM_Metadata
         $this->_tableName = $tableInfo[0]['table'];
         foreach ($tableInfo as $fieldInfo) {
             $this->_tableInfo[ $fieldInfo['name'] ] = $fieldInfo;
+            $this->_aliases[ strtolower(Piece_ORM_Inflector::camelize($fieldInfo['name'])) ] = $fieldInfo['name'];
         }
     }
 
@@ -99,7 +101,7 @@ class Piece_ORM_Metadata
      */
     function getDatatype($fieldName)
     {
-        return $this->_tableInfo[ $fieldName ]['mdb2type'];
+        return @$this->_tableInfo[$fieldName]['mdb2type'];
     }
 
     // }}}
@@ -126,6 +128,19 @@ class Piece_ORM_Metadata
     function getTableName()
     {
         return $this->_tableName;
+    }
+
+    // }}}
+    // {{{ getFieldNameWithAlias()
+
+    /**
+     * Gets the field name of the table with a given alias.
+     *
+     * @return string
+     */
+    function getFieldNameWithAlias($alias)
+    {
+        return @$this->_aliases[$alias];
     }
 
     /**#@-*/
