@@ -109,6 +109,39 @@ class Piece_ORM_Mapper_Common
         return $this->_lastQuery;
     }
 
+    // }}}
+    // {{{ insert()
+
+    /**
+     * Inserts an object to a table.
+     *
+     * @param mixed &$subject
+     * @return integer
+     * @throws PIECE_ORM_ERROR_UNEXPECTED_VALUE
+     */
+    function insert(&$subject)
+    {
+        if (is_null($subject)) {
+            Piece_ORM_Error::push(PIECE_ORM_ERROR_UNEXPECTED_VALUE,
+                                  "An unexpected value detected. insert() cannot receive null."
+                                  );
+            return;
+        }
+
+        if (!is_object($subject)) {
+            Piece_ORM_Error::push(PIECE_ORM_ERROR_UNEXPECTED_VALUE,
+                                  "An unexpected value detected. insert() can only receive object."
+                                  );
+            return;
+        }
+
+        $query = $this->_buildQuery('insert', $subject);
+        $this->_dbh->query($query);
+        $this->_lastQuery = $this->_dbh->last_query;
+
+        return $this->_dbh->lastInsertID($this->_metadata->getTableName(), 'id');
+    }
+
     /**#@-*/
 
     /**#@+

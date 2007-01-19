@@ -201,6 +201,24 @@ class Piece_ORM_Mapper_APITestCase extends PHPUnit_TestCase
         $this->assertEquals("SELECT * FROM person WHERE first_name = 'Atsuhiro' AND service_id = 1", $mapper->getLastQuery());
     }
 
+    function testInsert()
+    {
+        $subject = &new stdClass();
+        $subject->firstName = 'Taro';
+        $subject->lastName = 'ITEMAN';
+        $subject->serviceId = 3;
+        $mapper = &Piece_ORM_Mapper_Factory::factory('Person');
+        $id = $mapper->insert($subject);
+
+        $this->assertNotNull($id);
+
+        $person = &$mapper->findById($id);
+
+        $this->assertEquals('Taro', $person->firstName);
+        $this->assertEquals('ITEMAN', $person->lastName);
+        $this->assertEquals(3, $person->serviceId);
+    }
+
     /**#@-*/
 
     /**#@+

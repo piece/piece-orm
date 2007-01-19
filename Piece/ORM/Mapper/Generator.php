@@ -120,7 +120,11 @@ class Piece_ORM_Mapper_Generator
         }
 
         foreach ($this->_config as $method) {
-            $this->_addFind($method['name'], $method['query']);
+            if (substr($method['name'], 0, 6) == 'findBy') {
+                $this->_addFind($method['name'], $method['query']);
+            } elseif (substr($method['name'], 0, 6) == 'insert') {
+                $this->_addInsert($method['query']);
+            }
         }
 
         return "class {$this->_mapperClass} extends Piece_ORM_Mapper_Common
@@ -152,6 +156,20 @@ class Piece_ORM_Mapper_Generator
         \$object = &\$this->_find(__FUNCTION__, \$criteria);
         return \$object;
     }";
+    }
+
+    // }}}
+    // {{{ _addInsert()
+
+    /**
+     * Adds the insert method and its query to the mapper source.
+     *
+     * @param string $query
+     */
+    function _addInsert($query)
+    {
+        $this->_methodDefinitions['insert'] = "
+    var \$insert = '$query';";
     }
 
     /**#@-*/
