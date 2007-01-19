@@ -159,6 +159,20 @@ class Piece_ORM_Mapper_APITestCase extends PHPUnit_TestCase
         $this->assertFalse(method_exists($mapper, 'findByMdate'));
     }
 
+    function testFindWithCriteria()
+    {
+        $criteria = &new stdClass();
+        $criteria->id = 1;
+        $mapper = &Piece_ORM_Mapper_Factory::factory('Person');
+        $person = &$mapper->findById(1);
+        $personWithCriteria = &$mapper->findById($criteria);
+
+        foreach ($person as $key => $value)
+        {
+            $this->assertEquals($value, $personWithCriteria->$key);
+        }
+    }
+
     /**#@-*/
 
     /**#@+

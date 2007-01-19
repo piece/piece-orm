@@ -108,13 +108,13 @@ class Piece_ORM_Mapper_Common
      * Finds an object with an appropriate SQL query.
      *
      * @param string $methodName
-     * @param string $value
+     * @param mixed  $criteria
      * @return stdClass
      * @throws PIECE_ORM_ERROR_UNEXPECTED_VALUE
      */
-    function &_find($methodName, $value)
+    function &_find($methodName, $criteria)
     {
-        if (is_null($value)) {
+        if (is_null($criteria)) {
             Piece_ORM_Error::push(PIECE_ORM_ERROR_UNEXPECTED_VALUE,
                                   "An unexpected value detected. $methodName() cannot receive null."
                                   );
@@ -122,9 +122,12 @@ class Piece_ORM_Mapper_Common
             return $return;
         }
 
-        $propertyName = Piece_ORM_Inflector::lowercaseFirstLetter(substr($methodName, 6));
-        $criteria = &new stdClass();
-        $criteria->$propertyName = $value;
+        if (!is_object($criteria)) {
+            $propertyName = Piece_ORM_Inflector::lowercaseFirstLetter(substr($methodName, 6));
+            $criterion = $criteria;
+            $criteria = &new stdClass();
+            $criteria->$propertyName = $criterion;
+        }
 
         $query = $this->_buildQuery($methodName, $criteria);
         $result = &$this->_dbh->query($query);
