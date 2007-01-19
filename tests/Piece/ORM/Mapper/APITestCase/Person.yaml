@@ -1,0 +1,5 @@
+- name: findByIdAndServiceId
+  query: SELECT * FROM person WHERE id = $id AND service_id = $serviceId
+
+- name: findByFirstName
+  query: SELECT * FROM person WHERE first_name = $firstName AND service_id = $serviceId
