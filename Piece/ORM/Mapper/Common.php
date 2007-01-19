@@ -124,6 +124,10 @@ class Piece_ORM_Mapper_Common
 
         if (!is_object($criteria)) {
             $propertyName = Piece_ORM_Inflector::lowercaseFirstLetter(substr($methodName, 6));
+            if (version_compare(phpversion(), '5.0.0', '<')) {
+                $propertyName = Piece_ORM_Inflector::camelize($this->_metadata->getFieldNameWithAlias($propertyName), true);
+            }
+
             $criterion = $criteria;
             $criteria = &new stdClass();
             $criteria->$propertyName = $criterion;
