@@ -190,6 +190,17 @@ class Piece_ORM_Mapper_APITestCase extends PHPUnit_TestCase
         $this->assertTrue(array_key_exists('mdate', $person));
     }
 
+    function testOverwriteBuiltinMethod()
+    {
+        $criteria = &new stdClass();
+        $criteria->firstName = 'Atsuhiro';
+        $criteria->serviceId = 1;
+        $mapper = &Piece_ORM_Mapper_Factory::factory('Person');
+        $mapper->findByFirstName($criteria);
+
+        $this->assertEquals("SELECT * FROM person WHERE first_name = 'Atsuhiro' AND service_id = 1", $mapper->getLastQuery());
+    }
+
     /**#@-*/
 
     /**#@+
