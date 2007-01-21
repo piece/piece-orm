@@ -219,6 +219,50 @@ class Piece_ORM_Mapper_APITestCase extends PHPUnit_TestCase
         $this->assertEquals(3, $person->serviceId);
     }
 
+    function testFindAll()
+    {
+        $mapper = &Piece_ORM_Mapper_Factory::factory('Person');
+        $people = $mapper->findAll();
+
+        $this->assertEquals('SELECT * FROM person', $mapper->getLastQuery());
+        $this->assertTrue(is_array($people));
+        $this->assertTrue(count($people));
+
+        foreach ($people as $person) {
+            $this->assertEquals(strtolower('stdClass'), strtolower(get_class($person)));
+            $this->assertTrue(array_key_exists('id', $person));
+            $this->assertTrue(array_key_exists('firstName', $person));
+            $this->assertTrue(array_key_exists('lastName', $person));
+            $this->assertTrue(array_key_exists('version', $person));
+            $this->assertTrue(array_key_exists('rdate', $person));
+            $this->assertTrue(array_key_exists('mdate', $person));
+        }
+    }
+
+    function testFindAllWithCriteria()
+    {
+        $criteria = &new stdClass();
+        $criteria->serviceId = 2;
+        $mapper = &Piece_ORM_Mapper_Factory::factory('Person');
+        $people = $mapper->findAllByServiceId(2);
+
+        $this->assertEquals('SELECT * FROM person WHERE service_id = 2', $mapper->getLastQuery());
+
+        $peopleWithCriteria = $mapper->findAllByServiceId($criteria);
+
+        $this->assertEquals('SELECT * FROM person WHERE service_id = 2', $mapper->getLastQuery());
+
+        $this->assertTrue(is_array($people));
+        $this->assertTrue(count($people));
+
+        for ($i = 0; $i < count($people); ++$i) {
+            foreach ($people[$i] as $key => $value)
+            {
+                $this->assertEquals($value, $peopleWithCriteria[$i]->$key);
+            }
+        }
+    }
+
     /**#@-*/
 
     /**#@+
