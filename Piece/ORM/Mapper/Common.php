@@ -141,18 +141,20 @@ class Piece_ORM_Mapper_Common
             return;
         }
 
-        PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
-        $id = $this->_dbh->lastInsertID($this->_metadata->getTableName(), 'id');
-        PEAR::staticPopErrorHandling();
-        if (MDB2::isError($id)) {
-            Piece_ORM_Error::pushPEARError($id,
-                                           PIECE_ORM_ERROR_INVOCATION_FAILED,
-                                           'Failed to invoke MDB2_Driver_' . $this->_getDriverName() . '::lastInsertID() for any reasons.'
-                                           );
-            return;
-        }
+        if ($this->_metadata->hasID()) {
+            PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
+            $id = $this->_dbh->lastInsertID($this->_metadata->getTableName(), $this->_metadata->getIDFieldName());
+            PEAR::staticPopErrorHandling();
+            if (MDB2::isError($id)) {
+                Piece_ORM_Error::pushPEARError($id,
+                                               PIECE_ORM_ERROR_INVOCATION_FAILED,
+                                               'Failed to invoke MDB2_Driver_' . $this->_getDriverName() . '::lastInsertID() for any reasons.'
+                                               );
+                return;
+            }
 
-        return $id;
+            return $id;
+        }
     }
 
     /**#@-*/
