@@ -38,6 +38,8 @@
  */
 
 require_once 'Piece/ORM/Inflector.php';
+require_once 'Piece/ORM/Error.php';
+require_once 'MDB2.php';
 
 // {{{ Piece_ORM_Mapper_Common
 
@@ -136,7 +138,7 @@ class Piece_ORM_Mapper_Common
             return;
         }
 
-        $this->_executeQuery('insert', $subject);
+        $this->_executeQuery(__FUNCTION__, $subject);
         if (Piece_ORM_Error::hasErrors('exception')) {
             return;
         }
@@ -155,6 +157,23 @@ class Piece_ORM_Mapper_Common
 
             return $id;
         }
+    }
+
+    // }}}
+    // {{{ findAll()
+
+    /**
+     * Finds all objects with an appropriate SQL query.
+     *
+     * @param stdClass $criteria
+     * @return array
+     * @throws PIECE_ORM_ERROR_UNEXPECTED_VALUE
+     * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
+     */
+    function findAll($criteria = null)
+    {
+        $objects = $this->_findAll(__FUNCTION__, $criteria);
+        return $objects;
     }
 
     /**#@-*/
@@ -306,6 +325,90 @@ class Piece_ORM_Mapper_Common
     function _getDriverName()
     {
         return substr(strrchr(get_class($this->_dbh), '_'), 1);
+    }
+
+    // }}}
+    // {{{ _loadAll()
+
+    /**
+     * Loads all objects with a result object.
+     *
+     * @param MDB2_Result &$result
+     * @return array
+     */
+    function _loadAll(&$result)
+    {
+        $objects = array();
+        $error = null;
+        PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
+        while ($row = &$result->fetchRow()) {
+            if (MDB2::isError($row)) {
+                $error = &$row;
+                break;
+            }
+
+            $objects[] = &$this->_load($row);
+        }
+        PEAR::staticPopErrorHandling();
+
+        if (MDB2::isError($error)) {
+            Piece_ORM_Error::pushPEARError($error,
+                                           PIECE_ORM_ERROR_INVOCATION_FAILED,
+                                           'Failed to invoke MDB2_Driver_' . $this->_getDriverName() . '::fetchRow() for any reasons.'
+                                           );
+            return;
+        }
+
+        return $objects;
+    }
+
+    // }}}
+    // {{{ _findAll()
+
+    /**
+     * Finds all objects with an appropriate SQL query.
+     *
+     * @param string   $methodName
+     * @param stdClass $criteria
+     * @return array
+     * @throws PIECE_ORM_ERROR_UNEXPECTED_VALUE
+     * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
+     */
+    function _findAll($methodName, $criteria)
+    {
+        if (is_null($criteria)) {
+            $criteria = &new stdClass();
+        }
+
+        if (!is_object($criteria)) {
+            if (strtolower($methodName) == strtolower('findAll')) {
+                Piece_ORM_Error::push(PIECE_ORM_ERROR_UNEXPECTED_VALUE,
+                                      'An unexpected value detected. findAll() can only receive object or null.'
+                                      );
+                return;
+            }
+
+            $propertyName = Piece_ORM_Inflector::lowercaseFirstLetter(substr($methodName, 9));
+            if (version_compare(phpversion(), '5.0.0', '<')) {
+                $propertyName = Piece_ORM_Inflector::camelize($this->_metadata->getFieldNameWithAlias($propertyName), true);
+            }
+
+            $criterion = $criteria;
+            $criteria = &new stdClass();
+            $criteria->$propertyName = $criterion;
+        }
+
+        $result = &$this->_executeQuery($methodName, $criteria);
+        if (Piece_ORM_Error::hasErrors('exception')) {
+            return;
+        }
+
+        $objects = $this->_loadAll($result);
+        if (Piece_ORM_Error::hasErrors('exception')) {
+            return;
+        }
+
+        return $objects;
     }
 
     /**#@-*/
