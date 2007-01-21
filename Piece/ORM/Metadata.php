@@ -66,6 +66,8 @@ class Piece_ORM_Metadata
     var $_tableName;
     var $_tableInfo = array();
     var $_aliases = array();
+    var $_hasID = false;
+    var $_IDFieldName;
 
     /**#@-*/
 
@@ -87,6 +89,13 @@ class Piece_ORM_Metadata
         foreach ($tableInfo as $fieldInfo) {
             $this->_tableInfo[ $fieldInfo['name'] ] = $fieldInfo;
             $this->_aliases[ strtolower(Piece_ORM_Inflector::camelize($fieldInfo['name'])) ] = $fieldInfo['name'];
+
+            if (strpos($fieldInfo['flags'], 'primary_key') !== false) {
+                if ($fieldInfo['autoincrement']) {
+                    $this->_hasID = true;
+                    $this->_IDFieldName = $fieldInfo['name'];
+                }
+            }
         }
     }
 
@@ -94,7 +103,7 @@ class Piece_ORM_Metadata
     // {{{ getDatatype()
 
     /**
-     * Gets the datatype for the given field name.
+     * Gets the datatype for a given field name.
      *
      * @param string $fieldName
      * @return string
@@ -108,7 +117,7 @@ class Piece_ORM_Metadata
     // {{{ getFieldNames()
 
     /**
-     * Gets the field names of the table as an array.
+     * Gets the field names of a table as an array.
      *
      * @return array
      */
@@ -134,13 +143,39 @@ class Piece_ORM_Metadata
     // {{{ getFieldNameWithAlias()
 
     /**
-     * Gets the field name of the table with a given alias.
+     * Gets the field name of a table with a given alias.
      *
      * @return string
      */
     function getFieldNameWithAlias($alias)
     {
         return @$this->_aliases[$alias];
+    }
+
+    // }}}
+    // {{{ hasID()
+
+    /**
+     * Returns whether a table has an ID field or not.
+     *
+     * @return boolean
+     */
+    function hasID()
+    {
+        return $this->_hasID;
+    }
+
+    // }}}
+    // {{{ getIDFieldName()
+
+    /**
+     * Gets the ID field name for a table.
+     *
+     * @return string
+     */
+    function getIDFieldName()
+    {
+        return $this->_IDFieldName;
     }
 
     /**#@-*/
