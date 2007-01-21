@@ -114,15 +114,21 @@ class Piece_ORM_Mapper_Generator
             if ($datatype == 'integer' || $datatype == 'text') {
                 
                 $camelizedFieldName = Piece_ORM_Inflector::camelize($fieldName);
-                $methodName = "findBy$camelizedFieldName";
-                $this->_addFind($methodName, 'SELECT * FROM ' . $this->_metadata->getTableName() . " WHERE $fieldName = \$" . Piece_ORM_Inflector::lowerCaseFirstLetter($camelizedFieldName));
+                $this->_addFindBy("findBy$camelizedFieldName", 'SELECT * FROM ' . $this->_metadata->getTableName() . " WHERE $fieldName = \$" . Piece_ORM_Inflector::lowerCaseFirstLetter($camelizedFieldName));
+                $this->_addFindAllBy("findAllBy$camelizedFieldName", 'SELECT * FROM ' . $this->_metadata->getTableName() . " WHERE $fieldName = \$" . Piece_ORM_Inflector::lowerCaseFirstLetter($camelizedFieldName));
             }
         }
 
+        $this->_addFindAll('SELECT * FROM ' . $this->_metadata->getTableName());
+
         foreach ($this->_config as $method) {
-            if (substr($method['name'], 0, 6) == 'findBy') {
-                $this->_addFind($method['name'], $method['query']);
-            } elseif (substr($method['name'], 0, 6) == 'insert') {
+            if (preg_match('/^findBy.+$/i', $method['name'])) {
+                $this->_addFindBy($method['name'], $method['query']);
+            } elseif (preg_match('/^findAll$/i', $method['name'])) {
+                $this->_addFindAll($method['query']);
+            } elseif (preg_match('/^findAllBy.+$/i', $method['name'])) {
+                $this->_addFindAllBy($method['name'], $method['query']);
+            } elseif (preg_match('/^insert$/i', $method['name'])) {
                 $this->_addInsert($method['query']);
             }
         }
@@ -138,7 +144,7 @@ class Piece_ORM_Mapper_Generator
      */
 
     // }}}
-    // {{{ _addFind()
+    // {{{ _addFindBy()
 
     /**
      * Adds a findByXXX method and its query to the mapper source.
@@ -146,7 +152,7 @@ class Piece_ORM_Mapper_Generator
      * @param string $methodName
      * @param string $query
      */
-    function _addFind($methodName, $query)
+    function _addFindBy($methodName, $query)
     {
         $propertyName = strtolower($methodName);
         $this->_methodDefinitions[$methodName] = "
@@ -162,7 +168,7 @@ class Piece_ORM_Mapper_Generator
     // {{{ _addInsert()
 
     /**
-     * Adds the insert method and its query to the mapper source.
+     * Adds the query for insert() to the mapper source.
      *
      * @param string $query
      */
@@ -170,6 +176,41 @@ class Piece_ORM_Mapper_Generator
     {
         $this->_methodDefinitions['insert'] = "
     var \$insert = '$query';";
+    }
+
+    // }}}
+    // {{{ _addFindAll()
+
+    /**
+     * Adds the query for findAll() to the mapper source.
+     *
+     * @param string $query
+     */
+    function _addFindAll($query)
+    {
+        $this->_methodDefinitions['findall'] = "
+    var \$findall = '$query';";
+    }
+
+    // }}}
+    // {{{ _addFindAllBy()
+
+    /**
+     * Adds a findAllByXXX method and its query to the mapper source.
+     *
+     * @param string $methodName
+     * @param string $query
+     */
+    function _addFindAllBy($methodName, $query)
+    {
+        $propertyName = strtolower($methodName);
+        $this->_methodDefinitions[$methodName] = "
+    var \${$propertyName} = '$query';
+    function $methodName(\$criteria)
+    {
+        \$objects = \$this->_findAll(__FUNCTION__, \$criteria);
+        return \$objects;
+    }";
     }
 
     /**#@-*/
