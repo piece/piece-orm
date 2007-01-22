@@ -111,6 +111,7 @@ class Piece_ORM_Mapper_Generator
     {
         $this->_generateFind();
         $this->_generateInsert();
+        $this->_generateDelete();
         $this->_generateFromConfiguration();
 
         return "class {$this->_mapperClass} extends Piece_ORM_Mapper_Common
@@ -252,6 +253,32 @@ class Piece_ORM_Mapper_Generator
         }
 
         $this->_addInsert('INSERT INTO ' . $this->_metadata->getTableName() . ' (' . implode(", ", $fieldsForInsert) . ') VALUES (' . implode(', ', array_map(create_function('$f', "return '\$' . Piece_ORM_Inflector::camelize(\$f, true);"), $fieldsForInsert)) . ')');
+    }
+
+    // }}}
+    // {{{ _generateDelete()
+
+    /**
+     * Generates the built-in delete method.
+     */
+    function _generateDelete()
+    {
+        $idFieldName = $this->_metadata->getIDFieldName();
+        $this->_addDelete('DELETE FROM ' . $this->_metadata->getTableName() . ' WHERE ' . $idFieldName . ' = $' . Piece_ORM_Inflector::camelize($idFieldName, true));
+    }
+
+    // }}}
+    // {{{ _addDelete()
+
+    /**
+     * Adds the query for delete() to the mapper source.
+     *
+     * @param string $query
+     */
+    function _addDelete($query)
+    {
+        $this->_methodDefinitions['delete'] = "
+    var \$delete = '$query';";
     }
 
     /**#@-*/
