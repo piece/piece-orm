@@ -109,39 +109,9 @@ class Piece_ORM_Mapper_Generator
      */
     function generate()
     {
-        foreach ($this->_metadata->getFieldNames() as $fieldName) {
-            $datatype = $this->_metadata->getDatatype($fieldName);
-            if ($datatype == 'integer' || $datatype == 'text') {
-                
-                $camelizedFieldName = Piece_ORM_Inflector::camelize($fieldName);
-                $this->_addFindBy("findBy$camelizedFieldName", 'SELECT * FROM ' . $this->_metadata->getTableName() . " WHERE $fieldName = \$" . Piece_ORM_Inflector::lowerCaseFirstLetter($camelizedFieldName));
-                $this->_addFindAllBy("findAllBy$camelizedFieldName", 'SELECT * FROM ' . $this->_metadata->getTableName() . " WHERE $fieldName = \$" . Piece_ORM_Inflector::lowerCaseFirstLetter($camelizedFieldName));
-            }
-        }
-
-        $this->_addFindAll('SELECT * FROM ' . $this->_metadata->getTableName());
-
-        foreach ($this->_metadata->getFieldNames() as $fieldName) {
-            if (is_null($this->_metadata->getDefault($fieldName))) {
-                if (!$this->_metadata->isAutoIncrement($fieldName)) {
-                    $fieldsForInsert[] = $fieldName;
-                }
-            }
-        }
-
-        $this->_addInsert('INSERT INTO ' . $this->_metadata->getTableName() . ' (' . implode(", ", $fieldsForInsert) . ') VALUES (' . implode(', ', array_map(create_function('$f', "return '\$' . Piece_ORM_Inflector::camelize(\$f, true);"), $fieldsForInsert)) . ')');
-
-        foreach ($this->_config as $method) {
-            if (preg_match('/^findBy.+$/i', $method['name'])) {
-                $this->_addFindBy($method['name'], $method['query']);
-            } elseif (preg_match('/^findAll$/i', $method['name'])) {
-                $this->_addFindAll($method['query']);
-            } elseif (preg_match('/^findAllBy.+$/i', $method['name'])) {
-                $this->_addFindAllBy($method['name'], $method['query']);
-            } elseif (preg_match('/^insert$/i', $method['name'])) {
-                $this->_addInsert($method['query']);
-            }
-        }
+        $this->_generateFind();
+        $this->_generateInsert();
+        $this->_generateFromConfiguration();
 
         return "class {$this->_mapperClass} extends Piece_ORM_Mapper_Common
 {" . implode("\n", $this->_methodDefinitions) . "\n}";
@@ -221,6 +191,67 @@ class Piece_ORM_Mapper_Generator
         \$objects = \$this->_findAll(__FUNCTION__, \$criteria);
         return \$objects;
     }";
+    }
+
+    // }}}
+    // {{{ _generateFromConfigration()
+
+    /**
+     * Generates methods from configuration.
+     */
+    function _generateFromConfiguration()
+    {
+        foreach ($this->_config as $method) {
+            if (preg_match('/^findBy.+$/i', $method['name'])) {
+                $this->_addFindBy($method['name'], $method['query']);
+            } elseif (preg_match('/^findAll$/i', $method['name'])) {
+                $this->_addFindAll($method['query']);
+            } elseif (preg_match('/^findAllBy.+$/i', $method['name'])) {
+                $this->_addFindAllBy($method['name'], $method['query']);
+            } elseif (preg_match('/^insert$/i', $method['name'])) {
+                $this->_addInsert($method['query']);
+            }
+        }
+    }
+
+    // }}}
+    // {{{ _generateFind()
+
+    /**
+     * Generates built-in findByXXX, findAll, findAllByXXX methods.
+     */
+    function _generateFind()
+    {
+        foreach ($this->_metadata->getFieldNames() as $fieldName) {
+            $datatype = $this->_metadata->getDatatype($fieldName);
+            if ($datatype == 'integer' || $datatype == 'text') {
+                
+                $camelizedFieldName = Piece_ORM_Inflector::camelize($fieldName);
+                $this->_addFindBy("findBy$camelizedFieldName", 'SELECT * FROM ' . $this->_metadata->getTableName() . " WHERE $fieldName = \$" . Piece_ORM_Inflector::lowerCaseFirstLetter($camelizedFieldName));
+                $this->_addFindAllBy("findAllBy$camelizedFieldName", 'SELECT * FROM ' . $this->_metadata->getTableName() . " WHERE $fieldName = \$" . Piece_ORM_Inflector::lowerCaseFirstLetter($camelizedFieldName));
+            }
+        }
+
+        $this->_addFindAll('SELECT * FROM ' . $this->_metadata->getTableName());
+    }
+
+    // }}}
+    // {{{ _generateInsert()
+
+    /**
+     * Generates the built-in insert method.
+     */
+    function _generateInsert()
+    {
+        foreach ($this->_metadata->getFieldNames() as $fieldName) {
+            if (is_null($this->_metadata->getDefault($fieldName))) {
+                if (!$this->_metadata->isAutoIncrement($fieldName)) {
+                    $fieldsForInsert[] = $fieldName;
+                }
+            }
+        }
+
+        $this->_addInsert('INSERT INTO ' . $this->_metadata->getTableName() . ' (' . implode(", ", $fieldsForInsert) . ') VALUES (' . implode(', ', array_map(create_function('$f', "return '\$' . Piece_ORM_Inflector::camelize(\$f, true);"), $fieldsForInsert)) . ')');
     }
 
     /**#@-*/
