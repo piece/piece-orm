@@ -121,6 +121,16 @@ class Piece_ORM_Mapper_Generator
 
         $this->_addFindAll('SELECT * FROM ' . $this->_metadata->getTableName());
 
+        foreach ($this->_metadata->getFieldNames() as $fieldName) {
+            if (is_null($this->_metadata->getDefault($fieldName))) {
+                if (!$this->_metadata->isAutoIncrement($fieldName)) {
+                    $fieldsForInsert[] = $fieldName;
+                }
+            }
+        }
+
+        $this->_addInsert('INSERT INTO ' . $this->_metadata->getTableName() . ' (' . implode(", ", $fieldsForInsert) . ') VALUES (' . implode(', ', array_map(create_function('$f', "return '\$' . Piece_ORM_Inflector::camelize(\$f, true);"), $fieldsForInsert)) . ')');
+
         foreach ($this->_config as $method) {
             if (preg_match('/^findBy.+$/i', $method['name'])) {
                 $this->_addFindBy($method['name'], $method['query']);
