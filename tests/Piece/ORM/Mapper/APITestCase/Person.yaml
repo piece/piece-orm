@@ -10,7 +10,7 @@
   query: INSERT INTO person (first_name, last_name, service_id) VALUES ($firstName, $lastName, $serviceId)
 
 - name: findAllByServiceId
-  query: SELECT * FROM person WHERE service_id = $serviceId
+  query: SELECT * FROM person WHERE service_id = $serviceId AND version >= 0
 
 # Local Variables:
 # mode: conf-colon
