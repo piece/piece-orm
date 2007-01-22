@@ -110,7 +110,7 @@ class Piece_ORM_Metadata
      */
     function getDatatype($fieldName)
     {
-        return @$this->_tableInfo[$fieldName]['mdb2type'];
+        return $this->_tableInfo[$fieldName]['mdb2type'];
     }
 
     // }}}
@@ -149,7 +149,7 @@ class Piece_ORM_Metadata
      */
     function getFieldNameWithAlias($alias)
     {
-        return @$this->_aliases[$alias];
+        return $this->_aliases[$alias];
     }
 
     // }}}
@@ -176,6 +176,34 @@ class Piece_ORM_Metadata
     function getIDFieldName()
     {
         return $this->_IDFieldName;
+    }
+
+    // }}}
+    // {{{ getDefault()
+
+    /**
+     * Gets the default value for a given field name.
+     *
+     * @param string $fieldName
+     * @return string
+     */
+    function getDefault($fieldName)
+    {
+        return $this->_tableInfo[$fieldName]['default'];
+    }
+
+    // }}}
+    // {{{ isAutoIncrement()
+
+    /**
+     * Returns whether a field is auto increment field or not.
+     *
+     * @param string $fieldName
+     * @return boolean
+     */
+    function isAutoIncrement($fieldName)
+    {
+        return array_key_exists('autoincrement', $this->_tableInfo[$fieldName]);
     }
 
     /**#@-*/
