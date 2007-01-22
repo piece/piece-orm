@@ -138,7 +138,7 @@ class Piece_ORM_Mapper_Common
             return;
         }
 
-        $this->_executeQuery(__FUNCTION__, $subject);
+        $this->_executeQuery(__FUNCTION__, $subject, true);
         if (Piece_ORM_Error::hasErrors('exception')) {
             return;
         }
@@ -174,6 +174,37 @@ class Piece_ORM_Mapper_Common
     {
         $objects = $this->_findAll(__FUNCTION__, $criteria);
         return $objects;
+    }
+
+    // }}}
+    // {{{ delete()
+
+    /**
+     * Removes an object from a table.
+     *
+     * @param mixed $id
+     * @return integer
+     * @throws PIECE_ORM_ERROR_UNEXPECTED_VALUE
+     * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
+     */
+    function delete($id)
+    {
+        if (is_null($id)) {
+            Piece_ORM_Error::push(PIECE_ORM_ERROR_UNEXPECTED_VALUE,
+                                  'An unexpected value detected. delete() cannot receive null.'
+                                  );
+            return;
+        }
+
+        $propertyName = Piece_ORM_Inflector::camelize($this->_metadata->getIDFieldName(), true);
+        $criteria = &new stdClass();
+        $criteria->$propertyName = $id;
+        $affectedRows = $this->_executeQuery(__FUNCTION__, $criteria, true);
+        if (Piece_ORM_Error::hasErrors('exception')) {
+            return;
+        }
+
+        return $affectedRows;
     }
 
     /**#@-*/
@@ -291,15 +322,20 @@ class Piece_ORM_Mapper_Common
      *
      * @param string   $methodName
      * @param stdClass $criteria
+     * @param boolean  $isManip
      * @return mixed
      * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
      */
-    function &_executeQuery($methodName, $criteria)
+    function &_executeQuery($methodName, $criteria, $isManip = false)
     {
         $query = $this->_buildQuery($methodName, $criteria);
 
         PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
-        $result = &$this->_dbh->query($query);
+        if (!$isManip) {
+            $result = &$this->_dbh->query($query);
+        } else {
+            $result = $this->_dbh->exec($query);
+        }
         PEAR::staticPopErrorHandling();
         $this->_lastQuery = $this->_dbh->last_query;
         if (MDB2::isError($result)) {
