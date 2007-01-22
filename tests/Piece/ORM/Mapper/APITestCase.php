@@ -218,12 +218,8 @@ class Piece_ORM_Mapper_APITestCase extends PHPUnit_TestCase
 
     function testInsert()
     {
-        $subject = &new stdClass();
-        $subject->firstName = 'Taro';
-        $subject->lastName = 'ITEMAN';
-        $subject->serviceId = 3;
+        $id = $this->_insert();
         $mapper = &Piece_ORM_Mapper_Factory::factory('Person');
-        $id = $mapper->insert($subject);
 
         $this->assertEquals("INSERT INTO person (first_name, last_name, service_id) VALUES ('Taro', 'ITEMAN', 3)", $mapper->getLastQuery());
         $this->assertNotNull($id);
@@ -280,11 +276,41 @@ class Piece_ORM_Mapper_APITestCase extends PHPUnit_TestCase
         }
     }
 
+    function testDelete()
+    {
+        $id = $this->_insert();
+        $mapper = &Piece_ORM_Mapper_Factory::factory('Person');
+
+        $this->assertEquals("INSERT INTO person (first_name, last_name, service_id) VALUES ('Taro', 'ITEMAN', 3)", $mapper->getLastQuery());
+        $this->assertNotNull($id);
+
+        $person = &$mapper->findById($id);
+
+        $this->assertEquals('Taro', $person->firstName);
+        $this->assertEquals('ITEMAN', $person->lastName);
+        $this->assertEquals(3, $person->serviceId);
+
+        $affectedRows = $mapper->delete($id);
+
+        $this->assertEquals(1, $affectedRows);
+        $this->assertNull($mapper->findById($id));
+    }
+
     /**#@-*/
 
     /**#@+
      * @access private
      */
+
+    function _insert()
+    {
+        $subject = &new stdClass();
+        $subject->firstName = 'Taro';
+        $subject->lastName = 'ITEMAN';
+        $subject->serviceId = 3;
+        $mapper = &Piece_ORM_Mapper_Factory::factory('Person');
+        return $mapper->insert($subject);
+    }
 
     /**#@-*/
 
