@@ -157,6 +157,14 @@ class Piece_ORM_Mapper_APITestCase extends PHPUnit_TestCase
         $this->assertTrue(method_exists($mapper, 'findByVersion'));
         $this->assertFalse(method_exists($mapper, 'findByRdate'));
         $this->assertFalse(method_exists($mapper, 'findByMdate'));
+        $this->assertTrue(method_exists($mapper, 'findAll'));
+        $this->assertTrue(method_exists($mapper, 'findAllById'));
+        $this->assertTrue(method_exists($mapper, 'findAllByFirstName'));
+        $this->assertTrue(method_exists($mapper, 'findAllByLastName'));
+        $this->assertTrue(method_exists($mapper, 'findAllByVersion'));
+        $this->assertFalse(method_exists($mapper, 'findAllByRdate'));
+        $this->assertFalse(method_exists($mapper, 'findAllByMdate'));
+        $this->assertTrue(method_exists($mapper, 'insert'));
     }
 
     function testFindWithCriteria()
@@ -217,6 +225,7 @@ class Piece_ORM_Mapper_APITestCase extends PHPUnit_TestCase
         $mapper = &Piece_ORM_Mapper_Factory::factory('Person');
         $id = $mapper->insert($subject);
 
+        $this->assertEquals("INSERT INTO person (first_name, last_name, service_id) VALUES ('Taro', 'ITEMAN', 3)", $mapper->getLastQuery());
         $this->assertNotNull($id);
 
         $person = &$mapper->findById($id);
