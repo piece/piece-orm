@@ -244,6 +244,7 @@ class Piece_ORM_Mapper_Generator
      */
     function _generateInsert()
     {
+        $fieldsForInsert = array();
         foreach ($this->_metadata->getFieldNames() as $fieldName) {
             if (is_null($this->_metadata->getDefault($fieldName))) {
                 if (!$this->_metadata->isAutoIncrement($fieldName)) {
@@ -263,8 +264,16 @@ class Piece_ORM_Mapper_Generator
      */
     function _generateDelete()
     {
-        $idFieldName = $this->_metadata->getIDFieldName();
-        $this->_addDelete('DELETE FROM ' . $this->_metadata->getTableName() . ' WHERE ' . $idFieldName . ' = $' . Piece_ORM_Inflector::camelize($idFieldName, true));
+        if ($this->_metadata->hasPrimaryKey()) {
+            $primaryKey = $this->_metadata->getPrimaryKey();
+            $fieldName = array_shift($primaryKey);
+            $whereClause = "$fieldName = \$" . Piece_ORM_Inflector::camelize($fieldName, true);
+            foreach ($primaryKey as $complexFieldName) {
+                $whereClause .= "$complexFieldName = \$" . Piece_ORM_Inflector::camelize($complexFieldName, true);
+            }
+
+            $this->_addDelete('DELETE FROM ' . $this->_metadata->getTableName() . " WHERE $whereClause");
+        }
     }
 
     // }}}
