@@ -145,7 +145,8 @@ class Piece_ORM_Mapper_Common
 
         if ($this->_metadata->hasID()) {
             PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
-            $id = $this->_dbh->lastInsertID($this->_metadata->getTableName(), $this->_metadata->getIDFieldName());
+            $primaryKey = $this->_metadata->getPrimaryKey();
+            $id = $this->_dbh->lastInsertID($this->_metadata->getTableName(), $primaryKey[0]);
             PEAR::staticPopErrorHandling();
             if (MDB2::isError($id)) {
                 Piece_ORM_Error::pushPEARError($id,
@@ -182,23 +183,35 @@ class Piece_ORM_Mapper_Common
     /**
      * Removes an object from a table.
      *
-     * @param mixed $id
+     * @param mixed $criteria
      * @return integer
      * @throws PIECE_ORM_ERROR_UNEXPECTED_VALUE
      * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
      */
-    function delete($id)
+    function delete($criteria)
     {
-        if (is_null($id)) {
+        if (is_null($criteria)) {
             Piece_ORM_Error::push(PIECE_ORM_ERROR_UNEXPECTED_VALUE,
                                   'An unexpected value detected. delete() cannot receive null.'
                                   );
             return;
         }
 
-        $propertyName = Piece_ORM_Inflector::camelize($this->_metadata->getIDFieldName(), true);
-        $criteria = &new stdClass();
-        $criteria->$propertyName = $id;
+        if (!is_object($criteria)) {
+            if ($this->_metadata->hasPrimaryKey() && !$this->_metadata->hasComplexPrimaryKey()) {
+                $primaryKey = $this->_metadata->getPrimaryKey();
+                $propertyName = Piece_ORM_Inflector::camelize($primaryKey[0], true);
+                $criterion = $criteria;
+                $criteria = &new stdClass();
+                $criteria->$propertyName = $criterion;
+            } else {
+                Piece_ORM_Error::push(PIECE_ORM_ERROR_UNEXPECTED_VALUE,
+                                      'An unexpected value detected. delete() can receive non-object only if a table has a single primary key and has not a complex primary key.'
+                                      );
+                return;
+            }
+        }
+
         $affectedRows = $this->_executeQuery(__FUNCTION__, $criteria, true);
         if (Piece_ORM_Error::hasErrors('exception')) {
             return;

@@ -67,7 +67,7 @@ class Piece_ORM_Metadata
     var $_tableInfo = array();
     var $_aliases = array();
     var $_hasID = false;
-    var $_IDFieldName;
+    var $_primaryKey = array();
 
     /**#@-*/
 
@@ -91,10 +91,13 @@ class Piece_ORM_Metadata
             $this->_aliases[ strtolower(Piece_ORM_Inflector::camelize($fieldInfo['name'])) ] = $fieldInfo['name'];
 
             if (strpos($fieldInfo['flags'], 'primary_key') !== false) {
-                if ($fieldInfo['autoincrement']) {
-                    $this->_hasID = true;
-                    $this->_IDFieldName = $fieldInfo['name'];
-                }
+                $this->_primaryKey[] = $fieldInfo['name'];
+            }
+        }
+
+        if (count($this->_primaryKey) == 1) {
+            if ($this->isAutoIncrement($this->_primaryKey[0])) {
+                $this->_hasID = true;
             }
         }
     }
@@ -166,19 +169,6 @@ class Piece_ORM_Metadata
     }
 
     // }}}
-    // {{{ getIDFieldName()
-
-    /**
-     * Gets the ID field name for a table.
-     *
-     * @return string
-     */
-    function getIDFieldName()
-    {
-        return $this->_IDFieldName;
-    }
-
-    // }}}
     // {{{ getDefault()
 
     /**
@@ -204,6 +194,51 @@ class Piece_ORM_Metadata
     function isAutoIncrement($fieldName)
     {
         return array_key_exists('autoincrement', $this->_tableInfo[$fieldName]);
+    }
+
+    // }}}
+    // {{{ hasPrimaryKey()
+
+    /**
+     * Returns whether a table has the primary key.
+     *
+     * @return boolean
+     */
+    function hasPrimaryKey()
+    {
+        return (boolean)count($this->_primaryKey);
+    }
+
+    // }}}
+    // {{{ hasComplexPrimaryKey()
+
+    /**
+     * Returns whether a table has the complex primary key.
+     *
+     * @return boolean
+     */
+    function hasComplexPrimaryKey()
+    {
+        if ($this->hasPrimaryKey()) {
+            return (boolean)count($this->_primaryKey) > 1;
+        } else {
+            return false;
+        }
+    }
+
+    // }}}
+    // {{{ hasComplexPrimaryKey()
+
+    /**
+     * Gets the primary key for a table as an array.
+     *
+     * @return array
+     */
+    function getPrimaryKey()
+    {
+        if ($this->hasPrimaryKey()) {
+            return $this->_primaryKey;
+        }
     }
 
     /**#@-*/
