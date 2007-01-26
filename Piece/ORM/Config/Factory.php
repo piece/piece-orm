@@ -150,7 +150,7 @@ class Piece_ORM_Config_Factory
                                   );
             Piece_ORM_Error::popCallback();
 
-            $config = &Piece_ORM_Config_Factory::_getConfigurationFromFile($configFile);
+            $config = &Piece_ORM_Config_Factory::_createConfigurationFromFile($configFile);
             return $config;
         }
 
@@ -162,7 +162,7 @@ class Piece_ORM_Config_Factory
                                   );
             Piece_ORM_Error::popCallback();
 
-            $config = &Piece_ORM_Config_Factory::_getConfigurationFromFile($configFile);
+            $config = &Piece_ORM_Config_Factory::_createConfigurationFromFile($configFile);
             return $config;
         }
 
@@ -181,7 +181,7 @@ class Piece_ORM_Config_Factory
     // {{{ _getConfiguration()
 
     /**
-     * Gets a Piece_ORM_Config object from a configuration file or a cache.
+     * Gets a Piece_ORM_Config object from a cache.
      *
      * @param string $masterFile
      * @param string $cacheDirectory
@@ -208,12 +208,12 @@ class Piece_ORM_Config_Factory
                                   );
             Piece_ORM_Error::popCallback();
 
-            $config = &Piece_ORM_Config_Factory::_getConfigurationFromFile($masterFile);
+            $config = &Piece_ORM_Config_Factory::_createConfigurationFromFile($masterFile);
             return $config;
         }
 
         if (!$config) {
-            $config = &Piece_ORM_Config_Factory::_getConfigurationFromFile($masterFile);
+            $config = &Piece_ORM_Config_Factory::_createConfigurationFromFile($masterFile);
             $result = $cache->save($config);
             if (PEAR::isError($result)) {
                 Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
@@ -229,7 +229,7 @@ class Piece_ORM_Config_Factory
     }
 
     // }}}
-    // {{{ _getConfigurationFromFile()
+    // {{{ _createConfigurationFromFile()
 
     /**
      * Parses the given file and returns a Piece_ORM_Config object.
@@ -237,7 +237,7 @@ class Piece_ORM_Config_Factory
      * @param string $file
      * @return Piece_ORM_Config
      */
-    function &_getConfigurationFromFile($file)
+    function &_createConfigurationFromFile($file)
     {
         $config = &new Piece_ORM_Config();
         $yaml = Spyc::YAMLLoad($file);
