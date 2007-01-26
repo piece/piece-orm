@@ -102,41 +102,7 @@ class Piece_ORM_Metadata_Factory
         $context = &Piece_ORM_Context::singleton();
         $tableID = sha1($context->getDSN() . ".$tableName");
         if (!array_key_exists($tableID, $GLOBALS['PIECE_ORM_Metadata_Instances'])) {
-            if (!file_exists($GLOBALS['PIECE_ORM_Metadata_CacheDirectory'])) {
-                Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
-                Piece_ORM_Error::push(PIECE_ORM_ERROR_NOT_FOUND,
-                                      "The cache directory [ {$GLOBALS['PIECE_ORM_Metadata_CacheDirectory']} ] not found.",
-                                      'warning'
-                                      );
-                Piece_ORM_Error::popCallback();
-
-                $metadata = &Piece_ORM_Metadata_Factory::_getMetadataFromDatabase($tableName);
-                if (Piece_ORM_Error::hasErrors('exception')) {
-                    $return = null;
-                    return $return;
-                }
-
-                return $metadata;
-            }
-
-            if (!is_readable($GLOBALS['PIECE_ORM_Metadata_CacheDirectory']) || !is_writable($GLOBALS['PIECE_ORM_Metadata_CacheDirectory'])) {
-                Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
-                Piece_ORM_Error::push(PIECE_ORM_ERROR_NOT_READABLE,
-                                      "The cache directory [ {$GLOBALS['PIECE_ORM_Metadata_CacheDirectory']} ] was not readable or writable.",
-                                      'warning'
-                                      );
-                Piece_ORM_Error::popCallback();
-
-                $metadata = &Piece_ORM_Metadata_Factory::_getMetadataFromDatabase($tableName);
-                if (Piece_ORM_Error::hasErrors('exception')) {
-                    $return = null;
-                    return $return;
-                }
-
-                return $metadata;
-            }
-
-            $metadata = &Piece_ORM_Metadata_Factory::_getMetadata($tableID, $tableName);
+            $metadata = &Piece_ORM_Metadata_Factory::_createMetadata($tableName, $tableID);
             if (Piece_ORM_Error::hasErrors('exception')) {
                 $return = null;
                 return $return;
@@ -165,7 +131,7 @@ class Piece_ORM_Metadata_Factory
     /**
      * Sets a cache directory.
      *
-     * @param string $directory
+     * @param string $cacheDirectory
      * @return string
      */
     function setCacheDirectory($cacheDirectory)
@@ -186,14 +152,14 @@ class Piece_ORM_Metadata_Factory
     // {{{ _getMetadata()
 
     /**
-     * Gets a Piece_ORM_Metadata object from a database or a cache.
+     * Gets a Piece_ORM_Metadata object from a cache.
      *
-     * @param string $tableID
      * @param string $tableName
+     * @param string $tableID
      * @return Piece_ORM_Metadata
      * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
      */
-    function &_getMetadata($tableID, $tableName)
+    function &_getMetadata($tableName, $tableID)
     {
         $cache = &new Cache_Lite(array('cacheDir' => "{$GLOBALS['PIECE_ORM_Metadata_CacheDirectory']}/",
                                        'automaticSerialization' => true,
@@ -208,12 +174,11 @@ class Piece_ORM_Metadata_Factory
         if (PEAR::isError($metadata)) {
             Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
             Piece_ORM_Error::push(PIECE_ORM_ERROR_CANNOT_READ,
-                                  "Cannot read the cache file in the directory [ {$GLOBALS['PIECE_ORM_Metadata_CacheDirectory']} ].",
-                                  'warning'
+                                  "Cannot read the cache file in the directory [ {$GLOBALS['PIECE_ORM_Metadata_CacheDirectory']} ]."
                                   );
             Piece_ORM_Error::popCallback();
 
-            $metadata = &Piece_ORM_Metadata_Factory::_getMetadataFromDatabase($tableName);
+            $metadata = &Piece_ORM_Metadata_Factory::_createMetadataFromDatabase($tableName);
             if (Piece_ORM_Error::hasErrors('exception')) {
                 $return = null;
                 return $return;
@@ -223,7 +188,7 @@ class Piece_ORM_Metadata_Factory
         }
 
         if (!$metadata) {
-            $metadata = &Piece_ORM_Metadata_Factory::_getMetadataFromDatabase($tableName);
+            $metadata = &Piece_ORM_Metadata_Factory::_createMetadataFromDatabase($tableName);
             if (Piece_ORM_Error::hasErrors('exception')) {
                 $return = null;
                 return $return;
@@ -244,16 +209,16 @@ class Piece_ORM_Metadata_Factory
     }
 
     // }}}
-    // {{{ _getMetadataFromDatabase()
+    // {{{ _createMetadataFromDatabase()
 
     /**
-     * Gets a Piece_ORM_Metadata object from a database.
+     * Creates a Piece_ORM_Metadata object from a database.
      *
      * @param string $tableName
      * @return Piece_ORM_Metadata
      * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
      */
-    function &_getMetadataFromDatabase($tableName)
+    function &_createMetadataFromDatabase($tableName)
     {
         $context = &Piece_ORM_Context::singleton();
         $dbh = &$context->getConnection();
@@ -287,6 +252,47 @@ class Piece_ORM_Metadata_Factory
         }
 
         $metadata = &new Piece_ORM_Metadata($tableInfo);
+        return $metadata;
+    }
+
+    // }}}
+    // {{{ _createMetadata()
+
+    /**
+     * Creates a Piece_ORM_Metadata object from a cache or a database.
+     *
+     * @param string $tableName
+     * @param string $tableID
+     * @return Piece_ORM_Metadata
+     * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
+     */
+    function &_createMetadata($tableName, $tableID)
+    {
+        if (!file_exists($GLOBALS['PIECE_ORM_Metadata_CacheDirectory'])) {
+            Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
+            Piece_ORM_Error::push(PIECE_ORM_ERROR_NOT_FOUND,
+                                  "The cache directory [ {$GLOBALS['PIECE_ORM_Metadata_CacheDirectory']} ] not found.",
+                                  'warning'
+                                  );
+            Piece_ORM_Error::popCallback();
+
+            $metadata = &Piece_ORM_Metadata_Factory::_createMetadataFromDatabase($tableName);
+            return $metadata;
+        }
+
+        if (!is_readable($GLOBALS['PIECE_ORM_Metadata_CacheDirectory']) || !is_writable($GLOBALS['PIECE_ORM_Metadata_CacheDirectory'])) {
+            Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
+            Piece_ORM_Error::push(PIECE_ORM_ERROR_NOT_READABLE,
+                                  "The cache directory [ {$GLOBALS['PIECE_ORM_Metadata_CacheDirectory']} ] was not readable or writable.",
+                                  'warning'
+                                  );
+            Piece_ORM_Error::popCallback();
+
+            $metadata = &Piece_ORM_Metadata_Factory::_createMetadataFromDatabase($tableName);
+            return $metadata;
+        }
+
+        $metadata = &Piece_ORM_Metadata_Factory::_getMetadata($tableName, $tableID);
         return $metadata;
     }
 
