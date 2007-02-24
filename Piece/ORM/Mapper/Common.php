@@ -220,6 +220,41 @@ class Piece_ORM_Mapper_Common
         return $affectedRows;
     }
 
+    // }}}
+    // {{{ update()
+
+    /**
+     * Updates an object in a table.
+     *
+     * @param mixed $subject
+     * @return integer
+     * @throws PIECE_ORM_ERROR_UNEXPECTED_VALUE
+     * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
+     */
+    function update($subject)
+    {
+        if (is_null($subject)) {
+            Piece_ORM_Error::push(PIECE_ORM_ERROR_UNEXPECTED_VALUE,
+                                  'An unexpected value detected. update() cannot receive null.'
+                                  );
+            return;
+        }
+
+        if (!is_object($subject)) {
+            Piece_ORM_Error::push(PIECE_ORM_ERROR_UNEXPECTED_VALUE,
+                                  'An unexpected value detected. update() cannot receive non-object.'
+                                  );
+            return;
+        }
+
+        $affectedRows = $this->_executeQuery(__FUNCTION__, $subject, true);
+        if (Piece_ORM_Error::hasErrors('exception')) {
+            return;
+        }
+
+        return $affectedRows;
+    }
+
     /**#@-*/
 
     /**#@+
@@ -341,6 +376,10 @@ class Piece_ORM_Mapper_Common
      */
     function &_executeQuery($methodName, $criteria, $isManip = false)
     {
+        if (version_compare(phpversion(), '5.0.0', '>=')) {
+            $criteria = clone $criteria;
+        }
+
         $query = $this->_buildQuery($methodName, $criteria);
 
         PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
