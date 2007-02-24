@@ -165,6 +165,7 @@ class Piece_ORM_Mapper_APITestCase extends PHPUnit_TestCase
         $this->assertFalse(method_exists($mapper, 'findAllByRdate'));
         $this->assertFalse(method_exists($mapper, 'findAllByMdate'));
         $this->assertTrue(method_exists($mapper, 'insert'));
+        $this->assertTrue(method_exists($mapper, 'delete'));
     }
 
     function testFindWithCriteria()
