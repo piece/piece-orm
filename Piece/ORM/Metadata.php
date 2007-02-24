@@ -186,7 +186,7 @@ class Piece_ORM_Metadata
     // {{{ isAutoIncrement()
 
     /**
-     * Returns whether a field is auto increment field or not.
+     * Returns whether a field is an auto increment field or not.
      *
      * @param string $fieldName
      * @return boolean
@@ -227,7 +227,7 @@ class Piece_ORM_Metadata
     }
 
     // }}}
-    // {{{ hasComplexPrimaryKey()
+    // {{{ getPrimaryKey()
 
     /**
      * Gets the primary key for a table as an array.
@@ -238,6 +238,24 @@ class Piece_ORM_Metadata
     {
         if ($this->hasPrimaryKey()) {
             return $this->_primaryKey;
+        }
+    }
+
+    // }}}
+    // {{{ isPartOfPrimaryKey()
+
+    /**
+     * Returns whether a field is a part of the primary key or not.
+     *
+     * @param string $fieldName
+     * @return boolean
+     */
+    function isPartOfPrimaryKey($fieldName)
+    {
+        if ($this->hasPrimaryKey()) {
+            return in_array($fieldName, $this->_primaryKey);
+        } else {
+            return false;
         }
     }
 
