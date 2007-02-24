@@ -166,6 +166,7 @@ class Piece_ORM_Mapper_APITestCase extends PHPUnit_TestCase
         $this->assertFalse(method_exists($mapper, 'findAllByMdate'));
         $this->assertTrue(method_exists($mapper, 'insert'));
         $this->assertTrue(method_exists($mapper, 'delete'));
+        $this->assertTrue(method_exists($mapper, 'update'));
     }
 
     function testFindWithCriteria()
@@ -293,8 +294,34 @@ class Piece_ORM_Mapper_APITestCase extends PHPUnit_TestCase
 
         $affectedRows = $mapper->delete($id);
 
+        $this->assertEquals("DELETE FROM person WHERE id = $id", $mapper->getLastQuery());
         $this->assertEquals(1, $affectedRows);
         $this->assertNull($mapper->findById($id));
+    }
+
+    function testUpdate()
+    {
+        $id = $this->_insert();
+        $mapper = &Piece_ORM_Mapper_Factory::factory('Person');
+
+        $this->assertEquals("INSERT INTO person (first_name, last_name, service_id) VALUES ('Taro', 'ITEMAN', 3)", $mapper->getLastQuery());
+        $this->assertNotNull($id);
+
+        $person1 = &$mapper->findById($id);
+
+        $this->assertEquals('Taro', $person1->firstName);
+        $this->assertEquals('ITEMAN', $person1->lastName);
+        $this->assertEquals(3, $person1->serviceId);
+
+        $person1->firstName = 'Seven';
+        $affectedRows = $mapper->update($person1);
+
+        $this->assertEquals("UPDATE person SET first_name = '{$person1->firstName}', last_name = '{$person1->lastName}', service_id = {$person1->serviceId}, version = {$person1->version}, rdate = '{$person1->rdate}', mdate = '{$person1->mdate}' WHERE id = $id", $mapper->getLastQuery());
+        $this->assertEquals(1, $affectedRows);
+
+        $person2 = $mapper->findById($id);
+
+        $this->assertEquals('Seven', $person2->firstName);
     }
 
     /**#@-*/
