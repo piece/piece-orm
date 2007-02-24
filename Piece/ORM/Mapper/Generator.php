@@ -112,6 +112,7 @@ class Piece_ORM_Mapper_Generator
         $this->_generateFind();
         $this->_generateInsert();
         $this->_generateDelete();
+        $this->_generateUpdate();
         $this->_generateFromConfiguration();
 
         return "class {$this->_mapperClass} extends Piece_ORM_Mapper_Common
@@ -244,16 +245,16 @@ class Piece_ORM_Mapper_Generator
      */
     function _generateInsert()
     {
-        $fieldsForInsert = array();
+        $fields = array();
         foreach ($this->_metadata->getFieldNames() as $fieldName) {
             if (is_null($this->_metadata->getDefault($fieldName))) {
                 if (!$this->_metadata->isAutoIncrement($fieldName)) {
-                    $fieldsForInsert[] = $fieldName;
+                    $fields[] = $fieldName;
                 }
             }
         }
 
-        $this->_addInsert('INSERT INTO ' . $this->_metadata->getTableName() . ' (' . implode(", ", $fieldsForInsert) . ') VALUES (' . implode(', ', array_map(create_function('$f', "return '\$' . Piece_ORM_Inflector::camelize(\$f, true);"), $fieldsForInsert)) . ')');
+        $this->_addInsert('INSERT INTO ' . $this->_metadata->getTableName() . ' (' . implode(", ", $fields) . ') VALUES (' . implode(', ', array_map(create_function('$f', "return '\$' . Piece_ORM_Inflector::camelize(\$f, true);"), $fields)) . ')');
     }
 
     // }}}
@@ -288,6 +289,49 @@ class Piece_ORM_Mapper_Generator
     {
         $this->_methodDefinitions['delete'] = "
     var \$delete = '$query';";
+    }
+
+    // }}}
+    // {{{ _generateUpdate()
+
+    /**
+     * Generates the built-in update method.
+     */
+    function _generateUpdate()
+    {
+        if ($this->_metadata->hasPrimaryKey()) {
+            $primaryKey = $this->_metadata->getPrimaryKey();
+            $fieldName = array_shift($primaryKey);
+            $whereClause = "$fieldName = \$" . Piece_ORM_Inflector::camelize($fieldName, true);
+            foreach ($primaryKey as $complexFieldName) {
+                $whereClause .= "$complexFieldName = \$" . Piece_ORM_Inflector::camelize($complexFieldName, true);
+            }
+
+            $fields = array();
+            foreach ($this->_metadata->getFieldNames() as $fieldName) {
+                if (!$this->_metadata->isAutoIncrement($fieldName)) {
+                    if (!$this->_metadata->isPartOfPrimaryKey($fieldName)) {
+                        $fields[] = "$fieldName = \$" . Piece_ORM_Inflector::camelize($fieldName, true);
+                    }
+                }
+            }
+
+            $this->_addUpdate('UPDATE ' . $this->_metadata->getTableName() . ' SET ' . implode(", ", $fields) . " WHERE $whereClause");
+        }
+    }
+
+    // }}}
+    // {{{ _addUpdate()
+
+    /**
+     * Adds the query for update() to the mapper source.
+     *
+     * @param string $query
+     */
+    function _addUpdate($query)
+    {
+        $this->_methodDefinitions['update'] = "
+    var \$update = '$query';";
     }
 
     /**#@-*/
