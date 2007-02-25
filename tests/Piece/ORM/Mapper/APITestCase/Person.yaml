@@ -1,16 +1,18 @@
 # $Id$
 
-- name: findByIdAndServiceId
-  query: SELECT * FROM person WHERE id = $id AND service_id = $serviceId
+method:
 
-- name: findByFirstName
-  query: SELECT * FROM person WHERE first_name = $firstName AND service_id = $serviceId
+  - name: findByIdAndServiceId
+    query: SELECT * FROM person WHERE id = $id AND service_id = $serviceId
 
-- name: insert
-  query: INSERT INTO person (first_name, last_name, service_id) VALUES ($firstName, $lastName, $serviceId)
+  - name: findByFirstName
+    query: SELECT * FROM person WHERE first_name = $firstName AND service_id = $serviceId
 
-- name: findAllByServiceId
-  query: SELECT * FROM person WHERE service_id = $serviceId AND version >= 0
+  - name: insert
+    query: INSERT INTO person (first_name, last_name, service_id) VALUES ($firstName, $lastName, $serviceId)
+
+  - name: findAllByServiceId
+    query: SELECT * FROM person WHERE service_id = $serviceId AND version >= 0
 
 # Local Variables:
 # mode: conf-colon

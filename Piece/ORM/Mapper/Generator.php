@@ -203,7 +203,7 @@ class Piece_ORM_Mapper_Generator
      */
     function _generateFromConfiguration()
     {
-        foreach ($this->_config as $method) {
+        foreach ($this->_config['method'] as $method) {
             if (preg_match('/^findBy.+$/i', $method['name'])) {
                 $this->_addFindBy($method['name'], $method['query']);
             } elseif (preg_match('/^findAll$/i', $method['name'])) {
