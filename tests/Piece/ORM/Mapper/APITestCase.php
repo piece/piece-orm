@@ -353,6 +353,62 @@ class Piece_ORM_Mapper_APITestCase extends PHPUnit_TestCase
         Piece_ORM_Error::popCallback();
     }
 
+    function testDeleteByInappropriatePrimaryKey()
+    {
+        Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
+
+        $person = &new stdClass();
+        $mapper = &Piece_ORM_Mapper_Factory::factory('Person');
+        $mapper->delete($person);
+
+        $this->assertTrue(Piece_ORM_Error::hasErrors('exception'));
+
+        $error = Piece_ORM_Error::pop();
+
+        $this->assertEquals(PIECE_ORM_ERROR_UNEXPECTED_VALUE, $error['code']);
+
+        $person = &new stdClass();
+        $person->id = null;
+        $mapper = &Piece_ORM_Mapper_Factory::factory('Person');
+        $mapper->delete($person);
+
+        $this->assertTrue(Piece_ORM_Error::hasErrors('exception'));
+
+        $error = Piece_ORM_Error::pop();
+
+        $this->assertEquals(PIECE_ORM_ERROR_UNEXPECTED_VALUE, $error['code']);
+
+        Piece_ORM_Error::popCallback();
+    }
+
+    function testUpdateByInappropriatePrimaryKey()
+    {
+        Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
+
+        $person = &new stdClass();
+        $mapper = &Piece_ORM_Mapper_Factory::factory('Person');
+        $mapper->update($person);
+
+        $this->assertTrue(Piece_ORM_Error::hasErrors('exception'));
+
+        $error = Piece_ORM_Error::pop();
+
+        $this->assertEquals(PIECE_ORM_ERROR_UNEXPECTED_VALUE, $error['code']);
+
+        $person = &new stdClass();
+        $person->id = null;
+        $mapper = &Piece_ORM_Mapper_Factory::factory('Person');
+        $mapper->update($person);
+
+        $this->assertTrue(Piece_ORM_Error::hasErrors('exception'));
+
+        $error = Piece_ORM_Error::pop();
+
+        $this->assertEquals(PIECE_ORM_ERROR_UNEXPECTED_VALUE, $error['code']);
+
+        Piece_ORM_Error::popCallback();
+    }
+
     /**#@-*/
 
     /**#@+

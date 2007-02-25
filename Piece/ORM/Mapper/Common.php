@@ -190,6 +190,13 @@ class Piece_ORM_Mapper_Common
      */
     function delete($criteria)
     {
+        if (!$this->_metadata->hasPrimaryKey()) {
+            Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_OPERATION,
+                                  'The primary key required to invoke update().'
+                                  );
+            return;
+        }
+
         if (is_null($criteria)) {
             Piece_ORM_Error::push(PIECE_ORM_ERROR_UNEXPECTED_VALUE,
                                   'An unexpected value detected. delete() cannot receive null.'
@@ -212,7 +219,7 @@ class Piece_ORM_Mapper_Common
                 return;
             }
 
-            if ($this->_metadata->hasPrimaryKey() && !$this->_metadata->hasComplexPrimaryKey()) {
+            if (!$this->_metadata->hasComplexPrimaryKey()) {
                 $primaryKey = $this->_metadata->getPrimaryKey();
                 $propertyName = Piece_ORM_Inflector::camelize($primaryKey[0], true);
                 $criterion = $criteria;
@@ -221,6 +228,30 @@ class Piece_ORM_Mapper_Common
             } else {
                 Piece_ORM_Error::push(PIECE_ORM_ERROR_UNEXPECTED_VALUE,
                                       'An unexpected value detected. delete() can receive non-object only if a table has a single primary key and has not a complex primary key.'
+                                      );
+                return;
+            }
+        }
+
+        foreach ($this->_metadata->getPrimaryKey() as $primaryKey) {
+            $propertyName = Piece_ORM_Inflector::camelize($primaryKey, true);
+            if (!array_key_exists($propertyName, $criteria)) {
+                Piece_ORM_Error::push(PIECE_ORM_ERROR_UNEXPECTED_VALUE,
+                                      'The primary key not found in the given value.'
+                                      );
+                return;
+            }
+
+            if (!is_scalar($criteria->$propertyName)) {
+                Piece_ORM_Error::push(PIECE_ORM_ERROR_UNEXPECTED_VALUE,
+                                      'An inappropriate value for the primary key detected.'
+                                      );
+                return;
+            }
+
+            if (!strlen($criteria->$propertyName)) {
+                Piece_ORM_Error::push(PIECE_ORM_ERROR_UNEXPECTED_VALUE,
+                                      'An inappropriate value for the primary key detected.'
                                       );
                 return;
             }
@@ -247,6 +278,13 @@ class Piece_ORM_Mapper_Common
      */
     function update($subject)
     {
+        if (!$this->_metadata->hasPrimaryKey()) {
+            Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_OPERATION,
+                                  'The primary key required to invoke update().'
+                                  );
+            return;
+        }
+
         if (is_null($subject)) {
             Piece_ORM_Error::push(PIECE_ORM_ERROR_UNEXPECTED_VALUE,
                                   'An unexpected value detected. update() cannot receive null.'
@@ -259,6 +297,30 @@ class Piece_ORM_Mapper_Common
                                   'An unexpected value detected. update() cannot receive non-object.'
                                   );
             return;
+        }
+
+        foreach ($this->_metadata->getPrimaryKey() as $primaryKey) {
+            $propertyName = Piece_ORM_Inflector::camelize($primaryKey, true);
+            if (!array_key_exists($propertyName, $subject)) {
+                Piece_ORM_Error::push(PIECE_ORM_ERROR_UNEXPECTED_VALUE,
+                                      'The primary key not found in the given value.'
+                                      );
+                return;
+            }
+
+            if (!is_scalar($subject->$propertyName)) {
+                Piece_ORM_Error::push(PIECE_ORM_ERROR_UNEXPECTED_VALUE,
+                                      'An inappropriate value for the primary key detected.'
+                                      );
+                return;
+            }
+
+            if (!strlen($subject->$propertyName)) {
+                Piece_ORM_Error::push(PIECE_ORM_ERROR_UNEXPECTED_VALUE,
+                                      'An inappropriate value for the primary key detected.'
+                                      );
+                return;
+            }
         }
 
         $affectedRows = $this->_executeQuery(__FUNCTION__, $subject, true);
@@ -391,7 +453,7 @@ class Piece_ORM_Mapper_Common
     function &_executeQuery($methodName, $criteria, $isManip = false)
     {
         if (version_compare(phpversion(), '5.0.0', '>=')) {
-            $criteria = clone $criteria;
+            $criteria = clone($criteria);
         }
 
         $query = $this->_buildQuery($methodName, $criteria);
