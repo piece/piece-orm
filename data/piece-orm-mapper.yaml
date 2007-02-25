@@ -1,0 +1,22 @@
+# $Id$
+
+name: mapper
+desc: the definition of Piece_ORM mapper configuration file.
+type: map
+mapping:
+  "method":
+    type: seq
+    required: no
+    sequence:
+      - type: map
+        required: yes
+        mapping:
+          "name": { type: str, required: yes }
+          "query": { type: str, required: yes }
+
+# Local Variables:
+# mode: conf-colon
+# coding: iso-8859-1
+# tab-width: 2
+# indent-tabs-mode: nil
+# End:
