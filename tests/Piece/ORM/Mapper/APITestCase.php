@@ -282,16 +282,6 @@ class Piece_ORM_Mapper_APITestCase extends PHPUnit_TestCase
     {
         $id = $this->_insert();
         $mapper = &Piece_ORM_Mapper_Factory::factory('Person');
-
-        $this->assertEquals("INSERT INTO person (first_name, last_name, service_id) VALUES ('Taro', 'ITEMAN', 3)", $mapper->getLastQuery());
-        $this->assertNotNull($id);
-
-        $person = &$mapper->findById($id);
-
-        $this->assertEquals('Taro', $person->firstName);
-        $this->assertEquals('ITEMAN', $person->lastName);
-        $this->assertEquals(3, $person->serviceId);
-
         $affectedRows = $mapper->delete($id);
 
         $this->assertEquals("DELETE FROM person WHERE id = $id", $mapper->getLastQuery());
@@ -303,16 +293,7 @@ class Piece_ORM_Mapper_APITestCase extends PHPUnit_TestCase
     {
         $id = $this->_insert();
         $mapper = &Piece_ORM_Mapper_Factory::factory('Person');
-
-        $this->assertEquals("INSERT INTO person (first_name, last_name, service_id) VALUES ('Taro', 'ITEMAN', 3)", $mapper->getLastQuery());
-        $this->assertNotNull($id);
-
         $person1 = &$mapper->findById($id);
-
-        $this->assertEquals('Taro', $person1->firstName);
-        $this->assertEquals('ITEMAN', $person1->lastName);
-        $this->assertEquals(3, $person1->serviceId);
-
         $person1->firstName = 'Seven';
         $affectedRows = $mapper->update($person1);
 
@@ -322,6 +303,54 @@ class Piece_ORM_Mapper_APITestCase extends PHPUnit_TestCase
         $person2 = $mapper->findById($id);
 
         $this->assertEquals('Seven', $person2->firstName);
+    }
+
+    function testDeleteByNull()
+    {
+        Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
+
+        $mapper = &Piece_ORM_Mapper_Factory::factory('Person');
+        $mapper->delete(null);
+
+        $this->assertTrue(Piece_ORM_Error::hasErrors('exception'));
+
+        $error = Piece_ORM_Error::pop();
+
+        $this->assertEquals(PIECE_ORM_ERROR_UNEXPECTED_VALUE, $error['code']);
+
+        Piece_ORM_Error::popCallback();
+    }
+
+    function testDeleteByEmptyString()
+    {
+        Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
+
+        $mapper = &Piece_ORM_Mapper_Factory::factory('Person');
+        $mapper->delete('');
+
+        $this->assertTrue(Piece_ORM_Error::hasErrors('exception'));
+
+        $error = Piece_ORM_Error::pop();
+
+        $this->assertEquals(PIECE_ORM_ERROR_UNEXPECTED_VALUE, $error['code']);
+
+        Piece_ORM_Error::popCallback();
+    }
+
+    function testDeleteByResource()
+    {
+        Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
+
+        $mapper = &Piece_ORM_Mapper_Factory::factory('Person');
+        $mapper->delete(fopen(__FILE__, 'r'));
+
+        $this->assertTrue(Piece_ORM_Error::hasErrors('exception'));
+
+        $error = Piece_ORM_Error::pop();
+
+        $this->assertEquals(PIECE_ORM_ERROR_UNEXPECTED_VALUE, $error['code']);
+
+        Piece_ORM_Error::popCallback();
     }
 
     /**#@-*/

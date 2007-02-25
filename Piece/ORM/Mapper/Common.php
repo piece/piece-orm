@@ -198,6 +198,20 @@ class Piece_ORM_Mapper_Common
         }
 
         if (!is_object($criteria)) {
+            if (!is_scalar($criteria)) {
+                Piece_ORM_Error::push(PIECE_ORM_ERROR_UNEXPECTED_VALUE,
+                                      'An unexpected value detected. delete() cannot receive non-scalar.'
+                                      );
+                return;
+            }
+
+            if (!strlen($criteria)) {
+                Piece_ORM_Error::push(PIECE_ORM_ERROR_UNEXPECTED_VALUE,
+                                      'An unexpected value detected. delete() cannot receive empty string.'
+                                      );
+                return;
+            }
+
             if ($this->_metadata->hasPrimaryKey() && !$this->_metadata->hasComplexPrimaryKey()) {
                 $primaryKey = $this->_metadata->getPrimaryKey();
                 $propertyName = Piece_ORM_Inflector::camelize($primaryKey[0], true);
