@@ -212,6 +212,10 @@ class Piece_ORM_Mapper_Generator
                 $this->_addFindAllBy($method['name'], $method['query']);
             } elseif (preg_match('/^insert$/i', $method['name'])) {
                 $this->_addInsert($method['query']);
+            } elseif (preg_match('/^update$/i', $method['name'])) {
+                $this->_addUpdate($method['query']);
+            } elseif (preg_match('/^delete$/i', $method['name'])) {
+                $this->_addDelete($method['query']);
             }
         }
     }

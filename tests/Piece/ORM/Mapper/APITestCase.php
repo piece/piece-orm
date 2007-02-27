@@ -426,6 +426,60 @@ class Piece_ORM_Mapper_APITestCase extends PHPUnit_TestCase
         $this->assertEquals('Taro', $person->firstName);
         $this->assertEquals('ITEMAN', $person->lastName);
         $this->assertEquals(1, $person->serviceId);
+
+        $cache = &new Cache_Lite(array('cacheDir' => "$cacheDirectory/",
+                                       'automaticSerialization' => true,
+                                       'errorHandlingAPIBreak' => true)
+                                 );
+        $cache->clean();
+    }
+
+    function testOverwriteUpdateQuery()
+    {
+        $cacheDirectory = dirname(__FILE__) . '/' . basename(__FILE__, '.php') . '/Overwrite';
+        Piece_ORM_Mapper_Factory::setConfigDirectory($cacheDirectory);
+        Piece_ORM_Mapper_Factory::setCacheDirectory($cacheDirectory);
+
+        $id = $this->_insert();
+        $mapper = &Piece_ORM_Mapper_Factory::factory('Person');
+        $person1 = &$mapper->findById($id);
+        $person1->firstName = 'Seven';
+        $affectedRows = $mapper->update($person1);
+
+        $this->assertEquals("UPDATE person SET first_name = '{$person1->firstName}', last_name = '{$person1->lastName}', version = version + 1, mdate = CURRENT_TIMESTAMP WHERE id = $id AND service_id = {$person1->serviceId}", $mapper->getLastQuery());
+        $this->assertEquals(1, $affectedRows);
+
+        $person2 = $mapper->findById($id);
+
+        $this->assertEquals('Seven', $person2->firstName);
+
+        $cache = &new Cache_Lite(array('cacheDir' => "$cacheDirectory/",
+                                       'automaticSerialization' => true,
+                                       'errorHandlingAPIBreak' => true)
+                                 );
+        $cache->clean();
+    }
+
+    function testOverwriteDeleteQuery()
+    {
+        $cacheDirectory = dirname(__FILE__) . '/' . basename(__FILE__, '.php') . '/Overwrite';
+        Piece_ORM_Mapper_Factory::setConfigDirectory($cacheDirectory);
+        Piece_ORM_Mapper_Factory::setCacheDirectory($cacheDirectory);
+
+        $id = $this->_insert();
+        $mapper = &Piece_ORM_Mapper_Factory::factory('Person');
+        $person = &$mapper->findById($id);
+        $affectedRows = $mapper->delete($person);
+
+        $this->assertEquals("DELETE FROM person WHERE id = $id AND service_id = {$person->serviceId}", $mapper->getLastQuery());
+        $this->assertEquals(1, $affectedRows);
+        $this->assertNull($mapper->findById($id));
+
+        $cache = &new Cache_Lite(array('cacheDir' => "$cacheDirectory/",
+                                       'automaticSerialization' => true,
+                                       'errorHandlingAPIBreak' => true)
+                                 );
+        $cache->clean();
     }
 
     /**#@-*/
