@@ -409,6 +409,25 @@ class Piece_ORM_Mapper_APITestCase extends PHPUnit_TestCase
         Piece_ORM_Error::popCallback();
     }
 
+    function testOverwriteInsertQuery()
+    {
+        $cacheDirectory = dirname(__FILE__) . '/' . basename(__FILE__, '.php') . '/Overwrite';
+        Piece_ORM_Mapper_Factory::setConfigDirectory($cacheDirectory);
+        Piece_ORM_Mapper_Factory::setCacheDirectory($cacheDirectory);
+
+        $id = $this->_insert();
+        $mapper = &Piece_ORM_Mapper_Factory::factory('Person');
+
+        $this->assertEquals("INSERT INTO person (first_name, last_name, service_id) VALUES ('Taro', 'ITEMAN', 1)", $mapper->getLastQuery());
+        $this->assertNotNull($id);
+
+        $person = &$mapper->findById($id);
+
+        $this->assertEquals('Taro', $person->firstName);
+        $this->assertEquals('ITEMAN', $person->lastName);
+        $this->assertEquals(1, $person->serviceId);
+    }
+
     /**#@-*/
 
     /**#@+
