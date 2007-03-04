@@ -34,13 +34,17 @@
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License (revised)
  * @version    SVN: $Id$
  * @link       http://piece-framework.com/piece-orm/
+ * @see        Piece_ORM_Inflector
  * @since      File available since Release 0.1.0
  */
 
-// {{{ Piece_ORM_Inflector
+require_once 'PHPUnit.php';
+require_once 'Piece/ORM/Inflector.php';
+
+// {{{ Piece_ORM_InflectorTestCase
 
 /**
- * A utility class for words operation.
+ * TestCase for Piece_ORM_Inflector
  *
  * @package    Piece_ORM
  * @author     KUBO Atsuhiro <iteman@users.sourceforge.net>
@@ -48,9 +52,10 @@
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License (revised)
  * @version    Release: @package_version@
  * @link       http://piece-framework.com/piece-orm/
+ * @see        Piece_ORM_Inflector
  * @since      Class available since Release 0.1.0
  */
-class Piece_ORM_Inflector
+class Piece_ORM_InflectorTestCase extends PHPUnit_TestCase
 {
 
     // {{{ properties
@@ -69,59 +74,12 @@ class Piece_ORM_Inflector
 
     /**#@+
      * @access public
-     * @static
      */
 
-    // }}}
-    // {{{ camelize()
-
-    /**
-     * Camelizes a word.
-     *
-     * @param string  $word
-     * @param boolean $lowercaseFirstLetter
-     * @return string
-     * @link http://www.zend.com/codex.php?id=1564&single=1
-     */
-    function camelize($word, $lowercaseFirstLetter = false)
+    function testUnderscore()
     {
-        $camelizedWord = str_replace(' ', '', ucwords(preg_replace('/[^A-Z^a-z^0-9]+/', ' ', $word)));
-        if (!$lowercaseFirstLetter) {
-            return $camelizedWord;
-        } else {
-            return Piece_ORM_Inflector::lowercaseFirstLetter($camelizedWord);
-        }
-    }
-
-    // }}}
-    // {{{ underscore()
-
-    /**
-     * Underscores a word.
-     *
-     * @param string $word
-     * @return string
-     * @link http://www.zend.com/codex.php?id=1564&single=1
-     */
-    function underscore($word)
-    {
-        return strtolower(preg_replace('/[^A-Z^a-z^0-9]+/', '_',
-                                       preg_replace('/([a-z\d])([A-Z])/', '\1_\2',
-                                                    preg_replace('/([A-Z]+)([A-Z][a-z])/', '\1_\2', $word))));
-    }
-
-    // }}}
-    // {{{ lowercaseFirstLetter()
-
-    /**
-     * Lowercases the first letter in a word.
-     *
-     * @param string $word
-     * @return string
-     */
-    function lowercaseFirstLetter($word)
-    {
-        return strtolower(substr($word, 0, 1)) . substr($word, 1);
+        $this->assertEquals('keyword_id', Piece_ORM_Inflector::underscore('keywordId'));
+        $this->assertEquals('keyword1_id', Piece_ORM_Inflector::underscore('keyword1Id'));
     }
 
     /**#@-*/
