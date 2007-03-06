@@ -48,7 +48,8 @@ require_once 'Piece/ORM/Config.php';
 // {{{ Piece_ORM_Mapper_APITestCase
 
 /**
- * TestCase for Piece_ORM_Mapper_Factory
+ * The base class for compatibility test. This class provides test cases to
+ * check compatibility for various DB implementations.
  *
  * @package    Piece_ORM
  * @author     KUBO Atsuhiro <iteman@users.sourceforge.net>
@@ -59,7 +60,7 @@ require_once 'Piece/ORM/Config.php';
  * @see        Piece_ORM_Mapper_Common
  * @since      Class available since Release 0.1.0
  */
-class Piece_ORM_Mapper_APITestCase extends PHPUnit_TestCase
+class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
 {
 
     // {{{ properties
@@ -77,6 +78,7 @@ class Piece_ORM_Mapper_APITestCase extends PHPUnit_TestCase
     var $_cacheDirectory;
     var $_oldCacheDirectory;
     var $_oldMetadataCacheDirectory;
+    var $_dsn;
 
     /**#@-*/
 
@@ -87,10 +89,11 @@ class Piece_ORM_Mapper_APITestCase extends PHPUnit_TestCase
     function setUp()
     {
         Piece_ORM_Error::pushCallback(create_function('$error', 'var_dump($error); return ' . PEAR_ERRORSTACK_DIE . ';'));
-        $this->_cacheDirectory = dirname(__FILE__) . '/' . basename(__FILE__, '.php');
+        preg_match('/^.+_(.+)testcase$/i', get_class($this), $matches);
+        $this->_cacheDirectory = dirname(__FILE__) . '/' . ucwords($matches[1]) . 'TestCase';
         $config = &new Piece_ORM_Config();
         $config->addConfiguration('piece',
-                                  'pgsql://piece:piece@localhost/piece', 
+                                  $this->_dsn,
                                   array('debug' => 2, 'result_buffering' => false)
                                   );
         $context = &Piece_ORM_Context::singleton();
@@ -223,7 +226,8 @@ class Piece_ORM_Mapper_APITestCase extends PHPUnit_TestCase
         $id = $this->_insert();
         $mapper = &Piece_ORM_Mapper_Factory::factory('Person');
 
-        $this->assertEquals("INSERT INTO person (first_name, last_name, service_id) VALUES ('Taro', 'ITEMAN', 3)", $mapper->getLastQuery());
+        $this->_assertQueryForTestInsert($mapper->getLastQuery());
+//         $this->assertEquals("INSERT INTO person (first_name, last_name, service_id) VALUES ('Taro', 'ITEMAN', 3)", $mapper->getLastQuery());
         $this->assertNotNull($id);
 
         $person = &$mapper->findById($id);
@@ -411,14 +415,14 @@ class Piece_ORM_Mapper_APITestCase extends PHPUnit_TestCase
 
     function testOverwriteInsertQuery()
     {
-        $cacheDirectory = dirname(__FILE__) . '/' . basename(__FILE__, '.php') . '/Overwrite';
+        $cacheDirectory = "{$this->_cacheDirectory}/Overwrite";
         Piece_ORM_Mapper_Factory::setConfigDirectory($cacheDirectory);
         Piece_ORM_Mapper_Factory::setCacheDirectory($cacheDirectory);
 
         $id = $this->_insert();
         $mapper = &Piece_ORM_Mapper_Factory::factory('Person');
 
-        $this->assertEquals("INSERT INTO person (first_name, last_name, service_id) VALUES ('Taro', 'ITEMAN', 1)", $mapper->getLastQuery());
+        $this->_assertQueryForTestOverwriteInsertQuery($mapper->getLastQuery());
         $this->assertNotNull($id);
 
         $person = &$mapper->findById($id);
@@ -436,7 +440,7 @@ class Piece_ORM_Mapper_APITestCase extends PHPUnit_TestCase
 
     function testOverwriteUpdateQuery()
     {
-        $cacheDirectory = dirname(__FILE__) . '/' . basename(__FILE__, '.php') . '/Overwrite';
+        $cacheDirectory = "{$this->_cacheDirectory}/Overwrite";
         Piece_ORM_Mapper_Factory::setConfigDirectory($cacheDirectory);
         Piece_ORM_Mapper_Factory::setCacheDirectory($cacheDirectory);
 
@@ -446,7 +450,7 @@ class Piece_ORM_Mapper_APITestCase extends PHPUnit_TestCase
         $person1->firstName = 'Seven';
         $affectedRows = $mapper->update($person1);
 
-        $this->assertEquals("UPDATE person SET first_name = '{$person1->firstName}', last_name = '{$person1->lastName}', version = version + 1, mdate = CURRENT_TIMESTAMP WHERE id = $id AND service_id = {$person1->serviceId}", $mapper->getLastQuery());
+        $this->_assertQueryForTestOverwriteUpdateQuery($mapper->getLastQuery(), $person1);
         $this->assertEquals(1, $affectedRows);
 
         $person2 = $mapper->findById($id);
@@ -462,7 +466,7 @@ class Piece_ORM_Mapper_APITestCase extends PHPUnit_TestCase
 
     function testOverwriteDeleteQuery()
     {
-        $cacheDirectory = dirname(__FILE__) . '/' . basename(__FILE__, '.php') . '/Overwrite';
+        $cacheDirectory = "{$this->_cacheDirectory}/Overwrite";
         Piece_ORM_Mapper_Factory::setConfigDirectory($cacheDirectory);
         Piece_ORM_Mapper_Factory::setCacheDirectory($cacheDirectory);
 
@@ -494,9 +498,18 @@ class Piece_ORM_Mapper_APITestCase extends PHPUnit_TestCase
         $subject->firstName = 'Taro';
         $subject->lastName = 'ITEMAN';
         $subject->serviceId = 3;
+        $this->_addMissingPropertyForInsert($subject);
         $mapper = &Piece_ORM_Mapper_Factory::factory('Person');
         return $mapper->insert($subject);
     }
+
+    function _assertQueryForTestInsert($query) {}
+
+    function _addMissingPropertyForInsert($subject) {}
+
+    function _assertQueryForTestOverwriteInsertQuery($query) {}
+
+    function _assertQueryForTestOverwriteUpdateQuery($query, $domainObject) {}
 
     /**#@-*/
 
