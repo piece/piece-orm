@@ -217,20 +217,14 @@ class Piece_ORM_Error
             $backtrace = debug_backtrace();
         }
 
-        if ($level == 'exception') {
-            $context = $error->getBacktrace();
-        } else {
-            $context = array();
-        }
-
         Piece_ORM_Error::push($code, $message, $level, $params,
                               array('code' => $error->getCode(),
                                     'message' => $error->getMessage(),
-                                    'params' => array(),
+                                    'params' => array('userinfo' => $error->getUserInfo(),
+                                                      'debuginfo' => $error->getDebugInfo()),
                                     'package' => 'PEAR',
                                     'level' => $level,
-                                    'time' => $time,
-                                    'context' => $context),
+                                    'time' => $time),
                               $backtrace
                               );
     }
