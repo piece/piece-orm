@@ -184,7 +184,7 @@ class Piece_ORMTestCase extends PHPUnit_TestCase
                              $this->_cacheDirectory,
                              $this->_cacheDirectory
                              );
-        $mapper = &Piece_ORM::getMapper('person');
+        $mapper = &Piece_ORM::getMapper('Person');
 
         $this->assertTrue(is_subclass_of($mapper, 'Piece_ORM_Mapper_Common'));
     }
