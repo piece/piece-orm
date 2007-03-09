@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- $Id$ -->
+<!DOCTYPE package SYSTEM "http://pear.php.net/dtd/package-1.0">
+<package version="1.0" packagerversion="1.5.0">
+ <name>Piece_ORM</name>
+ <summary>An object-relational mapping framework for PHP</summary>
+ <description>Piece_ORM is an object-relational mapping framework for PHP.
+
+Piece_ORM is a framework against the background of Data Mapper.
+A mapper is automatically generated from a configuration file and the metadata of a table.
+Piece_ORM uses the stdClass as the default domain model for a mapper, and uses a stdClass object as a criteria object for SELECT queries.
+ </description>
+ <maintainers>
+  <maintainer>
+   <user>iteman</user>
+   <name>KUBO Atsuhiro</name>
+   <email>iteman@users.sourceforge.net</email>
+   <role>lead</role>
+  </maintainer>
+  </maintainers>
+ <release>
+  <version>0.1.0</version>
+  <date>2007-03-09</date>
+  <license>BSD License (revised)</license>
+  <state>alpha</state>
+  <notes>This is the first release of Piece_ORM.
+  </notes>
+  <deps>
+   <dep type="php" rel="ge" version="4.3.0" optional="no"/>
+   <dep type="pkg" rel="ge" version="2.3.0" optional="no">MDB2</dep>
+   <dep type="pkg" rel="ge" version="1.7.0" optional="no">Cache_Lite</dep>
+   <dep type="pkg" rel="ge" version="1.4.3" optional="no">PEAR</dep>
+   <dep type="pkg" rel="ge" version="0.4.0" optional="yes">Stagehand_TestRunner</dep>
+  </deps>
+  <filelist>
+   <dir name="/" baseinstalldir="/">
+    <dir name="data">
+     <dir name="schemas">
+      <dir name="mysql">
+       <file role="data" name="person.ddl">
+        <replace from="@package_version@" to="version" type="package-info"/>
+       </file>
+      </dir> <!-- /data/schemas/mysql -->
+      <dir name="pgsql">
+       <file role="data" name="person.ddl">
+        <replace from="@package_version@" to="version" type="package-info"/>
+       </file>
+      </dir> <!-- /data/schemas/pgsql -->
+     </dir> <!-- /data/schemas -->
+     <file role="data" name="piece-orm-mapper.yaml">
+      <replace from="@package_version@" to="version" type="package-info"/>
+     </file>
+    </dir> <!-- /data -->
+    <dir name="Piece">
+     <dir name="ORM">
+      <dir name="Config">
+       <file role="php" name="Factory.php">
+        <replace from="@package_version@" to="version" type="package-info"/>
+       </file>
+      </dir> <!-- /Piece/ORM/Config -->
+      <dir name="Mapper">
+       <file role="php" name="Common.php">
+        <replace from="@package_version@" to="version" type="package-info"/>
+       </file>
+       <file role="php" name="Factory.php">
+        <replace from="@package_version@" to="version" type="package-info"/>
+       </file>
+       <file role="php" name="Generator.php">
+        <replace from="@package_version@" to="version" type="package-info"/>
+       </file>
+      </dir> <!-- /Piece/ORM/Mapper -->
+      <dir name="Metadata">
+       <file role="php" name="Factory.php">
+        <replace from="@package_version@" to="version" type="package-info"/>
+       </file>
+      </dir> <!-- /Piece/ORM/Metadata -->
+      <file role="php" name="Config.php">
+       <replace from="@package_version@" to="version" type="package-info"/>
+      </file>
+      <file role="php" name="Context.php">
+       <replace from="@package_version@" to="version" type="package-info"/>
+      </file>
+      <file role="php" name="Error.php">
+       <replace from="@package_version@" to="version" type="package-info"/>
+      </file>
+      <file role="php" name="Inflector.php">
+       <replace from="@package_version@" to="version" type="package-info"/>
+      </file>
+      <file role="php" name="Metadata.php">
+       <replace from="@package_version@" to="version" type="package-info"/>
+      </file>
+     </dir> <!-- /Piece/ORM -->
+     <file role="php" name="ORM.php">
+      <replace from="@package_version@" to="version" type="package-info"/>
+     </file>
+    </dir> <!-- /Piece -->
+    <dir name="tests">
+     <dir name="Piece">
+      <dir name="ORM">
+       <dir name="Config">
+        <dir name="FactoryTestCase">
+         <file role="test" name="piece-orm-config.yaml">
+          <replace from="@package_version@" to="version" type="package-info"/>
+         </file>
+        </dir> <!-- /tests/Piece/ORM/Config/FactoryTestCase -->
+        <file role="test" name="FactoryTestCase.php">
+         <replace from="@package_version@" to="version" type="package-info"/>
+        </file>
+        <file role="test" name="TestRunner.php">
+         <replace from="@package_version@" to="version" type="package-info"/>
+        </file>
+       </dir> <!-- /tests/Piece/ORM/Config -->
+       <dir name="Mapper">
+        <dir name="FactoryTestCase">
+         <file role="test" name="Person.yaml">
+          <replace from="@package_version@" to="version" type="package-info"/>
+         </file>
+        </dir> <!-- /tests/Piece/ORM/Mapper/FactoryTestCase -->
+        <dir name="MysqlTestCase">
+         <dir name="Overwrite">
+          <file role="test" name="Person.yaml">
+           <replace from="@package_version@" to="version" type="package-info"/>
+          </file>
+         </dir> <!-- /tests/Piece/ORM/Mapper/MysqlTestCase/Overwrite -->
+         <file role="test" name="Person.yaml">
+          <replace from="@package_version@" to="version" type="package-info"/>
+         </file>
+        </dir> <!-- /tests/Piece/ORM/Mapper/MysqlTestCase -->
+        <dir name="PgsqlTestCase">
+         <dir name="Overwrite">
+          <file role="test" name="Person.yaml">
+           <replace from="@package_version@" to="version" type="package-info"/>
+          </file>
+         </dir> <!-- /tests/Piece/ORM/Mapper/PgsqlTestCase/Overwrite -->
+         <file role="test" name="Person.yaml">
+          <replace from="@package_version@" to="version" type="package-info"/>
+         </file>
+        </dir> <!-- /tests/Piece/ORM/Mapper/PgsqlTestCase -->
+        <file role="test" name="CompatibilityTest.php">
+         <replace from="@package_version@" to="version" type="package-info"/>
+        </file>
+        <file role="test" name="FactoryTestCase.php">
+         <replace from="@package_version@" to="version" type="package-info"/>
+        </file>
+        <file role="test" name="MysqlTestCase.php">
+         <replace from="@package_version@" to="version" type="package-info"/>
+        </file>
+        <file role="test" name="PgsqlTestCase.php">
+         <replace from="@package_version@" to="version" type="package-info"/>
+        </file>
+        <file role="test" name="TestRunner.php">
+         <replace from="@package_version@" to="version" type="package-info"/>
+        </file>
+       </dir> <!-- /tests/Piece/ORM/Mapper -->
+       <dir name="Metadata">
+        <file role="test" name="FactoryTestCase.php">
+         <replace from="@package_version@" to="version" type="package-info"/>
+        </file>
+        <file role="test" name="TestRunner.php">
+         <replace from="@package_version@" to="version" type="package-info"/>
+        </file>
+       </dir> <!-- /tests/Piece/ORM/Metadata -->
+       <file role="test" name="ConfigTestCase.php">
+        <replace from="@package_version@" to="version" type="package-info"/>
+       </file>
+       <file role="test" name="InflectorTestCase.php">
+        <replace from="@package_version@" to="version" type="package-info"/>
+       </file>
+       <file role="test" name="TestRunner.php">
+        <replace from="@package_version@" to="version" type="package-info"/>
+       </file>
+      </dir> <!-- /tests/Piece/ORM -->
+      <dir name="ORMTestCase">
+       <file role="test" name="Person.yaml">
+        <replace from="@package_version@" to="version" type="package-info"/>
+       </file>
+       <file role="test" name="piece-orm-config.yaml">
+        <replace from="@package_version@" to="version" type="package-info"/>
+       </file>
+      </dir> <!-- /tests/Piece/ORMTestCase -->
+      <file role="test" name="ORMTestCase.php">
+       <replace from="@package_version@" to="version" type="package-info"/>
+      </file>
+      <file role="test" name="TestRunner.php">
+       <replace from="@package_version@" to="version" type="package-info"/>
+      </file>
+     </dir> <!-- /tests/Piece -->
+     <file role="test" name="AllTestRunner.php">
+      <replace from="@package_version@" to="version" type="package-info"/>
+     </file>
+    </dir> <!-- /tests -->
+   </dir> <!-- / -->
+  </filelist>
+ </release>
+ <changelog>
+   <release>
+    <version>0.1.0</version>
+    <date>2007-03-09</date>
+    <license>BSD License (revised)</license>
+    <state>alpha</state>
+    <notes>This is the first release of Piece_ORM.
+    </notes>
+   </release>
+ </changelog>
+</package>

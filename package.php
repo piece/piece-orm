@@ -46,7 +46,7 @@ $version = '0.1.0';
 $apiVersion = '0.1.0';
 $apiStability = 'beta';
 $releaseStability = 'alpha';
-$notes = '';
+$notes = 'This is the first release of Piece_ORM.';
 
 $package = new PEAR_PackageFileManager2();
 $package->setOptions(array('filelistgenerator' => 'svn',
