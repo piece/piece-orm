@@ -122,8 +122,9 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
 
     function testFind()
     {
+        $id = $this->_insert();
         $mapper = &Piece_ORM_Mapper_Factory::factory('Person');
-        $person = &$mapper->findById(1);
+        $person = &$mapper->findById($id);
 
         $this->assertEquals(strtolower('stdClass'), strtolower(get_class($person)));
         $this->assertTrue(array_key_exists('id', $person));
@@ -132,6 +133,8 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         $this->assertTrue(array_key_exists('version', $person));
         $this->assertTrue(array_key_exists('rdate', $person));
         $this->assertTrue(array_key_exists('mdate', $person));
+
+        $mapper->delete($id);
     }
 
     function testFindWithNull()
@@ -174,11 +177,12 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
 
     function testFindWithCriteria()
     {
-        $expectedQuery = 'SELECT * FROM person WHERE id = 1';
+        $id = $this->_insert();
+        $expectedQuery = "SELECT * FROM person WHERE id = $id";
         $criteria = &new stdClass();
-        $criteria->id = 1;
+        $criteria->id = $id;
         $mapper = &Piece_ORM_Mapper_Factory::factory('Person');
-        $person = &$mapper->findById(1);
+        $person = &$mapper->findById($id);
         $mapper = &Piece_ORM_Mapper_Factory::factory('Person');
 
         $this->assertEquals($expectedQuery, $mapper->getLastQuery());
@@ -191,16 +195,20 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         {
             $this->assertEquals($value, $personWithCriteria->$key);
         }
+
+        $mapper->delete($id);
     }
 
     function testFindWithUserDefineMethod()
     {
+        $id = $this->_insert();
         $criteria = &new stdClass();
-        $criteria->id = 1;
-        $criteria->serviceId = 2;
+        $criteria->id = $id;
+        $criteria->serviceId = 3;
         $mapper = &Piece_ORM_Mapper_Factory::factory('Person');
         $person = &$mapper->findByIdAndServiceId($criteria);
 
+        $this->assertEquals("SELECT * FROM person WHERE id = $id AND service_id = 3", $mapper->getLastQuery());
         $this->assertEquals(strtolower('stdClass'), strtolower(get_class($person)));
         $this->assertTrue(array_key_exists('id', $person));
         $this->assertTrue(array_key_exists('firstName', $person));
@@ -208,6 +216,8 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         $this->assertTrue(array_key_exists('version', $person));
         $this->assertTrue(array_key_exists('rdate', $person));
         $this->assertTrue(array_key_exists('mdate', $person));
+
+        $mapper->delete($id);
     }
 
     function testOverwriteBuiltinMethod()
@@ -221,30 +231,16 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         $this->assertEquals("SELECT * FROM person WHERE first_name = 'Atsuhiro' AND service_id = 1", $mapper->getLastQuery());
     }
 
-    function testInsert()
-    {
-        $id = $this->_insert();
-        $mapper = &Piece_ORM_Mapper_Factory::factory('Person');
-
-        $this->_assertQueryForTestInsert($mapper->getLastQuery());
-//         $this->assertEquals("INSERT INTO person (first_name, last_name, service_id) VALUES ('Taro', 'ITEMAN', 3)", $mapper->getLastQuery());
-        $this->assertNotNull($id);
-
-        $person = &$mapper->findById($id);
-
-        $this->assertEquals('Taro', $person->firstName);
-        $this->assertEquals('ITEMAN', $person->lastName);
-        $this->assertEquals(3, $person->serviceId);
-    }
-
     function testFindAll()
     {
+        $this->_insert();
+        $this->_insert();
         $mapper = &Piece_ORM_Mapper_Factory::factory('Person');
         $people = $mapper->findAll();
 
         $this->assertEquals('SELECT * FROM person', $mapper->getLastQuery());
         $this->assertTrue(is_array($people));
-        $this->assertTrue(count($people));
+        $this->assertEquals(2, count($people));
 
         foreach ($people as $person) {
             $this->assertEquals(strtolower('stdClass'), strtolower(get_class($person)));
@@ -255,15 +251,21 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
             $this->assertTrue(array_key_exists('rdate', $person));
             $this->assertTrue(array_key_exists('mdate', $person));
         }
+
+        foreach ($people as $person) {
+            $mapper->delete($person->id);
+        }
     }
 
     function testFindAllWithCriteria()
     {
-        $expectedQuery = 'SELECT * FROM person WHERE service_id = 2 AND version >= 0';
+        $this->_insert();
+        $this->_insert();
+        $expectedQuery = 'SELECT * FROM person WHERE service_id = 3 AND version >= 0';
         $criteria = &new stdClass();
-        $criteria->serviceId = 2;
+        $criteria->serviceId = 3;
         $mapper = &Piece_ORM_Mapper_Factory::factory('Person');
-        $people = $mapper->findAllByServiceId(2);
+        $people = $mapper->findAllByServiceId(3);
 
         $this->assertEquals($expectedQuery, $mapper->getLastQuery());
 
@@ -272,7 +274,7 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         $this->assertEquals($expectedQuery, $mapper->getLastQuery());
 
         $this->assertTrue(is_array($people));
-        $this->assertTrue(count($people));
+        $this->assertEquals(2, count($people));
 
         for ($i = 0; $i < count($people); ++$i) {
             foreach ($people[$i] as $key => $value)
@@ -280,17 +282,10 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
                 $this->assertEquals($value, $peopleWithCriteria[$i]->$key);
             }
         }
-    }
 
-    function testDelete()
-    {
-        $id = $this->_insert();
-        $mapper = &Piece_ORM_Mapper_Factory::factory('Person');
-        $affectedRows = $mapper->delete($id);
-
-        $this->assertEquals("DELETE FROM person WHERE id = $id", $mapper->getLastQuery());
-        $this->assertEquals(1, $affectedRows);
-        $this->assertNull($mapper->findById($id));
+        foreach ($people as $person) {
+            $mapper->delete($person->id);
+        }
     }
 
     function testUpdate()
@@ -307,6 +302,8 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         $person2 = $mapper->findById($id);
 
         $this->assertEquals('Seven', $person2->firstName);
+
+        $mapper->delete($id);
     }
 
     function testDeleteByNull()
@@ -436,6 +433,9 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
                                        'errorHandlingAPIBreak' => true)
                                  );
         $cache->clean();
+        $mapper->delete((object)array('id' => $person->id, 'serviceId' => 1));
+
+        $this->assertEquals("DELETE FROM person WHERE id = {$person->id} AND service_id = 1", $mapper->getLastQuery());
     }
 
     function testOverwriteUpdateQuery()
@@ -462,28 +462,9 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
                                        'errorHandlingAPIBreak' => true)
                                  );
         $cache->clean();
-    }
+        $mapper->delete((object)array('id' => $person1->id, 'serviceId' => $person1->serviceId));
 
-    function testOverwriteDeleteQuery()
-    {
-        $cacheDirectory = "{$this->_cacheDirectory}/Overwrite";
-        Piece_ORM_Mapper_Factory::setConfigDirectory($cacheDirectory);
-        Piece_ORM_Mapper_Factory::setCacheDirectory($cacheDirectory);
-
-        $id = $this->_insert();
-        $mapper = &Piece_ORM_Mapper_Factory::factory('Person');
-        $person = &$mapper->findById($id);
-        $affectedRows = $mapper->delete($person);
-
-        $this->assertEquals("DELETE FROM person WHERE id = $id AND service_id = {$person->serviceId}", $mapper->getLastQuery());
-        $this->assertEquals(1, $affectedRows);
-        $this->assertNull($mapper->findById($id));
-
-        $cache = &new Cache_Lite(array('cacheDir' => "$cacheDirectory/",
-                                       'automaticSerialization' => true,
-                                       'errorHandlingAPIBreak' => true)
-                                 );
-        $cache->clean();
+        $this->assertEquals("DELETE FROM person WHERE id = {$person1->id} AND service_id = {$person1->serviceId}", $mapper->getLastQuery());
     }
 
     /**#@-*/
