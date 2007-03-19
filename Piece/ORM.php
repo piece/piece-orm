@@ -87,32 +87,24 @@ class Piece_ORM
      * file in the given configration directory using
      * Piece_ORM_Config_Factory::factory(). The method creates a new object
      * if the load failed.
-     * Second this method merges the given configuretion into the loaded
-     * configuration.
-     * Finally this method sets the configuration to the current context.
+     * Second this method sets the configuration to the current context.
      * And also this method sets a configuration/cache directory for mappers
      * and a cache directory for Piece_ORM_Metadata class.
      *
-     * @param string           $configDirectory
-     * @param string           $cacheDirectory
-     * @param Piece_ORM_Config $dynamicConfig
-     * @param string           $mapperConfigDirectory
-     * @param string           $mapperCacheDirectory
-     * @param string           $metadataCacheDirectory
+     * @param string $configDirectory
+     * @param string $cacheDirectory
+     * @param string $mapperConfigDirectory
+     * @param string $mapperCacheDirectory
+     * @param string $metadataCacheDirectory
      */
     function configure($configDirectory,
                        $cacheDirectory,
-                       $dynamicConfig,
                        $mapperConfigDirectory,
                        $mapperCacheDirectory,
                        $metadataCacheDirectory = null
                        )
     {
         $config = &Piece_ORM_Config_Factory::factory($configDirectory, $cacheDirectory);
-
-        if (strtolower(get_class($dynamicConfig)) == strtolower('Piece_ORM_Config')) {
-            $config->merge($dynamicConfig);
-        }
 
         $context = &Piece_ORM_Context::singleton();
         $context->setConfiguration($config);
@@ -142,6 +134,21 @@ class Piece_ORM
     {
         $mapper = &Piece_ORM_Mapper_Factory::factory($mapperName);
         return $mapper;
+    }
+
+    // }}}
+    // {{{ getConfiguration()
+
+    /**
+     * Gets the Piece_ORM_Config object after calling configure().
+     *
+     * @return Piece_ORM_Config
+     */
+    function &getConfiguration()
+    {
+        $context = &Piece_ORM_Context::singleton();
+        $config = &$context->getConfiguration();
+        return $config;
     }
 
     /**#@-*/

@@ -118,7 +118,6 @@ class Piece_ORMTestCase extends PHPUnit_TestCase
 
         Piece_ORM::configure($this->_cacheDirectory,
                              $this->_cacheDirectory,
-                             null,
                              $this->_cacheDirectory,
                              $this->_cacheDirectory,
                              $this->_cacheDirectory
@@ -142,7 +141,13 @@ class Piece_ORMTestCase extends PHPUnit_TestCase
 
         $this->assertTrue(count($yaml));
 
-        $config = &new Piece_ORM_Config();
+        Piece_ORM::configure($this->_cacheDirectory,
+                             $this->_cacheDirectory,
+                             $this->_cacheDirectory,
+                             $this->_cacheDirectory,
+                             $this->_cacheDirectory
+                             );
+        $config = &Piece_ORM::getConfiguration();
         $config->addConfiguration('database1',
                                   'pgsql://piece:piece@localhost/piece',
                                   array('debug' => 5)
@@ -155,15 +160,6 @@ class Piece_ORMTestCase extends PHPUnit_TestCase
                                   'pgsql://piece:piece@localhost/piece',
                                   array('debug' => 0, 'result_buffering' => false)
                                   );
-        Piece_ORM::configure($this->_cacheDirectory,
-                             $this->_cacheDirectory,
-                             $config,
-                             $this->_cacheDirectory,
-                             $this->_cacheDirectory,
-                             $this->_cacheDirectory
-                             );
-        $context = &Piece_ORM_Context::singleton();
-        $config = &$context->getConfiguration();
 
         $this->assertEquals($yaml[0]['dsn'], $config->getDSN('database1'));
         $this->assertTrue($yaml[0]['options'] != $config->getOptions('database1'));
@@ -179,7 +175,6 @@ class Piece_ORMTestCase extends PHPUnit_TestCase
     {
         Piece_ORM::configure($this->_cacheDirectory,
                              $this->_cacheDirectory,
-                             null,
                              $this->_cacheDirectory,
                              $this->_cacheDirectory,
                              $this->_cacheDirectory
