@@ -124,6 +124,9 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
     {
         $id = $this->_insert();
         $mapper = &Piece_ORM_Mapper_Factory::factory('Person');
+
+        $this->_assertQueryForTestInsert($mapper->getLastQuery());
+
         $person = &$mapper->findById($id);
 
         $this->assertEquals(strtolower('stdClass'), strtolower(get_class($person)));
@@ -467,6 +470,20 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         $this->assertEquals("DELETE FROM person WHERE id = {$person1->id} AND service_id = {$person1->serviceId}", $mapper->getLastQuery());
     }
 
+    function testReplaceEmptyStringWithNull()
+    {
+        $subject = &new stdClass();
+        $subject->name = 'Foo';
+        $subject->description = '';
+        $this->_addMissingPropertyForInsert($subject);
+        $mapper = &Piece_ORM_Mapper_Factory::factory('Service');
+        $id = $mapper->insert($subject);
+
+        $this->_assertQueryForReplaceEmptyStringWithNull($mapper->getLastQuery());
+
+        $mapper->delete($id);
+    }
+
     /**#@-*/
 
     /**#@+
@@ -491,6 +508,8 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
     function _assertQueryForTestOverwriteInsertQuery($query) {}
 
     function _assertQueryForTestOverwriteUpdateQuery($query, $domainObject) {}
+
+    function _assertQueryForReplaceEmptyStringWithNull($query) {}
 
     /**#@-*/
 
