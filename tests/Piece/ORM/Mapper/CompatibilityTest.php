@@ -484,6 +484,29 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         $mapper->delete($id);
     }
 
+    function testThrowExceptionIfDetectingProblemWhenBuildingQuery()
+    {
+        $id = $this->_insert();
+        $mapper = &Piece_ORM_Mapper_Factory::factory('Person');
+        $person = &$mapper->findById($id);
+        $person->firstName = 'Seven';
+        unset($person->lastName);
+
+        Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
+
+        $affectedRows = $mapper->update($person);
+
+        $this->assertTrue(Piece_ORM_Error::hasErrors('exception'));
+
+        $error = Piece_ORM_Error::pop();
+
+        $this->assertEquals(PIECE_ORM_ERROR_INVOCATION_FAILED, $error['code']);
+
+        Piece_ORM_Error::popCallback();
+
+        $mapper->delete($id);
+    }
+
     /**#@-*/
 
     /**#@+

@@ -401,6 +401,7 @@ class Piece_ORM_Mapper_Common
      * @param string   $methodName
      * @param stdClass $criteria
      * @return string
+     * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
      */
     function _buildQuery($methodName, $criteria)
     {
@@ -410,7 +411,18 @@ class Piece_ORM_Mapper_Common
 
         extract((array)$criteria);
         $query = strtolower($methodName);
+
+        ob_start();
         eval("\$query = \"{$this->$query}\";");
+        $contents = ob_get_contents();
+        ob_end_clean();
+        if (strlen($contents)) {
+            Piece_ORM_Error::push(PIECE_ORM_ERROR_INVOCATION_FAILED,
+                                  "Failed to build a query for any reasons. See below for more details.
+ $contents");
+            return;
+        }
+
         return $query;
     }
 
@@ -457,6 +469,10 @@ class Piece_ORM_Mapper_Common
         }
 
         $query = $this->_buildQuery($methodName, $criteria);
+        if (Piece_ORM_Error::hasErrors('exception')) {
+            $return = null;
+            return $return;
+        }
 
         PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
         if (!$isManip) {
