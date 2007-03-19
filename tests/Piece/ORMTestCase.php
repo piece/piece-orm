@@ -98,6 +98,7 @@ class Piece_ORMTestCase extends PHPUnit_TestCase
 
     function tearDown()
     {
+        $GLOBALS['PIECE_ORM_Configured'] = false;
         Piece_ORM_Metadata_Factory::clearInstances();
         Piece_ORM_Mapper_Factory::clearInstances();
         Piece_ORM_Context::clear();
@@ -182,6 +183,30 @@ class Piece_ORMTestCase extends PHPUnit_TestCase
         $mapper = &Piece_ORM::getMapper('Person');
 
         $this->assertTrue(is_subclass_of($mapper, 'Piece_ORM_Mapper_Common'));
+    }
+
+    function testGetMapperBeforeCallingConfigure()
+    {
+        $mapper = &Piece_ORM::getMapper('Person');
+
+        $this->assertNull($mapper);
+        $this->assertTrue(Piece_ORM_Error::hasErrors('warning'));
+
+        $error = Piece_ORM_Error::pop();
+
+        $this->assertEquals(PIECE_ORM_ERROR_INVALID_OPERATION, $error['code']);
+    }
+
+    function testGetConfigurationBeforeCallingConfigure()
+    {
+        $config = &Piece_ORM::getConfiguration();
+
+        $this->assertNull($config);
+        $this->assertTrue(Piece_ORM_Error::hasErrors('warning'));
+
+        $error = Piece_ORM_Error::pop();
+
+        $this->assertEquals(PIECE_ORM_ERROR_INVALID_OPERATION, $error['code']);
     }
 
     /**#@-*/

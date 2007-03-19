@@ -42,6 +42,11 @@ require_once 'Piece/ORM/Mapper/Factory.php';
 require_once 'Piece/ORM/Metadata/Factory.php';
 require_once 'Piece/ORM/Context.php';
 
+// {{{ GLOBALS
+
+$GLOBALS['PIECE_ORM_Configured'] = false;
+
+// }}}
 // {{{ Piece_ORM
 
 /**
@@ -112,6 +117,8 @@ class Piece_ORM
         Piece_ORM_Mapper_Factory::setConfigDirectory($mapperConfigDirectory);
         Piece_ORM_Mapper_Factory::setCacheDirectory($mapperCacheDirectory);
         Piece_ORM_Metadata_Factory::setCacheDirectory($metadataCacheDirectory);
+
+        $GLOBALS['PIECE_ORM_Configured'] = true;
     }
 
     // }}}
@@ -132,6 +139,17 @@ class Piece_ORM
      */
     function &getMapper($mapperName)
     {
+        if (!$GLOBALS['PIECE_ORM_Configured']) {
+            Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
+            Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_OPERATION,
+                                  __FUNCTION__ . ' method must be called after calling configure().',
+                                  'warning'
+                                  );
+            Piece_ORM_Error::popCallback();
+            $return = null;
+            return $return;
+        }
+
         $mapper = &Piece_ORM_Mapper_Factory::factory($mapperName);
         return $mapper;
     }
@@ -146,6 +164,17 @@ class Piece_ORM
      */
     function &getConfiguration()
     {
+        if (!$GLOBALS['PIECE_ORM_Configured']) {
+            Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
+            Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_OPERATION,
+                                  __FUNCTION__ . ' method must be called after calling configure().',
+                                  'warning'
+                                  );
+            Piece_ORM_Error::popCallback();
+            $return = null;
+            return $return;
+        }
+
         $context = &Piece_ORM_Context::singleton();
         $config = &$context->getConfiguration();
         return $config;
