@@ -161,23 +161,6 @@ class Piece_ORM_Mapper_Common
     }
 
     // }}}
-    // {{{ findAll()
-
-    /**
-     * Finds all objects with an appropriate SQL query.
-     *
-     * @param stdClass $criteria
-     * @return array
-     * @throws PIECE_ORM_ERROR_UNEXPECTED_VALUE
-     * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
-     */
-    function findAll($criteria = null)
-    {
-        $objects = $this->_findAll(__FUNCTION__, $criteria);
-        return $objects;
-    }
-
-    // }}}
     // {{{ delete()
 
     /**

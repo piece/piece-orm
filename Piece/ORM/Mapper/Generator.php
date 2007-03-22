@@ -126,15 +126,15 @@ class Piece_ORM_Mapper_Generator
      */
 
     // }}}
-    // {{{ _addFindBy()
+    // {{{ _addFind()
 
     /**
-     * Adds a findByXXX method and its query to the mapper source.
+     * Adds a findXXX method and its query to the mapper source.
      *
      * @param string $methodName
      * @param string $query
      */
-    function _addFindBy($methodName, $query)
+    function _addFind($methodName, $query)
     {
         $propertyName = strtolower($methodName);
         $this->_methodDefinitions[$methodName] = "
@@ -164,31 +164,17 @@ class Piece_ORM_Mapper_Generator
     // {{{ _addFindAll()
 
     /**
-     * Adds the query for findAll() to the mapper source.
-     *
-     * @param string $query
-     */
-    function _addFindAll($query)
-    {
-        $this->_methodDefinitions['findall'] = "
-    var \$findall = '$query';";
-    }
-
-    // }}}
-    // {{{ _addFindAllBy()
-
-    /**
-     * Adds a findAllByXXX method and its query to the mapper source.
+     * Adds a findAllXXX method and its query to the mapper source.
      *
      * @param string $methodName
      * @param string $query
      */
-    function _addFindAllBy($methodName, $query)
+    function _addFindAll($methodName, $query)
     {
         $propertyName = strtolower($methodName);
         $this->_methodDefinitions[$methodName] = "
     var \${$propertyName} = '$query';
-    function $methodName(\$criteria)
+    function $methodName(\$criteria = null)
     {
         \$objects = \$this->_findAll(__FUNCTION__, \$criteria);
         return \$objects;
@@ -204,12 +190,10 @@ class Piece_ORM_Mapper_Generator
     function _generateFromConfiguration()
     {
         foreach ($this->_config['method'] as $method) {
-            if (preg_match('/^findBy.+$/i', $method['name'])) {
-                $this->_addFindBy($method['name'], $method['query']);
-            } elseif (preg_match('/^findAll$/i', $method['name'])) {
-                $this->_addFindAll($method['query']);
-            } elseif (preg_match('/^findAllBy.+$/i', $method['name'])) {
-                $this->_addFindAllBy($method['name'], $method['query']);
+            if (preg_match('/^findAll.*$/i', $method['name'])) {
+                $this->_addFindAll($method['name'], $method['query']);
+            } elseif (preg_match('/^find.+$/i', $method['name'])) {
+                $this->_addFind($method['name'], $method['query']);
             } elseif (preg_match('/^insert$/i', $method['name'])) {
                 $this->_addInsert($method['query']);
             } elseif (preg_match('/^update$/i', $method['name'])) {
@@ -224,7 +208,7 @@ class Piece_ORM_Mapper_Generator
     // {{{ _generateFind()
 
     /**
-     * Generates built-in findByXXX, findAll, findAllByXXX methods.
+     * Generates built-in findXXX, findAll, findAllXXX methods.
      */
     function _generateFind()
     {
@@ -233,12 +217,12 @@ class Piece_ORM_Mapper_Generator
             if ($datatype == 'integer' || $datatype == 'text') {
                 
                 $camelizedFieldName = Piece_ORM_Inflector::camelize($fieldName);
-                $this->_addFindBy("findBy$camelizedFieldName", 'SELECT * FROM ' . $this->_metadata->getTableName() . " WHERE $fieldName = \$" . Piece_ORM_Inflector::lowerCaseFirstLetter($camelizedFieldName));
-                $this->_addFindAllBy("findAllBy$camelizedFieldName", 'SELECT * FROM ' . $this->_metadata->getTableName() . " WHERE $fieldName = \$" . Piece_ORM_Inflector::lowerCaseFirstLetter($camelizedFieldName));
+                $this->_addFind("findBy$camelizedFieldName", 'SELECT * FROM ' . $this->_metadata->getTableName() . " WHERE $fieldName = \$" . Piece_ORM_Inflector::lowerCaseFirstLetter($camelizedFieldName));
+                $this->_addFindAll("findAllBy$camelizedFieldName", 'SELECT * FROM ' . $this->_metadata->getTableName() . " WHERE $fieldName = \$" . Piece_ORM_Inflector::lowerCaseFirstLetter($camelizedFieldName));
             }
         }
 
-        $this->_addFindAll('SELECT * FROM ' . $this->_metadata->getTableName());
+        $this->_addFindAll('findAll', 'SELECT * FROM ' . $this->_metadata->getTableName());
     }
 
     // }}}
