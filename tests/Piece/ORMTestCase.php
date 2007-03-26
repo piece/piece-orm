@@ -119,8 +119,6 @@ class Piece_ORMTestCase extends PHPUnit_TestCase
 
         Piece_ORM::configure($this->_cacheDirectory,
                              $this->_cacheDirectory,
-                             $this->_cacheDirectory,
-                             $this->_cacheDirectory,
                              $this->_cacheDirectory
                              );
         $context = &Piece_ORM_Context::singleton();
@@ -143,8 +141,6 @@ class Piece_ORMTestCase extends PHPUnit_TestCase
         $this->assertTrue(count($yaml));
 
         Piece_ORM::configure($this->_cacheDirectory,
-                             $this->_cacheDirectory,
-                             $this->_cacheDirectory,
                              $this->_cacheDirectory,
                              $this->_cacheDirectory
                              );
@@ -175,8 +171,6 @@ class Piece_ORMTestCase extends PHPUnit_TestCase
     function testGetMapper()
     {
         Piece_ORM::configure($this->_cacheDirectory,
-                             $this->_cacheDirectory,
-                             $this->_cacheDirectory,
                              $this->_cacheDirectory,
                              $this->_cacheDirectory
                              );

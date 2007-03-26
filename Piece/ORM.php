@@ -99,14 +99,10 @@ class Piece_ORM
      * @param string $configDirectory
      * @param string $cacheDirectory
      * @param string $mapperConfigDirectory
-     * @param string $mapperCacheDirectory
-     * @param string $metadataCacheDirectory
      */
     function configure($configDirectory,
                        $cacheDirectory,
-                       $mapperConfigDirectory,
-                       $mapperCacheDirectory,
-                       $metadataCacheDirectory = null
+                       $mapperConfigDirectory
                        )
     {
         $config = &Piece_ORM_Config_Factory::factory($configDirectory, $cacheDirectory);
@@ -115,8 +111,8 @@ class Piece_ORM
         $context->setConfiguration($config);
 
         Piece_ORM_Mapper_Factory::setConfigDirectory($mapperConfigDirectory);
-        Piece_ORM_Mapper_Factory::setCacheDirectory($mapperCacheDirectory);
-        Piece_ORM_Metadata_Factory::setCacheDirectory($metadataCacheDirectory);
+        Piece_ORM_Mapper_Factory::setCacheDirectory($cacheDirectory);
+        Piece_ORM_Metadata_Factory::setCacheDirectory($cacheDirectory);
 
         $GLOBALS['PIECE_ORM_Configured'] = true;
     }
