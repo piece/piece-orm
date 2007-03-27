@@ -82,7 +82,7 @@ class Piece_ORM_Config
      * @param string $configurationName
      * @return string
      */
-    function getDSN($configurationName = null)
+    function getDSN($configurationName)
     {
         if (!count($this->_configurations)) {
             return;
@@ -108,7 +108,7 @@ class Piece_ORM_Config
      * @param string $configurationName
      * @return array
      */
-    function getOptions($configurationName = null)
+    function getOptions($configurationName)
     {
         if (!count($this->_configurations)) {
             return;
