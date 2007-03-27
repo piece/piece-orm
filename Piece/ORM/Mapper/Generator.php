@@ -138,7 +138,7 @@ class Piece_ORM_Mapper_Generator
     {
         $propertyName = strtolower($methodName);
         $this->_methodDefinitions[$methodName] = "
-    var \${$propertyName} = '$query';
+" . $this->_getPropertyDeclaration($propertyName, $query) . "
     function &$methodName(\$criteria)
     {
         \$object = &\$this->_find(__FUNCTION__, \$criteria);
@@ -157,7 +157,7 @@ class Piece_ORM_Mapper_Generator
     function _addInsert($query)
     {
         $this->_methodDefinitions['insert'] = "
-    var \$insert = '$query';";
+" . $this->_getPropertyDeclaration('insert', $query);
     }
 
     // }}}
@@ -173,7 +173,7 @@ class Piece_ORM_Mapper_Generator
     {
         $propertyName = strtolower($methodName);
         $this->_methodDefinitions[$methodName] = "
-    var \${$propertyName} = '$query';
+" . $this->_getPropertyDeclaration($propertyName, $query) . "
     function $methodName(\$criteria = null)
     {
         \$objects = \$this->_findAll(__FUNCTION__, \$criteria);
@@ -191,15 +191,15 @@ class Piece_ORM_Mapper_Generator
     {
         foreach ($this->_config['method'] as $method) {
             if (preg_match('/^findAll.*$/i', $method['name'])) {
-                $this->_addFindAll($method['name'], $method['query']);
+                $this->_addFindAll($method['name'], @$method['query']);
             } elseif (preg_match('/^find.+$/i', $method['name'])) {
-                $this->_addFind($method['name'], $method['query']);
+                $this->_addFind($method['name'], @$method['query']);
             } elseif (preg_match('/^insert$/i', $method['name'])) {
-                $this->_addInsert($method['query']);
+                $this->_addInsert(@$method['query']);
             } elseif (preg_match('/^update$/i', $method['name'])) {
-                $this->_addUpdate($method['query']);
+                $this->_addUpdate(@$method['query']);
             } elseif (preg_match('/^delete$/i', $method['name'])) {
-                $this->_addDelete($method['query']);
+                $this->_addDelete(@$method['query']);
             }
         }
     }
@@ -277,7 +277,7 @@ class Piece_ORM_Mapper_Generator
     function _addDelete($query)
     {
         $this->_methodDefinitions['delete'] = "
-    var \$delete = '$query';";
+" . $this->_getPropertyDeclaration('delete', $query);
     }
 
     // }}}
@@ -320,7 +320,25 @@ class Piece_ORM_Mapper_Generator
     function _addUpdate($query)
     {
         $this->_methodDefinitions['update'] = "
-    var \$update = '$query';";
+" . $this->_getPropertyDeclaration('update', $query);
+    }
+
+    // }}}
+    // {{{ _getPropertyDeclaration()
+
+    /**
+     * Gets a property declaration.
+     *
+     * @param string $propertyName
+     * @param string $query
+     */
+    function _getPropertyDeclaration($propertyName, $query)
+    {
+        if (is_null($query)) {
+            return "    var \${$propertyName};";
+        } else {
+            return "    var \${$propertyName} = '$query';";
+        }
     }
 
     /**#@-*/
