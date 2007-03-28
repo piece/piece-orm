@@ -242,7 +242,9 @@ class Piece_ORM_Config_Factory
         $config = &new Piece_ORM_Config();
         $yaml = Spyc::YAMLLoad($file);
         foreach ($yaml as $configuration) {
-            $config->addConfiguration($configuration['name'], $configuration['dsn'], $configuration['options']);
+            $config->setDSN($configuration['name'], $configuration['dsn']);
+            $config->setOptions($configuration['name'], @$configuration['options']);
+            $config->setDirectorySuffix($configuration['name'], @$configuration['directorySuffix']);
         }
 
         return $config;
