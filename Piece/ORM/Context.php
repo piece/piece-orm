@@ -40,6 +40,7 @@
 require_once 'Piece/ORM/Error.php';
 require_once 'MDB2.php';
 require_once 'PEAR.php';
+require_once 'Piece/ORM/Mapper/Factory.php';
 
 // {{{ GLOBALS
 
@@ -76,6 +77,7 @@ class Piece_ORM_Context
 
     var $_config;
     var $_database;
+    var $_mapperConfigDirectory;
 
     /**#@-*/
 
@@ -154,6 +156,13 @@ class Piece_ORM_Context
     function setDatabase($name)
     {
         $this->_database = $name;
+
+        $directorySuffix = $this->_config->getDirectorySuffix($this->_database);
+        if (!is_null($directorySuffix) && strlen($directorySuffix)) {
+            Piece_ORM_Mapper_Factory::setConfigDirectory("{$this->_mapperConfigDirectory}/$directorySuffix");
+        } else {
+            Piece_ORM_Mapper_Factory::setConfigDirectory($this->_mapperConfigDirectory);
+        }
     }
 
     // }}}
@@ -207,6 +216,19 @@ class Piece_ORM_Context
 
         $dbh->setFetchMode(MDB2_FETCHMODE_ASSOC);
         return $dbh;
+    }
+
+    // }}}
+    // {{{ setMapperConfigDirectory()
+
+    /**
+     * Sets the configuration directory for the mapper configuration.
+     *
+     * @param string $mapperConfigDirectory
+     */
+    function setMapperConfigDirectory($mapperConfigDirectory)
+    {
+        $this->_mapperConfigDirectory = $mapperConfigDirectory;
     }
 
     /**#@-*/
