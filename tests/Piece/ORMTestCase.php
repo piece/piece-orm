@@ -197,6 +197,21 @@ class Piece_ORMTestCase extends PHPUnit_TestCase
         $this->assertEquals(PIECE_ORM_ERROR_INVALID_OPERATION, $error['code']);
     }
 
+    function testSetDatabase()
+    {
+        $cacheDirectory = dirname(__FILE__) . '/' . basename(__FILE__, '.php') . '/SetDatabase';
+        Piece_ORM::configure($cacheDirectory,
+                             $cacheDirectory,
+                             $cacheDirectory
+                             );
+
+        $this->assertEquals("$cacheDirectory/database1", Piece_ORM_Mapper_Factory::setConfigDirectory('./foo'));
+
+        Piece_ORM::setDatabase('database2');
+
+        $this->assertEquals("$cacheDirectory/database2", Piece_ORM_Mapper_Factory::setConfigDirectory('./foo'));
+    }
+
     /**#@-*/
 
     /**#@+
