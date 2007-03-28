@@ -77,69 +77,52 @@ class Piece_ORM_Config
     // {{{ getDSN()
 
     /**
-     * Gets the DSN for the given configuration name.
+     * Gets the DSN for the given database.
      *
-     * @param string $configurationName
+     * @param string $database
      * @return string
      */
-    function getDSN($configurationName)
+    function getDSN($database)
     {
         if (!count($this->_configurations)) {
             return;
         }
 
-        if (is_null($configurationName)) {
-            $configurationName = key($this->_configurations);
-        }
-
-        if (!array_key_exists($configurationName, $this->_configurations)) {
+        if (!array_key_exists($database, $this->_configurations)) {
             return;
         }
 
-        return $this->_configurations[$configurationName]['dsn'];
+        if (!array_key_exists('dsn', $this->_configurations[$database])) {
+            return;
+        }
+
+        return $this->_configurations[$database]['dsn'];
     }
 
     // }}}
     // {{{ getOptions()
 
     /**
-     * Gets the options for the given configuration name.
+     * Gets the options for the given database.
      *
-     * @param string $configurationName
+     * @param string $database
      * @return array
      */
-    function getOptions($configurationName)
+    function getOptions($database)
     {
         if (!count($this->_configurations)) {
             return;
         }
 
-        if (is_null($configurationName)) {
-            $configurationName = key($this->_configurations);
-        }
-
-        if (!array_key_exists($configurationName, $this->_configurations)) {
+        if (!array_key_exists($database, $this->_configurations)) {
             return;
         }
 
-        return $this->_configurations[$configurationName]['options'];
-    }
+        if (!array_key_exists('options', $this->_configurations[$database])) {
+            return;
+        }
 
-    // }}}
-    // {{{ addConfiguration()
-
-    /**
-     * Adds a database configuration.
-     *
-     * @param string $configurationName
-     * @param string $dsn
-     * @param array  $options
-     */
-    function addConfiguration($configurationName, $dsn, $options = false)
-    {
-        $this->_configurations[$configurationName] = array('dsn' => $dsn,
-                                                           'options' => $options
-                                                           );
+        return $this->_configurations[$database]['options'];
     }
 
     // }}}
@@ -176,11 +159,92 @@ class Piece_ORM_Config
      * A callback that will be called by array_walk() function in merge().
      *
      * @param array $configuration
-     * @param string $configurationName
+     * @param string $database
      */
-    function mergeConfigurations($configuration, $configurationName)
+    function mergeConfigurations($configuration, $database)
     {
-        $this->addConfiguration($configurationName, $configuration['dsn'], $configuration['options']);
+        $this->addConfiguration($database, $configuration['dsn'], $configuration['options']);
+    }
+
+    // }}}
+    // {{{ getDefaultDatabase()
+
+    /**
+     * Gets the default database.
+     *
+     * @return string
+     */
+    function getDefaultDatabase()
+    {
+        return key($this->_configurations);
+    }
+
+    // }}}
+    // {{{ getDirectorySuffix()
+
+    /**
+     * Gets the directory suffix for the given database.
+     *
+     * @param string $database
+     * @return string
+     */
+    function getDirectorySuffix($database)
+    {
+        if (!count($this->_configurations)) {
+            return;
+        }
+
+        if (!array_key_exists($database, $this->_configurations)) {
+            return;
+        }
+
+        if (!array_key_exists('directorySuffix', $this->_configurations[$database])) {
+            return;
+        }
+
+        return $this->_configurations[$database]['directorySuffix'];
+    }
+
+    // }}}
+    // {{{ setDSN()
+
+    /**
+     * Sets the DSN for a given database.
+     *
+     * @param string $database
+     * @param string $dsn
+     */
+    function setDSN($database, $dsn)
+    {
+        $this->_configurations[$database]['dsn'] = $dsn;
+    }
+
+    // }}}
+    // {{{ setOptions()
+
+    /**
+     * Sets the options for a given database.
+     *
+     * @param string $database
+     * @param string $options
+     */
+    function setOptions($database, $options)
+    {
+        $this->_configurations[$database]['options'] = $options;
+    }
+
+    // }}}
+    // {{{ setDirectorySuffix()
+
+    /**
+     * Sets the directory suffix for a given database.
+     *
+     * @param string $database
+     * @param string $directorySuffix
+     */
+    function setDirectorySuffix($database, $directorySuffix)
+    {
+        $this->_configurations[$database]['directorySuffix'] = $directorySuffix;
     }
 
     /**#@-*/
