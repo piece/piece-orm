@@ -190,7 +190,7 @@ class Piece_ORM
     function setDatabase($database)
     {
         $context = &Piece_ORM_Context::singleton();
-        $context->setDatabase($name);
+        $context->setDatabase($database);
     }
 
     /**#@-*/
