@@ -151,11 +151,11 @@ class Piece_ORM_Context
     /**
      * Sets a database as the current database.
      *
-     * @param string $name
+     * @param string $database
      */
-    function setDatabase($name)
+    function setDatabase($database)
     {
-        $this->_database = $name;
+        $this->_database = $database;
 
         $directorySuffix = $this->_config->getDirectorySuffix($this->_database);
         if (!is_null($directorySuffix) && strlen($directorySuffix)) {
