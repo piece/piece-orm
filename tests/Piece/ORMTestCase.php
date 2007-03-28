@@ -145,18 +145,12 @@ class Piece_ORMTestCase extends PHPUnit_TestCase
                              $this->_cacheDirectory
                              );
         $config = &Piece_ORM::getConfiguration();
-        $config->addConfiguration('database1',
-                                  'pgsql://piece:piece@localhost/piece',
-                                  array('debug' => 5)
-                                  );
-        $config->addConfiguration('database2',
-                                  'pgsql://piece:piece@localhost/piece_test',
-                                  array('debug' => 0, 'result_buffering' => false)
-                                  );
-        $config->addConfiguration('piece',
-                                  'pgsql://piece:piece@localhost/piece',
-                                  array('debug' => 0, 'result_buffering' => false)
-                                  );
+        $config->setDSN('database1', 'pgsql://piece:piece@localhost/piece');
+        $config->setOptions('database1', array('debug' => 5));
+        $config->setDSN('database2', 'pgsql://piece:piece@localhost/piece_test');
+        $config->setOptions('database2', array('debug' => 0, 'result_buffering' => false));
+        $config->setDSN('piece', 'pgsql://piece:piece@localhost/piece');
+        $config->setOptions('piece', array('debug' => 0, 'result_buffering' => false));
 
         $this->assertEquals($yaml[0]['dsn'], $config->getDSN('database1'));
         $this->assertTrue($yaml[0]['options'] != $config->getOptions('database1'));

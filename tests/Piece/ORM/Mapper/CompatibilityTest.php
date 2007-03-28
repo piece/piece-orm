@@ -92,12 +92,11 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         preg_match('/^.+_(.+)testcase$/i', get_class($this), $matches);
         $this->_cacheDirectory = dirname(__FILE__) . '/' . ucwords($matches[1]) . 'TestCase';
         $config = &new Piece_ORM_Config();
-        $config->addConfiguration('piece',
-                                  $this->_dsn,
-                                  array('debug' => 2, 'result_buffering' => false)
-                                  );
+        $config->setDSN('piece', $this->_dsn);
+        $config->setOptions('piece', array('debug' => 2, 'result_buffering' => false));
         $context = &Piece_ORM_Context::singleton();
         $context->setConfiguration($config);
+        $context->setDatabase('piece');
         $this->_oldCacheDirectory = Piece_ORM_Mapper_Factory::setConfigDirectory($this->_cacheDirectory);
         Piece_ORM_Mapper_Factory::setCacheDirectory($this->_cacheDirectory);
         $this->_oldMetadataCacheDirectory = Piece_ORM_Metadata_Factory::setCacheDirectory($this->_cacheDirectory);

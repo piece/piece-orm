@@ -88,12 +88,11 @@ class Piece_ORM_Metadata_FactoryTestCase extends PHPUnit_TestCase
         Piece_ORM_Error::pushCallback(create_function('$error', 'var_dump($error); return ' . PEAR_ERRORSTACK_DIE . ';'));
         $this->_cacheDirectory = dirname(__FILE__) . '/' . basename(__FILE__, '.php');
         $config = &new Piece_ORM_Config();
-        $config->addConfiguration('piece',
-                                  'pgsql://piece:piece@localhost/piece', 
-                                  array('debug' => 2, 'result_buffering' => false)
-                                  );
+        $config->setDSN('piece', 'pgsql://piece:piece@localhost/piece');
+        $config->setOptions('piece', array('debug' => 2, 'result_buffering' => false));
         $context = &Piece_ORM_Context::singleton();
         $context->setConfiguration($config);
+        $context->setDatabase('piece');
         $this->_oldCacheDirectory = Piece_ORM_Metadata_Factory::setCacheDirectory($this->_cacheDirectory);
     }
 
