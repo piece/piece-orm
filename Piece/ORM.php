@@ -93,8 +93,9 @@ class Piece_ORM
      * Piece_ORM_Config_Factory::factory(). The method creates a new object
      * if the load failed.
      * Second this method sets the configuration to the current context.
-     * And also this method sets a configuration/cache directory for mappers
-     * and a cache directory for Piece_ORM_Metadata class.
+     * And also this method sets the configuration directory for the mapper
+     * configuration, and the cache directory for mappers, and the cache
+     * directory for Piece_ORM_Metadata class.
      *
      * @param string $configDirectory
      * @param string $cacheDirectory
@@ -105,12 +106,14 @@ class Piece_ORM
                        $mapperConfigDirectory
                        )
     {
-        $config = &Piece_ORM_Config_Factory::factory($configDirectory, $cacheDirectory);
-
+        $config = &Piece_ORM_Config_Factory::factory($configDirectory,
+                                                     $cacheDirectory
+                                                     );
         $context = &Piece_ORM_Context::singleton();
         $context->setConfiguration($config);
+        $context->setMapperConfigDirectory($mapperConfigDirectory);
+        $context->setDatabase($config->getDefaultDatabase());
 
-        Piece_ORM_Mapper_Factory::setConfigDirectory($mapperConfigDirectory);
         Piece_ORM_Mapper_Factory::setCacheDirectory($cacheDirectory);
         Piece_ORM_Metadata_Factory::setCacheDirectory($cacheDirectory);
 
@@ -174,6 +177,20 @@ class Piece_ORM
         $context = &Piece_ORM_Context::singleton();
         $config = &$context->getConfiguration();
         return $config;
+    }
+
+    // }}}
+    // {{{ setDatabase()
+
+    /**
+     * Sets a database as the current database.
+     *
+     * @param string $database
+     */
+    function setDatabase($database)
+    {
+        $context = &Piece_ORM_Context::singleton();
+        $context->setDatabase($name);
     }
 
     /**#@-*/
