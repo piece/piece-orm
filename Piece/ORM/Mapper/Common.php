@@ -437,7 +437,7 @@ class Piece_ORM_Mapper_Common
     // {{{ _executeQueryWithCriteria()
 
     /**
-     * Executes a query.
+     * Executes a query with the given criteria.
      *
      * @param string   $methodName
      * @param stdClass $criteria
@@ -457,23 +457,7 @@ class Piece_ORM_Mapper_Common
             return $return;
         }
 
-        PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
-        if (!$isManip) {
-            $result = &$this->_dbh->query($query);
-        } else {
-            $result = $this->_dbh->exec($query);
-        }
-        PEAR::staticPopErrorHandling();
-        $this->_lastQuery = $this->_dbh->last_query;
-        if (MDB2::isError($result)) {
-            Piece_ORM_Error::pushPEARError($result,
-                                           PIECE_ORM_ERROR_INVOCATION_FAILED,
-                                           'Failed to invoke MDB2_Driver_' . $this->_getDriverName() . '::query() for any reasons.'
-                                           );
-            $return = null;
-            return $return;
-        }
-
+        $result = &$this->_executeQuery($query, $isManip);
         return $result;
     }
 
@@ -630,8 +614,10 @@ class Piece_ORM_Mapper_Common
     // {{{ _executeQuery()
 
     /**
-     * @param string   $query
-     * @param boolean  $isManip
+     * Executes a query.
+     *
+     * @param string  $query
+     * @param boolean $isManip
      * @return mixed
      * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
      */
@@ -644,7 +630,9 @@ class Piece_ORM_Mapper_Common
             $result = $this->_dbh->exec($query);
         }
         PEAR::staticPopErrorHandling();
+
         $this->_lastQuery = $this->_dbh->last_query;
+
         if (MDB2::isError($result)) {
             Piece_ORM_Error::pushPEARError($result,
                                            PIECE_ORM_ERROR_INVOCATION_FAILED,
