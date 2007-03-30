@@ -517,7 +517,7 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         $cacheDirectory = "{$this->_cacheDirectory}/ManyToManyRelationships";
         Piece_ORM_Mapper_Factory::setConfigDirectory($cacheDirectory);
         Piece_ORM_Mapper_Factory::setCacheDirectory($cacheDirectory);
-        $this->_setupForRelations();
+        $this->_setupForRelationships();
 
         $mapper = &Piece_ORM_Mapper_Factory::factory('Employee');
         $employees = $mapper->findAllWithSkills2();
@@ -578,7 +578,7 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
 
     function _assertQueryForReplaceEmptyStringWithNull($query) {}
 
-    function _setupForRelations()
+    function _setupForRelationships()
     {
         $employee1 = &new stdClass();
         $employee1->name = 'Foo';
