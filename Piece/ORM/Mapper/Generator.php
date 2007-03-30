@@ -335,7 +335,8 @@ class Piece_ORM_Mapper_Generator
     // {{{ _getQueryPropertyDeclaration()
 
     /**
-     * Gets a property declaration that will be used as the query for a method.
+     * Gets a property declaration that will be used as the query for
+     * a method.
      *
      * @param string $propertyName
      * @param string $query
@@ -353,8 +354,8 @@ class Piece_ORM_Mapper_Generator
     // {{{ _getRelationshipPropertyDeclaration()
 
     /**
-     * Gets a property declaration that will be used as the relationship information
-     * for a method.
+     * Gets a property declaration that will be used as the relationship
+     * information for a method.
      *
      * @param string $propertyName
      * @param array  $relationship
