@@ -210,6 +210,12 @@ class Piece_ORMTestCase extends PHPUnit_TestCase
         Piece_ORM::setDatabase('database2');
 
         $this->assertEquals("$cacheDirectory/database2", Piece_ORM_Mapper_Factory::setConfigDirectory('./foo'));
+
+        $cache = &new Cache_Lite(array('cacheDir' => "$cacheDirectory/",
+                                       'automaticSerialization' => true,
+                                       'errorHandlingAPIBreak' => true)
+                                 );
+        $cache->clean();
     }
 
     /**#@-*/
