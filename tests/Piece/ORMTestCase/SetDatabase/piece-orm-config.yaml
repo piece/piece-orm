@@ -1,0 +1,22 @@
+# $Id$
+
+- name: database1
+  dsn: pgsql://piece:piece@localhost/piece
+  options:
+    debug: 2
+    result_buffering: false
+  directorySuffix: database1
+
+- name: database2
+  dsn: pgsql://piece:piece@localhost/piece
+  options:
+    debug: 0
+    result_buffering: false
+  directorySuffix: database2
+
+# Local Variables:
+# mode: conf-colon
+# coding: iso-8859-1
+# tab-width: 2
+# indent-tabs-mode: nil
+# End:
