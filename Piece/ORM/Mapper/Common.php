@@ -138,7 +138,7 @@ class Piece_ORM_Mapper_Common
             return;
         }
 
-        $this->_executeQuery(__FUNCTION__, $subject, true);
+        $this->_executeQueryWithCriteria(__FUNCTION__, $subject, true);
         if (Piece_ORM_Error::hasErrors('exception')) {
             return;
         }
@@ -240,7 +240,7 @@ class Piece_ORM_Mapper_Common
             }
         }
 
-        $affectedRows = $this->_executeQuery(__FUNCTION__, $criteria, true);
+        $affectedRows = $this->_executeQueryWithCriteria(__FUNCTION__, $criteria, true);
         if (Piece_ORM_Error::hasErrors('exception')) {
             return;
         }
@@ -306,7 +306,7 @@ class Piece_ORM_Mapper_Common
             }
         }
 
-        $affectedRows = $this->_executeQuery(__FUNCTION__, $subject, true);
+        $affectedRows = $this->_executeQueryWithCriteria(__FUNCTION__, $subject, true);
         if (Piece_ORM_Error::hasErrors('exception')) {
             return;
         }
@@ -353,7 +353,7 @@ class Piece_ORM_Mapper_Common
             $criteria->$propertyName = $criterion;
         }
 
-        $result = &$this->_executeQuery($methodName, $criteria);
+        $result = &$this->_executeQueryWithCriteria($methodName, $criteria);
         if (Piece_ORM_Error::hasErrors('exception')) {
             $return = null;
             return $return;
@@ -393,7 +393,7 @@ class Piece_ORM_Mapper_Common
         }
 
         extract((array)$criteria);
-        $query = strtolower($methodName);
+        $query = '__query__' . strtolower($methodName);
 
         ob_start();
         eval("\$query = \"{$this->$query}\";");
@@ -434,7 +434,7 @@ class Piece_ORM_Mapper_Common
     }
 
     // }}}
-    // {{{ _executeQuery()
+    // {{{ _executeQueryWithCriteria()
 
     /**
      * Executes a query.
@@ -445,7 +445,7 @@ class Piece_ORM_Mapper_Common
      * @return mixed
      * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
      */
-    function &_executeQuery($methodName, $criteria, $isManip = false)
+    function &_executeQueryWithCriteria($methodName, $criteria, $isManip = false)
     {
         if (version_compare(phpversion(), '5.0.0', '>=')) {
             $criteria = clone($criteria);
@@ -497,20 +497,32 @@ class Piece_ORM_Mapper_Common
      * Loads all objects with a result object.
      *
      * @param MDB2_Result &$result
+     * @param array       $relationship
      * @return array
+     * @throws PIECE_ORM_ERROR_UNEXPECTED_VALUE
+     * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
      */
-    function _loadAll(&$result)
+    function _loadAll(&$result, $relationship = array())
     {
+        $numberOfRelationships = count($relationship);
+        $relationshipKeys = array();
         $objects = array();
+        $objectsIndexes = array();
         $error = null;
         PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
-        while ($row = &$result->fetchRow()) {
+        for ($i = 0; $row = &$result->fetchRow(); ++$i) {
             if (MDB2::isError($row)) {
                 $error = &$row;
                 break;
             }
 
             $objects[] = &$this->_load($row);
+
+            for ($k = 0; $k < $numberOfRelationships; ++$k) {
+                $objects[$i]->{$relationship[$k]['mappedBy']} = array();
+                $relationshipKeys[$k][] = $row[ $relationship[$k]['through']['referencedColumn'] ];
+                $objectsIndexes[$k][ $row[ $relationship[$k]['through']['referencedColumn'] ] ]= $i;
+            }
         }
         PEAR::staticPopErrorHandling();
 
@@ -520,6 +532,22 @@ class Piece_ORM_Mapper_Common
                                            'Failed to invoke MDB2_Driver_' . $this->_getDriverName() . '::fetchRow() for any reasons.'
                                            );
             return;
+        }
+
+        for ($i = 0; $i < $numberOfRelationships; ++$i) {
+            $relationshipKeyFieldName = "{$relationship[$i]['through']['table']}_{$relationship[$i]['through']['column']}";
+            $query = "SELECT {$relationship[$i]['through']['table']}.{$relationship[$i]['through']['column']} AS $relationshipKeyFieldName, {$relationship[$i]['table']}.* FROM {$relationship[$i]['table']}, {$relationship[$i]['through']['table']} WHERE {$relationship[$i]['through']['table']}.{$relationship[$i]['through']['column']} IN (" . implode(',', $relationshipKeys[$i]) . ") AND {$relationship[$i]['table']}.{$relationship[$i]['column']} = {$relationship[$i]['through']['table']}.{$relationship[$i]['through']['inverseColumn']}";
+            $associatedObjects = $this->_findAllWithQuery($query);
+            if (Piece_ORM_Error::hasErrors('exception')) {
+                return;
+            }
+
+            $numberOfAssociatedObjects = count($associatedObjects);
+            $relationshipKeyPropertyName = Piece_ORM_Inflector::camelize($relationshipKeyFieldName, true);
+            for ($k = 0; $k < $numberOfAssociatedObjects; ++$k) {
+                $objects[ $objectsIndexes[$i][ $associatedObjects[$k]->$relationshipKeyPropertyName ] ]->{$relationship[$i]['mappedBy']}[] = &$associatedObjects[$k];
+                unset($associatedObjects[$k]->$relationshipKeyPropertyName);
+            }
         }
 
         return $objects;
@@ -561,7 +589,31 @@ class Piece_ORM_Mapper_Common
             $criteria->$propertyName = $criterion;
         }
 
-        $result = &$this->_executeQuery($methodName, $criteria);
+        $result = &$this->_executeQueryWithCriteria($methodName, $criteria);
+        if (Piece_ORM_Error::hasErrors('exception')) {
+            return;
+        }
+
+        $objects = $this->_loadAll($result, $this->{'__relationship__' . strtolower($methodName)});
+        if (Piece_ORM_Error::hasErrors('exception')) {
+            return;
+        }
+
+        return $objects;
+    }
+
+    // }}}
+    // {{{ _findAllWithQuery()
+
+    /**
+     * @param string $query
+     * @return array
+     * @throws PIECE_ORM_ERROR_UNEXPECTED_VALUE
+     * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
+     */
+    function _findAllWithQuery($query)
+    {
+        $result = &$this->_executeQuery($query);
         if (Piece_ORM_Error::hasErrors('exception')) {
             return;
         }
@@ -572,6 +624,37 @@ class Piece_ORM_Mapper_Common
         }
 
         return $objects;
+    }
+
+    // }}}
+    // {{{ _executeQuery()
+
+    /**
+     * @param string   $query
+     * @param boolean  $isManip
+     * @return mixed
+     * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
+     */
+    function &_executeQuery($query, $isManip = false)
+    {
+        PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
+        if (!$isManip) {
+            $result = &$this->_dbh->query($query);
+        } else {
+            $result = $this->_dbh->exec($query);
+        }
+        PEAR::staticPopErrorHandling();
+        $this->_lastQuery = $this->_dbh->last_query;
+        if (MDB2::isError($result)) {
+            Piece_ORM_Error::pushPEARError($result,
+                                           PIECE_ORM_ERROR_INVOCATION_FAILED,
+                                           'Failed to invoke MDB2_Driver_' . $this->_getDriverName() . '::query() for any reasons.'
+                                           );
+            $return = null;
+            return $return;
+        }
+
+        return $result;
     }
 
     /**#@-*/

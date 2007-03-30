@@ -1,0 +1,27 @@
+# $Id$
+
+method:
+
+  - name: findAllWithSkills1
+    relationship:
+      - type: manyToMany
+        table: skill
+
+  - name: findAllWithSkills2
+    relationship:
+      - type: manyToMany
+        mappedBy: skills
+        table: skill
+        column: id
+        through:
+          table: employee_skill
+          column: employee_id
+          referencedColumn: id
+          inverseColumn: skill_id
+
+# Local Variables:
+# mode: conf-colon
+# coding: iso-8859-1
+# tab-width: 2
+# indent-tabs-mode: nil
+# End:

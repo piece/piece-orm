@@ -133,12 +133,14 @@ class Piece_ORM_Mapper_Generator
      *
      * @param string $methodName
      * @param string $query
+     * @param array  $relationship
      */
-    function _addFind($methodName, $query)
+    function _addFind($methodName, $query, $relationship = null)
     {
         $propertyName = strtolower($methodName);
         $this->_methodDefinitions[$methodName] = "
-" . $this->_getPropertyDeclaration($propertyName, $query) . "
+" . $this->_getQueryPropertyDeclaration($propertyName, $query) . "
+" . $this->_getRelationshipPropertyDeclaration($propertyName, $relationship) . "
     function &$methodName(\$criteria)
     {
         \$object = &\$this->_find(__FUNCTION__, \$criteria);
@@ -157,7 +159,7 @@ class Piece_ORM_Mapper_Generator
     function _addInsert($query)
     {
         $this->_methodDefinitions['insert'] = "
-" . $this->_getPropertyDeclaration('insert', $query);
+" . $this->_getQueryPropertyDeclaration('insert', $query);
     }
 
     // }}}
@@ -168,12 +170,18 @@ class Piece_ORM_Mapper_Generator
      *
      * @param string $methodName
      * @param string $query
+     * @param array  $relationship
      */
-    function _addFindAll($methodName, $query)
+    function _addFindAll($methodName, $query = null, $relationship = null)
     {
+        if (is_null($query) || !strlen($query)) {
+            $query = 'SELECT * FROM ' . $this->_metadata->getTableName();
+        }
+
         $propertyName = strtolower($methodName);
         $this->_methodDefinitions[$methodName] = "
-" . $this->_getPropertyDeclaration($propertyName, $query) . "
+" . $this->_getQueryPropertyDeclaration($propertyName, $query) . "
+" . $this->_getRelationshipPropertyDeclaration($propertyName, $relationship) . "
     function $methodName(\$criteria = null)
     {
         \$objects = \$this->_findAll(__FUNCTION__, \$criteria);
@@ -191,9 +199,9 @@ class Piece_ORM_Mapper_Generator
     {
         foreach ($this->_config['method'] as $method) {
             if (preg_match('/^findAll.*$/i', $method['name'])) {
-                $this->_addFindAll($method['name'], @$method['query']);
+                $this->_addFindAll($method['name'], @$method['query'], @$method['relationship']);
             } elseif (preg_match('/^find.+$/i', $method['name'])) {
-                $this->_addFind($method['name'], @$method['query']);
+                $this->_addFind($method['name'], @$method['query'], @$method['relationship']);
             } elseif (preg_match('/^insert$/i', $method['name'])) {
                 $this->_addInsert(@$method['query']);
             } elseif (preg_match('/^update$/i', $method['name'])) {
@@ -222,7 +230,7 @@ class Piece_ORM_Mapper_Generator
             }
         }
 
-        $this->_addFindAll('findAll', 'SELECT * FROM ' . $this->_metadata->getTableName());
+        $this->_addFindAll('findAll');
     }
 
     // }}}
@@ -277,7 +285,7 @@ class Piece_ORM_Mapper_Generator
     function _addDelete($query)
     {
         $this->_methodDefinitions['delete'] = "
-" . $this->_getPropertyDeclaration('delete', $query);
+" . $this->_getQueryPropertyDeclaration('delete', $query);
     }
 
     // }}}
@@ -320,24 +328,43 @@ class Piece_ORM_Mapper_Generator
     function _addUpdate($query)
     {
         $this->_methodDefinitions['update'] = "
-" . $this->_getPropertyDeclaration('update', $query);
+" . $this->_getQueryPropertyDeclaration('update', $query);
     }
 
     // }}}
-    // {{{ _getPropertyDeclaration()
+    // {{{ _getQueryPropertyDeclaration()
 
     /**
-     * Gets a property declaration.
+     * Gets a property declaration that will be used as the query for a method.
      *
      * @param string $propertyName
      * @param string $query
      */
-    function _getPropertyDeclaration($propertyName, $query)
+    function _getQueryPropertyDeclaration($propertyName, $query)
     {
         if (is_null($query)) {
-            return "    var \${$propertyName};";
+            return "    var \$__query__{$propertyName};";
         } else {
-            return "    var \${$propertyName} = '$query';";
+            return "    var \$__query__{$propertyName} = '$query';";
+        }
+    }
+
+    // }}}
+    // {{{ _getRelationshipPropertyDeclaration()
+
+    /**
+     * Gets a property declaration that will be used as the relationship information
+     * for a method.
+     *
+     * @param string $propertyName
+     * @param array  $relationship
+     */
+    function _getRelationshipPropertyDeclaration($propertyName, $relationship)
+    {
+        if (is_array($relationship)) {
+            return "    var \$__relationship__{$propertyName} = " . var_export($relationship, true) . ';';
+        } else {
+            return "    var \$__relationship__{$propertyName} = array();";
         }
     }
 
