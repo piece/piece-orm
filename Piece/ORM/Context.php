@@ -158,10 +158,10 @@ class Piece_ORM_Context
         $this->_database = $database;
 
         $directorySuffix = $this->_config->getDirectorySuffix($this->_database);
-        if (!is_null($directorySuffix) && strlen($directorySuffix)) {
-            Piece_ORM_Mapper_Factory::setConfigDirectory("{$this->_mapperConfigDirectory}/$directorySuffix");
-        } else {
+        if (is_null($directorySuffix) || !strlen($directorySuffix)) {
             Piece_ORM_Mapper_Factory::setConfigDirectory($this->_mapperConfigDirectory);
+        } else {
+            Piece_ORM_Mapper_Factory::setConfigDirectory("{$this->_mapperConfigDirectory}/$directorySuffix");
         }
     }
 
