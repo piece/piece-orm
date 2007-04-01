@@ -44,14 +44,15 @@ require_once 'PEAR/ErrorStack.php';
 /*
  * Error codes
  */
-define('PIECE_ORM_ERROR_INVOCATION_FAILED', -1);
-define('PIECE_ORM_ERROR_NOT_FOUND',         -2);
-define('PIECE_ORM_ERROR_NOT_READABLE',      -3);
-define('PIECE_ORM_ERROR_CANNOT_READ',       -4);
-define('PIECE_ORM_ERROR_CANNOT_WRITE',      -5);
-define('PIECE_ORM_ERROR_INVALID_OPERATION', -6);
-define('PIECE_ORM_ERROR_INVALID_MAPPER',    -7);
-define('PIECE_ORM_ERROR_UNEXPECTED_VALUE',  -8);
+define('PIECE_ORM_ERROR_INVOCATION_FAILED',     -1);
+define('PIECE_ORM_ERROR_NOT_FOUND',             -2);
+define('PIECE_ORM_ERROR_NOT_READABLE',          -3);
+define('PIECE_ORM_ERROR_CANNOT_READ',           -4);
+define('PIECE_ORM_ERROR_CANNOT_WRITE',          -5);
+define('PIECE_ORM_ERROR_INVALID_OPERATION',     -6);
+define('PIECE_ORM_ERROR_INVALID_MAPPER',        -7);
+define('PIECE_ORM_ERROR_UNEXPECTED_VALUE',      -8);
+define('PIECE_ORM_ERROR_INVALID_CONFIGURATION', -9);
 
 // }}}
 // {{{ Piece_ORM_Error
