@@ -259,6 +259,20 @@ class Piece_ORM_Metadata
         }
     }
 
+    // }}}
+    // {{{ hasField()
+
+    /**
+     * Returns whether a table has the given field.
+     *
+     * @param string $fieldName
+     * @return boolean
+     */
+    function hasField($fieldName)
+    {
+        return array_key_exists($fieldName, $this->_tableInfo);
+    }
+
     /**#@-*/
 
     /**#@+
