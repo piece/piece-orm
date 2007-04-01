@@ -211,6 +211,7 @@ class Piece_ORM_Mapper_Factory
      * @throws PIECE_ORM_ERROR_CANNOT_READ
      * @throws PIECE_ORM_ERROR_CANNOT_WRITE
      * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
+     * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
      */
     function _getMapperSource($mapperID, $mapperName, $configFile)
     {
@@ -229,15 +230,13 @@ class Piece_ORM_Mapper_Factory
             Piece_ORM_Error::push(PIECE_ORM_ERROR_CANNOT_READ,
                                   "Cannot read the mapper source file in the directory [ {$GLOBALS['PIECE_ORM_Mapper_CacheDirectory']} ]."
                                   );
-            $return = null;
-            return $return;
+            return;
         }
 
         if (!$mapperSource) {
             $mapperSource = Piece_ORM_Mapper_Factory::_generateMapperSource($mapperID, $mapperName, $configFile);
             if (Piece_ORM_Error::hasErrors('exception')) {
-                $return = null;
-                return $return;
+                return;
             }
 
             $result = $cache->save($mapperSource);
@@ -245,8 +244,7 @@ class Piece_ORM_Mapper_Factory
                 Piece_ORM_Error::push(PIECE_ORM_ERROR_CANNOT_WRITE,
                                       "Cannot write the mapper source to the cache file in the directory [ {$GLOBALS['PIECE_ORM_Mapper_CacheDirectory']} ]."
                                       );
-                $return = null;
-                return $return;
+                return;
             }
         }
 
@@ -264,13 +262,13 @@ class Piece_ORM_Mapper_Factory
      * @param string $configFile
      * @return string
      * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
+     * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
      */
     function _generateMapperSource($mapperID, $mapperName, $configFile)
     {
         $metadata = &Piece_ORM_Metadata_Factory::factory($mapperName);
         if (Piece_ORM_Error::hasErrors('exception')) {
-            $return = null;
-            return $return;
+            return;
         }
 
         $yaml = Spyc::YAMLLoad($configFile);
@@ -316,6 +314,7 @@ class Piece_ORM_Mapper_Factory
      * @throws PIECE_ORM_ERROR_CANNOT_READ
      * @throws PIECE_ORM_ERROR_CANNOT_WRITE
      * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
+     * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
      */
     function _load($mapperID, $mapperName)
     {
