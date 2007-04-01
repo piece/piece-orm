@@ -6,12 +6,13 @@ method:
     relationship:
       - type: manyToMany
         table: skill
+        mappedBy: skills
 
   - name: findAllWithSkills2
     relationship:
       - type: manyToMany
-        mappedBy: skills
         table: skill
+        mappedBy: skills
         column: id
         through:
           table: employee_skill

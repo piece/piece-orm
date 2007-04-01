@@ -106,17 +106,188 @@ class Piece_ORM_Mapper_Generator
      * Generates a mapper source.
      *
      * @return string
+     * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
      */
     function generate()
     {
         $this->_generateFind();
+        if (Piece_ORM_Error::hasErrors('exception')) {
+            return;
+        }
+
         $this->_generateInsert();
         $this->_generateDelete();
         $this->_generateUpdate();
+
         $this->_generateFromConfiguration();
+        if (Piece_ORM_Error::hasErrors('exception')) {
+            return;
+        }
 
         return "class {$this->_mapperClass} extends Piece_ORM_Mapper_Common
 {" . implode("\n", $this->_methodDefinitions) . "\n}";
+    }
+
+    // }}}
+    // {{{ normalizeRelationship()
+
+    /**
+     * Normalized a relationship element.
+     *
+     * @param array $relationship
+     * @return array
+     * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
+     * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
+     */
+    function normalizeRelationship($relationship)
+    {
+        $relationshipTypes = array('manyToMany');
+        if (!array_key_exists('type', $relationship)) {
+            Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_CONFIGURATION,
+                                  'The element [ type ] is required to generate a relationship property declaration.'
+                                  );
+            return;
+        }
+
+        if (!in_array($relationship['type'], $relationshipTypes)) {
+            Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_CONFIGURATION,
+                                  'The value of the element [ type ] must be one of ' . implode(', ', $relationshipTypes)
+                                  );
+            return;
+        }
+
+        if (!array_key_exists('table', $relationship)) {
+            Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_CONFIGURATION,
+                                  'The element [ table ] is required to generate a relationship property declaration.'
+                                  );
+            return;
+        }
+
+        $relationshipMetadata = &Piece_ORM_Metadata_Factory::factory($relationship['table']);
+        if (Piece_ORM_Error::hasErrors('exception')) {
+            return;
+        }
+
+        if (!array_key_exists('mappedBy', $relationship)) {
+            Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_CONFIGURATION,
+                                  'The element [ mappedBy ] is required to generate a relationship property declaration.'
+                                  );
+            return;
+        }
+
+        if ($relationship['type'] == 'manyToMany') {
+            if (!array_key_exists('column', $relationship)) {
+                if ($relationshipMetadata->hasPrimaryKey() && !$relationshipMetadata->hasComplexPrimaryKey()) {
+                    $primaryKey = $relationshipMetadata->getPrimaryKey();
+                    $relationship['column'] = $primaryKey[0];
+                } else {
+                    Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_CONFIGURATION,
+                                          'A single primary key field is required if the element [ column ] omit.'
+                                          );
+                    return;
+                }
+            } 
+
+            if (!$relationshipMetadata->hasField($relationship['column'])) {
+                Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_CONFIGURATION,
+                                      "The field [ {$relationship['column']} ] not found in the table [ " . $this->_metadata->getTableName() . ' ].'
+                                      );
+                return;
+            }
+
+            $relationship['referencedColumn'] = null;
+
+            if (!array_key_exists('through', $relationship)) {
+                $relationship['through'] = array();
+            }
+
+            if (!array_key_exists('table', $relationship['through'])) {
+                $throughTableName1 = $this->_metadata->getTableName() . "_{$relationship['table']}";
+                $throughTableName2 = "{$relationship['table']}_" . $this->_metadata->getTableName();
+                foreach (array($throughTableName1, $throughTableName2) as $throughTableName) {
+                    Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
+                    $throughMetadata = &Piece_ORM_Metadata_Factory::factory($throughTableName);
+                    Piece_ORM_Error::popCallback();
+                    if (!Piece_ORM_Error::hasErrors('exception')) {
+                        $relationship['through']['table'] = $throughTableName;
+                        break;
+                    }
+
+                    Piece_ORM_Error::pop();
+                }
+
+                if (!$throughMetadata) {
+                    Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_CONFIGURATION,
+                                          "One of [ $throughTableName1 ] or [ $throughTableName2 ] must exists in the database, if the element [ table ] in the element [ through ] omit."
+                                          );
+                    return; 
+                }
+            }
+
+            $throughMetadata = &Piece_ORM_Metadata_Factory::factory($relationship['through']['table']);
+            if (Piece_ORM_Error::hasErrors('exception')) {
+                return;
+            }
+
+            if (!array_key_exists('column', $relationship['through'])) {
+                if ($this->_metadata->hasPrimaryKey() && !$this->_metadata->hasComplexPrimaryKey()) {
+                    $primaryKey = $this->_metadata->getPrimaryKey();
+                    $relationship['through']['column'] = $this->_metadata->getTableName() . "_{$primaryKey[0]}";
+                } else {
+                    Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_CONFIGURATION,
+                                          'A single primary key field is required, if the element [ column ] in the element [ through ] omit.'
+                                          );
+                    return;
+                }
+            } 
+
+            if (!$throughMetadata->hasField($relationship['through']['column'])) {
+                Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_CONFIGURATION,
+                                      "The field [ {$relationship['through']['column']} ] not found in the table [ " . $throughMetadata->getTableName() . ' ].'
+                                      );
+                return;
+            }
+
+            if (!array_key_exists('referencedColumn', $relationship['through'])) {
+                if ($this->_metadata->hasPrimaryKey() && !$this->_metadata->hasComplexPrimaryKey()) {
+                    $primaryKey = $this->_metadata->getPrimaryKey();
+                    $relationship['through']['referencedColumn'] = $primaryKey[0];
+                } else {
+                    Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_CONFIGURATION,
+                                          'A single primary key field is required, if the element [ referencedColumn ] in the element [ through ] omit.'
+                                          );
+                    return;
+                }
+            } 
+
+            if (!$this->_metadata->hasField($relationship['through']['referencedColumn'])) {
+                Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_CONFIGURATION,
+                                      "The field [ {$relationship['through']['referencedColumn']} ] not found in the table [ " . $this->_metadata->getTableName() . ' ].'
+                                      );
+                return;
+            }
+
+            if (!array_key_exists('inverseColumn', $relationship['through'])) {
+                if ($relationshipMetadata->hasPrimaryKey() && !$relationshipMetadata->hasComplexPrimaryKey()) {
+                    $primaryKey = $relationshipMetadata->getPrimaryKey();
+                    $relationship['through']['inverseColumn'] = $relationshipMetadata->getTableName() . "_{$primaryKey[0]}";
+                } else {
+                    Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_CONFIGURATION,
+                                          'A single primary key field is required, if the element [ column ] in the element [ through ] omit.'
+                                          );
+                    return;
+                }
+            } 
+
+            if (!$throughMetadata->hasField($relationship['through']['inverseColumn'])) {
+                Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_CONFIGURATION,
+                                      "The field [ {$relationship['through']['inverseColumn']} ] not found in the table [ " . $throughMetadata->getTableName() . ' ].'
+                                      );
+                return;
+            }
+        }
+
+        return $relationship;
     }
 
     /**#@-*/
@@ -133,14 +304,21 @@ class Piece_ORM_Mapper_Generator
      *
      * @param string $methodName
      * @param string $query
-     * @param array  $relationship
+     * @param array  $relationships
+     * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
+     * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
      */
-    function _addFind($methodName, $query, $relationship = null)
+    function _addFind($methodName, $query, $relationships = null)
     {
         $propertyName = strtolower($methodName);
+        $relationshipsPropertyDeclaration = $this->_getRelationshipPropertyDeclaration($propertyName, $relationships);
+        if (Piece_ORM_Error::hasErrors('exception')) {
+            return;
+        }
+
         $this->_methodDefinitions[$methodName] = "
 " . $this->_getQueryPropertyDeclaration($propertyName, $query) . "
-" . $this->_getRelationshipPropertyDeclaration($propertyName, $relationship) . "
+$relationshipsPropertyDeclaration
     function &$methodName(\$criteria)
     {
         \$object = &\$this->_find(__FUNCTION__, \$criteria);
@@ -170,18 +348,25 @@ class Piece_ORM_Mapper_Generator
      *
      * @param string $methodName
      * @param string $query
-     * @param array  $relationship
+     * @param array  $relationships
+     * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
+     * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
      */
-    function _addFindAll($methodName, $query = null, $relationship = null)
+    function _addFindAll($methodName, $query = null, $relationships = null)
     {
         if (is_null($query) || !strlen($query)) {
             $query = 'SELECT * FROM ' . $this->_metadata->getTableName();
         }
 
         $propertyName = strtolower($methodName);
+        $relationshipsPropertyDeclaration = $this->_getRelationshipPropertyDeclaration($propertyName, $relationships);
+        if (Piece_ORM_Error::hasErrors('exception')) {
+            return;
+        }
+
         $this->_methodDefinitions[$methodName] = "
 " . $this->_getQueryPropertyDeclaration($propertyName, $query) . "
-" . $this->_getRelationshipPropertyDeclaration($propertyName, $relationship) . "
+$relationshipsPropertyDeclaration
     function $methodName(\$criteria = null)
     {
         \$objects = \$this->_findAll(__FUNCTION__, \$criteria);
@@ -194,14 +379,23 @@ class Piece_ORM_Mapper_Generator
 
     /**
      * Generates methods from configuration.
+     *
+     * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
+     * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
      */
     function _generateFromConfiguration()
     {
         foreach ($this->_config['method'] as $method) {
             if (preg_match('/^findAll.*$/i', $method['name'])) {
                 $this->_addFindAll($method['name'], @$method['query'], @$method['relationship']);
+                if (Piece_ORM_Error::hasErrors('exception')) {
+                    return;
+                }
             } elseif (preg_match('/^find.+$/i', $method['name'])) {
                 $this->_addFind($method['name'], @$method['query'], @$method['relationship']);
+                if (Piece_ORM_Error::hasErrors('exception')) {
+                    return;
+                }
             } elseif (preg_match('/^insert$/i', $method['name'])) {
                 $this->_addInsert(@$method['query']);
             } elseif (preg_match('/^update$/i', $method['name'])) {
@@ -217,6 +411,9 @@ class Piece_ORM_Mapper_Generator
 
     /**
      * Generates built-in findXXX, findAll, findAllXXX methods.
+     *
+     * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
+     * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
      */
     function _generateFind()
     {
@@ -226,7 +423,14 @@ class Piece_ORM_Mapper_Generator
                 
                 $camelizedFieldName = Piece_ORM_Inflector::camelize($fieldName);
                 $this->_addFind("findBy$camelizedFieldName", 'SELECT * FROM ' . $this->_metadata->getTableName() . " WHERE $fieldName = \$" . Piece_ORM_Inflector::lowerCaseFirstLetter($camelizedFieldName));
+                if (Piece_ORM_Error::hasErrors('exception')) {
+                    return;
+                }
+
                 $this->_addFindAll("findAllBy$camelizedFieldName", 'SELECT * FROM ' . $this->_metadata->getTableName() . " WHERE $fieldName = \$" . Piece_ORM_Inflector::lowerCaseFirstLetter($camelizedFieldName));
+                if (Piece_ORM_Error::hasErrors('exception')) {
+                    return;
+                }
             }
         }
 
@@ -358,12 +562,20 @@ class Piece_ORM_Mapper_Generator
      * information for a method.
      *
      * @param string $propertyName
-     * @param array  $relationship
+     * @param array  $relationships
+     * @return string
+     * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
+     * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
      */
-    function _getRelationshipPropertyDeclaration($propertyName, $relationship)
+    function _getRelationshipPropertyDeclaration($propertyName, $relationships)
     {
-        if (is_array($relationship)) {
-            return "    var \$__relationship__{$propertyName} = " . var_export($relationship, true) . ';';
+        if (is_array($relationships)) {
+            $relationships = array_map(array(&$this, 'normalizeRelationship'), $relationships);
+            if (Piece_ORM_Error::hasErrors('exception')) {
+                return;
+            }
+
+            return "    var \$__relationship__{$propertyName} = " . var_export($relationships, true) . ';';
         } else {
             return "    var \$__relationship__{$propertyName} = array();";
         }

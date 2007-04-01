@@ -526,23 +526,19 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         $this->assertEquals(4, count($employees));
 
         foreach ($employees as $employee) {
-            $this->assertEquals(strtolower('stdClass'), strtolower(get_class($employee)));
-            $this->assertTrue(array_key_exists('id', $employee));
-            $this->assertTrue(array_key_exists('name', $employee));
-            $this->assertTrue(array_key_exists('version', $employee));
-            $this->assertTrue(array_key_exists('rdate', $employee));
-            $this->assertTrue(array_key_exists('mdate', $employee));
-
-            $this->assertTrue(array_key_exists('skills', $employee));
+            $this->assertEquals(array('id', 'name', 'version', 'rdate', 'mdate', 'skills'),
+                                array_keys(get_object_vars($employee))
+                                );
             $this->assertTrue(is_array($employee->skills));
+
             foreach ($employee->skills as $skill) {
-                $this->assertTrue(array_key_exists('id', $skill));
-                $this->assertTrue(array_key_exists('name', $skill));
-                $this->assertTrue(array_key_exists('version', $skill));
-                $this->assertTrue(array_key_exists('rdate', $skill));
-                $this->assertTrue(array_key_exists('mdate', $skill));
+                $this->assertEquals(array('id', 'name', 'version', 'rdate', 'mdate'),
+                                    array_keys(get_object_vars($skill))
+                                    );
             }
         }
+
+        $this->assertEquals($employees, $mapper->findAllWithSkills1());
 
         $cache = &new Cache_Lite(array('cacheDir' => "$cacheDirectory/",
                                        'automaticSerialization' => true,
