@@ -20,6 +20,12 @@ method:
           referencedColumn: id
           inverseColumn: skill_id
 
+  - name: findAllByName
+    relationship:
+      - type: manyToMany
+        table: skill
+        mappedBy: skills
+
 # Local Variables:
 # mode: conf-colon
 # coding: iso-8859-1

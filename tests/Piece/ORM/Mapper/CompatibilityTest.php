@@ -547,6 +547,37 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         $cache->clean();
     }
 
+    function testManyToManyRelationshipsWithBuiltinMethod()
+    {
+        $cacheDirectory = "{$this->_cacheDirectory}/ManyToManyRelationships";
+        Piece_ORM_Mapper_Factory::setConfigDirectory($cacheDirectory);
+        Piece_ORM_Mapper_Factory::setCacheDirectory($cacheDirectory);
+        $this->_setupForRelationships();
+
+        $mapper = &Piece_ORM_Mapper_Factory::factory('Employee');
+        $employees = $mapper->findAllByName('Qux');
+
+        $this->assertTrue(is_array($employees));
+        $this->assertEquals(1, count($employees));
+        $this->assertEquals(array('id', 'name', 'version', 'rdate', 'mdate', 'skills'),
+                            array_keys(get_object_vars($employees[0]))
+                            );
+        $this->assertTrue(is_array($employees[0]->skills));
+        $this->assertEquals(2, count($employees[0]->skills));
+
+        foreach ($employees[0]->skills as $skill) {
+            $this->assertEquals(array('id', 'name', 'version', 'rdate', 'mdate'),
+                                array_keys(get_object_vars($skill))
+                                );
+        }
+
+        $cache = &new Cache_Lite(array('cacheDir' => "$cacheDirectory/",
+                                       'automaticSerialization' => true,
+                                       'errorHandlingAPIBreak' => true)
+                                 );
+        $cache->clean();
+    }
+
     /**#@-*/
 
     /**#@+
