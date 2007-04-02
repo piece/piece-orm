@@ -73,6 +73,9 @@ class Piece_ORM_Mapper_Generator
     var $_config;
     var $_metadata;
     var $_methodDefinitions = array();
+    var $_propertyDefinitions = array('query' => array(),
+                                      'relationship' => array()
+                                      );
 
     /**#@-*/
 
@@ -125,7 +128,10 @@ class Piece_ORM_Mapper_Generator
         }
 
         return "class {$this->_mapperClass} extends Piece_ORM_Mapper_Common
-{" . implode("\n", $this->_methodDefinitions) . "\n}";
+{\n" .
+            implode("\n", $this->_propertyDefinitions['query']) . "\n" .
+            implode("\n", $this->_propertyDefinitions['relationship']) . "\n" .
+            implode("\n", $this->_methodDefinitions) . "\n}";
     }
 
     // }}}
@@ -307,14 +313,24 @@ class Piece_ORM_Mapper_Generator
     function _addFind($methodName, $query, $relationships = null)
     {
         $propertyName = strtolower($methodName);
-        $relationshipsPropertyDeclaration = $this->_getRelationshipPropertyDeclaration($propertyName, $relationships);
+
+        if (!$query) {
+            if (!array_key_exists($propertyName, $this->_propertyDefinitions['query'])) {
+                $query = 'SELECT * FROM ' . $this->_metadata->getTableName();
+            }
+        }
+
+        if ($query) {
+            $this->_propertyDefinitions['query'][$propertyName] =
+                $this->_getQueryPropertyDeclaration($propertyName, $query);
+        }
+
+        $this->_propertyDefinitions['relationship'][$propertyName] = $this->_getRelationshipPropertyDeclaration($propertyName, $relationships);
         if (Piece_ORM_Error::hasErrors('exception')) {
             return;
         }
 
         $this->_methodDefinitions[$methodName] = "
-" . $this->_getQueryPropertyDeclaration($propertyName, $query) . "
-$relationshipsPropertyDeclaration
     function &$methodName(\$criteria)
     {
         \$object = &\$this->_find(__FUNCTION__, \$criteria);
@@ -332,8 +348,9 @@ $relationshipsPropertyDeclaration
      */
     function _addInsert($query)
     {
-        $this->_methodDefinitions['insert'] = "
-" . $this->_getQueryPropertyDeclaration('insert', $query);
+        if ($query) {
+            $this->_propertyDefinitions['query']['insert'] = $this->_getQueryPropertyDeclaration('insert', $query);
+        }
     }
 
     // }}}
@@ -350,19 +367,25 @@ $relationshipsPropertyDeclaration
      */
     function _addFindAll($methodName, $query = null, $relationships = null)
     {
-        if (is_null($query) || !strlen($query)) {
-            $query = 'SELECT * FROM ' . $this->_metadata->getTableName();
+        $propertyName = strtolower($methodName);
+
+        if (!$query) {
+            if (!array_key_exists($propertyName, $this->_propertyDefinitions['query'])) {
+                $query = 'SELECT * FROM ' . $this->_metadata->getTableName();
+            }
         }
 
-        $propertyName = strtolower($methodName);
-        $relationshipsPropertyDeclaration = $this->_getRelationshipPropertyDeclaration($propertyName, $relationships);
+        if ($query) {
+            $this->_propertyDefinitions['query'][$propertyName] =
+                $this->_getQueryPropertyDeclaration($propertyName, $query);
+        }
+
+        $this->_propertyDefinitions['relationship'][$propertyName] = $this->_getRelationshipPropertyDeclaration($propertyName, $relationships);
         if (Piece_ORM_Error::hasErrors('exception')) {
             return;
         }
 
         $this->_methodDefinitions[$methodName] = "
-" . $this->_getQueryPropertyDeclaration($propertyName, $query) . "
-$relationshipsPropertyDeclaration
     function $methodName(\$criteria = null)
     {
         \$objects = \$this->_findAll(__FUNCTION__, \$criteria);
@@ -484,8 +507,9 @@ $relationshipsPropertyDeclaration
      */
     function _addDelete($query)
     {
-        $this->_methodDefinitions['delete'] = "
-" . $this->_getQueryPropertyDeclaration('delete', $query);
+        if ($query) {
+            $this->_propertyDefinitions['query']['delete'] = $this->_getQueryPropertyDeclaration('delete', $query);
+        }
     }
 
     // }}}
@@ -527,8 +551,9 @@ $relationshipsPropertyDeclaration
      */
     function _addUpdate($query)
     {
-        $this->_methodDefinitions['update'] = "
-" . $this->_getQueryPropertyDeclaration('update', $query);
+        if ($query) {
+            $this->_propertyDefinitions['query']['update'] = $this->_getQueryPropertyDeclaration('update', $query);
+        }
     }
 
     // }}}
