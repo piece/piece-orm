@@ -145,8 +145,9 @@ class Piece_ORM_Mapper_Common
 
         if ($this->_metadata->hasID()) {
             PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
-            $primaryKey = $this->_metadata->getPrimaryKey();
-            $id = $this->_dbh->lastInsertID($this->_metadata->getTableName(), $primaryKey[0]);
+            $id = $this->_dbh->lastInsertID($this->_metadata->getTableName(),
+                                            $this->_metadata->getPrimaryKey()
+                                            );
             PEAR::staticPopErrorHandling();
             if (MDB2::isError($id)) {
                 Piece_ORM_Error::pushPEARError($id,
@@ -202,9 +203,8 @@ class Piece_ORM_Mapper_Common
                 return;
             }
 
-            if (!$this->_metadata->hasComplexPrimaryKey()) {
-                $primaryKey = $this->_metadata->getPrimaryKey();
-                $propertyName = Piece_ORM_Inflector::camelize($primaryKey[0], true);
+            if ($primaryKey = $this->_metadata->getPrimaryKey()) {
+                $propertyName = Piece_ORM_Inflector::camelize($primaryKey, true);
                 $criterion = $criteria;
                 $criteria = &new stdClass();
                 $criteria->$propertyName = $criterion;
@@ -216,7 +216,7 @@ class Piece_ORM_Mapper_Common
             }
         }
 
-        foreach ($this->_metadata->getPrimaryKey() as $primaryKey) {
+        foreach ($this->_metadata->getPrimaryKeys() as $primaryKey) {
             $propertyName = Piece_ORM_Inflector::camelize($primaryKey, true);
             if (!array_key_exists($propertyName, $criteria)) {
                 Piece_ORM_Error::push(PIECE_ORM_ERROR_UNEXPECTED_VALUE,
@@ -282,7 +282,7 @@ class Piece_ORM_Mapper_Common
             return;
         }
 
-        foreach ($this->_metadata->getPrimaryKey() as $primaryKey) {
+        foreach ($this->_metadata->getPrimaryKeys() as $primaryKey) {
             $propertyName = Piece_ORM_Inflector::camelize($primaryKey, true);
             if (!array_key_exists($propertyName, $subject)) {
                 Piece_ORM_Error::push(PIECE_ORM_ERROR_UNEXPECTED_VALUE,

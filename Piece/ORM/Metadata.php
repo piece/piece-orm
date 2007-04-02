@@ -210,31 +210,14 @@ class Piece_ORM_Metadata
     }
 
     // }}}
-    // {{{ hasComplexPrimaryKey()
-
-    /**
-     * Returns whether a table has the complex primary key.
-     *
-     * @return boolean
-     */
-    function hasComplexPrimaryKey()
-    {
-        if ($this->hasPrimaryKey()) {
-            return (boolean)count($this->_primaryKey) > 1;
-        } else {
-            return false;
-        }
-    }
-
-    // }}}
-    // {{{ getPrimaryKey()
+    // {{{ getPrimaryKeys()
 
     /**
      * Gets the primary key for a table as an array.
      *
      * @return array
      */
-    function getPrimaryKey()
+    function getPrimaryKeys()
     {
         if ($this->hasPrimaryKey()) {
             return $this->_primaryKey;
@@ -273,11 +256,45 @@ class Piece_ORM_Metadata
         return array_key_exists($fieldName, $this->_tableInfo);
     }
 
+    // }}}
+    // {{{ getPrimaryKey()
+
+    /**
+     * Gets the primary key for a table if the table has the single primary
+     * key.
+     *
+     * @return string
+     */
+    function getPrimaryKey()
+    {
+        if ($this->hasPrimaryKey() && !$this->_hasComplexPrimaryKey()) {
+            $primaryKeys = $this->_primaryKey;
+            return $primaryKeys[0];
+        }
+    }
+
     /**#@-*/
 
     /**#@+
      * @access private
      */
+
+    // }}}
+    // {{{ _hasComplexPrimaryKey()
+
+    /**
+     * Returns whether a table has the complex primary key.
+     *
+     * @return boolean
+     */
+    function _hasComplexPrimaryKey()
+    {
+        if ($this->hasPrimaryKey()) {
+            return (boolean)count($this->_primaryKey) > 1;
+        } else {
+            return false;
+        }
+    }
 
     /**#@-*/
 

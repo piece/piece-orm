@@ -177,9 +177,8 @@ class Piece_ORM_Mapper_Generator
 
         if ($relationship['type'] == 'manyToMany') {
             if (!array_key_exists('column', $relationship)) {
-                if ($relationshipMetadata->hasPrimaryKey() && !$relationshipMetadata->hasComplexPrimaryKey()) {
-                    $primaryKey = $relationshipMetadata->getPrimaryKey();
-                    $relationship['column'] = $primaryKey[0];
+                if ($primaryKey = $relationshipMetadata->getPrimaryKey()) {
+                    $relationship['column'] = $primaryKey;
                 } else {
                     Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_CONFIGURATION,
                                           'A single primary key field is required if the element [ column ] omit.'
@@ -230,9 +229,8 @@ class Piece_ORM_Mapper_Generator
             }
 
             if (!array_key_exists('column', $relationship['through'])) {
-                if ($this->_metadata->hasPrimaryKey() && !$this->_metadata->hasComplexPrimaryKey()) {
-                    $primaryKey = $this->_metadata->getPrimaryKey();
-                    $relationship['through']['column'] = $this->_metadata->getTableName() . "_{$primaryKey[0]}";
+                if ($primaryKey = $this->_metadata->getPrimaryKey()) {
+                    $relationship['through']['column'] = $this->_metadata->getTableName() . "_$primaryKey";
                 } else {
                     Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_CONFIGURATION,
                                           'A single primary key field is required, if the element [ column ] in the element [ through ] omit.'
@@ -249,9 +247,8 @@ class Piece_ORM_Mapper_Generator
             }
 
             if (!array_key_exists('referencedColumn', $relationship['through'])) {
-                if ($this->_metadata->hasPrimaryKey() && !$this->_metadata->hasComplexPrimaryKey()) {
-                    $primaryKey = $this->_metadata->getPrimaryKey();
-                    $relationship['through']['referencedColumn'] = $primaryKey[0];
+                if ($primaryKey = $this->_metadata->getPrimaryKey()) {
+                    $relationship['through']['referencedColumn'] = $primaryKey;
                 } else {
                     Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_CONFIGURATION,
                                           'A single primary key field is required, if the element [ referencedColumn ] in the element [ through ] omit.'
@@ -268,9 +265,8 @@ class Piece_ORM_Mapper_Generator
             }
 
             if (!array_key_exists('inverseColumn', $relationship['through'])) {
-                if ($relationshipMetadata->hasPrimaryKey() && !$relationshipMetadata->hasComplexPrimaryKey()) {
-                    $primaryKey = $relationshipMetadata->getPrimaryKey();
-                    $relationship['through']['inverseColumn'] = $relationshipMetadata->getTableName() . "_{$primaryKey[0]}";
+                if ($primaryKey = $relationshipMetadata->getPrimaryKey()) {
+                    $relationship['through']['inverseColumn'] = $relationshipMetadata->getTableName() . "_$primaryKey";
                 } else {
                     Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_CONFIGURATION,
                                           'A single primary key field is required, if the element [ column ] in the element [ through ] omit.'
@@ -467,10 +463,10 @@ $relationshipsPropertyDeclaration
     function _generateDelete()
     {
         if ($this->_metadata->hasPrimaryKey()) {
-            $primaryKey = $this->_metadata->getPrimaryKey();
-            $fieldName = array_shift($primaryKey);
+            $primaryKeys = $this->_metadata->getPrimaryKeys();
+            $fieldName = array_shift($primaryKeys);
             $whereClause = "$fieldName = \$" . Piece_ORM_Inflector::camelize($fieldName, true);
-            foreach ($primaryKey as $complexFieldName) {
+            foreach ($primaryKeys as $complexFieldName) {
                 $whereClause .= "$complexFieldName = \$" . Piece_ORM_Inflector::camelize($complexFieldName, true);
             }
 
@@ -501,10 +497,10 @@ $relationshipsPropertyDeclaration
     function _generateUpdate()
     {
         if ($this->_metadata->hasPrimaryKey()) {
-            $primaryKey = $this->_metadata->getPrimaryKey();
-            $fieldName = array_shift($primaryKey);
+            $primaryKeys = $this->_metadata->getPrimaryKeys();
+            $fieldName = array_shift($primaryKeys);
             $whereClause = "$fieldName = \$" . Piece_ORM_Inflector::camelize($fieldName, true);
-            foreach ($primaryKey as $complexFieldName) {
+            foreach ($primaryKeys as $complexFieldName) {
                 $whereClause .= "$complexFieldName = \$" . Piece_ORM_Inflector::camelize($complexFieldName, true);
             }
 
