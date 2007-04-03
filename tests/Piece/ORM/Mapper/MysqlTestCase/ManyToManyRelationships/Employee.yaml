@@ -26,6 +26,13 @@ method:
         table: skill
         mappedBy: skills
 
+  - name: findAllWithSkillsByName
+    query: SELECT * FROM employee WHERE name = $name
+    relationship:
+      - type: manyToMany
+        table: skill
+        mappedBy: skills
+
 # Local Variables:
 # mode: conf-colon
 # coding: iso-8859-1
