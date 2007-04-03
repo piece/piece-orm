@@ -343,14 +343,10 @@ class Piece_ORM_Mapper_Common
         }
 
         if (!is_object($criteria)) {
-            $propertyName = Piece_ORM_Inflector::lowercaseFirstLetter(substr($methodName, 6));
-            if (version_compare(phpversion(), '5.0.0', '<')) {
-                $propertyName = Piece_ORM_Inflector::camelize($this->_metadata->getFieldNameWithAlias($propertyName), true);
+            $criteria = &$this->_createCriteria($methodName, $criteria);
+            if (Piece_ORM_Error::hasErrors('exception')) {
+                return;
             }
-
-            $criterion = $criteria;
-            $criteria = &new stdClass();
-            $criteria->$propertyName = $criterion;
         }
 
         $result = &$this->_executeQueryWithCriteria($methodName, $criteria);
@@ -566,14 +562,10 @@ class Piece_ORM_Mapper_Common
                 return;
             }
 
-            $propertyName = Piece_ORM_Inflector::lowercaseFirstLetter(substr($methodName, 9));
-            if (version_compare(phpversion(), '5.0.0', '<')) {
-                $propertyName = Piece_ORM_Inflector::camelize($this->_metadata->getFieldNameWithAlias($propertyName), true);
+            $criteria = &$this->_createCriteria($methodName, $criteria);
+            if (Piece_ORM_Error::hasErrors('exception')) {
+                return;
             }
-
-            $criterion = $criteria;
-            $criteria = &new stdClass();
-            $criteria->$propertyName = $criterion;
         }
 
         $result = &$this->_executeQueryWithCriteria($methodName, $criteria);
@@ -648,6 +640,38 @@ class Piece_ORM_Mapper_Common
         }
 
         return $result;
+    }
+
+    // }}}
+    // {{{ _createCriteria()
+
+    /**
+     * Creates a criteria object from a method name and a value as
+     * a criterion.
+     *
+     * @param string $methodName
+     * @param mixed  $criterion
+     * @return stdClass
+     * @throws PIECE_ORM_ERROR_UNEXPECTED_VALUE
+     */
+    function &_createCriteria($methodName, $criterion)
+    {
+        if (preg_match('/By(.+)$/i', $methodName, $matches)) {
+            $propertyName = Piece_ORM_Inflector::lowercaseFirstLetter($matches[1]);
+            if (version_compare(phpversion(), '5.0.0', '<')) {
+                $propertyName = Piece_ORM_Inflector::camelize($this->_metadata->getFieldNameWithAlias($propertyName), true);
+            }
+
+            $criteria = &new stdClass();
+            $criteria->$propertyName = $criterion;
+            return $criteria;
+        } else {
+            Piece_ORM_Error::push(PIECE_ORM_ERROR_UNEXPECTED_VALUE,
+                                  "An unexpected value detected. $method() can only receive object or null."
+                                  );
+            $return = null;
+            return $return;
+        }
     }
 
     /**#@-*/
