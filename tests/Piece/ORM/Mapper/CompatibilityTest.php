@@ -613,6 +613,39 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         $cache->clean();
     }
 
+    function testManyToManyRelationshipsWithFind()
+    {
+        $cacheDirectory = "{$this->_cacheDirectory}/ManyToManyRelationships";
+        Piece_ORM_Mapper_Factory::setConfigDirectory($cacheDirectory);
+        Piece_ORM_Mapper_Factory::setCacheDirectory($cacheDirectory);
+        $this->_setupForRelationships();
+
+        $mapper = &Piece_ORM_Mapper_Factory::factory('Employee');
+        $employee = $mapper->findWithSkillsByName('Qux');
+
+        $this->assertFalse(is_array($employee));
+        $this->assertEquals(strtolower('stdClass'), strtolower(get_class($employee)));
+        foreach (array('id', 'name', 'version', 'rdate', 'mdate', 'skills') as $property) {
+            $this->assertTrue(array_key_exists($property, $employee), $property);
+        }
+        $this->assertTrue(is_array($employee->skills));
+        $this->assertEquals(2, count($employee->skills));
+
+        foreach ($employee->skills as $skill) {
+            foreach (array('id', 'name', 'version', 'rdate', 'mdate') as $property) {
+                $this->assertTrue(array_key_exists($property, $skill), $property);
+            }
+        }
+
+        $this->assertEquals($employee, $mapper->findWithSkillsByName((object)array('name' => 'Qux')));
+
+        $cache = &new Cache_Lite(array('cacheDir' => "$cacheDirectory/",
+                                       'automaticSerialization' => true,
+                                       'errorHandlingAPIBreak' => true)
+                                 );
+        $cache->clean();
+    }
+
     /**#@-*/
 
     /**#@+

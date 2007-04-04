@@ -355,20 +355,17 @@ class Piece_ORM_Mapper_Common
             return $return;
         }
 
-        PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
-        $row = &$result->fetchRow();
-        PEAR::staticPopErrorHandling();
-        if (MDB2::isError($row)) {
-            Piece_ORM_Error::pushPEARError($row,
-                                           PIECE_ORM_ERROR_INVOCATION_FAILED,
-                                           'Failed to invoke MDB2_Driver_' . $this->_getDriverName() . '::fetchRow() for any reasons.'
-                                           );
+        $objects = $this->_loadAll($result, $this->{'__relationship__' . strtolower($methodName)});
+        if (Piece_ORM_Error::hasErrors('exception')) {
+            return;
+        }
+
+        if (count($objects)) {
+            return $objects[0];
+        } else {
             $return = null;
             return $return;
         }
-
-        $object = &$this->_load($row);
-        return $object;
     }
 
     // }}}
