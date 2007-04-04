@@ -111,17 +111,13 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
                 $mapper->delete($id);
             }
         }
+        $this->_clearCache($this->_cacheDirectory);
         Piece_ORM_Metadata_Factory::setCacheDirectory($this->_oldMetadataCacheDirectory);
         Piece_ORM_Metadata_Factory::clearInstances();
         Piece_ORM_Mapper_Factory::setCacheDirectory($this->_oldCacheDirectory);
         Piece_ORM_Mapper_Factory::setConfigDirectory($this->_oldCacheDirectory);
         Piece_ORM_Mapper_Factory::clearInstances();
         Piece_ORM_Context::clear();
-        $cache = &new Cache_Lite(array('cacheDir' => "{$this->_cacheDirectory}/",
-                                       'automaticSerialization' => true,
-                                       'errorHandlingAPIBreak' => true)
-                                 );
-        $cache->clean();
         Piece_ORM_Error::clearErrors();
         Piece_ORM_Error::popCallback();
     }
@@ -129,6 +125,7 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
     function testFind()
     {
         $id = $this->_insert();
+        $this->_targetsForRemoval['Person'][] = $id;
         $mapper = &Piece_ORM_Mapper_Factory::factory('Person');
 
         $this->_assertQueryForTestInsert($mapper->getLastQuery());
@@ -142,8 +139,6 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         $this->assertTrue(array_key_exists('version', $person));
         $this->assertTrue(array_key_exists('rdate', $person));
         $this->assertTrue(array_key_exists('mdate', $person));
-
-        $mapper->delete($id);
     }
 
     function testFindWithNull()
@@ -186,6 +181,7 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
     function testFindWithCriteria()
     {
         $id = $this->_insert();
+        $this->_targetsForRemoval['Person'][] = $id;
         $expectedQuery = "SELECT * FROM person WHERE id = $id";
         $criteria = &new stdClass();
         $criteria->id = $id;
@@ -203,13 +199,12 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         {
             $this->assertEquals($value, $personWithCriteria->$key);
         }
-
-        $mapper->delete($id);
     }
 
     function testFindWithUserDefineMethod()
     {
         $id = $this->_insert();
+        $this->_targetsForRemoval['Person'][] = $id;
         $criteria = &new stdClass();
         $criteria->id = $id;
         $criteria->serviceId = 3;
@@ -224,8 +219,6 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         $this->assertTrue(array_key_exists('version', $person));
         $this->assertTrue(array_key_exists('rdate', $person));
         $this->assertTrue(array_key_exists('mdate', $person));
-
-        $mapper->delete($id);
     }
 
     function testOverwriteBuiltinMethod()
@@ -241,8 +234,10 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
 
     function testFindAll()
     {
-        $this->_insert();
-        $this->_insert();
+        $id = $this->_insert();
+        $this->_targetsForRemoval['Person'][] = $id;
+        $id = $this->_insert();
+        $this->_targetsForRemoval['Person'][] = $id;
         $mapper = &Piece_ORM_Mapper_Factory::factory('Person');
         $people = $mapper->findAll();
 
@@ -259,16 +254,14 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
             $this->assertTrue(array_key_exists('rdate', $person));
             $this->assertTrue(array_key_exists('mdate', $person));
         }
-
-        foreach ($people as $person) {
-            $mapper->delete($person->id);
-        }
     }
 
     function testFindAllWithCriteria()
     {
-        $this->_insert();
-        $this->_insert();
+        $id = $this->_insert();
+        $this->_targetsForRemoval['Person'][] = $id;
+        $id = $this->_insert();
+        $this->_targetsForRemoval['Person'][] = $id;
         $expectedQuery = 'SELECT * FROM person WHERE service_id = 3 AND version >= 0';
         $criteria = &new stdClass();
         $criteria->serviceId = 3;
@@ -290,15 +283,12 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
                 $this->assertEquals($value, $peopleWithCriteria[$i]->$key);
             }
         }
-
-        foreach ($people as $person) {
-            $mapper->delete($person->id);
-        }
     }
 
     function testUpdate()
     {
         $id = $this->_insert();
+        $this->_targetsForRemoval['Person'][] = $id;
         $mapper = &Piece_ORM_Mapper_Factory::factory('Person');
         $person1 = &$mapper->findById($id);
         $person1->firstName = 'Seven';
@@ -310,8 +300,6 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         $person2 = $mapper->findById($id);
 
         $this->assertEquals('Seven', $person2->firstName);
-
-        $mapper->delete($id);
     }
 
     function testDeleteByNull()
@@ -420,10 +408,7 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
 
     function testOverwriteInsertQuery()
     {
-        $cacheDirectory = "{$this->_cacheDirectory}/Overwrite";
-        Piece_ORM_Mapper_Factory::setConfigDirectory($cacheDirectory);
-        Piece_ORM_Mapper_Factory::setCacheDirectory($cacheDirectory);
-
+        $this->_configure('Overwrite');
         $id = $this->_insert();
         $mapper = &Piece_ORM_Mapper_Factory::factory('Person');
 
@@ -436,11 +421,6 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         $this->assertEquals('ITEMAN', $person->lastName);
         $this->assertEquals(1, $person->serviceId);
 
-        $cache = &new Cache_Lite(array('cacheDir' => "$cacheDirectory/",
-                                       'automaticSerialization' => true,
-                                       'errorHandlingAPIBreak' => true)
-                                 );
-        $cache->clean();
         $mapper->delete((object)array('id' => $person->id, 'serviceId' => 1));
 
         $this->assertEquals("DELETE FROM person WHERE id = {$person->id} AND service_id = 1", $mapper->getLastQuery());
@@ -448,10 +428,7 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
 
     function testOverwriteUpdateQuery()
     {
-        $cacheDirectory = "{$this->_cacheDirectory}/Overwrite";
-        Piece_ORM_Mapper_Factory::setConfigDirectory($cacheDirectory);
-        Piece_ORM_Mapper_Factory::setCacheDirectory($cacheDirectory);
-
+        $this->_configure('Overwrite');
         $id = $this->_insert();
         $mapper = &Piece_ORM_Mapper_Factory::factory('Person');
         $person1 = &$mapper->findById($id);
@@ -465,11 +442,6 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
 
         $this->assertEquals('Seven', $person2->firstName);
 
-        $cache = &new Cache_Lite(array('cacheDir' => "$cacheDirectory/",
-                                       'automaticSerialization' => true,
-                                       'errorHandlingAPIBreak' => true)
-                                 );
-        $cache->clean();
         $mapper->delete((object)array('id' => $person1->id, 'serviceId' => $person1->serviceId));
 
         $this->assertEquals("DELETE FROM person WHERE id = {$person1->id} AND service_id = {$person1->serviceId}", $mapper->getLastQuery());
@@ -514,9 +486,7 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
 
     function testManyToManyRelationships()
     {
-        $cacheDirectory = "{$this->_cacheDirectory}/ManyToManyRelationships";
-        Piece_ORM_Mapper_Factory::setConfigDirectory($cacheDirectory);
-        Piece_ORM_Mapper_Factory::setCacheDirectory($cacheDirectory);
+        $this->_configure('ManyToManyRelationships');
         $this->_setupForRelationships();
 
         $mapper = &Piece_ORM_Mapper_Factory::factory('Employee');
@@ -524,34 +494,13 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
 
         $this->assertTrue(is_array($employees));
         $this->assertEquals(4, count($employees));
-
-        foreach ($employees as $employee) {
-            $this->assertEquals(array('id', 'name', 'version', 'rdate', 'mdate', 'skills'),
-                                array_keys(get_object_vars($employee))
-                                );
-            $this->assertTrue(is_array($employee->skills));
-
-            foreach ($employee->skills as $skill) {
-                $this->assertEquals(array('id', 'name', 'version', 'rdate', 'mdate'),
-                                    array_keys(get_object_vars($skill))
-                                    );
-            }
-        }
-
+        $this->_assertManyToManyRelationships($employees);
         $this->assertEquals($employees, $mapper->findAllWithSkills1());
-
-        $cache = &new Cache_Lite(array('cacheDir' => "$cacheDirectory/",
-                                       'automaticSerialization' => true,
-                                       'errorHandlingAPIBreak' => true)
-                                 );
-        $cache->clean();
     }
 
     function testManyToManyRelationshipsWithBuiltinMethod()
     {
-        $cacheDirectory = "{$this->_cacheDirectory}/ManyToManyRelationships";
-        Piece_ORM_Mapper_Factory::setConfigDirectory($cacheDirectory);
-        Piece_ORM_Mapper_Factory::setCacheDirectory($cacheDirectory);
+        $this->_configure('ManyToManyRelationships');
         $this->_setupForRelationships();
 
         $mapper = &Piece_ORM_Mapper_Factory::factory('Employee');
@@ -559,32 +508,14 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
 
         $this->assertTrue(is_array($employees));
         $this->assertEquals(1, count($employees));
-        $this->assertEquals(array('id', 'name', 'version', 'rdate', 'mdate', 'skills'),
-                            array_keys(get_object_vars($employees[0]))
-                            );
-        $this->assertTrue(is_array($employees[0]->skills));
+        $this->_assertManyToManyRelationships($employees);
         $this->assertEquals(2, count($employees[0]->skills));
-
-        foreach ($employees[0]->skills as $skill) {
-            $this->assertEquals(array('id', 'name', 'version', 'rdate', 'mdate'),
-                                array_keys(get_object_vars($skill))
-                                );
-        }
-
         $this->assertEquals($employees, $mapper->findAllByName((object)array('name' => 'Qux')));
-
-        $cache = &new Cache_Lite(array('cacheDir' => "$cacheDirectory/",
-                                       'automaticSerialization' => true,
-                                       'errorHandlingAPIBreak' => true)
-                                 );
-        $cache->clean();
     }
 
     function testManyToManyRelationshipsWithUserDefinedMethod()
     {
-        $cacheDirectory = "{$this->_cacheDirectory}/ManyToManyRelationships";
-        Piece_ORM_Mapper_Factory::setConfigDirectory($cacheDirectory);
-        Piece_ORM_Mapper_Factory::setCacheDirectory($cacheDirectory);
+        $this->_configure('ManyToManyRelationships');
         $this->_setupForRelationships();
 
         $mapper = &Piece_ORM_Mapper_Factory::factory('Employee');
@@ -592,32 +523,14 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
 
         $this->assertTrue(is_array($employees));
         $this->assertEquals(1, count($employees));
-        $this->assertEquals(array('id', 'name', 'version', 'rdate', 'mdate', 'skills'),
-                            array_keys(get_object_vars($employees[0]))
-                            );
-        $this->assertTrue(is_array($employees[0]->skills));
+        $this->_assertManyToManyRelationships($employees);
         $this->assertEquals(2, count($employees[0]->skills));
-
-        foreach ($employees[0]->skills as $skill) {
-            $this->assertEquals(array('id', 'name', 'version', 'rdate', 'mdate'),
-                                array_keys(get_object_vars($skill))
-                                );
-        }
-
         $this->assertEquals($employees, $mapper->findAllWithSkillsByName((object)array('name' => 'Qux')));
-
-        $cache = &new Cache_Lite(array('cacheDir' => "$cacheDirectory/",
-                                       'automaticSerialization' => true,
-                                       'errorHandlingAPIBreak' => true)
-                                 );
-        $cache->clean();
     }
 
     function testManyToManyRelationshipsWithFind()
     {
-        $cacheDirectory = "{$this->_cacheDirectory}/ManyToManyRelationships";
-        Piece_ORM_Mapper_Factory::setConfigDirectory($cacheDirectory);
-        Piece_ORM_Mapper_Factory::setCacheDirectory($cacheDirectory);
+        $this->_configure('ManyToManyRelationships');
         $this->_setupForRelationships();
 
         $mapper = &Piece_ORM_Mapper_Factory::factory('Employee');
@@ -625,25 +538,9 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
 
         $this->assertFalse(is_array($employee));
         $this->assertEquals(strtolower('stdClass'), strtolower(get_class($employee)));
-        foreach (array('id', 'name', 'version', 'rdate', 'mdate', 'skills') as $property) {
-            $this->assertTrue(array_key_exists($property, $employee), $property);
-        }
-        $this->assertTrue(is_array($employee->skills));
+        $this->_assertManyToManyRelationships(array($employee));
         $this->assertEquals(2, count($employee->skills));
-
-        foreach ($employee->skills as $skill) {
-            foreach (array('id', 'name', 'version', 'rdate', 'mdate') as $property) {
-                $this->assertTrue(array_key_exists($property, $skill), $property);
-            }
-        }
-
         $this->assertEquals($employee, $mapper->findWithSkillsByName((object)array('name' => 'Qux')));
-
-        $cache = &new Cache_Lite(array('cacheDir' => "$cacheDirectory/",
-                                       'automaticSerialization' => true,
-                                       'errorHandlingAPIBreak' => true)
-                                 );
-        $cache->clean();
     }
 
     /**#@-*/
@@ -748,6 +645,40 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         $employeeSkillMapper = &Piece_ORM_Mapper_Factory::factory('EmployeeSkill');
         $employeeSkillId4 = $employeeSkillMapper->insert($employeeSkill);
         $this->_targetsForRemoval['EmployeeSkill'][] = $employeeSkillId4;
+    }
+
+    function _assertManyToManyRelationships($employees)
+    {
+        foreach ($employees as $employee) {
+            foreach (array('id', 'name', 'version', 'rdate', 'mdate', 'skills') as $property) {
+                $this->assertTrue(array_key_exists($property, $employee), $property);
+            }
+
+            $this->assertTrue(is_array($employee->skills));
+
+            foreach ($employee->skills as $skill) {
+                foreach (array('id', 'name', 'version', 'rdate', 'mdate') as $property) {
+                    $this->assertTrue(array_key_exists($property, $skill), $property);
+                }
+            }
+        }
+    }
+
+    function _clearCache($cacheDirectory)
+    {
+        $cache = &new Cache_Lite(array('cacheDir' => "$cacheDirectory/",
+                                       'automaticSerialization' => true,
+                                       'errorHandlingAPIBreak' => true)
+                                 );
+        $cache->clean();
+    }
+
+    function _configure($cacheDirectory)
+    {
+        $this->_cacheDirectory = "{$this->_cacheDirectory}/$cacheDirectory";
+        Piece_ORM_Mapper_Factory::setConfigDirectory($this->_cacheDirectory);
+        Piece_ORM_Mapper_Factory::setCacheDirectory($this->_cacheDirectory);
+        Piece_ORM_Metadata_Factory::setCacheDirectory($this->_cacheDirectory);
     }
 
     /**#@-*/
