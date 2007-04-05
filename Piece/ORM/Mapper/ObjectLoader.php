@@ -105,7 +105,7 @@ class Piece_ORM_Mapper_ObjectLoader
     }
 
     // }}}
-    // {{{ loadObjects()
+    // {{{ loadAll()
 
     /**
      * Loads all objects with a result object.
@@ -114,7 +114,7 @@ class Piece_ORM_Mapper_ObjectLoader
      * @throws PIECE_ORM_ERROR_UNEXPECTED_VALUE
      * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
      */
-    function loadObjects()
+    function loadAll()
     {
         $this->_loadPrimaryObjects();
         if (Piece_ORM_Error::hasErrors('exception')) {

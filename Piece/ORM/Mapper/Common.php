@@ -334,7 +334,7 @@ class Piece_ORM_Mapper_Common
             return;
         }
 
-        $objects = $this->_loadObjects($result);
+        $objects = $this->_loadAllObjects($result);
         if (Piece_ORM_Error::hasErrors('exception')) {
             return;
         }
@@ -412,7 +412,7 @@ class Piece_ORM_Mapper_Common
             return $return;
         }
 
-        $objects = $this->_loadObjects($result, $this->{'__relationship__' . strtolower($methodName)});
+        $objects = $this->_loadAllObjects($result, $this->{'__relationship__' . strtolower($methodName)});
         if (Piece_ORM_Error::hasErrors('exception')) {
             return;
         }
@@ -488,7 +488,7 @@ class Piece_ORM_Mapper_Common
     }
 
     // }}}
-    // {{{ _loadObjects()
+    // {{{ _loadAllObjects()
 
     /**
      * Loads all objects with a result object.
@@ -499,10 +499,10 @@ class Piece_ORM_Mapper_Common
      * @throws PIECE_ORM_ERROR_UNEXPECTED_VALUE
      * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
      */
-    function _loadObjects(&$result, $relationship = array())
+    function _loadAllObjects(&$result, $relationship = array())
     {
         $loader = &new Piece_ORM_Mapper_ObjectLoader($this, $result, $relationship);
-        return $loader->loadObjects();
+        return $loader->loadAll();
     }
 
     // }}}
@@ -543,7 +543,7 @@ class Piece_ORM_Mapper_Common
             return;
         }
 
-        $objects = $this->_loadObjects($result, $this->{'__relationship__' . strtolower($methodName)});
+        $objects = $this->_loadAllObjects($result, $this->{'__relationship__' . strtolower($methodName)});
         if (Piece_ORM_Error::hasErrors('exception')) {
             return;
         }
