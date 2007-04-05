@@ -6,13 +6,13 @@ method:
     relationship:
       - type: manyToMany
         table: skill
-        mappedBy: skills
+        mappedAs: skills
 
   - name: findAllWithSkills2
     relationship:
       - type: manyToMany
         table: skill
-        mappedBy: skills
+        mappedAs: skills
         column: id
         through:
           table: employee_skill
@@ -24,21 +24,21 @@ method:
     relationship:
       - type: manyToMany
         table: skill
-        mappedBy: skills
+        mappedAs: skills
 
   - name: findAllWithSkillsByName
     query: SELECT * FROM employee WHERE name = $name
     relationship:
       - type: manyToMany
         table: skill
-        mappedBy: skills
+        mappedAs: skills
 
   - name: findWithSkillsByName
     query: SELECT * FROM employee WHERE name = $name
     relationship:
       - type: manyToMany
         table: skill
-        mappedBy: skills
+        mappedAs: skills
 
 # Local Variables:
 # mode: conf-colon

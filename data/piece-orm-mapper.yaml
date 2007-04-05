@@ -48,7 +48,7 @@ mapping:
                 mapping:
                   "type": { type: str, required: yes, enum: [ manyToMany ] }
                   "table": { type: str, required: yes }
-                  "mappedBy": { type: str, required: no }
+                  "mappedAs": { type: str, required: no }
                   "column": { type: str, required: no }
                   "referencedColumn": { type: str, required: no }
                   "through":

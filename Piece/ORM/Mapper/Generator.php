@@ -174,9 +174,9 @@ class Piece_ORM_Mapper_Generator
             return;
         }
 
-        if (!array_key_exists('mappedBy', $relationship)) {
+        if (!array_key_exists('mappedAs', $relationship)) {
             Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_CONFIGURATION,
-                                  'The element [ mappedBy ] is required to generate a relationship property declaration.'
+                                  'The element [ mappedAs ] is required to generate a relationship property declaration.'
                                   );
             return;
         }

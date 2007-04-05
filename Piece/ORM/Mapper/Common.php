@@ -496,7 +496,7 @@ class Piece_ORM_Mapper_Common
             $objects[] = &$this->_load($row);
 
             for ($k = 0; $k < $numberOfRelationships; ++$k) {
-                $objects[$i]->{$relationship[$k]['mappedBy']} = array();
+                $objects[$i]->{$relationship[$k]['mappedAs']} = array();
                 $relationshipKeys[$k][] = $this->_dbh->quote($row[ $relationship[$k]['through']['referencedColumn'] ],
                                                              $this->_metadata->getDatatype($relationship[$k]['through']['referencedColumn'])
                                                              );
@@ -524,7 +524,7 @@ class Piece_ORM_Mapper_Common
             $numberOfAssociatedObjects = count($associatedObjects);
             $relationshipKeyPropertyName = Piece_ORM_Inflector::camelize($relationshipKeyFieldName, true);
             for ($k = 0; $k < $numberOfAssociatedObjects; ++$k) {
-                $objects[ $objectsIndexes[$i][ $associatedObjects[$k]->$relationshipKeyPropertyName ] ]->{$relationship[$i]['mappedBy']}[] = &$associatedObjects[$k];
+                $objects[ $objectsIndexes[$i][ $associatedObjects[$k]->$relationshipKeyPropertyName ] ]->{$relationship[$i]['mappedAs']}[] = &$associatedObjects[$k];
                 unset($associatedObjects[$k]->$relationshipKeyPropertyName);
             }
         }
