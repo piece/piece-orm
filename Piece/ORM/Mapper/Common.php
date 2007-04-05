@@ -154,7 +154,7 @@ class Piece_ORM_Mapper_Common
             if (MDB2::isError($id)) {
                 Piece_ORM_Error::pushPEARError($id,
                                                PIECE_ORM_ERROR_INVOCATION_FAILED,
-                                               'Failed to invoke MDB2_Driver_' . $this->_getDriverName() . '::lastInsertID() for any reasons.'
+                                               'Failed to invoke MDB2_Driver_' . $this->getDriverName() . '::lastInsertID() for any reasons.'
                                                );
                 return;
             }
@@ -316,6 +316,61 @@ class Piece_ORM_Mapper_Common
         return $affectedRows;
     }
 
+    // }}}
+    // {{{ findAllWithQuery()
+
+    /**
+     * Finds all objects with a query.
+     *
+     * @param string $query
+     * @return array
+     * @throws PIECE_ORM_ERROR_UNEXPECTED_VALUE
+     * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
+     */
+    function findAllWithQuery($query)
+    {
+        $result = &$this->_executeQuery($query);
+        if (Piece_ORM_Error::hasErrors('exception')) {
+            return;
+        }
+
+        $objects = $this->_loadAll($result);
+        if (Piece_ORM_Error::hasErrors('exception')) {
+            return;
+        }
+
+        return $objects;
+    }
+
+    // }}}
+    // {{{ getDriverName()
+
+    /**
+     * Gets the driver name of the database handle for this mapper.
+     *
+     * @return string
+     */
+    function getDriverName()
+    {
+        return substr(strrchr(get_class($this->_dbh), '_'), 1);
+    }
+
+    // }}}
+    // {{{ quote()
+
+    /**
+     * Convert a text value into a DBMS specific format that is suitable to
+     * compose query statements.
+     *
+     * @param string $value
+     * @param string $fieldName
+     * @return string
+     */
+    function quote($value, $fieldName)
+    {
+        return $this->_dbh->quote($value, $this->_metadata->getDatatype($fieldName));
+    }
+
     /**#@-*/
 
     /**#@+
@@ -384,7 +439,7 @@ class Piece_ORM_Mapper_Common
     function _buildQuery($methodName, $criteria)
     {
         foreach ($criteria as $key => $value) {
-            $criteria->$key = $this->_dbh->quote($value, $this->_metadata->getDatatype(Piece_ORM_Inflector::underscore($key)));
+            $criteria->$key = $this->quote($value, Piece_ORM_Inflector::underscore($key));
         }
 
         extract((array)$criteria);
@@ -402,30 +457,6 @@ class Piece_ORM_Mapper_Common
         }
 
         return $query;
-    }
-
-    // }}}
-    // {{{ _load()
-
-    /**
-     * Loads an object with a row.
-     *
-     * @param array $row
-     * @return stdClass
-     */
-    function &_load($row)
-    {
-        if (is_null($row)) {
-            return $row;
-        }
-
-        $object = &new stdClass();
-        foreach ($row as $key => $value) {
-            $propertyName = Piece_ORM_Inflector::camelize($key, true);
-            $object->$propertyName = $value;
-        }
-
-        return $object;
     }
 
     // }}}
@@ -454,19 +485,6 @@ class Piece_ORM_Mapper_Common
 
         $result = &$this->_executeQuery($query, $isManip);
         return $result;
-    }
-
-    // }}}
-    // {{{ _getDriverName()
-
-    /**
-     * Gets the driver name of the database handle for this mapper.
-     *
-     * @return string
-     */
-    function _getDriverName()
-    {
-        return substr(strrchr(get_class($this->_dbh), '_'), 1);
     }
 
     // }}}
@@ -534,32 +552,6 @@ class Piece_ORM_Mapper_Common
     }
 
     // }}}
-    // {{{ _findAllWithQuery()
-
-    /**
-     * Finds all objects with a query.
-     *
-     * @param string $query
-     * @return array
-     * @throws PIECE_ORM_ERROR_UNEXPECTED_VALUE
-     * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
-     */
-    function _findAllWithQuery($query)
-    {
-        $result = &$this->_executeQuery($query);
-        if (Piece_ORM_Error::hasErrors('exception')) {
-            return;
-        }
-
-        $objects = $this->_loadAll($result);
-        if (Piece_ORM_Error::hasErrors('exception')) {
-            return;
-        }
-
-        return $objects;
-    }
-
-    // }}}
     // {{{ _executeQuery()
 
     /**
@@ -585,7 +577,7 @@ class Piece_ORM_Mapper_Common
         if (MDB2::isError($result)) {
             Piece_ORM_Error::pushPEARError($result,
                                            PIECE_ORM_ERROR_INVOCATION_FAILED,
-                                           'Failed to invoke MDB2_Driver_' . $this->_getDriverName() . '::query() for any reasons.'
+                                           'Failed to invoke MDB2_Driver_' . $this->getDriverName() . '::query() for any reasons.'
                                            );
             $return = null;
             return $return;

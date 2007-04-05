@@ -122,18 +122,18 @@ class Piece_ORM_Mapper_ObjectLoader
                 break;
             }
 
-            $objects[] = &$this->_mapper->_load($row);
+            $objects[] = &$this->_load($row);
             for ($k = 0; $k < $numberOfRelationships; ++$k) {
                 $objects[$i]->{$this->_relationship[$k]['mappedAs']} = array();
                 if ($this->_relationship[$k]['type'] == 'manyToMany') {
-                    $relationshipKeys[$k][] = $this->_mapper->_dbh->quote($row[ $this->_relationship[$k]['through']['referencedColumn'] ],
-                                                                 $this->_mapper->_metadata->getDatatype($this->_relationship[$k]['through']['referencedColumn'])
-                                                                 );
+                    $relationshipKeys[$k][] = $this->_mapper->quote($row[ $this->_relationship[$k]['through']['referencedColumn'] ],
+                                                                    $this->_relationship[$k]['through']['referencedColumn']
+                                                                    );
                     $objectsIndexes[$k][ $row[ $this->_relationship[$k]['through']['referencedColumn'] ] ] = $i;
                 } elseif ($this->_relationship[$k]['type'] == 'oneToMany') {
-                    $relationshipKeys[$k][] = $this->_mapper->_dbh->quote($row[ $this->_relationship[$k]['referencedColumn'] ],
-                                                                 $this->_mapper->_metadata->getDatatype($this->_relationship[$k]['referencedColumn'])
-                                                                 );
+                    $relationshipKeys[$k][] = $this->_mapper->quote($row[ $this->_relationship[$k]['referencedColumn'] ],
+                                                                    $this->_relationship[$k]['referencedColumn']
+                                                                    );
                     $objectsIndexes[$k][ $row[ $this->_relationship[$k]['referencedColumn'] ] ] = $i;
                 }
             }
@@ -143,7 +143,7 @@ class Piece_ORM_Mapper_ObjectLoader
         if (MDB2::isError($error)) {
             Piece_ORM_Error::pushPEARError($error,
                                            PIECE_ORM_ERROR_INVOCATION_FAILED,
-                                           'Failed to invoke MDB2_Driver_' . $this->_mapper->_getDriverName() . '::fetchRow() for any reasons.'
+                                           'Failed to invoke MDB2_Driver_' . $this->_mapper->getDriverName() . '::fetchRow() for any reasons.'
                                            );
             return;
         }
@@ -152,7 +152,7 @@ class Piece_ORM_Mapper_ObjectLoader
             if ($this->_relationship[$i]['type'] == 'manyToMany') {
                 $relationshipKeyFieldName = "{$this->_relationship[$i]['through']['table']}_{$this->_relationship[$i]['through']['column']}";
                 $query = "SELECT {$this->_relationship[$i]['through']['table']}.{$this->_relationship[$i]['through']['column']} AS $relationshipKeyFieldName, {$this->_relationship[$i]['table']}.* FROM {$this->_relationship[$i]['table']}, {$this->_relationship[$i]['through']['table']} WHERE {$this->_relationship[$i]['through']['table']}.{$this->_relationship[$i]['through']['column']} IN (" . implode(',', $relationshipKeys[$i]) . ") AND {$this->_relationship[$i]['table']}.{$this->_relationship[$i]['column']} = {$this->_relationship[$i]['through']['table']}.{$this->_relationship[$i]['through']['inverseColumn']}";
-                $associatedObjects = $this->_mapper->_findAllWithQuery($query);
+                $associatedObjects = $this->_mapper->findAllWithQuery($query);
                 if (Piece_ORM_Error::hasErrors('exception')) {
                     return;
                 }
@@ -165,7 +165,7 @@ class Piece_ORM_Mapper_ObjectLoader
                 }
             } elseif ($this->_relationship[$i]['type'] == 'oneToMany') {
                 $query = "SELECT * FROM {$this->_relationship[$i]['table']} WHERE {$this->_relationship[$i]['column']} IN (" . implode(',', $relationshipKeys[$i]) . ')';
-                $associatedObjects = $this->_mapper->_findAllWithQuery($query);
+                $associatedObjects = $this->_mapper->findAllWithQuery($query);
                 if (Piece_ORM_Error::hasErrors('exception')) {
                     return;
                 }
@@ -186,6 +186,30 @@ class Piece_ORM_Mapper_ObjectLoader
     /**#@+
      * @access private
      */
+
+    // }}}
+    // {{{ _load()
+
+    /**
+     * Loads an object with a row.
+     *
+     * @param array $row
+     * @return stdClass
+     */
+    function &_load($row)
+    {
+        if (is_null($row)) {
+            return $row;
+        }
+
+        $object = &new stdClass();
+        foreach ($row as $key => $value) {
+            $propertyName = Piece_ORM_Inflector::camelize($key, true);
+            $object->$propertyName = $value;
+        }
+
+        return $object;
+    }
 
     /**#@-*/
 
