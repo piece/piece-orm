@@ -34,6 +34,7 @@
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License (revised)
  * @version    SVN: $Id$
  * @link       http://piece-framework.com/piece-orm/
+ * @see        Piece_ORM_Mapper_Common
  * @since      File available since Release 0.2.0
  */
 
@@ -53,6 +54,7 @@ require_once 'PEAR.php';
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License (revised)
  * @version    Release: @package_version@
  * @link       http://piece-framework.com/piece-orm/
+ * @see        Piece_ORM_Mapper_Common
  * @since      Class available since Release 0.2.0
  */
 class Piece_ORM_Mapper_ObjectLoader
@@ -73,6 +75,10 @@ class Piece_ORM_Mapper_ObjectLoader
     var $_mapper;
     var $_result;
     var $_relationship;
+    var $_numberOfRelationships;
+    var $_relationshipKeys = array();
+    var $_objects = array();
+    var $_objectsIndexes = array();
 
     /**#@-*/
 
@@ -95,10 +101,11 @@ class Piece_ORM_Mapper_ObjectLoader
         $this->_mapper = &$mapper;
         $this->_result = &$result;
         $this->_relationship = $relationship;
+        $this->_numberOfRelationships = count($this->_relationship);
     }
 
     // }}}
-    // {{{ loadAll()
+    // {{{ loadObjects()
 
     /**
      * Loads all objects with a result object.
@@ -107,78 +114,19 @@ class Piece_ORM_Mapper_ObjectLoader
      * @throws PIECE_ORM_ERROR_UNEXPECTED_VALUE
      * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
      */
-    function loadAll()
+    function loadObjects()
     {
-        $numberOfRelationships = count($this->_relationship);
-        $relationshipKeys = array();
-        $objects = array();
-        $objectsIndexes = array();
-        $error = null;
-
-        PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
-        for ($i = 0; $row = &$this->_result->fetchRow(); ++$i) {
-            if (MDB2::isError($row)) {
-                $error = &$row;
-                break;
-            }
-
-            $objects[] = &$this->_load($row);
-            for ($k = 0; $k < $numberOfRelationships; ++$k) {
-                $objects[$i]->{$this->_relationship[$k]['mappedAs']} = array();
-                if ($this->_relationship[$k]['type'] == 'manyToMany') {
-                    $relationshipKeys[$k][] = $this->_mapper->quote($row[ $this->_relationship[$k]['through']['referencedColumn'] ],
-                                                                    $this->_relationship[$k]['through']['referencedColumn']
-                                                                    );
-                    $objectsIndexes[$k][ $row[ $this->_relationship[$k]['through']['referencedColumn'] ] ] = $i;
-                } elseif ($this->_relationship[$k]['type'] == 'oneToMany') {
-                    $relationshipKeys[$k][] = $this->_mapper->quote($row[ $this->_relationship[$k]['referencedColumn'] ],
-                                                                    $this->_relationship[$k]['referencedColumn']
-                                                                    );
-                    $objectsIndexes[$k][ $row[ $this->_relationship[$k]['referencedColumn'] ] ] = $i;
-                }
-            }
-        }
-        PEAR::staticPopErrorHandling();
-
-        if (MDB2::isError($error)) {
-            Piece_ORM_Error::pushPEARError($error,
-                                           PIECE_ORM_ERROR_INVOCATION_FAILED,
-                                           'Failed to invoke MDB2_Driver_' . $this->_mapper->getDriverName() . '::fetchRow() for any reasons.'
-                                           );
+        $this->_loadPrimaryObjects();
+        if (Piece_ORM_Error::hasErrors('exception')) {
             return;
         }
 
-        for ($i = 0; $i < $numberOfRelationships; ++$i) {
-            if ($this->_relationship[$i]['type'] == 'manyToMany') {
-                $relationshipKeyFieldName = "{$this->_relationship[$i]['through']['table']}_{$this->_relationship[$i]['through']['column']}";
-                $query = "SELECT {$this->_relationship[$i]['through']['table']}.{$this->_relationship[$i]['through']['column']} AS $relationshipKeyFieldName, {$this->_relationship[$i]['table']}.* FROM {$this->_relationship[$i]['table']}, {$this->_relationship[$i]['through']['table']} WHERE {$this->_relationship[$i]['through']['table']}.{$this->_relationship[$i]['through']['column']} IN (" . implode(',', $relationshipKeys[$i]) . ") AND {$this->_relationship[$i]['table']}.{$this->_relationship[$i]['column']} = {$this->_relationship[$i]['through']['table']}.{$this->_relationship[$i]['through']['inverseColumn']}";
-                $associatedObjects = $this->_mapper->findAllWithQuery($query);
-                if (Piece_ORM_Error::hasErrors('exception')) {
-                    return;
-                }
-
-                $numberOfAssociatedObjects = count($associatedObjects);
-                $relationshipKeyPropertyName = Piece_ORM_Inflector::camelize($relationshipKeyFieldName, true);
-                for ($k = 0; $k < $numberOfAssociatedObjects; ++$k) {
-                    $objects[ $objectsIndexes[$i][ $associatedObjects[$k]->$relationshipKeyPropertyName ] ]->{$this->_relationship[$i]['mappedAs']}[] = &$associatedObjects[$k];
-                    unset($associatedObjects[$k]->$relationshipKeyPropertyName);
-                }
-            } elseif ($this->_relationship[$i]['type'] == 'oneToMany') {
-                $query = "SELECT * FROM {$this->_relationship[$i]['table']} WHERE {$this->_relationship[$i]['column']} IN (" . implode(',', $relationshipKeys[$i]) . ')';
-                $associatedObjects = $this->_mapper->findAllWithQuery($query);
-                if (Piece_ORM_Error::hasErrors('exception')) {
-                    return;
-                }
-
-                $numberOfAssociatedObjects = count($associatedObjects);
-                $relationshipKeyPropertyName = Piece_ORM_Inflector::camelize($this->_relationship[$i]['column'], true);
-                for ($k = 0; $k < $numberOfAssociatedObjects; ++$k) {
-                    $objects[ $objectsIndexes[$i][ $associatedObjects[$k]->$relationshipKeyPropertyName ] ]->{$this->_relationship[$i]['mappedAs']}[] = &$associatedObjects[$k];
-                }
-            }
+        $this->_loadAssociatedObjects();
+        if (Piece_ORM_Error::hasErrors('exception')) {
+            return;
         }
 
-        return $objects;
+        return $this->_objects;
     }
 
     /**#@-*/
@@ -209,6 +157,83 @@ class Piece_ORM_Mapper_ObjectLoader
         }
 
         return $object;
+    }
+
+    // }}}
+    // {{{ _loadPrimaryObjects()
+
+    /**
+     * Loads all objects with a result object for the primary query.
+     */
+    function _loadPrimaryObjects()
+    {
+        PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
+        for ($i = 0; $row = &$this->_result->fetchRow(); ++$i) {
+            if (MDB2::isError($row)) {
+                PEAR::staticPopErrorHandling();
+                Piece_ORM_Error::pushPEARError($row,
+                                               PIECE_ORM_ERROR_INVOCATION_FAILED,
+                                               'Failed to invoke MDB2_Driver_' . $this->_mapper->getDriverName() . '::fetchRow() for any reasons.'
+                                               );
+                return;
+            }
+
+            $this->_objects[] = &$this->_load($row);
+            for ($k = 0; $k < $this->_numberOfRelationships; ++$k) {
+                $this->_objects[$i]->{$this->_relationship[$k]['mappedAs']} = array();
+                if ($this->_relationship[$k]['type'] == 'manyToMany') {
+                    $this->_relationshipKeys[$k][] = $this->_mapper->quote($row[ $this->_relationship[$k]['through']['referencedColumn'] ],
+                                                                           $this->_relationship[$k]['through']['referencedColumn']
+                                                                           );
+                    $this->_objectsIndexes[$k][ $row[ $this->_relationship[$k]['through']['referencedColumn'] ] ] = $i;
+                } elseif ($this->_relationship[$k]['type'] == 'oneToMany') {
+                    $this->_relationshipKeys[$k][] = $this->_mapper->quote($row[ $this->_relationship[$k]['referencedColumn'] ],
+                                                                           $this->_relationship[$k]['referencedColumn']
+                                                                           );
+                    $this->_objectsIndexes[$k][ $row[ $this->_relationship[$k]['referencedColumn'] ] ] = $i;
+                }
+            }
+        }
+        PEAR::staticPopErrorHandling();
+    }
+
+    // }}}
+    // {{{ _loadAssociatedObjects()
+
+    /**
+     * Loads associated objects into appropriate objects.
+     */
+    function _loadAssociatedObjects()
+    {
+        for ($i = 0; $i < $this->_numberOfRelationships; ++$i) {
+            if ($this->_relationship[$i]['type'] == 'manyToMany') {
+                $relationshipKeyFieldName = "{$this->_relationship[$i]['through']['table']}_{$this->_relationship[$i]['through']['column']}";
+                $query = "SELECT {$this->_relationship[$i]['through']['table']}.{$this->_relationship[$i]['through']['column']} AS $relationshipKeyFieldName, {$this->_relationship[$i]['table']}.* FROM {$this->_relationship[$i]['table']}, {$this->_relationship[$i]['through']['table']} WHERE {$this->_relationship[$i]['through']['table']}.{$this->_relationship[$i]['through']['column']} IN (" . implode(',', $this->_relationshipKeys[$i]) . ") AND {$this->_relationship[$i]['table']}.{$this->_relationship[$i]['column']} = {$this->_relationship[$i]['through']['table']}.{$this->_relationship[$i]['through']['inverseColumn']}";
+                $associatedObjects = $this->_mapper->findAllWithQuery($query);
+                if (Piece_ORM_Error::hasErrors('exception')) {
+                    return;
+                }
+
+                $numberOfAssociatedObjects = count($associatedObjects);
+                $relationshipKeyPropertyName = Piece_ORM_Inflector::camelize($relationshipKeyFieldName, true);
+                for ($k = 0; $k < $numberOfAssociatedObjects; ++$k) {
+                    $this->_objects[ $this->_objectsIndexes[$i][ $associatedObjects[$k]->$relationshipKeyPropertyName ] ]->{$this->_relationship[$i]['mappedAs']}[] = &$associatedObjects[$k];
+                    unset($associatedObjects[$k]->$relationshipKeyPropertyName);
+                }
+            } elseif ($this->_relationship[$i]['type'] == 'oneToMany') {
+                $query = "SELECT * FROM {$this->_relationship[$i]['table']} WHERE {$this->_relationship[$i]['column']} IN (" . implode(',', $this->_relationshipKeys[$i]) . ')';
+                $associatedObjects = $this->_mapper->findAllWithQuery($query);
+                if (Piece_ORM_Error::hasErrors('exception')) {
+                    return;
+                }
+
+                $numberOfAssociatedObjects = count($associatedObjects);
+                $relationshipKeyPropertyName = Piece_ORM_Inflector::camelize($this->_relationship[$i]['column'], true);
+                for ($k = 0; $k < $numberOfAssociatedObjects; ++$k) {
+                    $this->_objects[ $this->_objectsIndexes[$i][ $associatedObjects[$k]->$relationshipKeyPropertyName ] ]->{$this->_relationship[$i]['mappedAs']}[] = &$associatedObjects[$k];
+                }
+            }
+        }
     }
 
     /**#@-*/
