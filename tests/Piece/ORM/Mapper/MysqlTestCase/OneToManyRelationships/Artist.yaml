@@ -1,0 +1,24 @@
+# $Id$
+
+method:
+
+  - name: findAllWithAlbums1
+    relationship:
+      - type: oneToMany
+        table: album
+        mappedAs: albums
+
+  - name: findAllWithAlbums2
+    relationship:
+      - type: oneToMany
+        table: album
+        mappedAs: albums
+        column: artist_id
+        referencedColumn: id
+
+# Local Variables:
+# mode: conf-colon
+# coding: iso-8859-1
+# tab-width: 2
+# indent-tabs-mode: nil
+# End:

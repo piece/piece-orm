@@ -111,7 +111,11 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
                 $mapper->delete($id);
             }
         }
-        $this->_clearCache($this->_cacheDirectory);
+        $cache = &new Cache_Lite(array('cacheDir' => "{$this->_cacheDirectory}/",
+                                       'automaticSerialization' => true,
+                                       'errorHandlingAPIBreak' => true)
+                                 );
+        $cache->clean();
         Piece_ORM_Metadata_Factory::setCacheDirectory($this->_oldMetadataCacheDirectory);
         Piece_ORM_Metadata_Factory::clearInstances();
         Piece_ORM_Mapper_Factory::setCacheDirectory($this->_oldCacheDirectory);
@@ -487,7 +491,7 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
     function testManyToManyRelationships()
     {
         $this->_configure('ManyToManyRelationships');
-        $this->_setupForRelationships();
+        $this->_setupManyToManyRelationships();
 
         $mapper = &Piece_ORM_Mapper_Factory::factory('Employee');
         $employees = $mapper->findAllWithSkills2();
@@ -501,7 +505,7 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
     function testManyToManyRelationshipsWithBuiltinMethod()
     {
         $this->_configure('ManyToManyRelationships');
-        $this->_setupForRelationships();
+        $this->_setupManyToManyRelationships();
 
         $mapper = &Piece_ORM_Mapper_Factory::factory('Employee');
         $employees = $mapper->findAllByName('Qux');
@@ -516,7 +520,7 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
     function testManyToManyRelationshipsWithUserDefinedMethod()
     {
         $this->_configure('ManyToManyRelationships');
-        $this->_setupForRelationships();
+        $this->_setupManyToManyRelationships();
 
         $mapper = &Piece_ORM_Mapper_Factory::factory('Employee');
         $employees = $mapper->findAllWithSkillsByName('Qux');
@@ -531,7 +535,7 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
     function testManyToManyRelationshipsWithFind()
     {
         $this->_configure('ManyToManyRelationships');
-        $this->_setupForRelationships();
+        $this->_setupManyToManyRelationships();
 
         $mapper = &Piece_ORM_Mapper_Factory::factory('Employee');
         $employee = $mapper->findWithSkillsByName('Qux');
@@ -541,6 +545,20 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         $this->_assertManyToManyRelationships(array($employee));
         $this->assertEquals(2, count($employee->skills));
         $this->assertEquals($employee, $mapper->findWithSkillsByName((object)array('name' => 'Qux')));
+    }
+
+    function testOneToManyRelationships()
+    {
+        $this->_configure('OneToManyRelationships');
+        $this->_setupOneToManyRelationships();
+
+        $mapper = &Piece_ORM_Mapper_Factory::factory('Artist');
+        $artists = $mapper->findAllWithAlbums2();
+
+        $this->assertTrue(is_array($artists));
+        $this->assertEquals(3, count($artists));
+        $this->_assertOneToManyRelationships($artists);
+        $this->assertEquals($artists, $mapper->findAllWithAlbums1());
     }
 
     /**#@-*/
@@ -570,7 +588,7 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
 
     function _assertQueryForReplaceEmptyStringWithNull($query) {}
 
-    function _setupForRelationships()
+    function _setupManyToManyRelationships()
     {
         $employee1 = &new stdClass();
         $employee1->name = 'Foo';
@@ -664,21 +682,77 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         }
     }
 
-    function _clearCache($cacheDirectory)
-    {
-        $cache = &new Cache_Lite(array('cacheDir' => "$cacheDirectory/",
-                                       'automaticSerialization' => true,
-                                       'errorHandlingAPIBreak' => true)
-                                 );
-        $cache->clean();
-    }
-
     function _configure($cacheDirectory)
     {
         $this->_cacheDirectory = "{$this->_cacheDirectory}/$cacheDirectory";
         Piece_ORM_Mapper_Factory::setConfigDirectory($this->_cacheDirectory);
         Piece_ORM_Mapper_Factory::setCacheDirectory($this->_cacheDirectory);
         Piece_ORM_Metadata_Factory::setCacheDirectory($this->_cacheDirectory);
+    }
+
+    function _setupOneToManyRelationships()
+    {
+        $artist1 = &new stdClass();
+        $artist1->name = 'Foo';
+        $this->_addMissingPropertyForInsert($artist1);
+        $artistMapper = &Piece_ORM_Mapper_Factory::factory('Artist');
+        $artist1Id = $artistMapper->insert($artist1);
+        $this->_targetsForRemoval['Artist'][] = $artist1Id;
+
+        $artist2 = &new stdClass();
+        $artist2->name = 'Bar';
+        $this->_addMissingPropertyForInsert($artist2);
+        $artistMapper = &Piece_ORM_Mapper_Factory::factory('Artist');
+        $artist2Id = $artistMapper->insert($artist2);
+        $this->_targetsForRemoval['Artist'][] = $artist2Id;
+
+        $artist3 = &new stdClass();
+        $artist3->name = 'Baz';
+        $this->_addMissingPropertyForInsert($artist3);
+        $artistMapper = &Piece_ORM_Mapper_Factory::factory('Artist');
+        $artist3Id = $artistMapper->insert($artist3);
+        $this->_targetsForRemoval['Artist'][] = $artist3Id;
+
+        $album1 = &new stdClass();
+        $album1->name = 'The first album of the artist2';
+        $album1->artistId = $artist2Id;
+        $this->_addMissingPropertyForInsert($album1);
+        $albumMapper = &Piece_ORM_Mapper_Factory::factory('Album');
+        $album1Id = $albumMapper->insert($album1);
+        $this->_targetsForRemoval['Album'][] = $album1Id;
+
+        $album2 = &new stdClass();
+        $album2->name = 'The first album of the artist3';
+        $album2->artistId = $artist3Id;
+        $this->_addMissingPropertyForInsert($album2);
+        $albumMapper = &Piece_ORM_Mapper_Factory::factory('Album');
+        $album2Id = $albumMapper->insert($album2);
+        $this->_targetsForRemoval['Album'][] = $album2Id;
+
+        $album3 = &new stdClass();
+        $album3->name = 'The second album of the artist3';
+        $album3->artistId = $artist3Id;
+        $this->_addMissingPropertyForInsert($album3);
+        $albumMapper = &Piece_ORM_Mapper_Factory::factory('Album');
+        $album3Id = $albumMapper->insert($album3);
+        $this->_targetsForRemoval['Album'][] = $album3Id;
+    }
+
+    function _assertOneToManyRelationships($artists)
+    {
+        foreach ($artists as $artist) {
+            foreach (array('id', 'name', 'version', 'rdate', 'mdate', 'albums') as $property) {
+                $this->assertTrue(array_key_exists($property, $artist), $property);
+            }
+
+            $this->assertTrue(is_array($artist->albums));
+
+            foreach ($artist->albums as $album) {
+                foreach (array('id', 'name', 'version', 'rdate', 'mdate') as $property) {
+                    $this->assertTrue(array_key_exists($property, $album), $property);
+                }
+            }
+        }
     }
 
     /**#@-*/
