@@ -30,6 +30,7 @@
  *
  * @package    Piece_ORM
  * @author     KUBO Atsuhiro <iteman@users.sourceforge.net>
+ * @author     MATSUFUJI Hideharu <matsufuji@users.sourceforge.net>
  * @copyright  2007 KUBO Atsuhiro <iteman@users.sourceforge.net>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License (revised)
  * @version    SVN: $Id$
@@ -53,6 +54,7 @@ require_once 'Piece/ORM/Config.php';
  *
  * @package    Piece_ORM
  * @author     KUBO Atsuhiro <iteman@users.sourceforge.net>
+ * @author     MATSUFUJI Hideharu <matsufuji@users.sourceforge.net>
  * @copyright  2007 KUBO Atsuhiro <iteman@users.sourceforge.net>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License (revised)
  * @version    Release: @package_version@
@@ -561,6 +563,20 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         $this->assertEquals($artists, $mapper->findAllWithAlbums1());
     }
 
+    function testManyToOneRelationships()
+    {
+        $this->_configure('OneToManyRelationships');
+        $this->_setupOneToManyRelationships();
+
+        $mapper = &Piece_ORM_Mapper_Factory::factory('Album');
+        $albums = $mapper->findAllWithArtist2();
+
+        $this->assertTrue(is_array($albums));
+        $this->assertEquals(3, count($albums));
+        $this->_assertManyToOneRelationships($albums);
+        $this->assertEquals($albums, $mapper->findAllWithArtist1());
+    }
+
     /**#@-*/
 
     /**#@+
@@ -751,6 +767,20 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
                 foreach (array('id', 'name', 'version', 'rdate', 'mdate') as $property) {
                     $this->assertTrue(array_key_exists($property, $album), $property);
                 }
+            }
+        }
+    }
+
+    function _assertManyToOneRelationships($albums)
+    {
+        foreach ($albums as $album) {
+            foreach (array('id', 'artistId', 'name', 'version', 'rdate', 'mdate', 'artist') as $property) {
+                $this->assertTrue(array_key_exists($property, $album), $property);
+            }
+
+            $this->assertTrue(strtolower('stdClass'), strtolower(get_class($album->artist)));
+            foreach (array('id', 'name', 'version', 'rdate', 'mdate') as $property) {
+                $this->assertTrue(array_key_exists($property, $album->artist), $property);
             }
         }
     }

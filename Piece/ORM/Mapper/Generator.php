@@ -30,6 +30,7 @@
  *
  * @package    Piece_ORM
  * @author     KUBO Atsuhiro <iteman@users.sourceforge.net>
+ * @author     MATSUFUJI Hideharu <matsufuji@users.sourceforge.net>
  * @copyright  2007 KUBO Atsuhiro <iteman@users.sourceforge.net>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License (revised)
  * @version    SVN: $Id$
@@ -47,6 +48,7 @@ require_once 'Piece/ORM/Inflector.php';
  *
  * @package    Piece_ORM
  * @author     KUBO Atsuhiro <iteman@users.sourceforge.net>
+ * @author     MATSUFUJI Hideharu <matsufuji@users.sourceforge.net>
  * @copyright  2007 KUBO Atsuhiro <iteman@users.sourceforge.net>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License (revised)
  * @version    Release: @package_version@
@@ -147,7 +149,7 @@ class Piece_ORM_Mapper_Generator
      */
     function normalizeRelationship($relationship)
     {
-        $relationshipTypes = array('manyToMany', 'oneToMany');
+        $relationshipTypes = array('manyToMany', 'oneToMany', 'manyToOne');
         if (!array_key_exists('type', $relationship)) {
             Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_CONFIGURATION,
                                   'The element [ type ] is required to generate a relationship property declaration.'
@@ -309,6 +311,42 @@ class Piece_ORM_Mapper_Generator
             if (!array_key_exists('referencedColumn', $relationship)) {
                 if ($primaryKey = $this->_metadata->getPrimaryKey()) {
                     $relationship['referencedColumn'] = $primaryKey;
+                } else {
+                    Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_CONFIGURATION,
+                                          'A single primary key field is required, if the element [ referencedColumn ] in the element [ through ] omit.'
+                                          );
+                    return;
+                }
+            } 
+
+            if (!$this->_metadata->hasField($relationship['referencedColumn'])) {
+                Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_CONFIGURATION,
+                                      "The field [ {$relationship['referencedColumn']} ] not found in the table [ " . $this->_metadata->getTableName() . ' ].'
+                                      );
+                return;
+            }
+        } elseif ($relationship['type'] == 'manyToOne') {
+            if (!array_key_exists('column', $relationship)) {
+                if ($primaryKey = $relationshipMetadata->getPrimaryKey()) {
+                    $relationship['column'] = $primaryKey;
+                } else {
+                    Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_CONFIGURATION,
+                                          'A single primary key field is required, if the element [ column ] in the element [ relationship ] omit.'
+                                          );
+                    return;
+                }
+            } 
+
+            if (!$relationshipMetadata->hasField($relationship['column'])) {
+                Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_CONFIGURATION,
+                                      "The field [ {$relationship['column']} ] not found in the table [ " . $relationshipMetadata->getTableName() . ' ].'
+                                      );
+                return;
+            }
+
+            if (!array_key_exists('referencedColumn', $relationship)) {
+                if ($primaryKey = $relationshipMetadata->getPrimaryKey()) {
+                    $relationship['referencedColumn'] = $relationshipMetadata->getTableName() . "_$primaryKey";
                 } else {
                     Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_CONFIGURATION,
                                           'A single primary key field is required, if the element [ referencedColumn ] in the element [ through ] omit.'
