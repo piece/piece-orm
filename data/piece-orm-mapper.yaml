@@ -46,7 +46,7 @@ mapping:
               - type: map
                 required: yes
                 mapping:
-                  "type": { type: str, required: yes, enum: [ manyToMany, oneToMany, manyToOne ] }
+                  "type": { type: str, required: yes, enum: [ manyToMany, oneToMany, manyToOne, oneToOne ] }
                   "table": { type: str, required: yes }
                   "mappedAs": { type: str, required: no }
                   "column": { type: str, required: no }

@@ -200,6 +200,12 @@ class Piece_ORM_Mapper_ObjectLoader
                                                                            $this->_relationship[$j]['referencedColumn']
                                                                            );
                     $this->_objectsIndexes[$j][ $row[ $this->_relationship[$j]['referencedColumn'] ] ][] = $i;
+                } elseif ($this->_relationship[$j]['type'] == 'oneToOne') {
+                    $this->_objects[$i]->{$this->_relationship[$j]['mappedAs']} = null;
+                    $this->_relationshipKeys[$j][] = $this->_mapper->quote($row[ $this->_relationship[$j]['referencedColumn'] ],
+                                                                           $this->_relationship[$j]['referencedColumn']
+                                                                           );
+                    $this->_objectsIndexes[$j][ $row[ $this->_relationship[$j]['referencedColumn'] ] ] = $i;
                 }
             }
         }
@@ -254,6 +260,18 @@ class Piece_ORM_Mapper_ObjectLoader
                     for ($k = 0; $k < count($this->_objectsIndexes[$i][ $associatedObjects[$j]->$relationshipKeyPropertyName ]); ++$k) {
                         $this->_objects[ $this->_objectsIndexes[$i][ $associatedObjects[$j]->$relationshipKeyPropertyName ][$k] ]->{$this->_relationship[$i]['mappedAs']} = &$associatedObjects[$j];
                     }
+                }
+            } elseif ($this->_relationship[$i]['type'] == 'oneToOne') {
+                $query = "SELECT * FROM {$this->_relationship[$i]['table']} WHERE {$this->_relationship[$i]['column']} IN (" . implode(',', $this->_relationshipKeys[$i]) . ')';
+                $associatedObjects = $this->_mapper->findAllWithQuery($query);
+                if (Piece_ORM_Error::hasErrors('exception')) {
+                    return;
+                }
+
+                $numberOfAssociatedObjects = count($associatedObjects);
+                $relationshipKeyPropertyName = Piece_ORM_Inflector::camelize($this->_relationship[$i]['column'], true);
+                for ($j = 0; $j < $numberOfAssociatedObjects; ++$j) {
+                    $this->_objects[ $this->_objectsIndexes[$i][ $associatedObjects[$j]->$relationshipKeyPropertyName ] ]->{$this->_relationship[$i]['mappedAs']} = &$associatedObjects[$j];
                 }
             }
         }

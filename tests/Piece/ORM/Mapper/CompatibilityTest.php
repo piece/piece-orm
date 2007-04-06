@@ -577,6 +577,20 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         $this->assertEquals($albums, $mapper->findAllWithArtist1());
     }
 
+    function testOneToOneRelationships()
+    {
+        $this->_configure('OneToOneRelationships');
+        $this->_setupOneToOneRelationships();
+
+        $mapper = &Piece_ORM_Mapper_Factory::factory('Place');
+        $places = $mapper->findAllWithRestaurant2();
+
+        $this->assertTrue(is_array($places));
+        $this->assertEquals(3, count($places));
+        $this->_assertOneToOneRelationships($places);
+        $this->assertEquals($places, $mapper->findAllWithRestaurant1());
+    }
+
     /**#@-*/
 
     /**#@+
@@ -781,6 +795,64 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
             $this->assertTrue(strtolower('stdClass'), strtolower(get_class($album->artist)));
             foreach (array('id', 'name', 'version', 'rdate', 'mdate') as $property) {
                 $this->assertTrue(array_key_exists($property, $album->artist), $property);
+            }
+        }
+    }
+
+    function _setupOneToOneRelationships()
+    {
+        $place1 = &new stdClass();
+        $place1->name = 'Foo';
+        $this->_addMissingPropertyForInsert($place1);
+        $placeMapper = &Piece_ORM_Mapper_Factory::factory('Place');
+        $place1Id = $placeMapper->insert($place1);
+        $this->_targetsForRemoval['Place'][] = $place1Id;
+
+        $place2 = &new stdClass();
+        $place2->name = 'Bar';
+        $this->_addMissingPropertyForInsert($place2);
+        $placeMapper = &Piece_ORM_Mapper_Factory::factory('Place');
+        $place2Id = $placeMapper->insert($place2);
+        $this->_targetsForRemoval['Place'][] = $place2Id;
+
+        $place3 = &new stdClass();
+        $place3->name = 'Baz';
+        $this->_addMissingPropertyForInsert($place3);
+        $placeMapper = &Piece_ORM_Mapper_Factory::factory('Place');
+        $place3Id = $placeMapper->insert($place3);
+        $this->_targetsForRemoval['Place'][] = $place3Id;
+
+        $restaurant1 = &new stdClass();
+        $restaurant1->name = 'The restaurant on the place2';
+        $restaurant1->placeId = $place2Id;
+        $this->_addMissingPropertyForInsert($restaurant1);
+        $restaurantMapper = &Piece_ORM_Mapper_Factory::factory('Restaurant');
+        $restaurant1Id = $restaurantMapper->insert($restaurant1);
+        $this->_targetsForRemoval['Restaurant'][] = $restaurant1Id;
+
+        $restaurant2 = &new stdClass();
+        $restaurant2->name = 'The restaurant on the place3';
+        $restaurant2->placeId = $place3Id;
+        $this->_addMissingPropertyForInsert($restaurant2);
+        $restaurantMapper = &Piece_ORM_Mapper_Factory::factory('Restaurant');
+        $restaurant2Id = $restaurantMapper->insert($restaurant2);
+        $this->_targetsForRemoval['Restaurant'][] = $restaurant2Id;
+    }
+
+    function _assertOneToOneRelationships($places)
+    {
+        foreach ($places as $place) {
+            foreach (array('id', 'name', 'version', 'rdate', 'mdate', 'restaurant') as $property) {
+                $this->assertTrue(array_key_exists($property, $place), $property);
+            }
+
+            if (!is_null($place->restaurant)) {
+                $this->assertTrue(strtolower('stdClass'), strtolower(get_class($place->restaurant)));
+                foreach (array('id', 'name', 'version', 'rdate', 'mdate') as $property) {
+                    $this->assertTrue(array_key_exists($property, $place->restaurant), $property);
+                }
+            } else {
+                $this->assertEquals('Foo', $place->name);
             }
         }
     }
