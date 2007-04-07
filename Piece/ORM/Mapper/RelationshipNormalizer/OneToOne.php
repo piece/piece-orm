@@ -37,13 +37,13 @@
  * @since      File available since Release 0.2.0
  */
 
-require_once 'Piece/ORM/Mapper/RelationshipType/Common.php';
+require_once 'Piece/ORM/Mapper/RelationshipNormalizer/Common.php';
 require_once 'Piece/ORM/Error.php';
 
-// {{{ Piece_ORM_Mapper_RelationshipType_OneToMany
+// {{{ Piece_ORM_Mapper_RelationshipNormalizer_OneToOne
 
 /**
- * A driver class for One-to-Many relationships.
+ * A driver class for One-to-One relationships.
  *
  * @package    Piece_ORM
  * @author     KUBO Atsuhiro <iteman@users.sourceforge.net>
@@ -53,7 +53,7 @@ require_once 'Piece/ORM/Error.php';
  * @link       http://piece-framework.com/piece-orm/
  * @since      Class available since Release 0.2.0
  */
-class Piece_ORM_Mapper_RelationshipType_OneToMany extends Piece_ORM_Mapper_RelationshipType_Common
+class Piece_ORM_Mapper_RelationshipNormalizer_OneToOne extends Piece_ORM_Mapper_RelationshipNormalizer_Common
 {
 
     // {{{ properties

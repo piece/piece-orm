@@ -106,7 +106,7 @@ class Piece_ORM_Mapper_RelationshipType
     }
 
     // }}}
-    // {{{ getRelationshipTypes()
+    // {{{ getRelationshipType()
 
     /**
      * Gets the relationship types.

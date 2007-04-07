@@ -164,10 +164,10 @@ class Piece_ORM_Mapper_Generator
             return;
         }
 
-        $relationshipTypeClass = 'Piece_ORM_Mapper_RelationshipType_' . ucwords($relationship['type']);
-        include_once str_replace('_', '/', $relationshipTypeClass) . '.php';
-        $relationshipType = &new $relationshipTypeClass($relationship, $this->_metadata);
-        return $relationshipType->normalizeDefinition();
+        $relationshipNormalizerClass = 'Piece_ORM_Mapper_RelationshipNormalizer_' . ucwords($relationship['type']);
+        include_once str_replace('_', '/', $relationshipNormalizerClass) . '.php';
+        $relationshipNormalizer = &new $relationshipNormalizerClass($relationship, $this->_metadata);
+        return $relationshipNormalizer->normalize();
     }
 
     /**#@-*/

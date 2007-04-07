@@ -37,11 +37,11 @@
  * @since      File available since Release 0.2.0
  */
 
-require_once 'Piece/ORM/Mapper/RelationshipType/Common.php';
+require_once 'Piece/ORM/Mapper/RelationshipNormalizer/Common.php';
 require_once 'Piece/ORM/Error.php';
 require_once 'Piece/ORM/Metadata/Factory.php';
 
-// {{{ Piece_ORM_Mapper_RelationshipType_ManyToMany
+// {{{ Piece_ORM_Mapper_RelationshipNormalizer_ManyToMany
 
 /**
  * A driver class for Many-to-Many relationships.
@@ -54,7 +54,7 @@ require_once 'Piece/ORM/Metadata/Factory.php';
  * @link       http://piece-framework.com/piece-orm/
  * @since      Class available since Release 0.2.0
  */
-class Piece_ORM_Mapper_RelationshipType_ManyToMany extends Piece_ORM_Mapper_RelationshipType_Common
+class Piece_ORM_Mapper_RelationshipNormalizer_ManyToMany extends Piece_ORM_Mapper_RelationshipNormalizer_Common
 {
 
     // {{{ properties

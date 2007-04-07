@@ -37,13 +37,13 @@
  * @since      File available since Release 0.2.0
  */
 
-require_once 'Piece/ORM/Mapper/RelationshipType/Common.php';
+require_once 'Piece/ORM/Mapper/RelationshipNormalizer/Common.php';
 require_once 'Piece/ORM/Error.php';
 
-// {{{ Piece_ORM_Mapper_RelationshipType_OneToOne
+// {{{ Piece_ORM_Mapper_RelationshipNormalizer_ManyToOne
 
 /**
- * A driver class for One-to-One relationships.
+ * A driver class for Many-to-One relationships.
  *
  * @package    Piece_ORM
  * @author     KUBO Atsuhiro <iteman@users.sourceforge.net>
@@ -53,7 +53,7 @@ require_once 'Piece/ORM/Error.php';
  * @link       http://piece-framework.com/piece-orm/
  * @since      Class available since Release 0.2.0
  */
-class Piece_ORM_Mapper_RelationshipType_OneToOne extends Piece_ORM_Mapper_RelationshipType_Common
+class Piece_ORM_Mapper_RelationshipNormalizer_ManyToOne extends Piece_ORM_Mapper_RelationshipNormalizer_Common
 {
 
     // {{{ properties
@@ -90,8 +90,8 @@ class Piece_ORM_Mapper_RelationshipType_OneToOne extends Piece_ORM_Mapper_Relati
      */
     function _normalizeColumn()
     {
-        if ($primaryKey = $this->_metadata->getPrimaryKey()) {
-            $this->_relationship['column'] = $this->_metadata->getTableName() . "_$primaryKey";
+        if ($primaryKey = $this->_relationshipMetadata->getPrimaryKey()) {
+            $this->_relationship['column'] = $primaryKey;
             return true;
         } else {
             return false;
@@ -108,8 +108,8 @@ class Piece_ORM_Mapper_RelationshipType_OneToOne extends Piece_ORM_Mapper_Relati
      */
     function _normalizeReferencedColumn()
     {
-        if ($primaryKey = $this->_metadata->getPrimaryKey()) {
-            $this->_relationship['referencedColumn'] = $primaryKey;
+        if ($primaryKey = $this->_relationshipMetadata->getPrimaryKey()) {
+            $this->_relationship['referencedColumn'] = $this->_relationshipMetadata->getTableName() . "_$primaryKey";
             return true;
         } else {
             return false;

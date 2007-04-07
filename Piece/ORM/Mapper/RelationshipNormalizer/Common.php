@@ -40,7 +40,7 @@
 require_once 'Piece/ORM/Error.php';
 require_once 'Piece/ORM/Metadata/Factory.php';
 
-// {{{ Piece_ORM_Mapper_RelationshipType_Common
+// {{{ Piece_ORM_Mapper_RelationshipNormalizer_Common
 
 /**
  * The base class which is used to invoke relationship type specific behavior.
@@ -53,7 +53,7 @@ require_once 'Piece/ORM/Metadata/Factory.php';
  * @link       http://piece-framework.com/piece-orm/
  * @since      Class available since Release 0.2.0
  */
-class Piece_ORM_Mapper_RelationshipType_Common
+class Piece_ORM_Mapper_RelationshipNormalizer_Common
 {
 
     // {{{ properties
@@ -83,17 +83,19 @@ class Piece_ORM_Mapper_RelationshipType_Common
     // {{{ constructor
 
     /**
+     * Initializes properties with the given values.
+     *
      * @param array $relationship
      * @param Piece_ORM_Metadata &$metadata
      */
-    function Piece_ORM_Mapper_RelationshipType_Common($relationship, &$metadata)
+    function Piece_ORM_Mapper_RelationshipNormalizer_Common($relationship, &$metadata)
     {
         $this->_relationship = $relationship;
         $this->_metadata = &$metadata;
     }
 
     // }}}
-    // {{{ normalizeDefinition()
+    // {{{ normalize()
 
     /**
      * Normalizes a relationship definition.
@@ -102,7 +104,7 @@ class Piece_ORM_Mapper_RelationshipType_Common
      * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
      * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
      */
-    function normalizeDefinition()
+    function normalize()
     {
         if (!array_key_exists('table', $this->_relationship)) {
             Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_CONFIGURATION,
