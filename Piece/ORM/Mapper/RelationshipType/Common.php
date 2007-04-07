@@ -68,6 +68,11 @@ class Piece_ORM_Mapper_RelationshipType_Common
      * @access private
      */
 
+    var $_relationship;
+    var $_metadata;
+    var $_relationshipMetadata;
+    var $_referencedColumnRequired = true;
+
     /**#@-*/
 
     /**#@+
@@ -75,39 +80,87 @@ class Piece_ORM_Mapper_RelationshipType_Common
      */
 
     // }}}
+    // {{{ constructor
+
+    /**
+     * @param array $relationship
+     * @param Piece_ORM_Metadata &$metadata
+     */
+    function Piece_ORM_Mapper_RelationshipType_Common($relationship, &$metadata)
+    {
+        $this->_relationship = $relationship;
+        $this->_metadata = &$metadata;
+    }
+
+    // }}}
     // {{{ normalizeDefinition()
 
     /**
      * Normalizes a relationship definition.
      *
-     * @param array $relationship
-     * @param Piece_ORM_Metadata &$metadata
      * @return array
      * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
      * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
      */
-    function normalizeDefinition($relationship, &$metadata)
+    function normalizeDefinition()
     {
-        if (!array_key_exists('table', $relationship)) {
+        if (!array_key_exists('table', $this->_relationship)) {
             Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_CONFIGURATION,
                                   'The element [ table ] is required to generate a relationship property declaration.'
                                   );
             return;
         }
 
-        if (!array_key_exists('mappedAs', $relationship)) {
+        if (!array_key_exists('mappedAs', $this->_relationship)) {
             Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_CONFIGURATION,
                                   'The element [ mappedAs ] is required to generate a relationship property declaration.'
                                   );
             return;
         }
 
-        $relationshipMetadata = &Piece_ORM_Metadata_Factory::factory($relationship['table']);
+        $this->_relationshipMetadata = &Piece_ORM_Metadata_Factory::factory($this->_relationship['table']);
         if (Piece_ORM_Error::hasErrors('exception')) {
             return;
         }
 
-        return $this->_doNormalizeDefinitions($relationship, $metadata, $relationshipMetadata);
+        if (!array_key_exists('column', $this->_relationship)) {
+            if (!$this->_normalizeColumn()) {
+                Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_CONFIGURATION,
+                                      'A single primary key field is required, if the element [ column ] in the element [ relationship ] omit.'
+                                      );
+                return;
+            }
+        } 
+
+        if (!$this->_relationshipMetadata->hasField($this->_relationship['column'])) {
+            Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_CONFIGURATION,
+                                  "The field [ {$this->_relationship['column']} ] not found in the table [ " . $this->_relationshipMetadata->getTableName() . ' ].'
+                                  );
+            return;
+        }
+
+        if (!array_key_exists('referencedColumn', $this->_relationship)) {
+            if (!$this->_normalizeReferencedColumn()) {
+                Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_CONFIGURATION,
+                                      'A single primary key field is required, if the element [ referencedColumn ] in the element [ relationship ] omit.'
+                                      );
+                return;
+            }
+        } 
+
+        if ($this->_referencedColumnRequired && !$this->_metadata->hasField($this->_relationship['referencedColumn'])) {
+            Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_CONFIGURATION,
+                                  "The field [ {$this->_relationship['referencedColumn']} ] not found in the table [ " . $this->_metadata->getTableName() . ' ].'
+                                  );
+            return;
+        }
+
+        $this->_normalizeThrough();
+        if (Piece_ORM_Error::hasErrors('exception')) {
+            return;
+        }
+
+        return $this->_relationship;
     }
 
     /**#@-*/
@@ -117,21 +170,35 @@ class Piece_ORM_Mapper_RelationshipType_Common
      */
 
     // }}}
-    // {{{ _doNormalizeDefinition()
+    // {{{ _normalizeThrough()
 
     /**
-     * Normalizes a relationship definition with relationship type specific
-     * behavior.
+     * Normalizes "through" definition.
      *
-     * @param array $relationship
-     * @param Piece_ORM_Metadata &$metadata
-     * @param Piece_ORM_Metadata &$relationshipMetadata
-     * @return array
      * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
      * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
-     * @abstract
      */
-    function _doNormalizeDefinition($relationship, &$metadata, &$relationshipMetadata) {}
+    function _normalizeThrough() {}
+
+    // }}}
+    // {{{ _normalizeColumn()
+
+    /**
+     * Normalizes "column" definition.
+     *
+     * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
+     */
+    function _normalizeColumn() {}
+
+    // }}}
+    // {{{ _normalizeReferencedColumn()
+
+    /**
+     * Normalizes "referencedColumn" definition.
+     *
+     * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
+     */
+    function _normalizeReferencedColumn() {}
 
     /**#@-*/
 

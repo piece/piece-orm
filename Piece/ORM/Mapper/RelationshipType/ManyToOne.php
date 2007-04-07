@@ -81,57 +81,39 @@ class Piece_ORM_Mapper_RelationshipType_ManyToOne extends Piece_ORM_Mapper_Relat
      */
 
     // }}}
-    // {{{ _doNormalizeDefinition()
+    // {{{ _normalizeColumn()
 
     /**
-     * Normalizes a relationship definition with relationship type specific
-     * behavior.
+     * Normalizes "column" definition.
      *
-     * @param array $relationship
-     * @param Piece_ORM_Metadata &$metadata
-     * @param Piece_ORM_Metadata &$relationshipMetadata
-     * @return array
      * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
      */
-    function _doNormalizeDefinitions($relationship, &$metadata, &$relationshipMetadata)
+    function _normalizeColumn()
     {
-        if (!array_key_exists('column', $relationship)) {
-            if ($primaryKey = $relationshipMetadata->getPrimaryKey()) {
-                $relationship['column'] = $primaryKey;
-            } else {
-                Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_CONFIGURATION,
-                                      'A single primary key field is required, if the element [ column ] in the element [ relationship ] omit.'
-                                      );
-                return;
-            }
-        } 
-
-        if (!$relationshipMetadata->hasField($relationship['column'])) {
-            Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_CONFIGURATION,
-                                  "The field [ {$relationship['column']} ] not found in the table [ " . $relationshipMetadata->getTableName() . ' ].'
-                                  );
-            return;
+        if ($primaryKey = $this->_relationshipMetadata->getPrimaryKey()) {
+            $this->_relationship['column'] = $primaryKey;
+            return true;
+        } else {
+            return false;
         }
+    }
 
-        if (!array_key_exists('referencedColumn', $relationship)) {
-            if ($primaryKey = $relationshipMetadata->getPrimaryKey()) {
-                $relationship['referencedColumn'] = $relationshipMetadata->getTableName() . "_$primaryKey";
-            } else {
-                Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_CONFIGURATION,
-                                      'A single primary key field is required, if the element [ referencedColumn ] in the element [ through ] omit.'
-                                      );
-                return;
-            }
-        } 
+    // }}}
+    // {{{ _normalizeReferencedColumn()
 
-        if (!$metadata->hasField($relationship['referencedColumn'])) {
-            Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_CONFIGURATION,
-                                  "The field [ {$relationship['referencedColumn']} ] not found in the table [ " . $metadata->getTableName() . ' ].'
-                                  );
-            return;
+    /**
+     * Normalizes "referencedColumn" definition.
+     *
+     * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
+     */
+    function _normalizeReferencedColumn()
+    {
+        if ($primaryKey = $this->_relationshipMetadata->getPrimaryKey()) {
+            $this->_relationship['referencedColumn'] = $this->_relationshipMetadata->getTableName() . "_$primaryKey";
+            return true;
+        } else {
+            return false;
         }
-
-        return $relationship;
     }
 
     /**#@-*/

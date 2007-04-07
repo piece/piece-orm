@@ -166,8 +166,8 @@ class Piece_ORM_Mapper_Generator
 
         $relationshipTypeClass = 'Piece_ORM_Mapper_RelationshipType_' . ucwords($relationship['type']);
         include_once str_replace('_', '/', $relationshipTypeClass) . '.php';
-        $relationshipType = &new $relationshipTypeClass();
-        return $relationshipType->normalizeDefinition($relationship, $this->_metadata);
+        $relationshipType = &new $relationshipTypeClass($relationship, $this->_metadata);
+        return $relationshipType->normalizeDefinition();
     }
 
     /**#@-*/
