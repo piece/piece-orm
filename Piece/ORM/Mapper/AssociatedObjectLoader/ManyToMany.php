@@ -68,7 +68,6 @@ class Piece_ORM_Mapper_AssociatedObjectLoader_ManyToMany extends Piece_ORM_Mappe
      */
 
     var $_defaultValueOfMappedAs = array();
-    var $_useThrough = true;
 
     /**#@-*/
 
@@ -81,6 +80,68 @@ class Piece_ORM_Mapper_AssociatedObjectLoader_ManyToMany extends Piece_ORM_Mappe
     /**#@+
      * @access private
      */
+
+    // }}}
+    // {{{ _buildQuery()
+
+    /**
+     * Builds a query to get associated objects.
+     *
+     * @param array $relationship
+     * @param array &$relationshipKeys
+     * @return string
+     */
+    function _buildQuery($relationship, &$relationshipKeys)
+    {
+        return "SELECT {$relationship['through']['table']}.{$relationship['through']['column']} AS " . $this->_getRelationshipKeyFieldNameInSecondaryQuery($relationship) . ", {$relationship['table']}.* FROM {$relationship['table']}, {$relationship['through']['table']} WHERE {$relationship['through']['table']}.{$relationship['through']['column']} IN (" . implode(',', $relationshipKeys) . ") AND {$relationship['table']}.{$relationship['column']} = {$relationship['through']['table']}.{$relationship['through']['inverseColumn']}";
+    }
+
+    // }}}
+    // {{{ _getRelationshipKeyFieldNameInPrimaryQuery()
+
+    /**
+     * Gets the name of the relationship key field in the primary query.
+     *
+     * @param array $relationship
+     * @return string
+     */
+    function _getRelationshipKeyFieldNameInPrimaryQuery($relationship)
+    {
+        return $relationship['through']['referencedColumn'];
+    }
+
+    // }}}
+    // {{{ _getRelationshipKeyFieldNameInSecondaryQuery()
+
+    /**
+     * Gets the name of the relationship key field in the secondary query.
+     *
+     * @param array $relationship
+     * @return string
+     */
+    function _getRelationshipKeyFieldNameInSecondaryQuery($relationship)
+    {
+        return "{$relationship['through']['table']}_{$relationship['through']['column']}";
+    }
+
+    // }}}
+    // {{{ _associateObject()
+
+    /**
+     * Associates an object which are loaded by the secondary query into
+     * objects which are loaded by the primary query.
+     *
+     * @param stdClass &$associatedObject
+     * @param array    &$objects
+     * @param array    $objectIndexes
+     * @param string   $relationshipKeyPropertyName
+     * @param string   $mappedAs
+     */
+    function _associateObject(&$associatedObject, &$objects, $objectIndexes, $relationshipKeyPropertyName, $mappedAs)
+    {
+        $objects[ $objectIndexes[ $associatedObject->$relationshipKeyPropertyName ] ]->{$mappedAs}[] = &$associatedObject;
+        unset($associatedObject->$relationshipKeyPropertyName);
+    }
 
     /**#@-*/
 

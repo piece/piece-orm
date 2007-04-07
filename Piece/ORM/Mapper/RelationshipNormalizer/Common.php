@@ -43,7 +43,7 @@ require_once 'Piece/ORM/Metadata/Factory.php';
 // {{{ Piece_ORM_Mapper_RelationshipNormalizer_Common
 
 /**
- * The base class which is used to invoke relationship type specific behavior.
+ * The base class for relationship normalizers.
  *
  * @package    Piece_ORM
  * @author     KUBO Atsuhiro <iteman@users.sourceforge.net>
@@ -179,6 +179,7 @@ class Piece_ORM_Mapper_RelationshipNormalizer_Common
      *
      * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
      * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
+     * @abstract
      */
     function _normalizeThrough() {}
 
@@ -189,6 +190,7 @@ class Piece_ORM_Mapper_RelationshipNormalizer_Common
      * Normalizes "column" definition.
      *
      * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
+     * @abstract
      */
     function _normalizeColumn() {}
 
@@ -199,6 +201,7 @@ class Piece_ORM_Mapper_RelationshipNormalizer_Common
      * Normalizes "referencedColumn" definition.
      *
      * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
+     * @abstract
      */
     function _normalizeReferencedColumn() {}
 

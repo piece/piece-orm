@@ -81,6 +81,67 @@ class Piece_ORM_Mapper_AssociatedObjectLoader_OneToMany extends Piece_ORM_Mapper
      * @access private
      */
 
+    // }}}
+    // {{{ _buildQuery()
+
+    /**
+     * Builds a query to get associated objects.
+     *
+     * @param array $relationship
+     * @param array &$relationshipKeys
+     * @return string
+     */
+    function _buildQuery($relationship, &$relationshipKeys)
+    {
+        return "SELECT * FROM {$relationship['table']} WHERE {$relationship['column']} IN (" . implode(',', $relationshipKeys) . ')';
+    }
+
+    // }}}
+    // {{{ _getRelationshipKeyFieldNameInPrimaryQuery()
+
+    /**
+     * Gets the name of the relationship key field in the primary query.
+     *
+     * @param array $relationship
+     * @return string
+     */
+    function _getRelationshipKeyFieldNameInPrimaryQuery($relationship)
+    {
+        return $relationship['referencedColumn'];
+    }
+
+    // }}}
+    // {{{ _getRelationshipKeyFieldNameInSecondaryQuery()
+
+    /**
+     * Gets the name of the relationship key field in the secondary query.
+     *
+     * @param array $relationship
+     * @return string
+     */
+    function _getRelationshipKeyFieldNameInSecondaryQuery($relationship)
+    {
+        return $relationship['column'];
+    }
+
+    // }}}
+    // {{{ _associateObject()
+
+    /**
+     * Associates an object which are loaded by the secondary query into
+     * objects which are loaded by the primary query.
+     *
+     * @param stdClass &$associatedObject
+     * @param array    &$objects
+     * @param array    $objectIndexes
+     * @param string   $relationshipKeyPropertyName
+     * @param string   $mappedAs
+     */
+    function _associateObject(&$associatedObject, &$objects, $objectIndexes, $relationshipKeyPropertyName, $mappedAs)
+    {
+        $objects[ $objectIndexes[ $associatedObject->$relationshipKeyPropertyName ] ]->{$mappedAs}[] = &$associatedObject;
+    }
+
     /**#@-*/
 
     // }}}

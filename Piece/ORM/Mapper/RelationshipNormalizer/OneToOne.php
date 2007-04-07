@@ -43,7 +43,7 @@ require_once 'Piece/ORM/Error.php';
 // {{{ Piece_ORM_Mapper_RelationshipNormalizer_OneToOne
 
 /**
- * A driver class for One-to-One relationships.
+ * An relationship normalizer for One-to-One relationships.
  *
  * @package    Piece_ORM
  * @author     KUBO Atsuhiro <iteman@users.sourceforge.net>

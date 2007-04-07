@@ -67,7 +67,6 @@ class Piece_ORM_Mapper_AssociatedObjectLoader_Common
 
     var $_useMultipleIndexes = false;
     var $_defaultValueOfMappedAs;
-    var $_useThrough = false;
 
     /**#@-*/
 
@@ -89,24 +88,51 @@ class Piece_ORM_Mapper_AssociatedObjectLoader_Common
     function prepareLoading(&$objectLoader, $row, $i, $j)
     {
         $relationships = $objectLoader->getRelationships();
-        if ($this->_useThrough) {
-            $relationshipKeyField = $relationships[$j]['through']['referencedColumn'];
-        } else {
-            $relationshipKeyField = $relationships[$j]['referencedColumn'];
-        }
+        $relationshipKeyFieldName = $this->_getRelationshipKeyFieldNameInPrimaryQuery($relationships[$j]);
 
         $objects = &$objectLoader->getObjects();
         $objects[$i]->{$relationships[$j]['mappedAs']} = $this->_defaultValueOfMappedAs;
 
         $mapper = &$objectLoader->getMapper();
         $relationshipKeys = &$objectLoader->getRelationshipKeys();
-        $relationshipKeys[$j][] = $mapper->quote($row[$relationshipKeyField], $relationshipKeyField);
+        $relationshipKeys[$j][] = $mapper->quote($row[$relationshipKeyFieldName], $relationshipKeyFieldName);
 
         $objectIndexes = &$objectLoader->getObjectIndexes();
         if (!$this->_useMultipleIndexes) {
-            $objectIndexes[$j][ $row[$relationshipKeyField] ] = $i;
+            $objectIndexes[$j][ $row[$relationshipKeyFieldName] ] = $i;
         } else {
-            $objectIndexes[$j][ $row[$relationshipKeyField] ][] = $i;
+            $objectIndexes[$j][ $row[$relationshipKeyFieldName] ][] = $i;
+        }
+    }
+
+    // }}}
+    // {{{ loadAll()
+
+    /**
+     * Loads all associated objects into appropriate objects.
+     *
+     * @param Piece_ORM_Mapper_ObjectLoader &$objectLoader
+     * @param integer                       $i
+     * @throws PIECE_ORM_ERROR_UNEXPECTED_VALUE
+     * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
+     */
+    function loadAll(&$objectLoader, $i)
+    {
+        $relationships = $objectLoader->getRelationships();
+        $relationshipKeys = &$objectLoader->getRelationshipKeys();
+        $mapper = &$objectLoader->getMapper();
+        $associatedObjects = $mapper->findAllWithQuery($this->_buildQuery($relationships[$i], $relationshipKeys[$i]));
+        if (Piece_ORM_Error::hasErrors('exception')) {
+            return;
+        }
+
+        $relationshipKeyPropertyName = Piece_ORM_Inflector::camelize($this->_getRelationshipKeyFieldNameInSecondaryQuery($relationships[$i]), true);
+        $numberOfAssociatedObjects = count($associatedObjects);
+
+        $objects = &$objectLoader->getObjects();
+        $objectIndexes = &$objectLoader->getObjectIndexes();
+        for ($j = 0; $j < $numberOfAssociatedObjects; ++$j) {
+            $this->_associateObject($associatedObjects[$j], $objects, $objectIndexes[$i], $relationshipKeyPropertyName, $relationships[$i]['mappedAs']);
         }
     }
 
@@ -115,6 +141,57 @@ class Piece_ORM_Mapper_AssociatedObjectLoader_Common
     /**#@+
      * @access private
      */
+
+    // }}}
+    // {{{ _buildQuery()
+
+    /**
+     * Builds a query to get associated objects.
+     *
+     * @param array $relationship
+     * @param array &$relationshipKeys
+     * @return string
+     * @abstract
+     */
+    function _buildQuery($relationship, &$relationshipKeys) {}
+
+    // }}}
+    // {{{ _getRelationshipKeyFieldNameInPrimaryQuery()
+
+    /**
+     * Gets the name of the relationship key field in the primary query.
+     *
+     * @param array $relationship
+     * @abstract
+     */
+    function _getRelationshipKeyFieldNameInPrimaryQuery($relationship) {}
+
+    // }}}
+    // {{{ _getRelationshipKeyFieldNameInSecondaryQuery()
+
+    /**
+     * Gets the name of the relationship key field in the secondary query.
+     *
+     * @param array $relationship
+     * @abstract
+     */
+    function _getRelationshipKeyFieldNameInSecondaryQuery($relationship) {}
+
+    // }}}
+    // {{{ _associateObject()
+
+    /**
+     * Associates an object which are loaded by the secondary query into
+     * objects which are loaded by the primary query.
+     *
+     * @param stdClass &$associatedObject
+     * @param array    &$objects
+     * @param array    $objectIndexes
+     * @param string   $relationshipKeyPropertyName
+     * @param string   $mappedAs
+     * @abstract
+     */
+    function _associateObject(&$associatedObject, &$objects, $objectIndexes, $relationshipKeyPropertyName, $mappedAs) {}
 
     /**#@-*/
 

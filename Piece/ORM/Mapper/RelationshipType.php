@@ -37,25 +37,15 @@
  * @since      File available since Release 0.2.0
  */
 
-// {{{ constants
-
-/*
- * Relationship types
- */
-define('PIECE_ORM_RELATIONSHIPTYPE_MANYTOMANY', 'manyToMany');
-define('PIECE_ORM_RELATIONSHIPTYPE_ONETOMANY',  'oneToMany');
-define('PIECE_ORM_RELATIONSHIPTYPE_MANYTOONE',  'manyToOne');
-define('PIECE_ORM_RELATIONSHIPTYPE_ONETOONE',   'oneToOne');
-
-// }}}
 // {{{ GLOBALS
 
-$GLOBALS['PIECE_ORM_RelationshipTypes'] = array(PIECE_ORM_RELATIONSHIPTYPE_MANYTOMANY,
-                                                PIECE_ORM_RELATIONSHIPTYPE_ONETOMANY,
-                                                PIECE_ORM_RELATIONSHIPTYPE_MANYTOONE,
-                                                PIECE_ORM_RELATIONSHIPTYPE_ONETOONE
+$GLOBALS['PIECE_ORM_RelationshipTypes'] = array('manyToMany',
+                                                'oneToMany',
+                                                'manyToOne',
+                                                'oneToOne'
                                                 );
 
+// }}}
 // {{{ Piece_ORM_Mapper_RelationshipType
 
 /**

@@ -44,7 +44,7 @@ require_once 'Piece/ORM/Metadata/Factory.php';
 // {{{ Piece_ORM_Mapper_RelationshipNormalizer_ManyToMany
 
 /**
- * A driver class for Many-to-Many relationships.
+ * An relationship normalizer for Many-to-Many relationships.
  *
  * @package    Piece_ORM
  * @author     KUBO Atsuhiro <iteman@users.sourceforge.net>
