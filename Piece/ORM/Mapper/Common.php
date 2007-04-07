@@ -371,6 +371,29 @@ class Piece_ORM_Mapper_Common
         return $this->_dbh->quote($value, $this->_metadata->getDatatype($fieldName));
     }
 
+    // }}}
+    // {{{ setLimit()
+
+    /**
+     * Sets the range of the next query.
+     *
+     * @param integer $limit
+     * @param integer $offset
+     * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
+     */
+    function setLimit($limit, $offset = null)
+    {
+        PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
+        $result = $this->_dbh->setLimit($limit, $offset);
+        PEAR::staticPopErrorHandling();
+        if (MDB2::isError($result)) {
+            Piece_ORM_Error::pushPEARError($result,
+                                           PIECE_ORM_ERROR_INVOCATION_FAILED,
+                                           'Failed to invoke MDB2_Driver_' . $this->getDriverName() . '::setLimit() for any reasons.'
+                                           );
+        }
+    }
+
     /**#@-*/
 
     /**#@+

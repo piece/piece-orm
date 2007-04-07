@@ -591,6 +591,76 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         $this->assertEquals($places, $mapper->findAllWithRestaurant1());
     }
 
+    function testLimit()
+    {
+        $this->_configure('ManyToManyRelationships');
+        $this->_setupManyToManyRelationships();
+
+        $mapper = &Piece_ORM_Mapper_Factory::factory('Employee');
+        $mapper->setLimit(2);
+        $employees = $mapper->findAllWithSkills1();
+
+        $this->assertTrue(is_array($employees));
+        $this->assertEquals(2, count($employees));
+
+        $employees = $mapper->findAllWithSkills1();
+
+        $this->assertEquals(4, count($employees));
+    }
+
+    function testOffset()
+    {
+        $this->_configure('ManyToManyRelationships');
+        $this->_setupManyToManyRelationships();
+
+        $mapper = &Piece_ORM_Mapper_Factory::factory('Employee');
+        $mapper->setLimit(2, 2);
+        $employees = $mapper->findAllWithSkills1();
+
+        $this->assertTrue(is_array($employees));
+        $this->assertEquals(2, count($employees));
+        $this->assertEquals('Baz', $employees[0]->name);
+        $this->assertEquals('Qux', $employees[1]->name);
+    }
+
+    function testLimitFailure()
+    {
+        $this->_configure('ManyToManyRelationships');
+        $this->_setupManyToManyRelationships();
+
+        $mapper = &Piece_ORM_Mapper_Factory::factory('Employee');
+        Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
+
+        $mapper->setLimit(-1);
+
+        $this->assertTrue(Piece_ORM_Error::hasErrors('exception'));
+
+        $error = Piece_ORM_Error::pop();
+
+        $this->assertEquals(PIECE_ORM_ERROR_INVOCATION_FAILED, $error['code']);
+
+        Piece_ORM_Error::popCallback();
+    }
+
+    function testOffsetFailure()
+    {
+        $this->_configure('ManyToManyRelationships');
+        $this->_setupManyToManyRelationships();
+
+        $mapper = &Piece_ORM_Mapper_Factory::factory('Employee');
+        Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
+
+        $mapper->setLimit(2, -1);
+
+        $this->assertTrue(Piece_ORM_Error::hasErrors('exception'));
+
+        $error = Piece_ORM_Error::pop();
+
+        $this->assertEquals(PIECE_ORM_ERROR_INVOCATION_FAILED, $error['code']);
+
+        Piece_ORM_Error::popCallback();
+    }
+
     /**#@-*/
 
     /**#@+
