@@ -110,7 +110,7 @@ class Piece_ORM_Mapper_RelationshipType_ManyToMany extends Piece_ORM_Mapper_Rela
 
         if (!$relationshipMetadata->hasField($relationship['column'])) {
             Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_CONFIGURATION,
-                                  "The field [ {$relationship['column']} ] not found in the table [ " . $metadata->getTableName() . ' ].'
+                                  "The field [ {$relationship['column']} ] not found in the table [ " . $relationshipMetadata->getTableName() . ' ].'
                                   );
             return;
         }
