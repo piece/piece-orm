@@ -76,11 +76,11 @@ class Piece_ORM_Mapper_ObjectLoader
 
     var $_mapper;
     var $_result;
-    var $_relationship;
+    var $_relationships;
     var $_numberOfRelationships;
     var $_relationshipKeys = array();
     var $_objects = array();
-    var $_objectsIndexes = array();
+    var $_objectIndexes = array();
 
     /**#@-*/
 
@@ -96,14 +96,14 @@ class Piece_ORM_Mapper_ObjectLoader
      *
      * @param Piece_ORM_Mapper_Common &$mapper
      * @param MDB2_Result             &$result
-     * @param array                   $relationship
+     * @param array                   $relationships
      */
-    function Piece_ORM_Mapper_ObjectLoader(&$mapper, &$result, $relationship)
+    function Piece_ORM_Mapper_ObjectLoader(&$mapper, &$result, $relationships)
     {
         $this->_mapper = &$mapper;
         $this->_result = &$result;
-        $this->_relationship = $relationship;
-        $this->_numberOfRelationships = count($this->_relationship);
+        $this->_relationships = $relationships;
+        $this->_numberOfRelationships = count($this->_relationships);
     }
 
     // }}}
@@ -181,32 +181,28 @@ class Piece_ORM_Mapper_ObjectLoader
             }
 
             $this->_objects[] = &$this->_load($row);
+
             for ($j = 0; $j < $this->_numberOfRelationships; ++$j) {
-                if ($this->_relationship[$j]['type'] == 'manyToMany') {
-                    $this->_objects[$i]->{$this->_relationship[$j]['mappedAs']} = array();
-                    $this->_relationshipKeys[$j][] = $this->_mapper->quote($row[ $this->_relationship[$j]['through']['referencedColumn'] ],
-                                                                           $this->_relationship[$j]['through']['referencedColumn']
-                                                                           );
-                    $this->_objectsIndexes[$j][ $row[ $this->_relationship[$j]['through']['referencedColumn'] ] ] = $i;
-                } elseif ($this->_relationship[$j]['type'] == 'oneToMany') {
-                    $this->_objects[$i]->{$this->_relationship[$j]['mappedAs']} = array();
-                    $this->_relationshipKeys[$j][] = $this->_mapper->quote($row[ $this->_relationship[$j]['referencedColumn'] ],
-                                                                           $this->_relationship[$j]['referencedColumn']
-                                                                           );
-                    $this->_objectsIndexes[$j][ $row[ $this->_relationship[$j]['referencedColumn'] ] ] = $i;
-                } elseif ($this->_relationship[$j]['type'] == 'manyToOne') {
-                    $this->_objects[$i]->{$this->_relationship[$j]['mappedAs']} = null;
-                    $this->_relationshipKeys[$j][] = $this->_mapper->quote($row[ $this->_relationship[$j]['referencedColumn'] ],
-                                                                           $this->_relationship[$j]['referencedColumn']
-                                                                           );
-                    $this->_objectsIndexes[$j][ $row[ $this->_relationship[$j]['referencedColumn'] ] ][] = $i;
-                } elseif ($this->_relationship[$j]['type'] == 'oneToOne') {
-                    $this->_objects[$i]->{$this->_relationship[$j]['mappedAs']} = null;
-                    $this->_relationshipKeys[$j][] = $this->_mapper->quote($row[ $this->_relationship[$j]['referencedColumn'] ],
-                                                                           $this->_relationship[$j]['referencedColumn']
-                                                                           );
-                    $this->_objectsIndexes[$j][ $row[ $this->_relationship[$j]['referencedColumn'] ] ] = $i;
+                if ($this->_relationships[$j]['type'] == 'manyToMany') {
+                    $mappedAs = array();
+                    $relationshipKeyField = $this->_relationships[$j]['through']['referencedColumn'];
+                    $this->_objectIndexes[$j][ $row[$relationshipKeyField] ]= $i;
+                } elseif ($this->_relationships[$j]['type'] == 'oneToMany') {
+                    $mappedAs = array();
+                    $relationshipKeyField = $this->_relationships[$j]['referencedColumn'];
+                    $this->_objectIndexes[$j][ $row[$relationshipKeyField] ] = $i;
+                } elseif ($this->_relationships[$j]['type'] == 'manyToOne') {
+                    $mappedAs = null;
+                    $relationshipKeyField = $this->_relationships[$j]['referencedColumn'];
+                    $this->_objectIndexes[$j][ $row[$relationshipKeyField] ][] = $i;
+                } elseif ($this->_relationships[$j]['type'] == 'oneToOne') {
+                    $mappedAs = null;
+                    $relationshipKeyField = $this->_relationships[$j]['referencedColumn'];
+                    $this->_objectIndexes[$j][ $row[$relationshipKeyField] ] = $i;
                 }
+
+                $this->_objects[$i]->{$this->_relationships[$j]['mappedAs']} = $mappedAs;
+                $this->_relationshipKeys[$j][] = $this->_mapper->quote($row[$relationshipKeyField], $relationshipKeyField);
             }
         }
         PEAR::staticPopErrorHandling();
@@ -221,9 +217,9 @@ class Piece_ORM_Mapper_ObjectLoader
     function _loadAssociatedObjects()
     {
         for ($i = 0; $i < $this->_numberOfRelationships; ++$i) {
-            if ($this->_relationship[$i]['type'] == 'manyToMany') {
-                $relationshipKeyFieldName = "{$this->_relationship[$i]['through']['table']}_{$this->_relationship[$i]['through']['column']}";
-                $query = "SELECT {$this->_relationship[$i]['through']['table']}.{$this->_relationship[$i]['through']['column']} AS $relationshipKeyFieldName, {$this->_relationship[$i]['table']}.* FROM {$this->_relationship[$i]['table']}, {$this->_relationship[$i]['through']['table']} WHERE {$this->_relationship[$i]['through']['table']}.{$this->_relationship[$i]['through']['column']} IN (" . implode(',', $this->_relationshipKeys[$i]) . ") AND {$this->_relationship[$i]['table']}.{$this->_relationship[$i]['column']} = {$this->_relationship[$i]['through']['table']}.{$this->_relationship[$i]['through']['inverseColumn']}";
+            if ($this->_relationships[$i]['type'] == 'manyToMany') {
+                $relationshipKeyFieldName = "{$this->_relationships[$i]['through']['table']}_{$this->_relationships[$i]['through']['column']}";
+                $query = "SELECT {$this->_relationships[$i]['through']['table']}.{$this->_relationships[$i]['through']['column']} AS $relationshipKeyFieldName, {$this->_relationships[$i]['table']}.* FROM {$this->_relationships[$i]['table']}, {$this->_relationships[$i]['through']['table']} WHERE {$this->_relationships[$i]['through']['table']}.{$this->_relationships[$i]['through']['column']} IN (" . implode(',', $this->_relationshipKeys[$i]) . ") AND {$this->_relationships[$i]['table']}.{$this->_relationships[$i]['column']} = {$this->_relationships[$i]['through']['table']}.{$this->_relationships[$i]['through']['inverseColumn']}";
                 $associatedObjects = $this->_mapper->findAllWithQuery($query);
                 if (Piece_ORM_Error::hasErrors('exception')) {
                     return;
@@ -232,46 +228,46 @@ class Piece_ORM_Mapper_ObjectLoader
                 $numberOfAssociatedObjects = count($associatedObjects);
                 $relationshipKeyPropertyName = Piece_ORM_Inflector::camelize($relationshipKeyFieldName, true);
                 for ($j = 0; $j < $numberOfAssociatedObjects; ++$j) {
-                    $this->_objects[ $this->_objectsIndexes[$i][ $associatedObjects[$j]->$relationshipKeyPropertyName ] ]->{$this->_relationship[$i]['mappedAs']}[] = &$associatedObjects[$j];
+                    $this->_objects[ $this->_objectIndexes[$i][ $associatedObjects[$j]->$relationshipKeyPropertyName ] ]->{$this->_relationships[$i]['mappedAs']}[] = &$associatedObjects[$j];
                     unset($associatedObjects[$j]->$relationshipKeyPropertyName);
                 }
-            } elseif ($this->_relationship[$i]['type'] == 'oneToMany') {
-                $query = "SELECT * FROM {$this->_relationship[$i]['table']} WHERE {$this->_relationship[$i]['column']} IN (" . implode(',', $this->_relationshipKeys[$i]) . ')';
+            } elseif ($this->_relationships[$i]['type'] == 'oneToMany') {
+                $query = "SELECT * FROM {$this->_relationships[$i]['table']} WHERE {$this->_relationships[$i]['column']} IN (" . implode(',', $this->_relationshipKeys[$i]) . ')';
                 $associatedObjects = $this->_mapper->findAllWithQuery($query);
                 if (Piece_ORM_Error::hasErrors('exception')) {
                     return;
                 }
 
                 $numberOfAssociatedObjects = count($associatedObjects);
-                $relationshipKeyPropertyName = Piece_ORM_Inflector::camelize($this->_relationship[$i]['column'], true);
+                $relationshipKeyPropertyName = Piece_ORM_Inflector::camelize($this->_relationships[$i]['column'], true);
                 for ($j = 0; $j < $numberOfAssociatedObjects; ++$j) {
-                    $this->_objects[ $this->_objectsIndexes[$i][ $associatedObjects[$j]->$relationshipKeyPropertyName ] ]->{$this->_relationship[$i]['mappedAs']}[] = &$associatedObjects[$j];
+                    $this->_objects[ $this->_objectIndexes[$i][ $associatedObjects[$j]->$relationshipKeyPropertyName ] ]->{$this->_relationships[$i]['mappedAs']}[] = &$associatedObjects[$j];
                 }
-            } elseif ($this->_relationship[$i]['type'] == 'manyToOne') {
-                $query = "SELECT * FROM {$this->_relationship[$i]['table']} WHERE {$this->_relationship[$i]['column']} IN (" . implode(',', $this->_relationshipKeys[$i]) . ')';
+            } elseif ($this->_relationships[$i]['type'] == 'manyToOne') {
+                $query = "SELECT * FROM {$this->_relationships[$i]['table']} WHERE {$this->_relationships[$i]['column']} IN (" . implode(',', $this->_relationshipKeys[$i]) . ')';
                 $associatedObjects = $this->_mapper->findAllWithQuery($query);
                 if (Piece_ORM_Error::hasErrors('exception')) {
                     return;
                 }
 
                 $numberOfAssociatedObjects = count($associatedObjects);
-                $relationshipKeyPropertyName = Piece_ORM_Inflector::camelize($this->_relationship[$i]['column'], true);
+                $relationshipKeyPropertyName = Piece_ORM_Inflector::camelize($this->_relationships[$i]['column'], true);
                 for ($j = 0; $j < $numberOfAssociatedObjects; ++$j) {
-                    for ($k = 0; $k < count($this->_objectsIndexes[$i][ $associatedObjects[$j]->$relationshipKeyPropertyName ]); ++$k) {
-                        $this->_objects[ $this->_objectsIndexes[$i][ $associatedObjects[$j]->$relationshipKeyPropertyName ][$k] ]->{$this->_relationship[$i]['mappedAs']} = &$associatedObjects[$j];
+                    for ($k = 0; $k < count($this->_objectIndexes[$i][ $associatedObjects[$j]->$relationshipKeyPropertyName ]); ++$k) {
+                        $this->_objects[ $this->_objectIndexes[$i][ $associatedObjects[$j]->$relationshipKeyPropertyName ][$k] ]->{$this->_relationships[$i]['mappedAs']} = &$associatedObjects[$j];
                     }
                 }
-            } elseif ($this->_relationship[$i]['type'] == 'oneToOne') {
-                $query = "SELECT * FROM {$this->_relationship[$i]['table']} WHERE {$this->_relationship[$i]['column']} IN (" . implode(',', $this->_relationshipKeys[$i]) . ')';
+            } elseif ($this->_relationships[$i]['type'] == 'oneToOne') {
+                $query = "SELECT * FROM {$this->_relationships[$i]['table']} WHERE {$this->_relationships[$i]['column']} IN (" . implode(',', $this->_relationshipKeys[$i]) . ')';
                 $associatedObjects = $this->_mapper->findAllWithQuery($query);
                 if (Piece_ORM_Error::hasErrors('exception')) {
                     return;
                 }
 
                 $numberOfAssociatedObjects = count($associatedObjects);
-                $relationshipKeyPropertyName = Piece_ORM_Inflector::camelize($this->_relationship[$i]['column'], true);
+                $relationshipKeyPropertyName = Piece_ORM_Inflector::camelize($this->_relationships[$i]['column'], true);
                 for ($j = 0; $j < $numberOfAssociatedObjects; ++$j) {
-                    $this->_objects[ $this->_objectsIndexes[$i][ $associatedObjects[$j]->$relationshipKeyPropertyName ] ]->{$this->_relationship[$i]['mappedAs']} = &$associatedObjects[$j];
+                    $this->_objects[ $this->_objectIndexes[$i][ $associatedObjects[$j]->$relationshipKeyPropertyName ] ]->{$this->_relationships[$i]['mappedAs']} = &$associatedObjects[$j];
                 }
             }
         }
