@@ -704,6 +704,27 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
 
             $this->assertTrue(is_array($employee->skills));
 
+            switch ($employee->name) {
+            case 'Foo':
+                $this->assertEquals(0, count($employee->skills));
+                break;
+            case 'Bar':
+                $this->assertEquals(1, count($employee->skills));
+                $this->assertEquals('PHP', $employee->skills[0]->name);
+                break;
+            case 'Baz':
+                $this->assertEquals(1, count($employee->skills));
+                $this->assertEquals('OOP', $employee->skills[0]->name);
+                break;
+            case 'Qux':
+                $this->assertEquals(2, count($employee->skills));
+                $this->assertEquals('PHP', $employee->skills[0]->name);
+                $this->assertEquals('OOP', $employee->skills[1]->name);
+                break;
+            default:
+                $this->fail('Unknown name for Employee.');
+            }
+
             foreach ($employee->skills as $skill) {
                 foreach (array('id', 'name', 'version', 'rdate', 'mdate') as $property) {
                     $this->assertTrue(array_key_exists($property, $skill), $property);
@@ -776,6 +797,20 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
             }
 
             $this->assertTrue(is_array($artist->albums));
+
+            switch ($artist->name) {
+            case 'Foo':
+                $this->assertEquals(0, count($artist->albums));
+                break;
+            case 'Bar':
+                $this->assertEquals(1, count($artist->albums));
+                break;
+            case 'Baz':
+                $this->assertEquals(2, count($artist->albums));
+                break;
+            default:
+                $this->fail('Unknown name for Artist.');
+            }
 
             foreach ($artist->albums as $album) {
                 foreach (array('id', 'name', 'version', 'rdate', 'mdate') as $property) {
