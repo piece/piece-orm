@@ -422,20 +422,7 @@ class Piece_ORM_Mapper_Generator
      */
     function _addFind($methodName, $query, $relationships = null)
     {
-        $propertyName = strtolower($methodName);
-
-        if (!$query) {
-            if (!array_key_exists($propertyName, $this->_propertyDefinitions['query'])) {
-                $query = 'SELECT * FROM ' . $this->_metadata->getTableName();
-            }
-        }
-
-        if ($query) {
-            $this->_propertyDefinitions['query'][$propertyName] =
-                $this->_getQueryPropertyDeclaration($propertyName, $query);
-        }
-
-        $this->_propertyDefinitions['relationship'][$propertyName] = $this->_getRelationshipPropertyDeclaration($propertyName, $relationships);
+        $this->_addPropertyDefinitions($methodName, $query, $relationships);
         if (Piece_ORM_Error::hasErrors('exception')) {
             return;
         }
@@ -477,20 +464,7 @@ class Piece_ORM_Mapper_Generator
      */
     function _addFindAll($methodName, $query = null, $relationships = null)
     {
-        $propertyName = strtolower($methodName);
-
-        if (!$query) {
-            if (!array_key_exists($propertyName, $this->_propertyDefinitions['query'])) {
-                $query = 'SELECT * FROM ' . $this->_metadata->getTableName();
-            }
-        }
-
-        if ($query) {
-            $this->_propertyDefinitions['query'][$propertyName] =
-                $this->_getQueryPropertyDeclaration($propertyName, $query);
-        }
-
-        $this->_propertyDefinitions['relationship'][$propertyName] = $this->_getRelationshipPropertyDeclaration($propertyName, $relationships);
+        $this->_addPropertyDefinitions($methodName, $query, $relationships);
         if (Piece_ORM_Error::hasErrors('exception')) {
             return;
         }
@@ -710,6 +684,36 @@ class Piece_ORM_Mapper_Generator
         } else {
             return "    var \$__relationship__{$propertyName} = array();";
         }
+    }
+
+    // }}}
+    // {{{ _addPropertyDefinitions()
+
+    /**
+     * Adds property definitions generated from the given values.
+     *
+     * @param string $methodName
+     * @param string $query
+     * @param array  $relationships
+     * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
+     * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
+     */
+    function _addPropertyDefinitions($methodName, $query, $relationships)
+    {
+        $propertyName = strtolower($methodName);
+
+        if (!$query) {
+            if (!array_key_exists($propertyName, $this->_propertyDefinitions['query'])) {
+                $query = 'SELECT * FROM ' . $this->_metadata->getTableName();
+            }
+        }
+
+        if ($query) {
+            $this->_propertyDefinitions['query'][$propertyName] =
+                $this->_getQueryPropertyDeclaration($propertyName, $query);
+        }
+
+        $this->_propertyDefinitions['relationship'][$propertyName] = $this->_getRelationshipPropertyDeclaration($propertyName, $relationships);
     }
 
     /**#@-*/
