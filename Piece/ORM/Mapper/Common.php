@@ -75,6 +75,7 @@ class Piece_ORM_Mapper_Common
     var $_metadata;
     var $_dbh;
     var $_lastQuery;
+    var $_orders = array();
 
     /**#@-*/
 
@@ -394,6 +395,21 @@ class Piece_ORM_Mapper_Common
         }
     }
 
+    // }}}
+    // {{{ addOrder()
+
+    /**
+     * Adds an expression as a part of the sort order of the next query.
+     *
+     * @param string  $expression
+     * @param boolean $useDescendingOrder
+     * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
+     */
+    function addOrder($expression, $useDescendingOrder = false)
+    {
+        $this->_orders[] = "$expression " . (!$useDescendingOrder ? 'ASC' : 'DESC');
+    }
+
     /**#@-*/
 
     /**#@+
@@ -589,7 +605,12 @@ class Piece_ORM_Mapper_Common
     {
         PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
         if (!$isManip) {
+            if (count($this->_orders)) {
+                $query .= ' ORDER BY ' . implode(', ', $this->_orders);
+            }
+
             $result = &$this->_dbh->query($query);
+            $this->_orders = array();
         } else {
             $result = $this->_dbh->exec($query);
         }

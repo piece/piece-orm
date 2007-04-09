@@ -661,6 +661,38 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         Piece_ORM_Error::popCallback();
     }
 
+    function testOrder()
+    {
+        $this->_configure('ManyToManyRelationships');
+        $this->_setupManyToManyRelationships();
+
+        $mapper = &Piece_ORM_Mapper_Factory::factory('Employee');
+        $mapper->addOrder('name');
+        $mapper->addOrder('id');
+        $employees = $mapper->findAllWithSkills1();
+
+        $this->assertTrue(is_array($employees));
+        $this->assertEquals(4, count($employees));
+
+        $this->assertEquals('Bar', $employees[0]->name);
+        $this->assertEquals('Baz', $employees[1]->name);
+        $this->assertEquals('Foo', $employees[2]->name);
+        $this->assertEquals('Qux', $employees[3]->name);
+
+        $mapper->addOrder('name', true);
+        $mapper->addOrder('id');
+
+        $employees = $mapper->findAllWithSkills1();
+
+        $this->assertTrue(is_array($employees));
+        $this->assertEquals(4, count($employees));
+
+        $this->assertEquals('Bar', $employees[3]->name);
+        $this->assertEquals('Baz', $employees[2]->name);
+        $this->assertEquals('Foo', $employees[1]->name);
+        $this->assertEquals('Qux', $employees[0]->name);
+    }
+
     /**#@-*/
 
     /**#@+
