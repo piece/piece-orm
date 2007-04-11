@@ -413,37 +413,95 @@ class Piece_ORM_Mapper_Common
         $this->_orders[] = "$expression " . (!$useDescendingOrder ? 'ASC' : 'DESC');
     }
 
-    function &getLoadedObject($primaryKey)
+    // }}}
+    // {{{ getLoadedObject()
+
+    /**
+     * Gets a loaded object corresponding to the given primary key value.
+     *
+     * @param mixed $primaryKeyValue
+     * @return stdClass
+     */
+    function &getLoadedObject($primaryKeyValue)
     {
-        $object = &$this->_loadedObjects[$primaryKey];
+        $object = &$this->_loadedObjects[$primaryKeyValue];
         return $object;
     }
 
-    function addLoadedObject($primaryKey, &$object)
+    // }}}
+    // {{{ addLoadedObject()
+
+    /**
+     * Adds an object to the list of the loaded objects.
+     *
+     * @param string   $primaryKeyValue
+     * @param stdClass &$object
+     */
+    function addLoadedObject($primaryKeyValue, &$object)
     {
-        $this->_loadedObjects[$primaryKey] = &$object;
+        $this->_loadedObjects[$primaryKeyValue] = &$object;
     }
 
+    // }}}
+    // {{{ setPreloadCallback()
+
+    /**
+     * Sets a callback as a preload callback.
+     *
+     * @param callback $callback
+     */
     function setPreloadCallback($callback)
     {
         $this->_preloadCallback = $callback;
     }
 
+    // }}}
+    // {{{ getPreloadCallback()
+
+    /**
+     * Gets a preload callback.
+     *
+     * @return callback
+     */
     function getPreloadCallback()
     {
         return $this->_preloadCallback;
     }
 
+    // }}}
+    // {{{ setPreloadCallbackArgs()
+
+    /**
+     * Sets arguments which will be pass to a preload callback.
+     *
+     * @param array $args
+     */
     function setPreloadCallbackArgs($args)
     {
         $this->_preloadCallbackArgs = $args;
     }
 
+    // }}}
+    // {{{ getPreloadCallbackArgs()
+
+    /**
+     * Sets arguments which will be pass to a preload callback.
+     *
+     * @param array $args
+     */
     function getPreloadCallbackArgs()
     {
         return $this->_preloadCallbackArgs;
     }
 
+    // }}}
+    // {{{ getPreloadCallbackArgs()
+
+    /**
+     * Gets the metadata object for this mapper.
+     *
+     * @return Piece_ORM_Metadata
+     */
     function &getMetadata()
     {
         return $this->_metadata;
