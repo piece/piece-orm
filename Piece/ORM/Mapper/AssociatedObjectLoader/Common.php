@@ -37,6 +37,9 @@
  * @since      File available since Release 0.2.0
  */
 
+require_once 'Piece/ORM/Inflector.php';
+require_once 'Piece/ORM/Error.php';
+
 // {{{ Piece_ORM_Mapper_AssociatedObjectLoader_Common
 
 /**
@@ -75,7 +78,12 @@ class Piece_ORM_Mapper_AssociatedObjectLoader_Common
      * @access public
      */
 
+    // }}}
+    // {{{ constructor
+
     /**
+     * Initializes properties with the given value.
+     *
      * @param Piece_ORM_Mapper_ObjectLoader &$objectLoader
      */
     function Piece_ORM_Mapper_AssociatedObjectLoader_Common(&$objectLoader)
