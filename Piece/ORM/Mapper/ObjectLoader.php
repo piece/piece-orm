@@ -43,6 +43,8 @@ require_once 'Piece/ORM/Inflector.php';
 require_once 'Piece/ORM/Error.php';
 require_once 'MDB2.php';
 require_once 'PEAR.php';
+require_once 'Piece/ORM/Mapper/RelationshipType.php';
+require_once 'Piece/ORM/Mapper/Factory.php';
 
 // {{{ Piece_ORM_Mapper_ObjectLoader
 
@@ -209,14 +211,31 @@ class Piece_ORM_Mapper_ObjectLoader
         return $this->_objectIndexes;
     }
 
-    function isLoadedRow($primaryKey)
+    // }}}
+    // {{{ isLoadedRow()
+
+    /**
+     * Returns whether the given primary key value is already loaded or not.
+     *
+     * @param string $primaryKeyValue
+     * @return boolean
+     */
+    function isLoadedRow($primaryKeyValue)
     {
-        return array_key_exists($primaryKey, $this->_loadedRows);
+        return array_key_exists($primaryKeyValue, $this->_loadedRows);
     }
 
-    function addLoadedRow($primaryKey)
+    // }}}
+    // {{{ addLoadedRow()
+
+    /**
+     * Adds an object to the list of the loaded objects.
+     *
+     * @param string $primaryKeyValue
+     */
+    function addLoadedRow($primaryKeyValue)
     {
-        $this->_loadedRows[$primaryKey] = 1;
+        $this->_loadedRows[$primaryKeyValue] = true;
     }
 
     /**#@-*/
