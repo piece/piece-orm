@@ -136,12 +136,12 @@ class Piece_ORM_Mapper_AssociatedObjectLoader_ManyToOne extends Piece_ORM_Mapper
      * @param array    $objectIndexes
      * @param string   $relationshipKeyPropertyName
      * @param string   $mappedAs
+     * @param mixed    &$mapper
      */
-    function _associateObject(&$associatedObject, &$objects, $objectIndexes, $relationshipKeyPropertyName, $mappedAs)
+    function _associateObject(&$associatedObject, &$objects, $objectIndexes, $relationshipKeyPropertyName, $mappedAs, &$mapper)
     {
-        $numberOfSameKeys = count($objectIndexes[ $associatedObject->$relationshipKeyPropertyName ]);
-        for ($k = 0; $k < $numberOfSameKeys; ++$k) {
-            $objects[ $objectIndexes[ $associatedObject->$relationshipKeyPropertyName ][$k] ]->{$mappedAs} = &$associatedObject;
+        for ($i = 0; $i < count($objectIndexes[ $associatedObject->$relationshipKeyPropertyName ]); ++$i) {
+            $objects[ $objectIndexes[ $associatedObject->$relationshipKeyPropertyName ][$i] ]->{$mappedAs} = &$associatedObject;
         }
     }
 

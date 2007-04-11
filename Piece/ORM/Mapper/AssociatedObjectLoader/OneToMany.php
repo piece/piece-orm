@@ -136,8 +136,9 @@ class Piece_ORM_Mapper_AssociatedObjectLoader_OneToMany extends Piece_ORM_Mapper
      * @param array    $objectIndexes
      * @param string   $relationshipKeyPropertyName
      * @param string   $mappedAs
+     * @param mixed    &$mapper
      */
-    function _associateObject(&$associatedObject, &$objects, $objectIndexes, $relationshipKeyPropertyName, $mappedAs)
+    function _associateObject(&$associatedObject, &$objects, $objectIndexes, $relationshipKeyPropertyName, $mappedAs, &$mapper)
     {
         $objects[ $objectIndexes[ $associatedObject->$relationshipKeyPropertyName ] ]->{$mappedAs}[] = &$associatedObject;
     }
