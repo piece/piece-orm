@@ -77,11 +77,12 @@ class Piece_ORM_Mapper_ObjectLoader
     var $_mapper;
     var $_result;
     var $_relationships;
-    var $_numberOfRelationships;
     var $_relationshipKeys = array();
     var $_objects = array();
     var $_objectIndexes = array();
     var $_associatedObjectLoaders = array();
+    var $_loadedRows = array();
+    var $_primaryKey;
 
     /**#@-*/
 
@@ -104,15 +105,17 @@ class Piece_ORM_Mapper_ObjectLoader
         $this->_mapper = &$mapper;
         $this->_result = &$result;
         $this->_relationships = $relationships;
-        $this->_numberOfRelationships = count($this->_relationships);
 
-        if ($this->_numberOfRelationships) {
+        if (count($this->_relationships)) {
             foreach (Piece_ORM_Mapper_RelationshipType::getRelationshipTypes() as $relationshipType) {
                 $associatedObjectsLoaderClass = 'Piece_ORM_Mapper_AssociatedObjectLoader_' . ucwords($relationshipType);
                 include_once str_replace('_', '/', $associatedObjectsLoaderClass) . '.php';
-                $this->_associatedObjectLoaders[$relationshipType] = &new $associatedObjectsLoaderClass();
+                $this->_associatedObjectLoaders[$relationshipType] = &new $associatedObjectsLoaderClass($this);
             }
         }
+
+        $metadata = &$this->_mapper->getMetadata();
+        $this->_primaryKey = $metadata->getPrimaryKey();
     }
 
     // }}}
@@ -206,6 +209,16 @@ class Piece_ORM_Mapper_ObjectLoader
         return $this->_objectIndexes;
     }
 
+    function isLoadedRow($primaryKey)
+    {
+        return array_key_exists($primaryKey, $this->_loadedRows);
+    }
+
+    function addLoadedRow($primaryKey)
+    {
+        $this->_loadedRows[$primaryKey] = 1;
+    }
+
     /**#@-*/
 
     /**#@+
@@ -227,10 +240,21 @@ class Piece_ORM_Mapper_ObjectLoader
             return $row;
         }
 
+        if ($this->_primaryKey) {
+            $loadedObject = &$this->_mapper->getLoadedObject($row[$this->_primaryKey]);
+            if (!is_null($loadedObject)) {
+                return $loadedObject;
+            }
+        }
+
         $object = &new stdClass();
         foreach ($row as $key => $value) {
             $propertyName = Piece_ORM_Inflector::camelize($key, true);
             $object->$propertyName = $value;
+        }
+
+        if ($this->_primaryKey) {
+            $this->_mapper->addLoadedObject($row[$this->_primaryKey], $object);
         }
 
         return $object;
@@ -244,6 +268,8 @@ class Piece_ORM_Mapper_ObjectLoader
      */
     function _loadPrimaryObjects()
     {
+        $preloadCallback = $this->_mapper->getPreloadCallback();
+        $preloadCallbackArgs = $this->_mapper->getPreloadCallbackArgs();
         PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
         for ($i = 0; $row = &$this->_result->fetchRow(); ++$i) {
             if (MDB2::isError($row)) {
@@ -255,10 +281,18 @@ class Piece_ORM_Mapper_ObjectLoader
                 return;
             }
 
-            $this->_objects[] = &$this->_load($row);
+            if (!is_null($preloadCallback)) {
+                $loadObject = call_user_func_array($preloadCallback, array_merge(array(&$row, &$this->_mapper), $preloadCallbackArgs));
+            } else {
+                $loadObject = true;
+            }
 
-            for ($j = 0; $j < $this->_numberOfRelationships; ++$j) {
-                $this->_associatedObjectLoaders[ $this->_relationships[$j]['type'] ]->prepareLoading($this, $row, $i, $j);
+            if ($loadObject) {
+                $this->_objects[] = &$this->_load($row);
+            }
+
+            for ($j = 0; $j < count($this->_relationships); ++$j) {
+                $this->_associatedObjectLoaders[ $this->_relationships[$j]['type'] ]->prepareLoading($row, $i, $j);
             }
         }
         PEAR::staticPopErrorHandling();
@@ -275,8 +309,13 @@ class Piece_ORM_Mapper_ObjectLoader
      */
     function _loadAssociatedObjects()
     {
-        for ($i = 0; $i < $this->_numberOfRelationships; ++$i) {
-            $this->_associatedObjectLoaders[ $this->_relationships[$i]['type'] ]->loadAll($this, $i);
+        for ($i = 0; $i < count($this->_relationships); ++$i) {
+            $mapper = &Piece_ORM_Mapper_Factory::factory(Piece_ORM_Inflector::camelize($this->_relationships[$i]['table']));
+            if (Piece_ORM_Error::hasErrors('exception')) {
+                return;
+            }
+
+            $this->_associatedObjectLoaders[ $this->_relationships[$i]['type'] ]->loadAll($mapper, $i);
             if (Piece_ORM_Error::hasErrors('exception')) {
                 return;
             }

@@ -68,12 +68,38 @@ class Piece_ORM_Mapper_AssociatedObjectLoader_ManyToMany extends Piece_ORM_Mappe
      */
 
     var $_defaultValueOfMappedAs = array();
+    var $_associations = array();
 
     /**#@-*/
 
     /**#@+
      * @access public
      */
+
+    // }}}
+    // {{{ addAssociation()
+
+    /**
+     * Adds an association about what an inverse side record is associated
+     * with an owning side record.
+     *
+     * @param array &$row
+     * @param mixed &$mapper
+     * @param array $relationship
+     */
+    function addAssociation(&$row, &$mapper, $relationship)
+    {
+        $metadata = &$mapper->getMetadata();
+        $primaryKey = $metadata->getPrimaryKey();
+        $this->_associations[ $row[$primaryKey] ][] = $row[ $this->_getRelationshipKeyFieldNameInSecondaryQuery($relationship) ];
+
+        if ($this->_objectLoader->isLoadedRow($row[$primaryKey])) {
+            return false;
+        } else {
+            $this->_objectLoader->addLoadedRow($row[$primaryKey]);
+            return true;
+        }
+    }
 
     /**#@-*/
 
@@ -137,10 +163,26 @@ class Piece_ORM_Mapper_AssociatedObjectLoader_ManyToMany extends Piece_ORM_Mappe
      * @param string   $relationshipKeyPropertyName
      * @param string   $mappedAs
      */
-    function _associateObject(&$associatedObject, &$objects, $objectIndexes, $relationshipKeyPropertyName, $mappedAs)
+    function _associateObject(&$associatedObject, &$objects, $objectIndexes, $relationshipKeyPropertyName, $mappedAs, &$mapper)
     {
-        $objects[ $objectIndexes[ $associatedObject->$relationshipKeyPropertyName ] ]->{$mappedAs}[] = &$associatedObject;
-        unset($associatedObject->$relationshipKeyPropertyName);
+        $metadata = &$mapper->getMetadata();
+        $primaryKey = $metadata->getPrimaryKey();
+        for ($i = 0; $i < count($this->_associations[ $associatedObject->$primaryKey ]); ++$i ) {
+            $objects[ $objectIndexes[ $this->_associations[ $associatedObject->$primaryKey ][$i] ] ]->{$mappedAs}[] = &$associatedObject;
+        }
+    }
+
+    // }}}
+    // {{{ _getPreloadCallback()
+
+    /**
+     * Gets the preload callback for a loader.
+     *
+     * @return callback
+     */
+    function _getPreloadCallback()
+    {
+        return array(&$this, 'addAssociation');
     }
 
     /**#@-*/

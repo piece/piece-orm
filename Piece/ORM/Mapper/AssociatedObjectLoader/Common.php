@@ -67,6 +67,7 @@ class Piece_ORM_Mapper_AssociatedObjectLoader_Common
 
     var $_useMultipleIndexes = false;
     var $_defaultValueOfMappedAs;
+    var $_objectLoader;
 
     /**#@-*/
 
@@ -74,30 +75,37 @@ class Piece_ORM_Mapper_AssociatedObjectLoader_Common
      * @access public
      */
 
+    /**
+     * @param Piece_ORM_Mapper_ObjectLoader &$objectLoader
+     */
+    function Piece_ORM_Mapper_AssociatedObjectLoader_Common(&$objectLoader)
+    {
+        $this->_objectLoader = &$objectLoader;
+    }
+
     // }}}
     // {{{ prepareLoading()
 
     /**
      * Prepares loading associated objects.
      *
-     * @param Piece_ORM_Mapper_ObjectLoader &$objectLoader
-     * @param array                         $row
-     * @param integer                       $i
-     * @param integer                       $j
+     * @param array   $row
+     * @param integer $i
+     * @param integer $j
      */
-    function prepareLoading(&$objectLoader, $row, $i, $j)
+    function prepareLoading($row, $i, $j)
     {
-        $relationships = $objectLoader->getRelationships();
+        $relationships = $this->_objectLoader->getRelationships();
         $relationshipKeyFieldName = $this->_getRelationshipKeyFieldNameInPrimaryQuery($relationships[$j]);
 
-        $objects = &$objectLoader->getObjects();
+        $objects = &$this->_objectLoader->getObjects();
         $objects[$i]->{$relationships[$j]['mappedAs']} = $this->_defaultValueOfMappedAs;
 
-        $mapper = &$objectLoader->getMapper();
-        $relationshipKeys = &$objectLoader->getRelationshipKeys();
+        $mapper = &$this->_objectLoader->getMapper();
+        $relationshipKeys = &$this->_objectLoader->getRelationshipKeys();
         $relationshipKeys[$j][] = $mapper->quote($row[$relationshipKeyFieldName], $relationshipKeyFieldName);
 
-        $objectIndexes = &$objectLoader->getObjectIndexes();
+        $objectIndexes = &$this->_objectLoader->getObjectIndexes();
         if (!$this->_useMultipleIndexes) {
             $objectIndexes[$j][ $row[$relationshipKeyFieldName] ] = $i;
         } else {
@@ -111,28 +119,29 @@ class Piece_ORM_Mapper_AssociatedObjectLoader_Common
     /**
      * Loads all associated objects into appropriate objects.
      *
-     * @param Piece_ORM_Mapper_ObjectLoader &$objectLoader
-     * @param integer                       $i
+     * @param mixed   &$mapper
+     * @param integer $i
      * @throws PIECE_ORM_ERROR_UNEXPECTED_VALUE
      * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
      */
-    function loadAll(&$objectLoader, $i)
+    function loadAll(&$mapper, $i)
     {
-        $relationships = $objectLoader->getRelationships();
-        $relationshipKeys = &$objectLoader->getRelationshipKeys();
-        $mapper = &$objectLoader->getMapper();
+        $relationships = $this->_objectLoader->getRelationships();
+        $relationshipKeys = &$this->_objectLoader->getRelationshipKeys();
+        $mapper->setPreloadCallback($this->_getPreloadCallback());
+        $mapper->setPreloadCallbackArgs(array($relationships[$i]));
+
         $associatedObjects = $mapper->findAllWithQuery($this->_buildQuery($relationships[$i], $relationshipKeys[$i]));
         if (Piece_ORM_Error::hasErrors('exception')) {
             return;
         }
 
         $relationshipKeyPropertyName = Piece_ORM_Inflector::camelize($this->_getRelationshipKeyFieldNameInSecondaryQuery($relationships[$i]), true);
-        $numberOfAssociatedObjects = count($associatedObjects);
 
-        $objects = &$objectLoader->getObjects();
-        $objectIndexes = &$objectLoader->getObjectIndexes();
-        for ($j = 0; $j < $numberOfAssociatedObjects; ++$j) {
-            $this->_associateObject($associatedObjects[$j], $objects, $objectIndexes[$i], $relationshipKeyPropertyName, $relationships[$i]['mappedAs']);
+        $objects = &$this->_objectLoader->getObjects();
+        $objectIndexes = &$this->_objectLoader->getObjectIndexes();
+        for ($j = 0; $j < count($associatedObjects); ++$j) {
+            $this->_associateObject($associatedObjects[$j], $objects, $objectIndexes[$i], $relationshipKeyPropertyName, $relationships[$i]['mappedAs'], $mapper);
         }
     }
 
@@ -192,6 +201,19 @@ class Piece_ORM_Mapper_AssociatedObjectLoader_Common
      * @abstract
      */
     function _associateObject(&$associatedObject, &$objects, $objectIndexes, $relationshipKeyPropertyName, $mappedAs) {}
+
+    // }}}
+    // {{{ _getPreloadCallback()
+
+    /**
+     * Gets the preload callback for a loader.
+     *
+     * @return callback
+     */
+    function _getPreloadCallback()
+    {
+        return null;
+    }
 
     /**#@-*/
 

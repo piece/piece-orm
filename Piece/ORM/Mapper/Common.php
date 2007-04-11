@@ -76,6 +76,9 @@ class Piece_ORM_Mapper_Common
     var $_dbh;
     var $_lastQuery;
     var $_orders = array();
+    var $_loadedObjects = array();
+    var $_preloadCallback;
+    var $_preloadCallbackArgs;
 
     /**#@-*/
 
@@ -410,6 +413,42 @@ class Piece_ORM_Mapper_Common
         $this->_orders[] = "$expression " . (!$useDescendingOrder ? 'ASC' : 'DESC');
     }
 
+    function &getLoadedObject($primaryKey)
+    {
+        $object = &$this->_loadedObjects[$primaryKey];
+        return $object;
+    }
+
+    function addLoadedObject($primaryKey, &$object)
+    {
+        $this->_loadedObjects[$primaryKey] = &$object;
+    }
+
+    function setPreloadCallback($callback)
+    {
+        $this->_preloadCallback = $callback;
+    }
+
+    function getPreloadCallback()
+    {
+        return $this->_preloadCallback;
+    }
+
+    function setPreloadCallbackArgs($args)
+    {
+        $this->_preloadCallbackArgs = $args;
+    }
+
+    function getPreloadCallbackArgs()
+    {
+        return $this->_preloadCallbackArgs;
+    }
+
+    function &getMetadata()
+    {
+        return $this->_metadata;
+    }
+
     /**#@-*/
 
     /**#@+
@@ -533,15 +572,17 @@ class Piece_ORM_Mapper_Common
      * Loads all objects with a result object.
      *
      * @param MDB2_Result &$result
-     * @param array       $relationship
+     * @param array       $relationships
      * @return array
      * @throws PIECE_ORM_ERROR_UNEXPECTED_VALUE
      * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
      */
-    function _loadAllObjects(&$result, $relationship = array())
+    function _loadAllObjects(&$result, $relationships = array())
     {
-        $loader = &new Piece_ORM_Mapper_ObjectLoader($this, $result, $relationship);
-        return $loader->loadAll();
+        $loader = &new Piece_ORM_Mapper_ObjectLoader($this, $result, $relationships);
+        $objects = $loader->loadAll();
+        $this->_loadCallback = null;
+        return $objects;
     }
 
     // }}}

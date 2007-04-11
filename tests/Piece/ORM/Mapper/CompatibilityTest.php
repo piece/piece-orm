@@ -303,7 +303,7 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         $this->assertEquals("UPDATE person SET first_name = '{$person1->firstName}', last_name = '{$person1->lastName}', service_id = {$person1->serviceId}, version = {$person1->version}, rdate = '{$person1->rdate}', mdate = '{$person1->mdate}' WHERE id = $id", $mapper->getLastQuery());
         $this->assertEquals(1, $affectedRows);
 
-        $person2 = $mapper->findById($id);
+        $person2 = &$mapper->findById($id);
 
         $this->assertEquals('Seven', $person2->firstName);
     }
@@ -444,7 +444,7 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         $this->_assertQueryForTestOverwriteUpdateQuery($mapper->getLastQuery(), $person1);
         $this->assertEquals(1, $affectedRows);
 
-        $person2 = $mapper->findById($id);
+        $person2 = &$mapper->findById($id);
 
         $this->assertEquals('Seven', $person2->firstName);
 
@@ -540,13 +540,18 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         $this->_setupManyToManyRelationships();
 
         $mapper = &Piece_ORM_Mapper_Factory::factory('Employee');
-        $employee = $mapper->findWithSkillsByName('Qux');
+        $employee1 = &$mapper->findWithSkillsByName('Qux');
 
-        $this->assertFalse(is_array($employee));
-        $this->assertEquals(strtolower('stdClass'), strtolower(get_class($employee)));
-        $this->_assertManyToManyRelationships(array($employee));
-        $this->assertEquals(2, count($employee->skills));
-        $this->assertEquals($employee, $mapper->findWithSkillsByName((object)array('name' => 'Qux')));
+        $this->assertFalse(is_array($employee1));
+        $this->assertEquals(strtolower('stdClass'), strtolower(get_class($employee1)));
+        $this->_assertManyToManyRelationships(array($employee1));
+        $this->assertEquals(2, count($employee1->skills));
+
+        $employee2 = &$mapper->findWithSkillsByName((object)array('name' => 'Qux'));
+
+        $this->assertEquals(2, count($employee1->skills));
+        $this->assertEquals(2, count($employee2->skills));
+        $this->assertEquals($employee1, $employee2);
     }
 
     function testOneToManyRelationships()
@@ -691,6 +696,31 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         $this->assertEquals('Baz', $employees[2]->name);
         $this->assertEquals('Foo', $employees[1]->name);
         $this->assertEquals('Qux', $employees[0]->name);
+    }
+
+    function testIdentityMap()
+    {
+        $this->_configure('ManyToManyRelationships');
+        $this->_setupManyToManyRelationships();
+
+        $mapper = &Piece_ORM_Mapper_Factory::factory('Employee');
+        $mapper->addOrder('id');
+        $employees = $mapper->findAllWithSkills1();
+
+        $this->assertTrue(is_array($employees));
+        $this->assertEquals(4, count($employees));
+
+        $this->assertEquals('Bar', $employees[1]->name);
+        $this->assertEquals('PHP', $employees[1]->skills[0]->name);
+        $this->assertFalse(array_key_exists('foo', $employees[1]->skills[0]));
+        $this->assertEquals('Qux', $employees[3]->name);
+        $this->assertEquals('PHP', $employees[3]->skills[0]->name);
+        $this->assertFalse(array_key_exists('foo', $employees[3]->skills[0]));
+
+        $employees[1]->skills[0]->foo = 'bar';
+
+        $this->assertTrue(array_key_exists('foo', $employees[1]->skills[0]));
+        $this->assertTrue(array_key_exists('foo', $employees[3]->skills[0]));
     }
 
     /**#@-*/
