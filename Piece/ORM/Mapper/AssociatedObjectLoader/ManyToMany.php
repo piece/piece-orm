@@ -86,6 +86,7 @@ class Piece_ORM_Mapper_AssociatedObjectLoader_ManyToMany extends Piece_ORM_Mappe
      * @param array &$row
      * @param mixed &$mapper
      * @param array $relationship
+     * @return boolean
      */
     function addAssociation(&$row, &$mapper, $relationship)
     {
@@ -97,6 +98,7 @@ class Piece_ORM_Mapper_AssociatedObjectLoader_ManyToMany extends Piece_ORM_Mappe
             return false;
         } else {
             $this->_objectLoader->addLoadedRow($row[$primaryKey]);
+            unset($row[ $this->_getRelationshipKeyFieldNameInSecondaryQuery($relationship) ]);
             return true;
         }
     }
