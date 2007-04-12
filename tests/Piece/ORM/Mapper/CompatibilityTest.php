@@ -721,6 +721,14 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
 
         $this->assertTrue(array_key_exists('foo', $employees[1]->skills[0]));
         $this->assertTrue(array_key_exists('foo', $employees[3]->skills[0]));
+
+        $employee = $mapper->findWithDepartmentsByName('Bar');
+
+        $this->assertTrue(array_key_exists('departments', $employee));
+        $this->assertTrue(array_key_exists('skills', $employee));
+        $this->assertEquals(1, count($employee->departments));
+        $this->assertEquals('The Export Department', $employee->departments[0]->name);
+        $this->assertEquals($employee, $employees[1]);
     }
 
     /**#@-*/
@@ -825,6 +833,66 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         $employeeSkillMapper = &Piece_ORM_Mapper_Factory::factory('EmployeeSkill');
         $employeeSkillId4 = $employeeSkillMapper->insert($employeeSkill);
         $this->_targetsForRemoval['EmployeeSkill'][] = $employeeSkillId4;
+
+        $department1 = &new stdClass();
+        $department1->name = 'The Accounting Department';
+        $this->_addMissingPropertyForInsert($department1);
+        $departmentMapper = &Piece_ORM_Mapper_Factory::factory('Department');
+        $department1Id = $departmentMapper->insert($department1);
+        $this->_targetsForRemoval['Department'][] = $department1Id;
+
+        $department2 = &new stdClass();
+        $department2->name = 'The Export Department';
+        $this->_addMissingPropertyForInsert($department2);
+        $departmentMapper = &Piece_ORM_Mapper_Factory::factory('Department');
+        $department2Id = $departmentMapper->insert($department2);
+        $this->_targetsForRemoval['Department'][] = $department2Id;
+
+        $department3 = &new stdClass();
+        $department3->name = 'The Personnel Department';
+        $this->_addMissingPropertyForInsert($department3);
+        $departmentMapper = &Piece_ORM_Mapper_Factory::factory('Department');
+        $department3Id = $departmentMapper->insert($department3);
+        $this->_targetsForRemoval['Department'][] = $department3Id;
+
+        $department4 = &new stdClass();
+        $department4->name = 'The Production Department';
+        $this->_addMissingPropertyForInsert($department4);
+        $departmentMapper = &Piece_ORM_Mapper_Factory::factory('Department');
+        $department4Id = $departmentMapper->insert($department4);
+        $this->_targetsForRemoval['Department'][] = $department4Id;
+
+        $employeeDepartment = &new stdClass();
+        $employeeDepartment->employeeId = $employee1Id;
+        $employeeDepartment->departmentId = $department1Id;
+        $this->_addMissingPropertyForInsert($employeeDepartment);
+        $employeeDepartmentMapper = &Piece_ORM_Mapper_Factory::factory('EmployeeDepartment');
+        $employeeDepartmentId1 = $employeeDepartmentMapper->insert($employeeDepartment);
+        $this->_targetsForRemoval['EmployeeDepartment'][] = $employeeDepartmentId1;
+
+        $employeeDepartment = &new stdClass();
+        $employeeDepartment->employeeId = $employee2Id;
+        $employeeDepartment->departmentId = $department2Id;
+        $this->_addMissingPropertyForInsert($employeeDepartment);
+        $employeeDepartmentMapper = &Piece_ORM_Mapper_Factory::factory('EmployeeDepartment');
+        $employeeDepartmentId2 = $employeeDepartmentMapper->insert($employeeDepartment);
+        $this->_targetsForRemoval['EmployeeDepartment'][] = $employeeDepartmentId2;
+
+        $employeeDepartment = &new stdClass();
+        $employeeDepartment->employeeId = $employee3Id;
+        $employeeDepartment->departmentId = $department3Id;
+        $this->_addMissingPropertyForInsert($employeeDepartment);
+        $employeeDepartmentMapper = &Piece_ORM_Mapper_Factory::factory('EmployeeDepartment');
+        $employeeDepartmentId3 = $employeeDepartmentMapper->insert($employeeDepartment);
+        $this->_targetsForRemoval['EmployeeDepartment'][] = $employeeDepartmentId3;
+
+        $employeeDepartment = &new stdClass();
+        $employeeDepartment->employeeId = $employee4Id;
+        $employeeDepartment->departmentId = $department4Id;
+        $this->_addMissingPropertyForInsert($employeeDepartment);
+        $employeeDepartmentMapper = &Piece_ORM_Mapper_Factory::factory('EmployeeDepartment');
+        $employeeDepartmentId4 = $employeeDepartmentMapper->insert($employeeDepartment);
+        $this->_targetsForRemoval['EmployeeDepartment'][] = $employeeDepartmentId4;
     }
 
     function _assertManyToManyRelationships($employees)

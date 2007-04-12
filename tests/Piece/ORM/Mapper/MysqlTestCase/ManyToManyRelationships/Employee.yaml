@@ -40,6 +40,13 @@ method:
         table: skill
         mappedAs: skills
 
+  - name: findWithDepartmentsByName
+    query: SELECT * FROM employee WHERE name = $name
+    relationship:
+      - type: manyToMany
+        table: department
+        mappedAs: departments
+
 # Local Variables:
 # mode: conf-colon
 # coding: iso-8859-1
