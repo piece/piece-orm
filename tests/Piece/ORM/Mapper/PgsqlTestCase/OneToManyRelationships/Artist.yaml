@@ -16,6 +16,13 @@ method:
         column: artist_id
         referencedColumn: id
 
+  - name: findAllWithOrderedAlbums
+    relationship:
+      - type: oneToMany
+        table: album
+        mappedAs: albums
+        orderBy: id DESC
+
 # Local Variables:
 # mode: conf-colon
 # coding: iso-8859-1

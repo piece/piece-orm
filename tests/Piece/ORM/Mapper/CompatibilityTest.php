@@ -748,6 +748,38 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         $this->assertEquals('The Export Department', $employees[1]->departments[0]->name);
     }
 
+    function testOrderOnManyToManyRelationships()
+    {
+        $this->_configure('ManyToManyRelationships');
+        $this->_setupManyToManyRelationships();
+
+        $mapper = &Piece_ORM_Mapper_Factory::factory('Employee');
+        $mapper->addOrder('id');
+        $employees = $mapper->findAllWithOrderedSkills();
+
+        $this->assertTrue(is_array($employees));
+        $this->assertEquals(4, count($employees));
+
+        $this->assertEquals('OOP', $employees[3]->skills[0]->name);
+        $this->assertEquals('PHP', $employees[3]->skills[1]->name);
+    }
+
+    function testOrderOnOneToManyRelationships()
+    {
+        $this->_configure('OneToManyRelationships');
+        $this->_setupOneToManyRelationships();
+
+        $mapper = &Piece_ORM_Mapper_Factory::factory('Artist');
+        $mapper->addOrder('id');
+        $artists = $mapper->findAllWithOrderedAlbums();
+
+        $this->assertTrue(is_array($artists));
+        $this->assertEquals(3, count($artists));
+
+        $this->assertEquals('The second album of the artist3', $artists[2]->albums[0]->name);
+        $this->assertEquals('The first album of the artist3', $artists[2]->albums[1]->name);
+    }
+
     /**#@-*/
 
     /**#@+

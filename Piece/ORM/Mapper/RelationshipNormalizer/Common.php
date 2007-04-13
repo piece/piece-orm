@@ -30,6 +30,7 @@
  *
  * @package    Piece_ORM
  * @author     KUBO Atsuhiro <iteman@users.sourceforge.net>
+ * @author     MATSUFUJI Hideharu <matsufuji@users.sourceforge.net>
  * @copyright  2007 KUBO Atsuhiro <iteman@users.sourceforge.net>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License (revised)
  * @version    SVN: $Id$
@@ -47,6 +48,7 @@ require_once 'Piece/ORM/Metadata/Factory.php';
  *
  * @package    Piece_ORM
  * @author     KUBO Atsuhiro <iteman@users.sourceforge.net>
+ * @author     MATSUFUJI Hideharu <matsufuji@users.sourceforge.net>
  * @copyright  2007 KUBO Atsuhiro <iteman@users.sourceforge.net>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License (revised)
  * @version    Release: @package_version@
@@ -157,6 +159,12 @@ class Piece_ORM_Mapper_RelationshipNormalizer_Common
             return;
         }
 
+        if (!array_key_exists('orderBy', $this->_relationship)) {
+            $this->_relationship['orderBy'] = null;
+        }
+
+        $this->_normalizeOrderBy();
+
         $this->_normalizeThrough();
         if (Piece_ORM_Error::hasErrors('exception')) {
             return;
@@ -204,6 +212,14 @@ class Piece_ORM_Mapper_RelationshipNormalizer_Common
      * @abstract
      */
     function _normalizeReferencedColumn() {}
+
+    // }}}
+    // {{{ _normalizeOrderBy()
+
+    /**
+     * Normalizes "orderBy" definition.
+     */
+    function _normalizeOrderBy() {}
 
     /**#@-*/
 

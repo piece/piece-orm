@@ -56,6 +56,13 @@ method:
         table: department
         mappedAs: departments
 
+  - name: findAllWithOrderedSkills
+    relationship:
+      - type: manyToMany
+        table: skill
+        mappedAs: skills
+        orderBy: skill.id DESC
+
 # Local Variables:
 # mode: conf-colon
 # coding: iso-8859-1

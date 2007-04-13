@@ -30,6 +30,7 @@
  *
  * @package    Piece_ORM
  * @author     KUBO Atsuhiro <iteman@users.sourceforge.net>
+ * @author     MATSUFUJI Hideharu <matsufuji@users.sourceforge.net>
  * @copyright  2007 KUBO Atsuhiro <iteman@users.sourceforge.net>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License (revised)
  * @version    SVN: $Id$
@@ -47,6 +48,7 @@ require_once 'Piece/ORM/Error.php';
  *
  * @package    Piece_ORM
  * @author     KUBO Atsuhiro <iteman@users.sourceforge.net>
+ * @author     MATSUFUJI Hideharu <matsufuji@users.sourceforge.net>
  * @copyright  2007 KUBO Atsuhiro <iteman@users.sourceforge.net>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License (revised)
  * @version    Release: @package_version@
@@ -114,6 +116,17 @@ class Piece_ORM_Mapper_RelationshipNormalizer_ManyToOne extends Piece_ORM_Mapper
         } else {
             return false;
         }
+    }
+
+    // }}}
+    // {{{ _normalizeOrderBy()
+
+    /**
+     * Normalizes "orderBy" definition.
+     */
+    function _normalizeOrderBy()
+    {
+        $this->_relationship['orderBy'] = null;
     }
 
     /**#@-*/

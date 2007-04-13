@@ -30,6 +30,7 @@
  *
  * @package    Piece_ORM
  * @author     KUBO Atsuhiro <iteman@users.sourceforge.net>
+ * @author     MATSUFUJI Hideharu <matsufuji@users.sourceforge.net>
  * @copyright  2007 KUBO Atsuhiro <iteman@users.sourceforge.net>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License (revised)
  * @version    SVN: $Id$
@@ -47,6 +48,7 @@ require_once 'Piece/ORM/Error.php';
  *
  * @package    Piece_ORM
  * @author     KUBO Atsuhiro <iteman@users.sourceforge.net>
+ * @author     MATSUFUJI Hideharu <matsufuji@users.sourceforge.net>
  * @copyright  2007 KUBO Atsuhiro <iteman@users.sourceforge.net>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License (revised)
  * @version    Release: @package_version@
@@ -139,7 +141,7 @@ class Piece_ORM_Mapper_AssociatedObjectLoader_Common
         $mapper->setPreloadCallback($this->_getPreloadCallback());
         $mapper->setPreloadCallbackArgs(array($relationships[$i]));
 
-        $associatedObjects = $mapper->findAllWithQuery($this->_buildQuery($relationships[$i], $relationshipKeys[$i]));
+        $associatedObjects = $mapper->findAllWithQuery($this->_buildQuery($relationships[$i], $relationshipKeys[$i]) . (is_null($relationships[$i]['orderBy']) ? '' : " ORDER BY {$relationships[$i]['orderBy']}"));
         if (Piece_ORM_Error::hasErrors('exception')) {
             return;
         }
