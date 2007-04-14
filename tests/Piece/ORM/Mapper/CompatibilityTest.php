@@ -82,6 +82,18 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
     var $_oldMetadataCacheDirectory;
     var $_dsn;
     var $_targetsForRemoval = array();
+    var $_tables = array('album',
+                         'artist',
+                         'department',
+                         'employee',
+                         'employee_department',
+                         'employee_skill',
+                         'person',
+                         'place',
+                         'restaurant',
+                         'service',
+                         'skill'
+                         );
 
     /**#@-*/
 
@@ -107,11 +119,10 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
 
     function tearDown()
     {
-        foreach ($this->_targetsForRemoval as $mapperName => $targets) {
-            foreach ($targets as $id) {
-                $mapper = &Piece_ORM_Mapper_Factory::factory($mapperName);
-                $mapper->delete($id);
-            }
+        $context = &Piece_ORM_Context::singleton();
+        $dbh = &$context->getConnection();
+        foreach ($this->_tables as $table) {
+            $dbh->exec("TRUNCATE $table");
         }
         $cache = &new Cache_Lite(array('cacheDir' => "{$this->_cacheDirectory}/",
                                        'automaticSerialization' => true,
@@ -463,8 +474,6 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         $id = $mapper->insert($subject);
 
         $this->_assertQueryForReplaceEmptyStringWithNull($mapper->getLastQuery());
-
-        $mapper->delete($id);
     }
 
     function testThrowExceptionIfDetectingProblemWhenBuildingQuery()
@@ -486,8 +495,6 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         $this->assertEquals(PIECE_ORM_ERROR_INVOCATION_FAILED, $error['code']);
 
         Piece_ORM_Error::popCallback();
-
-        $mapper->delete($id);
     }
 
     function testManyToManyRelationships()
@@ -778,6 +785,20 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
 
         $this->assertEquals('The second album of the artist3', $artists[2]->albums[0]->name);
         $this->assertEquals('The first album of the artist3', $artists[2]->albums[1]->name);
+    }
+
+    function testDelete()
+    {
+        $id = $this->_insert();
+        $mapper = &Piece_ORM_Mapper_Factory::factory('Person');
+        $person1 = &$mapper->findById($id);
+
+        $this->assertEquals(strtolower('stdClass'), strtolower(get_class($person1)));
+
+        $mapper->delete($id);
+        $person2 = &$mapper->findById($id);
+
+        $this->assertNull($person2);
     }
 
     /**#@-*/
