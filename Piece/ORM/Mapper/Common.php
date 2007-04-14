@@ -575,7 +575,9 @@ class Piece_ORM_Mapper_Common
     function _buildQuery($methodName, $criteria)
     {
         foreach ($criteria as $key => $value) {
-            $criteria->$key = $this->quote($value, Piece_ORM_Inflector::underscore($key));
+            if (is_scalar($value) || is_null($value)) {
+                $criteria->$key = $this->quote($value, Piece_ORM_Inflector::underscore($key));
+            }
         }
 
         extract((array)$criteria);
@@ -617,6 +619,11 @@ class Piece_ORM_Mapper_Common
         if (Piece_ORM_Error::hasErrors('exception')) {
             $return = null;
             return $return;
+        }
+
+        if (!$isManip && count($this->_orders)) {
+            $query .= ' ORDER BY ' . implode(', ', $this->_orders);
+            $this->_orders = array();
         }
 
         $result = &$this->_executeQuery($query, $isManip);
@@ -704,12 +711,7 @@ class Piece_ORM_Mapper_Common
     {
         PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
         if (!$isManip) {
-            if (count($this->_orders)) {
-                $query .= ' ORDER BY ' . implode(', ', $this->_orders);
-            }
-
             $result = &$this->_dbh->query($query);
-            $this->_orders = array();
         } else {
             $result = $this->_dbh->exec($query);
         }
