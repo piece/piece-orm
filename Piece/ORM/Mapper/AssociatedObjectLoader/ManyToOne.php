@@ -87,13 +87,12 @@ class Piece_ORM_Mapper_AssociatedObjectLoader_ManyToOne extends Piece_ORM_Mapper
     /**
      * Builds a query to get associated objects.
      *
-     * @param array $relationship
-     * @param array &$relationshipKeys
+     * @param integer $relationshipIndex
      * @return string
      */
-    function _buildQuery($relationship, &$relationshipKeys)
+    function _buildQuery($relationshipIndex)
     {
-        return "SELECT * FROM {$relationship['table']} WHERE {$relationship['column']} IN (" . implode(',', $relationshipKeys) . ')';
+        return "SELECT * FROM {$this->_relationships[$relationshipIndex]['table']} WHERE {$this->_relationships[$relationshipIndex]['column']} IN (" . implode(',', $this->_relationshipKeys[$relationshipIndex]) . ')';
     }
 
     // }}}
@@ -132,16 +131,14 @@ class Piece_ORM_Mapper_AssociatedObjectLoader_ManyToOne extends Piece_ORM_Mapper
      * objects which are loaded by the primary query.
      *
      * @param stdClass &$associatedObject
-     * @param array    &$objects
-     * @param array    $objectIndexes
-     * @param string   $relationshipKeyPropertyName
-     * @param string   $mappedAs
      * @param mixed    &$mapper
+     * @param string   $relationshipKeyPropertyName
+     * @param integer  $relationshipIndex
      */
-    function _associateObject(&$associatedObject, &$objects, $objectIndexes, $relationshipKeyPropertyName, $mappedAs, &$mapper)
+    function _associateObject(&$associatedObject, &$mapper, $relationshipKeyPropertyName, $relationshipIndex)
     {
-        for ($i = 0; $i < count($objectIndexes[ $associatedObject->$relationshipKeyPropertyName ]); ++$i) {
-            $objects[ $objectIndexes[ $associatedObject->$relationshipKeyPropertyName ][$i] ]->{$mappedAs} = &$associatedObject;
+        for ($i = 0; $i < count($this->_objectIndexes[$relationshipIndex][ $associatedObject->$relationshipKeyPropertyName ]); ++$i) {
+            $this->_objects[ $this->_objectIndexes[$relationshipIndex][ $associatedObject->$relationshipKeyPropertyName ][$i] ]->{$this->_relationships[$relationshipIndex]['mappedAs']} = &$associatedObject;
         }
     }
 
