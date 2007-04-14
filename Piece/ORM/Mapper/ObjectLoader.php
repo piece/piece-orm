@@ -83,7 +83,6 @@ class Piece_ORM_Mapper_ObjectLoader
     var $_objects = array();
     var $_objectIndexes = array();
     var $_associatedObjectLoaders = array();
-    var $_loadedRows = array();
     var $_primaryKey;
 
     /**#@-*/
@@ -104,7 +103,6 @@ class Piece_ORM_Mapper_ObjectLoader
      */
     function Piece_ORM_Mapper_ObjectLoader(&$mapper, &$result, $relationships)
     {
-        $this->_mapper = &$mapper;
         $this->_result = &$result;
         $this->_relationships = $relationships;
 
@@ -116,8 +114,9 @@ class Piece_ORM_Mapper_ObjectLoader
             }
         }
 
-        $metadata = &$this->_mapper->getMetadata();
+        $metadata = &$mapper->getMetadata();
         $this->_primaryKey = $metadata->getPrimaryKey();
+        $this->_mapper = &$mapper;
     }
 
     // }}}
@@ -137,9 +136,11 @@ class Piece_ORM_Mapper_ObjectLoader
             return;
         }
 
-        $this->_loadAssociatedObjects();
-        if (Piece_ORM_Error::hasErrors('exception')) {
-            return;
+        if (count($this->_objects)) {
+            $this->_loadAssociatedObjects();
+            if (Piece_ORM_Error::hasErrors('exception')) {
+                return;
+            }
         }
 
         return $this->_objects;
@@ -209,33 +210,6 @@ class Piece_ORM_Mapper_ObjectLoader
     function &getObjectIndexes()
     {
         return $this->_objectIndexes;
-    }
-
-    // }}}
-    // {{{ isLoadedRow()
-
-    /**
-     * Returns whether the given primary key value is already loaded or not.
-     *
-     * @param string $primaryKeyValue
-     * @return boolean
-     */
-    function isLoadedRow($primaryKeyValue)
-    {
-        return array_key_exists($primaryKeyValue, $this->_loadedRows);
-    }
-
-    // }}}
-    // {{{ addLoadedRow()
-
-    /**
-     * Adds an object to the list of the loaded objects.
-     *
-     * @param string $primaryKeyValue
-     */
-    function addLoadedRow($primaryKeyValue)
-    {
-        $this->_loadedRows[$primaryKeyValue] = true;
     }
 
     /**#@-*/
