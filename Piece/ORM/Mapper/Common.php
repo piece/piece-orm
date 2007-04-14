@@ -99,9 +99,9 @@ class Piece_ORM_Mapper_Common
      */
     function Piece_ORM_Mapper_Common(&$context, &$metadata)
     {
-        $this->_context = &$context;
         $this->_metadata = &$metadata;
-        $this->_dbh = &$this->_context->getConnection();
+        $this->_dbh = &$context->getConnection();
+        $this->_context = &$context;
     }
 
     // }}}
