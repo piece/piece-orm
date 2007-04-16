@@ -210,12 +210,13 @@ class Piece_ORM_Mapper_Generator
      * Adds the query for insert() to the mapper source.
      *
      * @param string $query
+     * @param array  $relationships
+     * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
+     * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
      */
-    function _addInsert($query)
+    function _addInsert($query, $relationships = null)
     {
-        if ($query) {
-            $this->_propertyDefinitions['query']['insert'] = $this->_getQueryPropertyDeclaration('insert', $query);
-        }
+        $this->_addPropertyDefinitions('insert', $query, $relationships);
     }
 
     // }}}
@@ -257,22 +258,33 @@ class Piece_ORM_Mapper_Generator
     function _generateFromConfiguration()
     {
         foreach ($this->_config['method'] as $method) {
-            if (preg_match('/^findAll.*$/i', $method['name'])) {
+            $queryType = $this->_getQueryType($method['name']);
+            if (Piece_ORM_Error::hasErrors('exception')) {
+                return;
+            }
+
+            switch ($queryType) {
+            case 'findAll':
                 $this->_addFindAll($method['name'], @$method['query'], @$method['relationship']);
                 if (Piece_ORM_Error::hasErrors('exception')) {
                     return;
                 }
-            } elseif (preg_match('/^find.+$/i', $method['name'])) {
+                break;
+            case 'find':
                 $this->_addFind($method['name'], @$method['query'], @$method['relationship']);
                 if (Piece_ORM_Error::hasErrors('exception')) {
                     return;
                 }
-            } elseif (preg_match('/^insert$/i', $method['name'])) {
-                $this->_addInsert(@$method['query']);
-            } elseif (preg_match('/^update$/i', $method['name'])) {
+                break;
+            case 'insert':
+                $this->_addInsert(@$method['query'], @$method['relationship']);
+                break;
+            case 'update':
                 $this->_addUpdate(@$method['query']);
-            } elseif (preg_match('/^delete$/i', $method['name'])) {
+                break;
+            case 'delete':
                 $this->_addDelete(@$method['query']);
+                break;
             }
         }
     }
@@ -471,8 +483,15 @@ class Piece_ORM_Mapper_Generator
         $propertyName = strtolower($methodName);
 
         if (!$query) {
-            if (!array_key_exists($propertyName, $this->_propertyDefinitions['query'])) {
-                $query = 'SELECT * FROM ' . $this->_metadata->getTableName();
+            $queryType = $this->_getQueryType($methodName);
+            if (Piece_ORM_Error::hasErrors('exception')) {
+                return;
+            }
+
+            if ($queryType == 'findAll' || $queryType == 'find') {
+                if (!array_key_exists($propertyName, $this->_propertyDefinitions['query'])) {
+                    $query = 'SELECT * FROM ' . $this->_metadata->getTableName();
+                }
             }
         }
 
@@ -482,6 +501,35 @@ class Piece_ORM_Mapper_Generator
         }
 
         $this->_propertyDefinitions['relationship'][$propertyName] = $this->_getRelationshipPropertyDeclaration($propertyName, $relationships);
+    }
+
+    // }}}
+    // {{{ _getQueryType()
+
+    /**
+     * Gets a query type from the given method name.
+     *
+     * @param string $methodName
+     * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
+     */
+    function _getQueryType($methodName)
+    {
+        if (preg_match('/^findAll.*$/i', $methodName)) {
+            return 'findAll';
+        } elseif (preg_match('/^find.+$/i', $methodName)) {
+            return 'find';
+        } elseif (preg_match('/^insert$/i', $methodName)) {
+            return 'insert';
+        } elseif (preg_match('/^update$/i', $methodName)) {
+            return 'update';
+        } elseif (preg_match('/^delete$/i', $methodName)) {
+            return 'delete';
+        } else {
+            Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_CONFIGURATION,
+                                  "Invalid method name [ $methodName ] detected."
+                                  );
+            return;
+        }
     }
 
     /**#@-*/
