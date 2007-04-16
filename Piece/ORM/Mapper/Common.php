@@ -507,6 +507,24 @@ class Piece_ORM_Mapper_Common
         return $this->_metadata;
     }
 
+    // }}}
+    // {{{ createObject()
+
+    /**
+     * Creates an object from a metadata.
+     *
+     * @return stdClass
+     */
+    function &createObject()
+    {
+        $object = &new stdClass();
+        foreach ($this->_metadata->getFieldNames() as $fieldName) {
+            $object->{ Piece_ORM_Inflector::camelize($fieldName, true) } = null;
+        }
+
+        return $object;
+    }
+
     /**#@-*/
 
     /**#@+
@@ -548,7 +566,7 @@ class Piece_ORM_Mapper_Common
             return $return;
         }
 
-        $objects = $this->_loadAllObjects($result, $this->{'__relationship__' . strtolower($methodName)});
+        $objects = $this->_loadAllObjects($result, $this->{ '__relationship__' . strtolower($methodName) });
         if (Piece_ORM_Error::hasErrors('exception')) {
             return;
         }
@@ -688,7 +706,7 @@ class Piece_ORM_Mapper_Common
             return;
         }
 
-        $objects = $this->_loadAllObjects($result, $this->{'__relationship__' . strtolower($methodName)});
+        $objects = $this->_loadAllObjects($result, $this->{ '__relationship__' . strtolower($methodName) });
         if (Piece_ORM_Error::hasErrors('exception')) {
             return;
         }

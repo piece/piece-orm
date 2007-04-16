@@ -801,6 +801,23 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         $this->assertNull($person2);
     }
 
+    function testCreateObject()
+    {
+        $this->_configure('ManyToManyRelationships');
+        $this->_setupManyToManyRelationships();
+
+        $mapper = &Piece_ORM_Mapper_Factory::factory('Employee');
+        $employee = &$mapper->createObject();
+
+        $this->assertEquals(strtolower('stdClass'), strtolower(get_class($employee)));
+        $this->assertEquals(5, count(array_keys((array)($employee))));
+        $this->assertTrue(array_key_exists('id', $employee));
+        $this->assertTrue(array_key_exists('name', $employee));
+        $this->assertTrue(array_key_exists('version', $employee));
+        $this->assertTrue(array_key_exists('rdate', $employee));
+        $this->assertTrue(array_key_exists('mdate', $employee));
+    }
+
     /**#@-*/
 
     /**#@+

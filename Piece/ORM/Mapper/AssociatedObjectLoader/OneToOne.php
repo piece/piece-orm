@@ -135,7 +135,7 @@ class Piece_ORM_Mapper_AssociatedObjectLoader_OneToOne extends Piece_ORM_Mapper_
      */
     function _associateObject(&$associatedObject, &$mapper, $relationshipKeyPropertyName, $relationshipIndex)
     {
-        $this->_objects[ $this->_objectIndexes[$relationshipIndex][ $associatedObject->$relationshipKeyPropertyName ] ]->{$this->_relationships[$relationshipIndex]['mappedAs']} = &$associatedObject;
+        $this->_objects[ $this->_objectIndexes[$relationshipIndex][ $associatedObject->$relationshipKeyPropertyName ] ]->{ $this->_relationships[$relationshipIndex]['mappedAs'] } = &$associatedObject;
     }
 
     /**#@-*/

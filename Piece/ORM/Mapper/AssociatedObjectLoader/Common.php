@@ -114,7 +114,7 @@ class Piece_ORM_Mapper_AssociatedObjectLoader_Common
     function prepareLoading($row, $objectIndex, $relationshipIndex)
     {
         $relationshipKeyFieldName = $this->_getRelationshipKeyFieldNameInPrimaryQuery($this->_relationships[$relationshipIndex]);
-        $this->_objects[$objectIndex]->{$this->_relationships[$relationshipIndex]['mappedAs']} = $this->_defaultValueOfMappedAs;
+        $this->_objects[$objectIndex]->{ $this->_relationships[$relationshipIndex]['mappedAs'] } = $this->_defaultValueOfMappedAs;
 
         $mapper = &$this->_objectLoader->getMapper();
         $this->_relationshipKeys[$relationshipIndex][] = $mapper->quote($row[$relationshipKeyFieldName], $relationshipKeyFieldName);
