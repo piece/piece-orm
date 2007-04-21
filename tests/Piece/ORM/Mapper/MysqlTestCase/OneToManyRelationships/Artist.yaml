@@ -23,6 +23,13 @@ method:
         mappedAs: albums
         orderBy: id DESC
 
+  - name: insert
+    query: INSERT INTO artist (name, rdate) VALUES ($name, CURRENT_TIMESTAMP)
+    relationship:
+      - type: oneToMany
+        table: album
+        mappedAs: albums
+
 # Local Variables:
 # mode: conf-colon
 # coding: iso-8859-1

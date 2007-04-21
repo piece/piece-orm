@@ -16,6 +16,12 @@ method:
         column: place_id
         referencedColumn: id
 
+  - name: insert
+    relationship:
+      - type: oneToOne
+        table: restaurant
+        mappedAs: restaurant
+
 # Local Variables:
 # mode: conf-colon
 # coding: iso-8859-1

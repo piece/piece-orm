@@ -16,6 +16,9 @@ method:
         column: id
         referencedColumn: artist_id
 
+  - name: insert
+    query: INSERT INTO album (artist_id, name, rdate) VALUES ($artistId, $name, CURRENT_TIMESTAMP)
+
 # Local Variables:
 # mode: conf-colon
 # coding: iso-8859-1

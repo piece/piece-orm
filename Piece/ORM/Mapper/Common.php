@@ -123,12 +123,12 @@ class Piece_ORM_Mapper_Common
     /**
      * Inserts an object to a table.
      *
-     * @param mixed $subject
+     * @param mixed &$subject
      * @return integer
      * @throws PIECE_ORM_ERROR_UNEXPECTED_VALUE
      * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
      */
-    function insert($subject)
+    function insert(&$subject)
     {
         if (is_null($subject)) {
             Piece_ORM_Error::push(PIECE_ORM_ERROR_UNEXPECTED_VALUE,
@@ -150,10 +150,9 @@ class Piece_ORM_Mapper_Common
         }
 
         if ($this->_metadata->hasID()) {
+            $primaryKey = $this->_metadata->getPrimaryKey();
             PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
-            $id = $this->_dbh->lastInsertID($this->_metadata->getTableName(),
-                                            $this->_metadata->getPrimaryKey()
-                                            );
+            $id = $this->_dbh->lastInsertID($this->_metadata->getTableName(), $primaryKey);
             PEAR::staticPopErrorHandling();
             if (MDB2::isError($id)) {
                 Piece_ORM_Error::pushPEARError($id,
@@ -162,6 +161,10 @@ class Piece_ORM_Mapper_Common
                                                );
                 return;
             }
+
+            $subject->{ Piece_ORM_Inflector::camelize($primaryKey, true) } = $id;
+
+            $this->_cascadeInsert($subject, $id);
 
             return $id;
         }
@@ -210,10 +213,9 @@ class Piece_ORM_Mapper_Common
             }
 
             if ($primaryKey = $this->_metadata->getPrimaryKey()) {
-                $propertyName = Piece_ORM_Inflector::camelize($primaryKey, true);
                 $criterion = $criteria;
                 $criteria = &new stdClass();
-                $criteria->$propertyName = $criterion;
+                $criteria->{ Piece_ORM_Inflector::camelize($primaryKey, true) } = $criterion;
             } else {
                 Piece_ORM_Error::push(PIECE_ORM_ERROR_UNEXPECTED_VALUE,
                                       'An unexpected value detected. delete() can receive non-object only if a table has a single primary key and has not a complex primary key.'
@@ -511,7 +513,7 @@ class Piece_ORM_Mapper_Common
     // {{{ createObject()
 
     /**
-     * Creates an object from a metadata.
+     * Creates an object from the metadata.
      *
      * @return stdClass
      */
@@ -778,6 +780,85 @@ class Piece_ORM_Mapper_Common
                                   );
             $return = null;
             return $return;
+        }
+    }
+
+    function _cascadeInsert(&$subject, $id)
+    {
+        foreach ($this->__relationship__insert as $relationship) {
+            switch ($relationship['type']) {
+            case 'manyToMany':
+                if (!array_key_exists($relationship['mappedAs'], $subject)) {
+                    return;
+                }
+
+                if (!is_array($subject->$relationship['mappedAs'])) {
+                    return;
+                }
+
+                $mapper = &Piece_ORM_Mapper_Factory::factory(Piece_ORM_Inflector::camelize($relationship['through']['table']));
+                if (Piece_ORM_Error::hasErrors('exception')) {
+                    return;
+                }
+
+                $object = &$mapper->createObject();
+                foreach ($subject->$relationship['mappedAs'] as $associatedObject) {
+                    $object->{ Piece_ORM_Inflector::camelize($relationship['through']['column'], true) } = $id;
+                    $object->{ Piece_ORM_Inflector::camelize($relationship['through']['inverseColumn'], true) } = $associatedObject->{ Piece_ORM_Inflector::camelize($relationship['column'], true) };
+                    $mapper->insert($object);
+                    if (Piece_ORM_Error::hasErrors('exception')) {
+                        return;
+                    }
+                }
+
+                break;
+            case 'oneToMany':
+                if (!array_key_exists($relationship['mappedAs'], $subject)) {
+                    return;
+                }
+
+                if (!is_array($subject->$relationship['mappedAs'])) {
+                    return;
+                }
+
+                $mapper = &Piece_ORM_Mapper_Factory::factory(Piece_ORM_Inflector::camelize($relationship['table']));
+                if (Piece_ORM_Error::hasErrors('exception')) {
+                    return;
+                }
+
+                for ($i = 0; $i < count($subject->$relationship['mappedAs']); ++$i) {
+                    $subject->{ $relationship['mappedAs'] }[$i]->{ Piece_ORM_Inflector::camelize($relationship['column'], true) } = $id;
+                    $mapper->insert($subject->{ $relationship['mappedAs'] }[$i]);
+                    if (Piece_ORM_Error::hasErrors('exception')) {
+                        return;
+                    }
+                }
+
+                break;
+            case 'manyToOne':
+                break;
+            case 'oneToOne':
+                if (!array_key_exists($relationship['mappedAs'], $subject)) {
+                    return;
+                }
+
+                if (!is_object($subject->$relationship['mappedAs'])) {
+                    return;
+                }
+
+                $mapper = &Piece_ORM_Mapper_Factory::factory(Piece_ORM_Inflector::camelize($relationship['table']));
+                if (Piece_ORM_Error::hasErrors('exception')) {
+                    return;
+                }
+
+                $subject->{ $relationship['mappedAs'] }->{ Piece_ORM_Inflector::camelize($relationship['column'], true) } = $id;
+                $mapper->insert($subject->{ $relationship['mappedAs'] });
+                if (Piece_ORM_Error::hasErrors('exception')) {
+                    return;
+                }
+
+                break;
+            }
         }
     }
 

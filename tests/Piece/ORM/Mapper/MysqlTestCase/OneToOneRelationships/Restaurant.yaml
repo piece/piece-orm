@@ -1,5 +1,10 @@
 # $Id$
 
+method:
+
+  - name: insert
+    query: INSERT INTO restaurant (place_id, name, rdate) VALUES ($placeId, $name, CURRENT_TIMESTAMP)
+
 # Local Variables:
 # mode: conf-colon
 # coding: iso-8859-1
