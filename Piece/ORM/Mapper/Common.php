@@ -124,7 +124,7 @@ class Piece_ORM_Mapper_Common
      * Inserts an object to a table.
      *
      * @param mixed &$subject
-     * @return integer
+     * @return mixed
      * @throws PIECE_ORM_ERROR_UNEXPECTED_VALUE
      * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
      */
@@ -149,8 +149,12 @@ class Piece_ORM_Mapper_Common
             return;
         }
 
+        $primaryKey = $this->_metadata->getPrimaryKey();
+        if ($primaryKey) {
+            $primaryKeyProperty = Piece_ORM_Inflector::camelize($primaryKey, true);
+        }
+
         if ($this->_metadata->hasID()) {
-            $primaryKey = $this->_metadata->getPrimaryKey();
             PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
             $id = $this->_dbh->lastInsertID($this->_metadata->getTableName(), $primaryKey);
             PEAR::staticPopErrorHandling();
@@ -162,11 +166,12 @@ class Piece_ORM_Mapper_Common
                 return;
             }
 
-            $subject->{ Piece_ORM_Inflector::camelize($primaryKey, true) } = $id;
+            $subject->$primaryKeyProperty = $id;
+        }
 
-            $this->_cascadeInsert($subject, $id);
-
-            return $id;
+        if ($primaryKey) {
+            $this->_cascadeInsert($subject, $subject->$primaryKeyProperty);
+            return $subject->$primaryKeyProperty;
         }
     }
 
