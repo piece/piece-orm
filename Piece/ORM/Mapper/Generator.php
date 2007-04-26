@@ -113,6 +113,8 @@ class Piece_ORM_Mapper_Generator
      *
      * @return string
      * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
+     * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
+     * @throws PIECE_ORM_ERROR_NOT_FOUND
      */
     function generate()
     {
@@ -147,6 +149,7 @@ class Piece_ORM_Mapper_Generator
      * @return array
      * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
      * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
+     * @throws PIECE_ORM_ERROR_NOT_FOUND
      */
     function normalizeRelationshipDefinition($relationship)
     {
@@ -187,6 +190,7 @@ class Piece_ORM_Mapper_Generator
      * @param array  $relationships
      * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
      * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
+     * @throws PIECE_ORM_ERROR_NOT_FOUND
      */
     function _addFind($methodName, $query, $relationships = null)
     {
@@ -198,7 +202,7 @@ class Piece_ORM_Mapper_Generator
         $this->_methodDefinitions[$methodName] = "
     function &$methodName(\$criteria)
     {
-        \$object = &\$this->_find(__FUNCTION__, \$criteria);
+        \$object = &\$this->_find('$methodName', \$criteria);
         return \$object;
     }";
     }
@@ -213,6 +217,7 @@ class Piece_ORM_Mapper_Generator
      * @param array  $relationships
      * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
      * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
+     * @throws PIECE_ORM_ERROR_NOT_FOUND
      */
     function _addInsert($query, $relationships = null)
     {
@@ -230,6 +235,7 @@ class Piece_ORM_Mapper_Generator
      * @param array  $relationships
      * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
      * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
+     * @throws PIECE_ORM_ERROR_NOT_FOUND
      */
     function _addFindAll($methodName, $query = null, $relationships = null)
     {
@@ -241,7 +247,7 @@ class Piece_ORM_Mapper_Generator
         $this->_methodDefinitions[$methodName] = "
     function $methodName(\$criteria = null)
     {
-        \$objects = \$this->_findAll(__FUNCTION__, \$criteria);
+        \$objects = \$this->_findAll('$methodName', \$criteria);
         return \$objects;
     }";
     }
@@ -254,6 +260,7 @@ class Piece_ORM_Mapper_Generator
      *
      * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
      * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
+     * @throws PIECE_ORM_ERROR_NOT_FOUND
      */
     function _generateFromConfiguration()
     {
@@ -280,7 +287,7 @@ class Piece_ORM_Mapper_Generator
                 $this->_addInsert(@$method['query'], @$method['relationship']);
                 break;
             case 'update':
-                $this->_addUpdate(@$method['query']);
+                $this->_addUpdate(@$method['query'], @$method['relationship']);
                 break;
             case 'delete':
                 $this->_addDelete(@$method['query']);
@@ -297,6 +304,7 @@ class Piece_ORM_Mapper_Generator
      *
      * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
      * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
+     * @throws PIECE_ORM_ERROR_NOT_FOUND
      */
     function _generateFind()
     {
@@ -412,12 +420,14 @@ class Piece_ORM_Mapper_Generator
      * Adds the query for update() to the mapper source.
      *
      * @param string $query
+     * @param array  $relationships
+     * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
+     * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
+     * @throws PIECE_ORM_ERROR_NOT_FOUND
      */
-    function _addUpdate($query)
+    function _addUpdate($query, $relationships = null)
     {
-        if ($query) {
-            $this->_propertyDefinitions['query']['update'] = $this->_getQueryPropertyDeclaration('update', $query);
-        }
+        $this->_addPropertyDefinitions('update', $query, $relationships);
     }
 
     // }}}
@@ -451,6 +461,7 @@ class Piece_ORM_Mapper_Generator
      * @return string
      * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
      * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
+     * @throws PIECE_ORM_ERROR_NOT_FOUND
      */
     function _getRelationshipPropertyDeclaration($propertyName, $relationships)
     {
@@ -477,6 +488,7 @@ class Piece_ORM_Mapper_Generator
      * @param array  $relationships
      * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
      * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
+     * @throws PIECE_ORM_ERROR_NOT_FOUND
      */
     function _addPropertyDefinitions($methodName, $query, $relationships)
     {
