@@ -84,6 +84,7 @@ class Piece_ORM_Mapper_ObjectLoader
     var $_objectIndexes = array();
     var $_associatedObjectLoaders = array();
     var $_primaryKey;
+    var $_useIdentityMap;
 
     /**#@-*/
 
@@ -100,8 +101,9 @@ class Piece_ORM_Mapper_ObjectLoader
      * @param Piece_ORM_Mapper_Common &$mapper
      * @param MDB2_Result             &$result
      * @param array                   $relationships
+     * @param boolean                 $useIdentityMap
      */
-    function Piece_ORM_Mapper_ObjectLoader(&$mapper, &$result, $relationships)
+    function Piece_ORM_Mapper_ObjectLoader(&$mapper, &$result, $relationships, $useIdentityMap)
     {
         $this->_result = &$result;
         $this->_relationships = $relationships;
@@ -117,6 +119,7 @@ class Piece_ORM_Mapper_ObjectLoader
         $metadata = &$mapper->getMetadata();
         $this->_primaryKey = $metadata->getPrimaryKey();
         $this->_mapper = &$mapper;
+        $this->_useIdentityMap = $useIdentityMap;
     }
 
     // }}}
@@ -233,7 +236,7 @@ class Piece_ORM_Mapper_ObjectLoader
             return $row;
         }
 
-        if ($this->_primaryKey) {
+        if ($this->_useIdentityMap && $this->_primaryKey) {
             $loadedObject = &$this->_mapper->getLoadedObject($row[$this->_primaryKey]);
             if (!is_null($loadedObject)) {
                 return $loadedObject;
@@ -246,7 +249,7 @@ class Piece_ORM_Mapper_ObjectLoader
             $object->$propertyName = $value;
         }
 
-        if ($this->_primaryKey) {
+        if ($this->_useIdentityMap && $this->_primaryKey) {
             $this->_mapper->addLoadedObject($row[$this->_primaryKey], $object);
         }
 
