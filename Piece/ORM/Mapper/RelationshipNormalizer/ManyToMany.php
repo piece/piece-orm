@@ -213,6 +213,20 @@ class Piece_ORM_Mapper_RelationshipNormalizer_ManyToMany extends Piece_ORM_Mappe
         return true;
     }
 
+    // }}}
+    // {{{ _checkHavingSinglePrimaryKey()
+
+    /**
+     * Returns whether it checks that whether an associated table has
+     * a single primary key.
+     *
+     * @return boolean
+     */
+    function _checkHavingSinglePrimaryKey()
+    {
+        return true;
+    }
+
     /**#@-*/
 
     // }}}

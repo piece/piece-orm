@@ -105,6 +105,7 @@ class Piece_ORM_Mapper_RelationshipNormalizer_Common
      * @return array
      * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
      * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
+     * @throws PIECE_ORM_ERROR_NOT_FOUND
      */
     function normalize()
     {
@@ -125,6 +126,15 @@ class Piece_ORM_Mapper_RelationshipNormalizer_Common
         $this->_relationshipMetadata = &Piece_ORM_Metadata_Factory::factory($this->_relationship['table']);
         if (Piece_ORM_Error::hasErrors('exception')) {
             return;
+        }
+
+        if ($this->_checkHavingSinglePrimaryKey()) {
+            if (!$this->_relationshipMetadata->getPrimaryKey()) {
+                Piece_ORM_Error::push(PIECE_ORM_ERROR_NOT_FOUND,
+                                      'A single primary key field is required in the table [ ' . $this->_relationshipMetadata->getTableName() . ' ].'
+                                      );
+                return;
+            }
         }
 
         if (!array_key_exists('column', $this->_relationship)) {
@@ -220,6 +230,18 @@ class Piece_ORM_Mapper_RelationshipNormalizer_Common
      * Normalizes "orderBy" definition.
      */
     function _normalizeOrderBy() {}
+
+    // }}}
+    // {{{ _checkHavingSinglePrimaryKey()
+
+    /**
+     * Returns whether it checks that whether an associated table has
+     * a single primary key.
+     *
+     * @return boolean
+     * @abstract
+     */
+    function _checkHavingSinglePrimaryKey() {}
 
     /**#@-*/
 

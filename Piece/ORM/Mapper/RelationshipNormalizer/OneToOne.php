@@ -129,6 +129,20 @@ class Piece_ORM_Mapper_RelationshipNormalizer_OneToOne extends Piece_ORM_Mapper_
         $this->_relationship['orderBy'] = null;
     }
 
+    // }}}
+    // {{{ _checkHavingSinglePrimaryKey()
+
+    /**
+     * Returns whether it checks that whether an associated table has
+     * a single primary key.
+     *
+     * @return boolean
+     */
+    function _checkHavingSinglePrimaryKey()
+    {
+        return false;
+    }
+
     /**#@-*/
 
     // }}}
