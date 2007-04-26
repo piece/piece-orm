@@ -212,6 +212,7 @@ class Piece_ORM_Mapper_Factory
      * @throws PIECE_ORM_ERROR_CANNOT_WRITE
      * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
      * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
+     * @throws PIECE_ORM_ERROR_NOT_FOUND
      */
     function _getMapperSource($mapperID, $mapperName, $configFile)
     {
@@ -263,6 +264,7 @@ class Piece_ORM_Mapper_Factory
      * @return string
      * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
      * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
+     * @throws PIECE_ORM_ERROR_NOT_FOUND
      */
     function _generateMapperSource($mapperID, $mapperName, $configFile)
     {
