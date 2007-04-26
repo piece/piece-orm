@@ -72,6 +72,33 @@ method:
         table: department
         mappedAs: departments
 
+  - name: update
+    relationship:
+      - type: manyToMany
+        table: skill
+        mappedAs: skills
+      - type: manyToMany
+        table: department
+        mappedAs: departments
+
+  - name: findById
+    relationship:
+      - type: manyToMany
+        table: skill
+        mappedAs: skills
+      - type: manyToMany
+        table: department
+        mappedAs: departments
+
+  - name: findByName
+    relationship:
+      - type: manyToMany
+        table: skill
+        mappedAs: skills
+      - type: manyToMany
+        table: department
+        mappedAs: departments
+
 # Local Variables:
 # mode: conf-colon
 # coding: iso-8859-1

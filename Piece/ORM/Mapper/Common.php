@@ -79,6 +79,7 @@ class Piece_ORM_Mapper_Common
     var $_loadedObjects = array();
     var $_preloadCallback;
     var $_preloadCallbackArgs;
+    var $_useIdentityMap = true;
 
     /**#@-*/
 
@@ -144,7 +145,7 @@ class Piece_ORM_Mapper_Common
             return;
         }
 
-        $this->_executeQueryWithCriteria(__FUNCTION__, $subject, true);
+        $this->_executeQueryWithCriteria('insert', $subject, true);
         if (Piece_ORM_Error::hasErrors('exception')) {
             return;
         }
@@ -253,7 +254,7 @@ class Piece_ORM_Mapper_Common
             }
         }
 
-        $affectedRows = $this->_executeQueryWithCriteria(__FUNCTION__, $criteria, true);
+        $affectedRows = $this->_executeQueryWithCriteria('delete', $criteria, true);
         if (Piece_ORM_Error::hasErrors('exception')) {
             return;
         }
@@ -267,12 +268,12 @@ class Piece_ORM_Mapper_Common
     /**
      * Updates an object in a table.
      *
-     * @param mixed $subject
+     * @param mixed &$subject
      * @return integer
      * @throws PIECE_ORM_ERROR_UNEXPECTED_VALUE
      * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
      */
-    function update($subject)
+    function update(&$subject)
     {
         if (!$this->_metadata->hasPrimaryKey()) {
             Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_OPERATION,
@@ -319,10 +320,16 @@ class Piece_ORM_Mapper_Common
             }
         }
 
-        $affectedRows = $this->_executeQueryWithCriteria(__FUNCTION__, $subject, true);
+        $affectedRows = $this->_executeQueryWithCriteria('update', $subject, true);
         if (Piece_ORM_Error::hasErrors('exception')) {
             return;
         }
+
+        if ($primaryKey = $this->_metadata->getPrimaryKey()) {
+            unset($this->_loadedObjects[ $subject->{ Piece_ORM_Inflector::camelize($primaryKey, true) } ]);
+        }
+
+        $this->_cascadeUpdate($subject);
 
         return $affectedRows;
     }
@@ -340,7 +347,7 @@ class Piece_ORM_Mapper_Common
      */
     function findAllWithQuery($query)
     {
-        $result = &$this->_executeQuery($query);
+        $result = &$this->executeQuery($query);
         if (Piece_ORM_Error::hasErrors('exception')) {
             return;
         }
@@ -532,6 +539,54 @@ class Piece_ORM_Mapper_Common
         return $object;
     }
 
+    // }}}
+    // {{{ setUseIdentityMap()
+
+    /**
+     * Sets whether use identity map or not for the next query.
+     *
+     * @param boolean $useIdentityMap
+     */
+    function setUseIdentityMap($useIdentityMap)
+    {
+        $this->_useIdentityMap = $useIdentityMap;
+    }
+
+    // }}}
+    // {{{ executeQuery()
+
+    /**
+     * Executes a query.
+     *
+     * @param string  $query
+     * @param boolean $isManip
+     * @return mixed
+     * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
+     */
+    function &executeQuery($query, $isManip = false)
+    {
+        PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
+        if (!$isManip) {
+            $result = &$this->_dbh->query($query);
+        } else {
+            $result = $this->_dbh->exec($query);
+        }
+        PEAR::staticPopErrorHandling();
+
+        $this->_lastQuery = $this->_dbh->last_query;
+
+        if (MDB2::isError($result)) {
+            Piece_ORM_Error::pushPEARError($result,
+                                           PIECE_ORM_ERROR_INVOCATION_FAILED,
+                                           'Failed to invoke MDB2_Driver_' . $this->getDriverName() . '::query() for any reasons.'
+                                           );
+            $return = null;
+            return $return;
+        }
+
+        return $result;
+    }
+
     /**#@-*/
 
     /**#@+
@@ -601,7 +656,10 @@ class Piece_ORM_Mapper_Common
     {
         foreach ($criteria as $key => $value) {
             if (is_scalar($value) || is_null($value)) {
-                $criteria->$key = $this->quote($value, Piece_ORM_Inflector::underscore($key));
+                $field = Piece_ORM_Inflector::underscore($key);
+                if ($this->_metadata->hasField($field)) {
+                    $criteria->$key = $this->quote($value, $field);
+                }
             }
         }
 
@@ -651,7 +709,7 @@ class Piece_ORM_Mapper_Common
             $this->_orders = array();
         }
 
-        $result = &$this->_executeQuery($query, $isManip);
+        $result = &$this->executeQuery($query, $isManip);
         return $result;
     }
 
@@ -669,7 +727,7 @@ class Piece_ORM_Mapper_Common
      */
     function _loadAllObjects(&$result, $relationships = array())
     {
-        $loader = &new Piece_ORM_Mapper_ObjectLoader($this, $result, $relationships);
+        $loader = &new Piece_ORM_Mapper_ObjectLoader($this, $result, $relationships, $this->_useIdentityMap);
         $objects = $loader->loadAll();
         $this->_loadCallback = null;
         return $objects;
@@ -695,7 +753,7 @@ class Piece_ORM_Mapper_Common
         }
 
         if (!is_object($criteria)) {
-            if (strtolower($methodName) == strtolower('findAll')) {
+            if ($methodName == 'findAll') {
                 Piece_ORM_Error::push(PIECE_ORM_ERROR_UNEXPECTED_VALUE,
                                       'An unexpected value detected. findAll() can only receive object or null.'
                                       );
@@ -722,41 +780,6 @@ class Piece_ORM_Mapper_Common
     }
 
     // }}}
-    // {{{ _executeQuery()
-
-    /**
-     * Executes a query.
-     *
-     * @param string  $query
-     * @param boolean $isManip
-     * @return mixed
-     * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
-     */
-    function &_executeQuery($query, $isManip = false)
-    {
-        PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
-        if (!$isManip) {
-            $result = &$this->_dbh->query($query);
-        } else {
-            $result = $this->_dbh->exec($query);
-        }
-        PEAR::staticPopErrorHandling();
-
-        $this->_lastQuery = $this->_dbh->last_query;
-
-        if (MDB2::isError($result)) {
-            Piece_ORM_Error::pushPEARError($result,
-                                           PIECE_ORM_ERROR_INVOCATION_FAILED,
-                                           'Failed to invoke MDB2_Driver_' . $this->getDriverName() . '::query() for any reasons.'
-                                           );
-            $return = null;
-            return $return;
-        }
-
-        return $result;
-    }
-
-    // }}}
     // {{{ _createCriteria()
 
     /**
@@ -771,13 +794,8 @@ class Piece_ORM_Mapper_Common
     function &_createCriteria($methodName, $criterion)
     {
         if (preg_match('/By(.+)$/i', $methodName, $matches)) {
-            $propertyName = Piece_ORM_Inflector::lowercaseFirstLetter($matches[1]);
-            if (version_compare(phpversion(), '5.0.0', '<')) {
-                $propertyName = Piece_ORM_Inflector::camelize($this->_metadata->getFieldNameWithAlias($propertyName), true);
-            }
-
             $criteria = &new stdClass();
-            $criteria->$propertyName = $criterion;
+            $criteria->{ Piece_ORM_Inflector::lowercaseFirstLetter($matches[1]) } = $criterion;
             return $criteria;
         } else {
             Piece_ORM_Error::push(PIECE_ORM_ERROR_UNEXPECTED_VALUE,
@@ -788,17 +806,17 @@ class Piece_ORM_Mapper_Common
         }
     }
 
-    function _cascadeInsert(&$subject, $id)
+    function _cascadeInsert(&$subject, $primaryKeyValue)
     {
         foreach ($this->__relationship__insert as $relationship) {
             switch ($relationship['type']) {
             case 'manyToMany':
                 if (!array_key_exists($relationship['mappedAs'], $subject)) {
-                    return;
+                    continue;
                 }
 
                 if (!is_array($subject->$relationship['mappedAs'])) {
-                    return;
+                    continue;
                 }
 
                 $mapper = &Piece_ORM_Mapper_Factory::factory(Piece_ORM_Inflector::camelize($relationship['through']['table']));
@@ -808,7 +826,7 @@ class Piece_ORM_Mapper_Common
 
                 $object = &$mapper->createObject();
                 foreach ($subject->$relationship['mappedAs'] as $associatedObject) {
-                    $object->{ Piece_ORM_Inflector::camelize($relationship['through']['column'], true) } = $id;
+                    $object->{ Piece_ORM_Inflector::camelize($relationship['through']['column'], true) } = $primaryKeyValue;
                     $object->{ Piece_ORM_Inflector::camelize($relationship['through']['inverseColumn'], true) } = $associatedObject->{ Piece_ORM_Inflector::camelize($relationship['column'], true) };
                     $mapper->insert($object);
                     if (Piece_ORM_Error::hasErrors('exception')) {
@@ -819,11 +837,11 @@ class Piece_ORM_Mapper_Common
                 break;
             case 'oneToMany':
                 if (!array_key_exists($relationship['mappedAs'], $subject)) {
-                    return;
+                    continue;
                 }
 
                 if (!is_array($subject->$relationship['mappedAs'])) {
-                    return;
+                    continue;
                 }
 
                 $mapper = &Piece_ORM_Mapper_Factory::factory(Piece_ORM_Inflector::camelize($relationship['table']));
@@ -832,7 +850,7 @@ class Piece_ORM_Mapper_Common
                 }
 
                 for ($i = 0; $i < count($subject->$relationship['mappedAs']); ++$i) {
-                    $subject->{ $relationship['mappedAs'] }[$i]->{ Piece_ORM_Inflector::camelize($relationship['column'], true) } = $id;
+                    $subject->{ $relationship['mappedAs'] }[$i]->{ Piece_ORM_Inflector::camelize($relationship['column'], true) } = $primaryKeyValue;
                     $mapper->insert($subject->{ $relationship['mappedAs'] }[$i]);
                     if (Piece_ORM_Error::hasErrors('exception')) {
                         return;
@@ -844,11 +862,11 @@ class Piece_ORM_Mapper_Common
                 break;
             case 'oneToOne':
                 if (!array_key_exists($relationship['mappedAs'], $subject)) {
-                    return;
+                    continue;
                 }
 
                 if (!is_object($subject->$relationship['mappedAs'])) {
-                    return;
+                    continue;
                 }
 
                 $mapper = &Piece_ORM_Mapper_Factory::factory(Piece_ORM_Inflector::camelize($relationship['table']));
@@ -856,10 +874,179 @@ class Piece_ORM_Mapper_Common
                     return;
                 }
 
-                $subject->{ $relationship['mappedAs'] }->{ Piece_ORM_Inflector::camelize($relationship['column'], true) } = $id;
+                $subject->{ $relationship['mappedAs'] }->{ Piece_ORM_Inflector::camelize($relationship['column'], true) } = $primaryKeyValue;
                 $mapper->insert($subject->{ $relationship['mappedAs'] });
                 if (Piece_ORM_Error::hasErrors('exception')) {
                     return;
+                }
+
+                break;
+            }
+        }
+    }
+
+    function _cascadeUpdate(&$subject)
+    {
+        foreach ($this->__relationship__update as $relationship) {
+            switch ($relationship['type']) {
+            case 'manyToMany':
+                if (!array_key_exists($relationship['mappedAs'], $subject)) {
+                    continue;
+                }
+
+                if (!is_array($subject->$relationship['mappedAs'])) {
+                    continue;
+                }
+
+                $mapper = &Piece_ORM_Mapper_Factory::factory(Piece_ORM_Inflector::camelize($relationship['through']['table']));
+                if (Piece_ORM_Error::hasErrors('exception')) {
+                    return;
+                }
+
+                $referencedColumnValue = $subject->{ Piece_ORM_Inflector::camelize($relationship['through']['referencedColumn'], true) };
+                $mapper->executeQuery("DELETE FROM {$relationship['through']['table']} WHERE {$relationship['through']['column']} = " . $mapper->quote($referencedColumnValue, $relationship['through']['column']), true);
+                if (Piece_ORM_Error::hasErrors('exception')) {
+                    return;
+                }
+
+                $object = &$mapper->createObject();
+                foreach ($subject->$relationship['mappedAs'] as $associatedObject) {
+                    $object->{ Piece_ORM_Inflector::camelize($relationship['through']['column'], true) } = $referencedColumnValue;
+                    $object->{ Piece_ORM_Inflector::camelize($relationship['through']['inverseColumn'], true) } = $associatedObject->{ Piece_ORM_Inflector::camelize($relationship['column'], true) };
+                    $mapper->insert($object);
+                    if (Piece_ORM_Error::hasErrors('exception')) {
+                        return;
+                    }
+                }
+
+                break;
+            case 'oneToMany':
+                if (!array_key_exists($relationship['mappedAs'], $subject)) {
+                    continue;
+                }
+
+                if (!is_array($subject->$relationship['mappedAs'])) {
+                    continue;
+                }
+
+                $mapper = &Piece_ORM_Mapper_Factory::factory(Piece_ORM_Inflector::camelize($relationship['table']));
+                if (Piece_ORM_Error::hasErrors('exception')) {
+                    return;
+                }
+
+                $referencedColumnValue = $subject->{ Piece_ORM_Inflector::camelize($relationship['referencedColumn'], true) };
+                $mapper->setUseIdentityMap(false);
+                $oldObjects = $mapper->findAllWithQuery("SELECT * FROM {$relationship['table']} WHERE {$relationship['column']} = " . $mapper->quote($referencedColumnValue, $relationship['column']));
+                $mapper->setUseIdentityMap(true);
+                if (Piece_ORM_Error::hasErrors('exception')) {
+                    return;
+                }
+
+                $metadata = &$mapper->getMetadata();
+                $primaryKeyProperty = Piece_ORM_Inflector::camelize($metadata->getPrimaryKey(), true);
+                $targetsForInsert = array();
+                $targetsForUpdate = array();
+                $targetsForDelete = array();
+                for ($i = 0; $i < count($subject->$relationship['mappedAs']); ++$i) {
+                    if (!array_key_exists($primaryKeyProperty, $subject->{ $relationship['mappedAs'] }[$i])) {
+                        $targetsForInsert[] = &$subject->{ $relationship['mappedAs'] }[$i];
+                        continue;
+                    }
+
+                    if (is_null($subject->{ $relationship['mappedAs'] }[$i]->$primaryKeyProperty)) {
+                        $targetsForInsert[] = &$subject->{ $relationship['mappedAs'] }[$i];
+                        continue;
+                    }
+
+                    $targetsForUpdate[] = &$subject->{ $relationship['mappedAs']}[$i];
+                }
+
+                $sorter = &new Sorter($primaryKeyProperty);
+                $sorter->sort($oldObjects);
+                $sorter->sort($targetsForUpdate);
+
+                $oldPrimaryKeyValues = array_map(create_function('$o', "return \$o->$primaryKeyProperty;"), $oldObjects);
+                $newPrimaryKeyValues = array_map(create_function('$o', "return \$o->$primaryKeyProperty;"), $targetsForUpdate);
+                foreach (array_keys(array_diff($oldPrimaryKeyValues, $newPrimaryKeyValues)) as $indexForDelete) {
+                    $targetsForDelete[] = $oldObjects[$indexForDelete];
+                }
+
+                foreach (array_keys(array_diff($newPrimaryKeyValues, $oldPrimaryKeyValues)) as $indexForInsert) {
+                    $targetsForInsert[] = &$targetsForUpdate[$indexForInsert];
+                    unset($targetsForUpdate[$indexForInsert]);
+                }
+
+                foreach (array_keys($targetsForDelete) as $i) {
+                    $mapper->delete($targetsForDelete[$i]->$primaryKeyProperty);
+                    if (Piece_ORM_Error::hasErrors('exception')) {
+                        return;
+                    }
+                }
+
+                foreach (array_keys($targetsForInsert) as $i) {
+                    $targetsForInsert[$i]->{ Piece_ORM_Inflector::camelize($relationship['column'], true) } = $referencedColumnValue;
+                    $mapper->insert($targetsForInsert[$i]);
+                    if (Piece_ORM_Error::hasErrors('exception')) {
+                        return;
+                    }
+                }
+
+                foreach (array_keys($targetsForUpdate) as $i) {
+                    $targetsForUpdate[$i]->{ Piece_ORM_Inflector::camelize($relationship['column'], true) } = $referencedColumnValue;
+                    $mapper->update($targetsForUpdate[$i]);
+                    if (Piece_ORM_Error::hasErrors('exception')) {
+                        return;
+                    }
+                }
+
+                break;
+            case 'manyToOne':
+                break;
+            case 'oneToOne':
+                if (!array_key_exists($relationship['mappedAs'], $subject)) {
+                    continue;
+                }
+
+                if (!is_null($subject->$relationship['mappedAs']) && !is_object($subject->$relationship['mappedAs'])) {
+                    continue;
+                }
+
+                $mapper = &Piece_ORM_Mapper_Factory::factory(Piece_ORM_Inflector::camelize($relationship['table']));
+                if (Piece_ORM_Error::hasErrors('exception')) {
+                    return;
+                }
+
+                $referencedColumnValue = $subject->{ Piece_ORM_Inflector::camelize($relationship['referencedColumn'], true) };
+                $mapper->setUseIdentityMap(false);
+                $methodName = 'findBy' . Piece_ORM_Inflector::camelize($relationship['column']);
+                $oldObject = $mapper->$methodName($referencedColumnValue);
+                $mapper->setUseIdentityMap(true);
+                if (Piece_ORM_Error::hasErrors('exception')) {
+                    return;
+                }
+
+                if (is_null($oldObject)) {
+                    if (!is_null($subject->$relationship['mappedAs'])) {
+                        $subject->$relationship['mappedAs']->{ Piece_ORM_Inflector::camelize($relationship['column'], true) } = $referencedColumnValue;
+                        $mapper->insert($subject->$relationship['mappedAs']);
+                        if (Piece_ORM_Error::hasErrors('exception')) {
+                            return;
+                        }
+                    }
+                } else {
+                    if (!is_null($subject->$relationship['mappedAs'])) {
+                        $mapper->update($subject->$relationship['mappedAs']);
+                        if (Piece_ORM_Error::hasErrors('exception')) {
+                            return;
+                        }
+                    } else {
+                        $metadata = &$mapper->getMetadata();
+                        $primaryKeyProperty = Piece_ORM_Inflector::camelize($metadata->getPrimaryKey(), true);
+                        $mapper->delete($oldObject->$primaryKeyProperty);
+                        if (Piece_ORM_Error::hasErrors('exception')) {
+                            return;
+                        }
+                    }
                 }
 
                 break;
@@ -873,6 +1060,30 @@ class Piece_ORM_Mapper_Common
 }
 
 // }}}
+
+class Sorter
+{
+    var $_key;
+
+    function Sorter($key)
+    {
+        $this->_key = $key;
+    }
+
+    function compare($a, $b)
+    {
+        if ($a->{ $this->_key } == $b->{ $this->_key }) {
+            return 0;
+        }
+
+        return $a->{ $this->_key } < $b->{ $this->_key } ? -1 : 1;
+    }
+
+    function sort(&$objects)
+    {
+        usort($objects, array(&$this, 'compare'));
+    }
+}
 
 /*
  * Local Variables:

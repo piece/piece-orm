@@ -308,6 +308,13 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         $person2 = &$mapper->findById($id);
 
         $this->assertEquals('Seven', $person2->firstName);
+
+        $person1->foo = 'bar';
+
+        $this->assertTrue(array_key_exists('foo', $person1));
+        $this->assertEquals('bar', $person1->foo);
+        $this->assertFalse(array_key_exists('foo', $person2));
+
     }
 
     function testDeleteByNull()
@@ -809,6 +816,154 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         $this->assertTrue(array_key_exists('mdate', $employee));
     }
 
+    function testCascadeUpdateOnManyToManyRelationships()
+    {
+        $this->_configure('ManyToManyRelationships');
+        $this->_setupManyToManyRelationships();
+
+        $skillMapper = &Piece_ORM_Mapper_Factory::factory('Skill');
+        $skills = $skillMapper->findAll();
+        $employeeMapper = &Piece_ORM_Mapper_Factory::factory('Employee');
+        $foo1 = &$employeeMapper->findByName('Foo');
+
+        $this->assertEquals(0, count($foo1->skills));
+
+        $foo1->skills = $skills;
+        $employeeMapper->update($foo1);
+        $foo2 = &$employeeMapper->findByName('Foo');
+
+        $this->assertEquals(2, count($foo2->skills));
+
+        $foo1->foo = 'bar';
+
+        $this->assertTrue(array_key_exists('foo', $foo1));
+        $this->assertEquals('bar', $foo1->foo);
+        $this->assertFalse(array_key_exists('foo', $foo2));
+        $this->assertEquals($foo1->departments, $foo2->departments);
+
+        unset($foo1->foo);
+        unset($foo1->skills);
+        unset($foo2->skills);
+        unset($foo1->departments);
+        unset($foo2->departments);
+
+        $this->assertEquals($foo1, $foo2);
+    }
+
+    function testCascadeUpdateOnOneToManyRelationships()
+    {
+        $this->_configure('OneToManyRelationships');
+        $this->_setupOneToManyRelationships();
+
+        $artistMapper = &Piece_ORM_Mapper_Factory::factory('Artist');
+        $baz1 = &$artistMapper->findByName('Baz');
+
+        $this->assertEquals(2, count($baz1->albums));
+
+        $albumMapper = &Piece_ORM_Mapper_Factory::factory('Album');
+
+        $album1 = &$albumMapper->createObject();
+        $album1->name = 'The 3rd album of the artist3';
+        $baz1->albums[] = &$album1;
+        array_shift($baz1->albums);
+
+        $this->assertEquals('The first album of the artist3', $baz1->albums[0]->name);
+
+        $baz1->albums[0]->name = 'The 1st album of the artist3';
+        $album2 = &$albumMapper->createObject();
+        $album2->id = '-1';
+        $album2->name = 'The 4th album of the artist3';
+        $baz1->albums[] = &$album2;
+        $artistMapper->update($baz1);
+
+        $baz2 = &$artistMapper->findByName('Baz');
+
+        $this->assertEquals(3, count($baz2->albums));
+        $this->assertEquals('The 4th album of the artist3', $baz2->albums[0]->name);
+        $this->assertEquals('The 3rd album of the artist3', $baz2->albums[1]->name);
+        $this->assertEquals('The 1st album of the artist3', $baz2->albums[2]->name);
+
+        $baz1->foo = 'bar';
+
+        $this->assertTrue(array_key_exists('foo', $baz1));
+        $this->assertEquals('bar', $baz1->foo);
+        $this->assertFalse(array_key_exists('foo', $baz2));
+
+        unset($baz1->albums);
+        unset($baz1->foo);
+        unset($baz2->albums);
+
+        $this->assertEquals($baz1, $baz2);
+    }
+
+    function testCascadeUpdateOnOneToOneRelationships()
+    {
+        $this->_configure('OneToOneRelationships');
+        $this->_setupOneToOneRelationships();
+
+        $placeMapper = &Piece_ORM_Mapper_Factory::factory('Place');
+        $foo1 = &$placeMapper->findByName('Foo');
+
+        $this->assertNull($foo1->restaurant);
+
+        $restaurantMapper = &Piece_ORM_Mapper_Factory::factory('Restaurant');
+
+        $restaurant1 = &$restaurantMapper->createObject();
+        $restaurant1->name = 'The restaurant on the place Foo.';
+        $foo1->restaurant = &$restaurant1;
+        $placeMapper->update($foo1);
+
+        $foo2 = &$placeMapper->findByName('Foo');
+
+        $this->assertEquals(strtolower('stdClass'), strtolower(get_class($foo2->restaurant)));
+
+        unset($foo1->restaurant);
+        unset($foo2->restaurant);
+
+        $this->assertEquals($foo1, $foo2);
+
+        $bar1 = &$placeMapper->findByName('Bar');
+
+        $this->assertEquals(strtolower('stdClass'), strtolower(get_class($bar1->restaurant)));
+
+        $bar1->restaurant = null;
+        $placeMapper->update($bar1);
+
+        $bar2 = &$placeMapper->findByName('Bar');
+
+        $this->assertNull($bar2->restaurant);
+
+        unset($bar1->restaurant);
+        unset($bar2->restaurant);
+
+        $this->assertEquals($bar1, $bar2);
+
+        $baz1 = &$placeMapper->findByName('Baz');
+
+        $this->assertEquals(strtolower('stdClass'), strtolower(get_class($baz1->restaurant)));
+        $this->assertEquals('The restaurant on the place Baz.', $baz1->restaurant->name);
+
+        $baz1->restaurant->name = 'The restaurant on the place Baz. (updated)';
+        $placeMapper->update($baz1);
+
+        $baz2 = &$placeMapper->findByName('Baz');
+
+        $this->assertEquals(strtolower('stdClass'), strtolower(get_class($baz2->restaurant)));
+        $this->assertEquals('The restaurant on the place Baz. (updated)', $baz2->restaurant->name);
+
+        $baz1->foo = 'bar';
+
+        $this->assertTrue(array_key_exists('foo', $baz1));
+        $this->assertEquals('bar', $baz1->foo);
+        $this->assertFalse(array_key_exists('foo', $baz2));
+
+        unset($bar1->restaurant);
+        unset($bar1->foo);
+        unset($bar2->restaurant);
+
+        $this->assertEquals($bar1, $bar2);
+    }
+
     /**#@-*/
 
     /**#@+
@@ -1037,14 +1192,14 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         $restaurantMapper = &Piece_ORM_Mapper_Factory::factory('Restaurant');
 
         $restaurant1 = &$restaurantMapper->createObject();
-        $restaurant1->name = 'The restaurant on the place2';
+        $restaurant1->name = 'The restaurant on the place Bar.';
         $place2 = &$placeMapper->createObject();
         $place2->name = 'Bar';
         $place2->restaurant = &$restaurant1;
         $placeMapper->insert($place2);
 
         $restaurant2 = &$restaurantMapper->createObject();
-        $restaurant2->name = 'The restaurant on the place2';
+        $restaurant2->name = 'The restaurant on the place Baz.';
         $place3 = &$placeMapper->createObject();
         $place3->name = 'Baz';
         $place3->restaurant = &$restaurant2;

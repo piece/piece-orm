@@ -23,6 +23,18 @@ method:
         table: restaurant
         mappedAs: restaurant
 
+  - name: findByName
+    relationship:
+      - type: oneToOne
+        table: restaurant
+        mappedAs: restaurant
+
+  - name: update
+    relationship:
+      - type: oneToOne
+        table: restaurant
+        mappedAs: restaurant
+
 # Local Variables:
 # mode: conf-colon
 # coding: iso-8859-1
