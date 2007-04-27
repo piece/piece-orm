@@ -587,6 +587,32 @@ class Piece_ORM_Mapper_Common
         return $result;
     }
 
+    // }}}
+    // {{{ findWithQuery()
+
+    /**
+     * Finds an object with a query.
+     *
+     * @param string $query
+     * @return stdClass
+     * @throws PIECE_ORM_ERROR_UNEXPECTED_VALUE
+     * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
+     */
+    function &findWithQuery($query)
+    {
+        $objects = $this->findAllWithQuery($query);
+        if (Piece_ORM_Error::hasErrors('exception')) {
+            return;
+        }
+
+        if (count($objects)) {
+            return $objects[0];
+        } else {
+            $return = null;
+            return $return;
+        }
+    }
+
     /**#@-*/
 
     /**#@+
@@ -615,20 +641,7 @@ class Piece_ORM_Mapper_Common
             return $return;
         }
 
-        if (!is_object($criteria)) {
-            $criteria = &$this->_createCriteria($methodName, $criteria);
-            if (Piece_ORM_Error::hasErrors('exception')) {
-                return;
-            }
-        }
-
-        $result = &$this->_executeQueryWithCriteria($methodName, $criteria);
-        if (Piece_ORM_Error::hasErrors('exception')) {
-            $return = null;
-            return $return;
-        }
-
-        $objects = $this->_loadAllObjects($result, $this->{ '__relationship__' . strtolower($methodName) });
+        $objects = $this->_findAll($methodName, $criteria);
         if (Piece_ORM_Error::hasErrors('exception')) {
             return;
         }
@@ -1018,8 +1031,7 @@ class Piece_ORM_Mapper_Common
 
                 $referencedColumnValue = $subject->{ Piece_ORM_Inflector::camelize($relationship['referencedColumn'], true) };
                 $mapper->setUseIdentityMap(false);
-                $methodName = 'findBy' . Piece_ORM_Inflector::camelize($relationship['column']);
-                $oldObject = $mapper->$methodName($referencedColumnValue);
+                $oldObject = $mapper->findWithQuery("SELECT * FROM {$relationship['table']} WHERE {$relationship['column']} = " . $mapper->quote($referencedColumnValue, $relationship['column']));
                 $mapper->setUseIdentityMap(true);
                 if (Piece_ORM_Error::hasErrors('exception')) {
                     return;
