@@ -322,7 +322,8 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
 
         $mapper = &Piece_ORM_Mapper_Factory::factory('Person');
-        $mapper->delete(null);
+        $subject = null;
+        $mapper->delete($subject);
 
         $this->assertTrue(Piece_ORM_Error::hasErrors('exception'));
 
@@ -338,7 +339,8 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
 
         $mapper = &Piece_ORM_Mapper_Factory::factory('Person');
-        $mapper->delete('');
+        $subject = '';
+        $mapper->delete($subject);
 
         $this->assertTrue(Piece_ORM_Error::hasErrors('exception'));
 
@@ -354,7 +356,8 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
 
         $mapper = &Piece_ORM_Mapper_Factory::factory('Person');
-        $mapper->delete(fopen(__FILE__, 'r'));
+        $subject = fopen(__FILE__, 'r');
+        $mapper->delete($subject);
 
         $this->assertTrue(Piece_ORM_Error::hasErrors('exception'));
 
@@ -369,8 +372,8 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
     {
         Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
 
-        $person = &new stdClass();
         $mapper = &Piece_ORM_Mapper_Factory::factory('Person');
+        $person = &$mapper->createObject();
         $mapper->delete($person);
 
         $this->assertTrue(Piece_ORM_Error::hasErrors('exception'));
@@ -379,7 +382,7 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
 
         $this->assertEquals(PIECE_ORM_ERROR_UNEXPECTED_VALUE, $error['code']);
 
-        $person = &new stdClass();
+        $person = &$mapper->createObject();
         $person->id = null;
         $mapper = &Piece_ORM_Mapper_Factory::factory('Person');
         $mapper->delete($person);
@@ -397,8 +400,8 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
     {
         Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
 
-        $person = &new stdClass();
         $mapper = &Piece_ORM_Mapper_Factory::factory('Person');
+        $person = &$mapper->createObject();
         $mapper->update($person);
 
         $this->assertTrue(Piece_ORM_Error::hasErrors('exception'));
@@ -407,7 +410,7 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
 
         $this->assertEquals(PIECE_ORM_ERROR_UNEXPECTED_VALUE, $error['code']);
 
-        $person = &new stdClass();
+        $person = &$mapper->createObject();
         $person->id = null;
         $mapper = &Piece_ORM_Mapper_Factory::factory('Person');
         $mapper->update($person);
@@ -436,7 +439,7 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         $this->assertEquals('ITEMAN', $person->lastName);
         $this->assertEquals(1, $person->serviceId);
 
-        $mapper->delete((object)array('id' => $person->id, 'serviceId' => 1));
+        $mapper->delete($person);
 
         $this->assertEquals("DELETE FROM person WHERE id = {$person->id} AND service_id = 1", $mapper->getLastQuery());
     }
@@ -457,18 +460,18 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
 
         $this->assertEquals('Seven', $person2->firstName);
 
-        $mapper->delete((object)array('id' => $person1->id, 'serviceId' => $person1->serviceId));
+        $mapper->delete($person1);
 
         $this->assertEquals("DELETE FROM person WHERE id = {$person1->id} AND service_id = {$person1->serviceId}", $mapper->getLastQuery());
     }
 
     function testReplaceEmptyStringWithNull()
     {
-        $subject = &new stdClass();
+        $mapper = &Piece_ORM_Mapper_Factory::factory('Service');
+        $subject = &$mapper->createObject();
         $subject->name = 'Foo';
         $subject->description = '';
         $this->_addMissingPropertyForInsert($subject);
-        $mapper = &Piece_ORM_Mapper_Factory::factory('Service');
         $id = $mapper->insert($subject);
 
         $this->_assertQueryForReplaceEmptyStringWithNull($mapper->getLastQuery());
@@ -793,7 +796,7 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
 
         $this->assertEquals(strtolower('stdClass'), strtolower(get_class($person1)));
 
-        $mapper->delete($id);
+        $mapper->delete($person1);
         $person2 = &$mapper->findById($id);
 
         $this->assertNull($person2);
@@ -964,6 +967,54 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         $this->assertEquals($bar1, $bar2);
     }
 
+    function testCascadeDeleteManyToManyRelationships()
+    {
+        $this->_configure('ManyToManyRelationships');
+        $this->_setupManyToManyRelationships();
+
+        $employeeMapper = &Piece_ORM_Mapper_Factory::factory('Employee');
+        $qux = &$employeeMapper->findByName('Qux');
+        $employeeSkillMapper = &Piece_ORM_Mapper_Factory::factory('EmployeeSkill');
+
+        $this->assertEquals(2, count($employeeSkillMapper->findAllByEmployeeId($qux->id)));
+
+        $employeeMapper->delete($qux);
+
+        $this->assertEquals(0, count($employeeSkillMapper->findAllByEmployeeId($qux->id)));
+    }
+
+    function testCascadeDeleteOnOneToManyRelationships()
+    {
+        $this->_configure('OneToManyRelationships');
+        $this->_setupOneToManyRelationships();
+
+        $artistMapper = &Piece_ORM_Mapper_Factory::factory('Artist');
+        $baz = &$artistMapper->findByName('Baz');
+        $albumMapper = &Piece_ORM_Mapper_Factory::factory('Album');
+
+        $this->assertEquals(2, count($albumMapper->findAllByArtistId($baz->id)));
+
+        $artistMapper->delete($baz);
+
+        $this->assertEquals(0, count($albumMapper->findAllByArtistId($baz->id)));
+    }
+
+    function testCascadeDeleteOnOneToOneRelationships()
+    {
+        $this->_configure('OneToOneRelationships');
+        $this->_setupOneToOneRelationships();
+
+        $placeMapper = &Piece_ORM_Mapper_Factory::factory('Place');
+        $baz = &$placeMapper->findByName('Baz');
+        $restaurantMapper = &Piece_ORM_Mapper_Factory::factory('Restaurant');
+
+        $this->assertEquals(strtolower('stdClass'), strtolower(get_class($restaurantMapper->findByPlaceId($baz->id))));
+
+        $placeMapper->delete($baz);
+
+        $this->assertNull($restaurantMapper->findByPlaceId($baz->id));
+    }
+
     /**#@-*/
 
     /**#@+
@@ -972,12 +1023,12 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
 
     function _insert()
     {
-        $subject = &new stdClass();
+        $mapper = &Piece_ORM_Mapper_Factory::factory('Person');
+        $subject = &$mapper->createObject();
         $subject->firstName = 'Taro';
         $subject->lastName = 'ITEMAN';
         $subject->serviceId = 3;
         $this->_addMissingPropertyForInsert($subject);
-        $mapper = &Piece_ORM_Mapper_Factory::factory('Person');
         return $mapper->insert($subject);
     }
 

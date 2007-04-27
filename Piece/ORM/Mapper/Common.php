@@ -182,71 +182,51 @@ class Piece_ORM_Mapper_Common
     /**
      * Removes an object from a table.
      *
-     * @param mixed $criteria
+     * @param mixed &$subject
      * @return integer
      * @throws PIECE_ORM_ERROR_UNEXPECTED_VALUE
      * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
      */
-    function delete($criteria)
+    function delete(&$subject)
     {
         if (!$this->_metadata->hasPrimaryKey()) {
             Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_OPERATION,
-                                  'The primary key required to invoke update().'
+                                  'The primary key required to invoke delete().'
                                   );
             return;
         }
 
-        if (is_null($criteria)) {
+        if (is_null($subject)) {
             Piece_ORM_Error::push(PIECE_ORM_ERROR_UNEXPECTED_VALUE,
                                   'An unexpected value detected. delete() cannot receive null.'
                                   );
             return;
         }
 
-        if (!is_object($criteria)) {
-            if (!is_scalar($criteria)) {
-                Piece_ORM_Error::push(PIECE_ORM_ERROR_UNEXPECTED_VALUE,
-                                      'An unexpected value detected. delete() cannot receive non-scalar.'
-                                      );
-                return;
-            }
-
-            if (!strlen($criteria)) {
-                Piece_ORM_Error::push(PIECE_ORM_ERROR_UNEXPECTED_VALUE,
-                                      'An unexpected value detected. delete() cannot receive empty string.'
-                                      );
-                return;
-            }
-
-            if ($primaryKey = $this->_metadata->getPrimaryKey()) {
-                $criterion = $criteria;
-                $criteria = &new stdClass();
-                $criteria->{ Piece_ORM_Inflector::camelize($primaryKey, true) } = $criterion;
-            } else {
-                Piece_ORM_Error::push(PIECE_ORM_ERROR_UNEXPECTED_VALUE,
-                                      'An unexpected value detected. delete() can receive non-object only if a table has a single primary key and has not a complex primary key.'
-                                      );
-                return;
-            }
+        if (!is_object($subject)) {
+            Piece_ORM_Error::push(PIECE_ORM_ERROR_UNEXPECTED_VALUE,
+                                  'An unexpected value detected. delete() cannot receive non-object.'
+                                  );
+            return;
         }
 
         foreach ($this->_metadata->getPrimaryKeys() as $primaryKey) {
             $propertyName = Piece_ORM_Inflector::camelize($primaryKey, true);
-            if (!array_key_exists($propertyName, $criteria)) {
+            if (!array_key_exists($propertyName, $subject)) {
                 Piece_ORM_Error::push(PIECE_ORM_ERROR_UNEXPECTED_VALUE,
                                       'The primary key not found in the given value.'
                                       );
                 return;
             }
 
-            if (!is_scalar($criteria->$propertyName)) {
+            if (!is_scalar($subject->$propertyName)) {
                 Piece_ORM_Error::push(PIECE_ORM_ERROR_UNEXPECTED_VALUE,
                                       'An inappropriate value for the primary key detected.'
                                       );
                 return;
             }
 
-            if (!strlen($criteria->$propertyName)) {
+            if (!strlen($subject->$propertyName)) {
                 Piece_ORM_Error::push(PIECE_ORM_ERROR_UNEXPECTED_VALUE,
                                       'An inappropriate value for the primary key detected.'
                                       );
@@ -254,7 +234,9 @@ class Piece_ORM_Mapper_Common
             }
         }
 
-        $affectedRows = $this->_executeQueryWithCriteria('delete', $criteria, true);
+        $this->_cascadeDelete($subject);
+
+        $affectedRows = $this->_executeQueryWithCriteria('delete', $subject, true);
         if (Piece_ORM_Error::hasErrors('exception')) {
             return;
         }
@@ -990,7 +972,7 @@ class Piece_ORM_Mapper_Common
                 }
 
                 foreach (array_keys($targetsForDelete) as $i) {
-                    $mapper->delete($targetsForDelete[$i]->$primaryKeyProperty);
+                    $mapper->delete($targetsForDelete[$i]);
                     if (Piece_ORM_Error::hasErrors('exception')) {
                         return;
                     }
@@ -1052,13 +1034,81 @@ class Piece_ORM_Mapper_Common
                             return;
                         }
                     } else {
-                        $metadata = &$mapper->getMetadata();
-                        $primaryKeyProperty = Piece_ORM_Inflector::camelize($metadata->getPrimaryKey(), true);
-                        $mapper->delete($oldObject->$primaryKeyProperty);
+                        $mapper->delete($oldObject);
                         if (Piece_ORM_Error::hasErrors('exception')) {
                             return;
                         }
                     }
+                }
+
+                break;
+            }
+        }
+    }
+
+    function _cascadeDelete(&$subject)
+    {
+        foreach ($this->__relationship__delete as $relationship) {
+            switch ($relationship['type']) {
+            case 'manyToMany':
+                if (!array_key_exists($relationship['mappedAs'], $subject)) {
+                    continue;
+                }
+
+                if (!is_array($subject->$relationship['mappedAs'])) {
+                    continue;
+                }
+
+                $mapper = &Piece_ORM_Mapper_Factory::factory(Piece_ORM_Inflector::camelize($relationship['through']['table']));
+                if (Piece_ORM_Error::hasErrors('exception')) {
+                    return;
+                }
+
+                $mapper->executeQuery("DELETE FROM {$relationship['through']['table']} WHERE {$relationship['through']['column']} = " . $mapper->quote($subject->{ Piece_ORM_Inflector::camelize($relationship['through']['referencedColumn'], true) }, $relationship['through']['column']), true);
+                if (Piece_ORM_Error::hasErrors('exception')) {
+                    return;
+                }
+
+                break;
+            case 'oneToMany':
+                if (!array_key_exists($relationship['mappedAs'], $subject)) {
+                    continue;
+                }
+
+                if (!is_array($subject->$relationship['mappedAs'])) {
+                    continue;
+                }
+
+                $mapper = &Piece_ORM_Mapper_Factory::factory(Piece_ORM_Inflector::camelize($relationship['table']));
+                if (Piece_ORM_Error::hasErrors('exception')) {
+                    return;
+                }
+
+                $mapper->executeQuery("DELETE FROM {$relationship['table']} WHERE {$relationship['column']} = " . $mapper->quote($subject->{ Piece_ORM_Inflector::camelize($relationship['referencedColumn'], true) }, $relationship['column']), true);
+                if (Piece_ORM_Error::hasErrors('exception')) {
+                    return;
+                }
+
+                break;
+            case 'manyToOne':
+                break;
+            case 'oneToOne':
+                if (!array_key_exists($relationship['mappedAs'], $subject)) {
+                    continue;
+                }
+
+                if (!is_null($subject->$relationship['mappedAs']) && !is_object($subject->$relationship['mappedAs'])) {
+                    continue;
+                }
+
+                $mapper = &Piece_ORM_Mapper_Factory::factory(Piece_ORM_Inflector::camelize($relationship['table']));
+                if (Piece_ORM_Error::hasErrors('exception')) {
+                    return;
+                }
+
+                $mapper->delete($subject->$relationship['mappedAs']);
+                if (Piece_ORM_Error::hasErrors('exception')) {
+                    return;
                 }
 
                 break;

@@ -34,6 +34,12 @@ method:
         table: restaurant
         mappedAs: restaurant
 
+  - name: delete
+    relationship:
+      - type: oneToOne
+        table: restaurant
+        mappedAs: restaurant
+
 # Local Variables:
 # mode: conf-colon
 # coding: iso-8859-1

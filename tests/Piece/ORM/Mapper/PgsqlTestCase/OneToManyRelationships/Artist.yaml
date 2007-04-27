@@ -42,6 +42,12 @@ method:
         mappedAs: albums
         orderBy: id DESC
 
+  - name: delete
+    relationship:
+      - type: oneToMany
+        table: album
+        mappedAs: albums
+
 # Local Variables:
 # mode: conf-colon
 # coding: iso-8859-1
