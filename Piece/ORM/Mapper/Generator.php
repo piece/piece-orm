@@ -307,7 +307,7 @@ class Piece_ORM_Mapper_Generator
                 $this->_addUpdate(@$method['query'], @$method['relationship']);
                 break;
             case 'delete':
-                $this->_addDelete(@$method['query']);
+                $this->_addDelete(@$method['query'], @$method['relationship']);
                 break;
             }
         }
@@ -393,12 +393,14 @@ class Piece_ORM_Mapper_Generator
      * Adds the query for delete() to the mapper source.
      *
      * @param string $query
+     * @param array  $relationships
+     * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
+     * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
+     * @throws PIECE_ORM_ERROR_NOT_FOUND
      */
-    function _addDelete($query)
+    function _addDelete($query, $relationships = null)
     {
-        if ($query) {
-            $this->_propertyDefinitions['query']['delete'] = $this->_getQueryPropertyDeclaration('delete', $query);
-        }
+        $this->_addPropertyDefinitions('delete', $query, $relationships);
     }
 
     // }}}
