@@ -40,6 +40,7 @@
 
 require_once 'Piece/ORM/Inflector.php';
 require_once 'Piece/ORM/Mapper/RelationshipType.php';
+require_once 'Piece/ORM/Mapper/Common.php';
 
 // {{{ Piece_ORM_Mapper_Generator
 
@@ -79,6 +80,7 @@ class Piece_ORM_Mapper_Generator
     var $_propertyDefinitions = array('query' => array(),
                                       'relationship' => array()
                                       );
+    var $_baseMapperMethods;
 
     /**#@-*/
 
@@ -103,6 +105,7 @@ class Piece_ORM_Mapper_Generator
         $this->_mapperName  = $mapperName;
         $this->_config      = $config;
         $this->_metadata    = &$metadata;
+        $this->_baseMapperMethods = get_class_methods('Piece_ORM_Mapper_Common');
     }
 
     // }}}
@@ -194,6 +197,13 @@ class Piece_ORM_Mapper_Generator
      */
     function _addFind($methodName, $query, $relationships = null)
     {
+        if (!$this->_validateMethodName($methodName)) {
+            Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_CONFIGURATION,
+                                  "Cannot use the method name [ $methodName ] since it is a reserved for internal use only."
+                                  );
+            return;
+        }
+
         $this->_addPropertyDefinitions($methodName, $query, $relationships);
         if (Piece_ORM_Error::hasErrors('exception')) {
             return;
@@ -239,6 +249,13 @@ class Piece_ORM_Mapper_Generator
      */
     function _addFindAll($methodName, $query = null, $relationships = null)
     {
+        if (!$this->_validateMethodName($methodName)) {
+            Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_CONFIGURATION,
+                                  "Cannot use the method name [ $methodName ] since it is a reserved for internal use only."
+                                  );
+            return;
+        }
+
         $this->_addPropertyDefinitions($methodName, $query, $relationships);
         if (Piece_ORM_Error::hasErrors('exception')) {
             return;
@@ -542,6 +559,24 @@ class Piece_ORM_Mapper_Generator
                                   );
             return;
         }
+    }
+
+    // }}}
+    // {{{ _validateMethodName()
+
+    /**
+     * Validates a method name.
+     *
+     * @param string $methodName
+     * @return boolean
+     */
+    function _validateMethodName($methodName)
+    {
+        if (version_compare(phpversion(), '5.0.0', '<')) {
+            $methodName = strtolower($methodName);
+        }
+
+        return !in_array($methodName, $this->_baseMapperMethods);
     }
 
     /**#@-*/
