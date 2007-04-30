@@ -184,28 +184,11 @@ class Piece_ORM_Mapper_ObjectPersister
             return;
         }
 
-        foreach ($this->_metadata->getPrimaryKeys() as $primaryKey) {
-            $propertyName = Piece_ORM_Inflector::camelize($primaryKey, true);
-            if (!array_key_exists($propertyName, $this->_subject)) {
-                Piece_ORM_Error::push(PIECE_ORM_ERROR_UNEXPECTED_VALUE,
-                                      'The primary key not found in the given value.'
-                                      );
-                return;
-            }
-
-            if (!is_scalar($this->_subject->$propertyName)) {
-                Piece_ORM_Error::push(PIECE_ORM_ERROR_UNEXPECTED_VALUE,
-                                      'An inappropriate value for the primary key detected.'
-                                      );
-                return;
-            }
-
-            if (!strlen($this->_subject->$propertyName)) {
-                Piece_ORM_Error::push(PIECE_ORM_ERROR_UNEXPECTED_VALUE,
-                                      'An inappropriate value for the primary key detected.'
-                                      );
-                return;
-            }
+        if (!$this->_validatePrimaryKeys()) {
+            Piece_ORM_Error::push(PIECE_ORM_ERROR_UNEXPECTED_VALUE,
+                                  'An unexpected value detected. Correct values are required for the primary keys to invoke update().'
+                                  );
+            return;
         }
 
         $affectedRows = $this->_mapper->executeQueryWithCriteria('update', $this->_subject, true);
@@ -256,28 +239,11 @@ class Piece_ORM_Mapper_ObjectPersister
             return;
         }
 
-        foreach ($this->_metadata->getPrimaryKeys() as $primaryKey) {
-            $propertyName = Piece_ORM_Inflector::camelize($primaryKey, true);
-            if (!array_key_exists($propertyName, $this->_subject)) {
-                Piece_ORM_Error::push(PIECE_ORM_ERROR_UNEXPECTED_VALUE,
-                                      'The primary key not found in the given value.'
-                                      );
-                return;
-            }
-
-            if (!is_scalar($this->_subject->$propertyName)) {
-                Piece_ORM_Error::push(PIECE_ORM_ERROR_UNEXPECTED_VALUE,
-                                      'An inappropriate value for the primary key detected.'
-                                      );
-                return;
-            }
-
-            if (!strlen($this->_subject->$propertyName)) {
-                Piece_ORM_Error::push(PIECE_ORM_ERROR_UNEXPECTED_VALUE,
-                                      'An inappropriate value for the primary key detected.'
-                                      );
-                return;
-            }
+        if (!$this->_validatePrimaryKeys()) {
+            Piece_ORM_Error::push(PIECE_ORM_ERROR_UNEXPECTED_VALUE,
+                                  'An unexpected value detected. Correct values are required for the primary keys to invoke delete().'
+                                  );
+            return;
         }
 
         $this->_cascadeDelete();
@@ -611,6 +577,26 @@ class Piece_ORM_Mapper_ObjectPersister
                 break;
             }
         }
+    }
+
+    function _validatePrimaryKeys()
+    {
+        foreach ($this->_metadata->getPrimaryKeys() as $primaryKey) {
+            $propertyName = Piece_ORM_Inflector::camelize($primaryKey, true);
+            if (!array_key_exists($propertyName, $this->_subject)) {
+                return false;
+            }
+
+            if (!is_scalar($this->_subject->$propertyName)) {
+                return false;
+            }
+
+            if (!strlen($this->_subject->$propertyName)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**#@-*/
