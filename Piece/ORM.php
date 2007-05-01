@@ -231,6 +231,29 @@ class Piece_ORM
         return $object;
     }
 
+    // }}}
+    // {{{ dressObject()
+
+    /**
+     * Converts an object into a specified object.
+     *
+     * @param stdClass &$oldObject
+     * @param mixed    $newObject
+     * @return mixed
+     */
+    function &dressObject(&$oldObject, $newObject)
+    {
+        foreach (array_keys(get_object_vars($oldObject)) as $property) {
+            if (!is_object($oldObject->$property)) {
+                $newObject->$property = $oldObject->$property;
+            } else {
+                $newObject->$property = &$oldObject->$property;
+            }
+        }
+
+        return $newObject;
+    }
+
     /**#@-*/
 
     /**#@+

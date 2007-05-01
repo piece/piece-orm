@@ -237,6 +237,30 @@ class Piece_ORMTestCase extends PHPUnit_TestCase
         $this->assertTrue(array_key_exists('mdate', $person));
     }
 
+    function testDressObject()
+    {
+        Piece_ORM::configure($this->_cacheDirectory,
+                             $this->_cacheDirectory,
+                             $this->_cacheDirectory
+                             );
+        $person = &Piece_ORM::createObject('Person');
+        $person->firstName = 'Foo';
+        $person->lastName = 'Bar';
+        $person->object = &new stdClass();
+        $realPerson = &Piece_ORM::dressObject($person, new Piece_ORMTestCase_Person());
+
+        $this->assertEquals(strtolower('Piece_ORMTestCase_Person'), strtolower(get_class($realPerson)));
+        $this->assertTrue(method_exists($realPerson, 'generatePassword'));
+        $this->assertEquals('Foo', $realPerson->firstName);
+        $this->assertTrue(array_key_exists('object', $realPerson));
+        $this->assertEquals(strtolower('stdClass'), strtolower(get_class($realPerson->object)));
+
+        $person->object->foo = 'bar';
+
+        $this->assertTrue(array_key_exists('foo', $realPerson->object));
+        $this->assertEquals('bar', $realPerson->object->foo);
+    }
+
     /**#@-*/
 
     /**#@+
@@ -246,6 +270,14 @@ class Piece_ORMTestCase extends PHPUnit_TestCase
     /**#@-*/
 
     // }}}
+}
+
+// }}}
+// {{{ Piece_ORMTestCase_Person
+
+class Piece_ORMTestCase_Person
+{
+    function generatePassword() {}
 }
 
 // }}}
