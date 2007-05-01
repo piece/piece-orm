@@ -127,12 +127,13 @@ class Piece_ORM_Mapper_Factory
             }
 
             $mapperClass = Piece_ORM_Mapper_Factory::_getMapperClass($mapperID);
-            $mapper = &new $mapperClass($context, $metadata);
+            $dbh = &$context->getConnection();
             if (Piece_ORM_Error::hasErrors('exception')) {
                 $return = null;
                 return $return;
             }
 
+            $mapper = &new $mapperClass($dbh, $metadata);
             if (!is_subclass_of($mapper, 'Piece_ORM_Mapper_Common')) {
                 Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_MAPPER,
                                       "The mapper class for [ $mapperName ] is invalid."

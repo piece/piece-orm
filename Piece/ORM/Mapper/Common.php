@@ -72,7 +72,6 @@ class Piece_ORM_Mapper_Common
      * @access private
      */
 
-    var $_context;
     var $_metadata;
     var $_dbh;
     var $_lastQuery;
@@ -92,18 +91,17 @@ class Piece_ORM_Mapper_Common
     // {{{ constructor
 
     /**
-     * Sets the Piece_ORM_Context object and a Piece_ORM_Metadata object as
-     * property.
+     * Sets the database handle for this mapper and a Piece_ORM_Metadata
+     * object as property.
      *
-     * @param Piece_ORM_Context  &$context
+     * @param mixed              &$dbh
      * @param Piece_ORM_Metadata &$metadata
      * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
      */
-    function Piece_ORM_Mapper_Common(&$context, &$metadata)
+    function Piece_ORM_Mapper_Common(&$dbh, &$metadata)
     {
+        $this->_dbh = &$dbh;
         $this->_metadata = &$metadata;
-        $this->_dbh = &$context->getConnection();
-        $this->_context = &$context;
     }
 
     // }}}
@@ -129,6 +127,13 @@ class Piece_ORM_Mapper_Common
      * @return mixed
      * @throws PIECE_ORM_ERROR_UNEXPECTED_VALUE
      * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
+     * @throws PIECE_ORM_ERROR_INVALID_OPERATION
+     * @throws PIECE_ORM_ERROR_NOT_FOUND
+     * @throws PIECE_ORM_ERROR_NOT_READABLE
+     * @throws PIECE_ORM_ERROR_CANNOT_READ
+     * @throws PIECE_ORM_ERROR_CANNOT_WRITE
+     * @throws PIECE_ORM_ERROR_INVALID_MAPPER
+     * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
      */
     function insert(&$subject)
     {
@@ -146,6 +151,13 @@ class Piece_ORM_Mapper_Common
      * @return integer
      * @throws PIECE_ORM_ERROR_UNEXPECTED_VALUE
      * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
+     * @throws PIECE_ORM_ERROR_INVALID_OPERATION
+     * @throws PIECE_ORM_ERROR_NOT_FOUND
+     * @throws PIECE_ORM_ERROR_NOT_READABLE
+     * @throws PIECE_ORM_ERROR_CANNOT_READ
+     * @throws PIECE_ORM_ERROR_CANNOT_WRITE
+     * @throws PIECE_ORM_ERROR_INVALID_MAPPER
+     * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
      */
     function delete(&$subject)
     {
@@ -163,6 +175,13 @@ class Piece_ORM_Mapper_Common
      * @return integer
      * @throws PIECE_ORM_ERROR_UNEXPECTED_VALUE
      * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
+     * @throws PIECE_ORM_ERROR_INVALID_OPERATION
+     * @throws PIECE_ORM_ERROR_NOT_FOUND
+     * @throws PIECE_ORM_ERROR_NOT_READABLE
+     * @throws PIECE_ORM_ERROR_CANNOT_READ
+     * @throws PIECE_ORM_ERROR_CANNOT_WRITE
+     * @throws PIECE_ORM_ERROR_INVALID_MAPPER
+     * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
      */
     function update(&$subject)
     {
@@ -480,6 +499,46 @@ class Piece_ORM_Mapper_Common
 
         $result = &$this->executeQuery($query, $isManip);
         return $result;
+    }
+
+    // }}}
+    // {{{ getLastInsertID()
+
+    /**
+     * Returns the value of an ID field if a table has an ID field.
+     *
+     * @return integer
+     * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
+     */
+    function getLastInsertID()
+    {
+        if ($this->_metadata->hasID()) {
+            PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
+            $id = $this->_dbh->lastInsertID($this->_metadata->getTableName(), $this->_metadata->getPrimaryKey());
+            PEAR::staticPopErrorHandling();
+            if (MDB2::isError($id)) {
+                Piece_ORM_Error::pushPEARError($id,
+                                               PIECE_ORM_ERROR_INVOCATION_FAILED,
+                                               'Failed to invoke MDB2_Driver_' . $this->getDriverName() . '::lastInsertID() for any reasons.'
+                                               );
+                return;
+            }
+
+            return $id;
+        }
+    }
+
+    // }}}
+    // {{{ removeLoadedObject()
+
+    /**
+     * Removes an object from the list of the loaded objects.
+     *
+     * @param string $primaryKeyValue
+     */
+    function removeLoadedObject($primaryKeyValue)
+    {
+        unset($this->_loadedObjects[$primaryKeyValue]);
     }
 
     /**#@-*/
