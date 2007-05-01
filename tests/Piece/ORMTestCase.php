@@ -218,6 +218,25 @@ class Piece_ORMTestCase extends PHPUnit_TestCase
         $cache->clean();
     }
 
+    function testCreateObject()
+    {
+        Piece_ORM::configure($this->_cacheDirectory,
+                             $this->_cacheDirectory,
+                             $this->_cacheDirectory
+                             );
+        $person = &Piece_ORM::createObject('Person');
+
+        $this->assertEquals(strtolower('stdClass'), strtolower(get_class($person)));
+        $this->assertEquals(7, count(array_keys((array)($person))));
+        $this->assertTrue(array_key_exists('id', $person));
+        $this->assertTrue(array_key_exists('firstName', $person));
+        $this->assertTrue(array_key_exists('lastName', $person));
+        $this->assertTrue(array_key_exists('serviceId', $person));
+        $this->assertTrue(array_key_exists('version', $person));
+        $this->assertTrue(array_key_exists('rdate', $person));
+        $this->assertTrue(array_key_exists('mdate', $person));
+    }
+
     /**#@-*/
 
     /**#@+

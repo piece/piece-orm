@@ -193,6 +193,44 @@ class Piece_ORM
         $context->setDatabase($database);
     }
 
+    // }}}
+    // {{{ createObject()
+
+    /**
+     * Creates an object from the metadata.
+     *
+     * @param string $mapperName
+     * @return stdClass
+     * @throws PIECE_ORM_ERROR_INVALID_OPERATION
+     * @throws PIECE_ORM_ERROR_NOT_FOUND
+     * @throws PIECE_ORM_ERROR_NOT_READABLE
+     * @throws PIECE_ORM_ERROR_CANNOT_READ
+     * @throws PIECE_ORM_ERROR_CANNOT_WRITE
+     * @throws PIECE_ORM_ERROR_INVALID_MAPPER
+     * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
+     */
+    function &createObject($mapperName)
+    {
+        if (!$GLOBALS['PIECE_ORM_Configured']) {
+            Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
+            Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_OPERATION,
+                                  __FUNCTION__ . ' method must be called after calling configure().',
+                                  'warning'
+                                  );
+            Piece_ORM_Error::popCallback();
+            $return = null;
+            return $return;
+        }
+
+        $mapper = &Piece_ORM_Mapper_Factory::factory($mapperName);
+        if (Piece_ORM_Error::hasErrors('exception')) {
+            return;
+        }
+
+        $object = &$mapper->createObject();
+        return $object;
+    }
+
     /**#@-*/
 
     /**#@+
