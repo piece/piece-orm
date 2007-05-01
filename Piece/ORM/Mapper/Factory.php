@@ -274,12 +274,7 @@ class Piece_ORM_Mapper_Factory
             return;
         }
 
-        $yaml = Spyc::YAMLLoad($configFile);
-        if (!array_key_exists('method', $yaml)) {
-            $yaml['method'] = array();
-        }
-
-        $generator = &new Piece_ORM_Mapper_Generator(Piece_ORM_Mapper_Factory::_getMapperClass($mapperID), $mapperName, $yaml, $metadata);
+        $generator = &new Piece_ORM_Mapper_Generator(Piece_ORM_Mapper_Factory::_getMapperClass($mapperID), $mapperName, Spyc::YAMLLoad($configFile), $metadata);
         return $generator->generate();
     }
 

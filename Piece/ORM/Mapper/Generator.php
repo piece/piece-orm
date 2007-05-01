@@ -281,6 +281,10 @@ class Piece_ORM_Mapper_Generator
      */
     function _generateFromConfiguration()
     {
+        if (!array_key_exists('method', $this->_config)) {
+            $this->_config['method'] = array();
+        }
+
         foreach ($this->_config['method'] as $method) {
             $queryType = $this->_getQueryType($method['name']);
             if (Piece_ORM_Error::hasErrors('exception')) {
