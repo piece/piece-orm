@@ -91,16 +91,12 @@ class Piece_ORM_Mapper_Common
     // {{{ constructor
 
     /**
-     * Sets the database handle for this mapper and a Piece_ORM_Metadata
-     * object as property.
+     * Sets the Piece_ORM_Metadata object for this mapper.
      *
-     * @param mixed              &$dbh
      * @param Piece_ORM_Metadata &$metadata
-     * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
      */
-    function Piece_ORM_Mapper_Common(&$dbh, &$metadata)
+    function Piece_ORM_Mapper_Common(&$metadata)
     {
-        $this->_dbh = &$dbh;
         $this->_metadata = &$metadata;
     }
 
@@ -539,6 +535,19 @@ class Piece_ORM_Mapper_Common
     function removeLoadedObject($primaryKeyValue)
     {
         unset($this->_loadedObjects[$primaryKeyValue]);
+    }
+
+    // }}}
+    // {{{ setConnection()
+
+    /**
+     * Sets the database handle for this mapper.
+     *
+     * @param mixed &$dbh
+     */
+    function setConnection(&$dbh)
+    {
+        $this->_dbh = &$dbh;
     }
 
     /**#@-*/

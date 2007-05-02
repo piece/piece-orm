@@ -93,6 +93,7 @@ class Piece_ORM_Mapper_FactoryTestCase extends PHPUnit_TestCase
         $config->setOptions('piece', array('debug' => 2, 'result_buffering' => false));
         $context = &Piece_ORM_Context::singleton();
         $context->setConfiguration($config);
+        $context->setMapperConfigDirectory($this->_cacheDirectory);
         $context->setDatabase('piece');
         $this->_oldCacheDirectory = Piece_ORM_Mapper_Factory::setConfigDirectory($this->_cacheDirectory);
         Piece_ORM_Mapper_Factory::setCacheDirectory($this->_cacheDirectory);
@@ -212,6 +213,25 @@ class Piece_ORM_Mapper_FactoryTestCase extends PHPUnit_TestCase
         $mapper1->foo = 'bar';
         $mapper2 = &Piece_ORM_Mapper_Factory::factory('Person');
 
+        $this->assertTrue(array_key_exists('foo', $mapper2));
+        $this->assertEquals('bar', $mapper2->foo);
+    }
+
+    function testSwitchDatabase()
+    {
+        $context = &Piece_ORM_Context::singleton();
+        $config = &$context->getConfiguration();
+        $config->setDSN('piece1', 'pgsql://piece:piece@localhost/piece');
+        $config->setOptions('piece1', array('debug' => 0, 'result_buffering' => false));
+        $mapper1 = &Piece_ORM_Mapper_Factory::factory('Person');
+
+        $this->assertEquals(2, $mapper1->_dbh->options['debug']);
+
+        $mapper1->foo = 'bar';
+        $context->setDatabase('piece1');
+        $mapper2 = &Piece_ORM_Mapper_Factory::factory('Person');
+
+        $this->assertEquals(0, $mapper2->_dbh->options['debug']);
         $this->assertTrue(array_key_exists('foo', $mapper2));
         $this->assertEquals('bar', $mapper2->foo);
     }

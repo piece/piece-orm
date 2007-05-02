@@ -126,14 +126,8 @@ class Piece_ORM_Mapper_Factory
                 return $return;
             }
 
-            $dbh = &$context->getConnection();
-            if (Piece_ORM_Error::hasErrors('exception')) {
-                $return = null;
-                return $return;
-            }
-
             $mapperClass = Piece_ORM_Mapper_Factory::_getMapperClass($mapperID);
-            $mapper = &new $mapperClass($dbh, $metadata);
+            $mapper = &new $mapperClass($metadata);
             if (!is_subclass_of($mapper, 'Piece_ORM_Mapper_Common')) {
                 Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_MAPPER,
                                       "The mapper class for [ $mapperName ] is invalid."
@@ -144,6 +138,14 @@ class Piece_ORM_Mapper_Factory
 
             $GLOBALS['PIECE_ORM_Mapper_Instances'][$mapperID] = &$mapper;
         }
+
+        $dbh = &$context->getConnection();
+        if (Piece_ORM_Error::hasErrors('exception')) {
+            $return = null;
+            return $return;
+        }
+
+        $GLOBALS['PIECE_ORM_Mapper_Instances'][$mapperID]->setConnection($dbh);
 
         return $GLOBALS['PIECE_ORM_Mapper_Instances'][$mapperID];
     }
