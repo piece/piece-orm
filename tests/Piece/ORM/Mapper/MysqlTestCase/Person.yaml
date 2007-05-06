@@ -1,15 +1,13 @@
 # $Id$
 
-method:
+- name: findByIdAndServiceId
+  query: SELECT * FROM person WHERE id = $id AND service_id = $serviceId
 
-  - name: findByIdAndServiceId
-    query: SELECT * FROM person WHERE id = $id AND service_id = $serviceId
+- name: findByFirstName
+  query: SELECT * FROM person WHERE first_name = $firstName AND service_id = $serviceId
 
-  - name: findByFirstName
-    query: SELECT * FROM person WHERE first_name = $firstName AND service_id = $serviceId
-
-  - name: findAllByServiceId
-    query: SELECT * FROM person WHERE service_id = $serviceId AND version >= 0
+- name: findAllByServiceId
+  query: SELECT * FROM person WHERE service_id = $serviceId AND version >= 0
 
 # Local Variables:
 # mode: conf-colon

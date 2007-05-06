@@ -1,44 +1,42 @@
 # $Id$
 
-method:
+- name: findAllWithRestaurant1
+  relationship:
+    - type: oneToOne
+      table: restaurant
+      mappedAs: restaurant
 
-  - name: findAllWithRestaurant1
-    relationship:
-      - type: oneToOne
-        table: restaurant
-        mappedAs: restaurant
+- name: findAllWithRestaurant2
+  relationship:
+    - type: oneToOne
+      table: restaurant
+      mappedAs: restaurant
+      column: place_id
+      referencedColumn: id
 
-  - name: findAllWithRestaurant2
-    relationship:
-      - type: oneToOne
-        table: restaurant
-        mappedAs: restaurant
-        column: place_id
-        referencedColumn: id
+- name: insert
+  relationship:
+    - type: oneToOne
+      table: restaurant
+      mappedAs: restaurant
 
-  - name: insert
-    relationship:
-      - type: oneToOne
-        table: restaurant
-        mappedAs: restaurant
+- name: findByName
+  relationship:
+    - type: oneToOne
+      table: restaurant
+      mappedAs: restaurant
 
-  - name: findByName
-    relationship:
-      - type: oneToOne
-        table: restaurant
-        mappedAs: restaurant
+- name: update
+  relationship:
+    - type: oneToOne
+      table: restaurant
+      mappedAs: restaurant
 
-  - name: update
-    relationship:
-      - type: oneToOne
-        table: restaurant
-        mappedAs: restaurant
-
-  - name: delete
-    relationship:
-      - type: oneToOne
-        table: restaurant
-        mappedAs: restaurant
+- name: delete
+  relationship:
+    - type: oneToOne
+      table: restaurant
+      mappedAs: restaurant
 
 # Local Variables:
 # mode: conf-colon

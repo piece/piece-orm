@@ -1,112 +1,110 @@
 # $Id$
 
-method:
+- name: findAllWithSkills1
+  relationship:
+    - type: manyToMany
+      table: skill
+      mappedAs: skills
 
-  - name: findAllWithSkills1
-    relationship:
-      - type: manyToMany
-        table: skill
-        mappedAs: skills
+- name: findAllWithSkills2
+  relationship:
+    - type: manyToMany
+      table: skill
+      mappedAs: skills
+      column: id
+      through:
+        table: employee_skill
+        column: employee_id
+        referencedColumn: id
+        inverseColumn: skill_id
 
-  - name: findAllWithSkills2
-    relationship:
-      - type: manyToMany
-        table: skill
-        mappedAs: skills
-        column: id
-        through:
-          table: employee_skill
-          column: employee_id
-          referencedColumn: id
-          inverseColumn: skill_id
+- name: findAllByName
+  relationship:
+    - type: manyToMany
+      table: skill
+      mappedAs: skills
 
-  - name: findAllByName
-    relationship:
-      - type: manyToMany
-        table: skill
-        mappedAs: skills
+- name: findAllWithSkillsByName
+  query: SELECT * FROM employee WHERE name = $name
+  relationship:
+    - type: manyToMany
+      table: skill
+      mappedAs: skills
 
-  - name: findAllWithSkillsByName
-    query: SELECT * FROM employee WHERE name = $name
-    relationship:
-      - type: manyToMany
-        table: skill
-        mappedAs: skills
+- name: findWithSkillsByName
+  query: SELECT * FROM employee WHERE name = $name
+  relationship:
+    - type: manyToMany
+      table: skill
+      mappedAs: skills
 
-  - name: findWithSkillsByName
-    query: SELECT * FROM employee WHERE name = $name
-    relationship:
-      - type: manyToMany
-        table: skill
-        mappedAs: skills
+- name: findWithDepartmentsByName
+  query: SELECT * FROM employee WHERE name = $name
+  relationship:
+    - type: manyToMany
+      table: department
+      mappedAs: departments
 
-  - name: findWithDepartmentsByName
-    query: SELECT * FROM employee WHERE name = $name
-    relationship:
-      - type: manyToMany
-        table: department
-        mappedAs: departments
+- name: findAllWithMultipleRelationships
+  relationship:
+    - type: manyToMany
+      table: skill
+      mappedAs: skills
+    - type: manyToMany
+      table: department
+      mappedAs: departments
 
-  - name: findAllWithMultipleRelationships
-    relationship:
-      - type: manyToMany
-        table: skill
-        mappedAs: skills
-      - type: manyToMany
-        table: department
-        mappedAs: departments
+- name: findAllWithOrderedSkills
+  relationship:
+    - type: manyToMany
+      table: skill
+      mappedAs: skills
+      orderBy: skill.id DESC
 
-  - name: findAllWithOrderedSkills
-    relationship:
-      - type: manyToMany
-        table: skill
-        mappedAs: skills
-        orderBy: skill.id DESC
+- name: insert
+  relationship:
+    - type: manyToMany
+      table: skill
+      mappedAs: skills
+    - type: manyToMany
+      table: department
+      mappedAs: departments
 
-  - name: insert
-    relationship:
-      - type: manyToMany
-        table: skill
-        mappedAs: skills
-      - type: manyToMany
-        table: department
-        mappedAs: departments
+- name: update
+  relationship:
+    - type: manyToMany
+      table: skill
+      mappedAs: skills
+    - type: manyToMany
+      table: department
+      mappedAs: departments
 
-  - name: update
-    relationship:
-      - type: manyToMany
-        table: skill
-        mappedAs: skills
-      - type: manyToMany
-        table: department
-        mappedAs: departments
+- name: findById
+  relationship:
+    - type: manyToMany
+      table: skill
+      mappedAs: skills
+    - type: manyToMany
+      table: department
+      mappedAs: departments
 
-  - name: findById
-    relationship:
-      - type: manyToMany
-        table: skill
-        mappedAs: skills
-      - type: manyToMany
-        table: department
-        mappedAs: departments
+- name: findByName
+  relationship:
+    - type: manyToMany
+      table: skill
+      mappedAs: skills
+    - type: manyToMany
+      table: department
+      mappedAs: departments
 
-  - name: findByName
-    relationship:
-      - type: manyToMany
-        table: skill
-        mappedAs: skills
-      - type: manyToMany
-        table: department
-        mappedAs: departments
-
-  - name: delete
-    relationship:
-      - type: manyToMany
-        table: skill
-        mappedAs: skills
-      - type: manyToMany
-        table: department
-        mappedAs: departments
+- name: delete
+  relationship:
+    - type: manyToMany
+      table: skill
+      mappedAs: skills
+    - type: manyToMany
+      table: department
+      mappedAs: departments
 
 # Local Variables:
 # mode: conf-colon

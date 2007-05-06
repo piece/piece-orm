@@ -1,15 +1,13 @@
 # $Id$
 
-method:
+- name: insert
+  query: INSERT INTO person (first_name, last_name, service_id, rdate) VALUES ($firstName, $lastName, 1, $rdate)
 
-  - name: insert
-    query: INSERT INTO person (first_name, last_name, service_id, rdate) VALUES ($firstName, $lastName, 1, $rdate)
+- name: update
+  query: UPDATE person SET first_name = $firstName, last_name = $lastName, version = version + 1 WHERE id = $id AND service_id = $serviceId
 
-  - name: update
-    query: UPDATE person SET first_name = $firstName, last_name = $lastName, version = version + 1 WHERE id = $id AND service_id = $serviceId
-
-  - name: delete
-    query: DELETE FROM person WHERE id = $id AND service_id = $serviceId
+- name: delete
+  query: DELETE FROM person WHERE id = $id AND service_id = $serviceId
 
 # Local Variables:
 # mode: conf-colon

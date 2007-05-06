@@ -1,53 +1,51 @@
 # $Id$
 
-method:
+- name: findAllWithAlbums1
+  relationship:
+    - type: oneToMany
+      table: album
+      mappedAs: albums
 
-  - name: findAllWithAlbums1
-    relationship:
-      - type: oneToMany
-        table: album
-        mappedAs: albums
+- name: findAllWithAlbums2
+  relationship:
+    - type: oneToMany
+      table: album
+      mappedAs: albums
+      column: artist_id
+      referencedColumn: id
 
-  - name: findAllWithAlbums2
-    relationship:
-      - type: oneToMany
-        table: album
-        mappedAs: albums
-        column: artist_id
-        referencedColumn: id
+- name: findAllWithOrderedAlbums
+  relationship:
+    - type: oneToMany
+      table: album
+      mappedAs: albums
+      orderBy: id DESC
 
-  - name: findAllWithOrderedAlbums
-    relationship:
-      - type: oneToMany
-        table: album
-        mappedAs: albums
-        orderBy: id DESC
+- name: insert
+  query: INSERT INTO artist (name, rdate) VALUES ($name, CURRENT_TIMESTAMP)
+  relationship:
+    - type: oneToMany
+      table: album
+      mappedAs: albums
 
-  - name: insert
-    query: INSERT INTO artist (name, rdate) VALUES ($name, CURRENT_TIMESTAMP)
-    relationship:
-      - type: oneToMany
-        table: album
-        mappedAs: albums
+- name: update
+  relationship:
+    - type: oneToMany
+      table: album
+      mappedAs: albums
 
-  - name: update
-    relationship:
-      - type: oneToMany
-        table: album
-        mappedAs: albums
+- name: findByName
+  relationship:
+    - type: oneToMany
+      table: album
+      mappedAs: albums
+      orderBy: id DESC
 
-  - name: findByName
-    relationship:
-      - type: oneToMany
-        table: album
-        mappedAs: albums
-        orderBy: id DESC
-
-  - name: delete
-    relationship:
-      - type: oneToMany
-        table: album
-        mappedAs: albums
+- name: delete
+  relationship:
+    - type: oneToMany
+      table: album
+      mappedAs: albums
 
 # Local Variables:
 # mode: conf-colon

@@ -1,9 +1,7 @@
 # $Id$
 
-method:
-
-  - name: insert
-    query: INSERT INTO department (name, rdate) VALUES ($name, CURRENT_TIMESTAMP)
+- name: insert
+  query: INSERT INTO department (name, rdate) VALUES ($name, CURRENT_TIMESTAMP)
 
 # Local Variables:
 # mode: conf-colon

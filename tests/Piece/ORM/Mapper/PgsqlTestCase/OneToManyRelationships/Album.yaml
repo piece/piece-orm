@@ -1,20 +1,18 @@
 # $Id$
 
-method:
+- name: findAllWithArtist1
+  relationship:
+    - type: manyToOne
+      table: artist
+      mappedAs: artist
 
-  - name: findAllWithArtist1
-    relationship:
-      - type: manyToOne
-        table: artist
-        mappedAs: artist
-
-  - name: findAllWithArtist2
-    relationship:
-      - type: manyToOne
-        table: artist
-        mappedAs: artist
-        column: id
-        referencedColumn: artist_id
+- name: findAllWithArtist2
+  relationship:
+    - type: manyToOne
+      table: artist
+      mappedAs: artist
+      column: id
+      referencedColumn: artist_id
 
 # Local Variables:
 # mode: conf-colon
