@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!-- $Id$ -->
 <!DOCTYPE package SYSTEM "http://pear.php.net/dtd/package-1.0">
-<package version="1.0" packagerversion="1.5.0">
+<package version="1.0" packagerversion="1.5.1">
  <name>Piece_ORM</name>
  <summary>An object-relational mapping framework for PHP</summary>
  <description>Piece_ORM is an object-relational mapping framework for PHP.
 
 Piece_ORM is a framework against the background of Data Mapper.
 A mapper is automatically generated from a configuration file and the metadata of a table.
-Piece_ORM uses the stdClass as the default domain model for a mapper, and uses a stdClass object as a criteria object for SELECT queries.
+Piece_ORM uses the stdClass as a domain object for a mapper, and uses a stdClass object as criteria.
  </description>
  <maintainers>
   <maintainer>
@@ -17,13 +17,85 @@ Piece_ORM uses the stdClass as the default domain model for a mapper, and uses a
    <email>iteman@users.sourceforge.net</email>
    <role>lead</role>
   </maintainer>
+  <maintainer>
+   <user>matsufuji</user>
+   <name>MATSUFUJI Hideharu</name>
+   <email>matsufuji@users.sourceforge.net</email>
+   <role>developer</role>
+  </maintainer>
   </maintainers>
  <release>
-  <version>0.1.0</version>
-  <date>2007-03-09</date>
+  <version>0.2.0</version>
+  <date>2007-05-09</date>
   <license>BSD License (revised)</license>
-  <state>alpha</state>
-  <notes>This is the first release of Piece_ORM.
+  <state>beta</state>
+  <notes>This is the first beta release of Piece_ORM.
+
+What&apos;s New in Piece_ORM 0.2.0
+
+* Relationships: Many-to-Many, One-to-Many, Many-to-One, and One-to-One relationships are supported on object loading/saving.
+* Simple configuration: Piece_ORM::configure() requires only three arguments.
+* Limit and offset: LIMIT and OFFSET are supported by Piece_ORM_Mapper_XXX::setLimit().
+* Sorting orders: ORDER BY clause is supported by Piece_ORM_Mapper_XXX::addOrder().
+* Object creation: Piece_ORM::createObject() and Piece_ORM_Mapper_XXX::createObject() can be used to create an object from metadata.
+* Object conversion: Piece_ORM::dressObject() can be used to convert an object into a specified object.
+
+See the following release notes for details.
+
+Enhancements
+============ 
+
+Mappers:
+
+- Added a feature so as to throw an exception if detecting problem when building a query. (Ticket #9)
+- Changed the method naming convention to not require &quot;By&quot; for findXXX/findAllXXX methods like &quot;findByXXX&quot;, &quot;findAllByXXX&quot;.
+- Added support for relationships.
+- Added support for LIMIT and OFFSET with setLimit(). (Ticket #14)
+- Added support ORDER BY clause with addOrder(). (Ticket #21)
+- Added support for Identity Map. (Ticket #23)
+- Added createObject() to create an object from metadata.
+- Moved _executeQuery() to public.
+- Added findWithQuery() to find an object with a query.
+- Added method name validation.
+- Changed delete() so that its argument can only be specified an object.
+- Added createObject() to create an object from metadata.
+- Changed behavior for creating/getting mapper objects so that the factory sets the current database handle to a mapper object every time it is called.
+- Removed the method element.
+
+Entry Point:
+
+- Removed a Piece_ORM_Config object from the arguments of configure().
+- Added getConfiguration() to get the Piece_ORM_Config object after calling configure().
+- Updated getMapper()/getConfiguration() so as to return null if calling their methods before calling configure().
+- Removed two the cache directories for mappers/metadata from the arguments of configure(). Now, the caches of mappers/metadata are stored in the same directory where a Piece_ORM_Config object is cached in.
+- Updated configure() so as to set the current database explicitly.
+- Added setDatabase() for setting a database as the current database.
+- Added createObject() to create an object from metadata.
+- Added dressObject() to convert an object into a specified object.
+
+Metadata:
+
+- Added hasField() for checking whether a table has the given field.
+
+Kernel:
+
+- Removed the default value from getDSN()/getOptions(). (Piece_ORM_Config)
+- Changed the way of configuration. Now setDSN(), setOptions(), and setDirectorySuffix() methods are used for configuration instead of addConfiguration(). (Piece_ORM_Config)
+- Removed addConfiguration(). (Piece_ORM_Config)
+- Added getDefaultDatabase() for getting the default database. (Piece_ORM_Config)
+- Adjusted to the new way of configuration. (Piece_ORM_Config_Factory)
+- Added setMapperConfigDirectory() for setting the configuration directory for the mapper configuration. (Piece_ORM_Context)
+- Updated setDatabase() so as to set the configuration directory with a directory suffix for the mapper configuration. (Piece_ORM_Context)
+- Added an error code PIECE_ORM_ERROR_INVALID_CONFIGURATION. (Piece_ORM_Error)
+- Added support for PostgreSQL &quot;timestamp with time zone&quot;.
+
+Defect Fixes
+============ 
+
+Mappers:
+
+- Fixed a problem that a built-in query is overwritten if only the relationship element is given for a built-in method.
+- Fixed a problem that a literal as a criterion cannot use with user-defined method.
   </notes>
   <deps>
    <dep type="php" rel="ge" version="4.3.0" optional="no"/>
@@ -37,17 +109,80 @@ Piece_ORM uses the stdClass as the default domain model for a mapper, and uses a
     <dir name="data">
      <dir name="schemas">
       <dir name="mysql">
+       <file role="data" name="album.ddl">
+        <replace from="@package_version@" to="version" type="package-info"/>
+       </file>
+       <file role="data" name="artist.ddl">
+        <replace from="@package_version@" to="version" type="package-info"/>
+       </file>
+       <file role="data" name="department.ddl">
+        <replace from="@package_version@" to="version" type="package-info"/>
+       </file>
+       <file role="data" name="employee.ddl">
+        <replace from="@package_version@" to="version" type="package-info"/>
+       </file>
+       <file role="data" name="employee_department.ddl">
+        <replace from="@package_version@" to="version" type="package-info"/>
+       </file>
+       <file role="data" name="employee_skill.ddl">
+        <replace from="@package_version@" to="version" type="package-info"/>
+       </file>
        <file role="data" name="person.ddl">
+        <replace from="@package_version@" to="version" type="package-info"/>
+       </file>
+       <file role="data" name="place.ddl">
+        <replace from="@package_version@" to="version" type="package-info"/>
+       </file>
+       <file role="data" name="restaurant.ddl">
+        <replace from="@package_version@" to="version" type="package-info"/>
+       </file>
+       <file role="data" name="service.ddl">
+        <replace from="@package_version@" to="version" type="package-info"/>
+       </file>
+       <file role="data" name="skill.ddl">
         <replace from="@package_version@" to="version" type="package-info"/>
        </file>
       </dir> <!-- /data/schemas/mysql -->
       <dir name="pgsql">
+       <file role="data" name="album.ddl">
+        <replace from="@package_version@" to="version" type="package-info"/>
+       </file>
+       <file role="data" name="artist.ddl">
+        <replace from="@package_version@" to="version" type="package-info"/>
+       </file>
+       <file role="data" name="department.ddl">
+        <replace from="@package_version@" to="version" type="package-info"/>
+       </file>
+       <file role="data" name="employee.ddl">
+        <replace from="@package_version@" to="version" type="package-info"/>
+       </file>
+       <file role="data" name="employee_department.ddl">
+        <replace from="@package_version@" to="version" type="package-info"/>
+       </file>
+       <file role="data" name="employee_skill.ddl">
+        <replace from="@package_version@" to="version" type="package-info"/>
+       </file>
        <file role="data" name="person.ddl">
+        <replace from="@package_version@" to="version" type="package-info"/>
+       </file>
+       <file role="data" name="place.ddl">
+        <replace from="@package_version@" to="version" type="package-info"/>
+       </file>
+       <file role="data" name="restaurant.ddl">
+        <replace from="@package_version@" to="version" type="package-info"/>
+       </file>
+       <file role="data" name="service.ddl">
+        <replace from="@package_version@" to="version" type="package-info"/>
+       </file>
+       <file role="data" name="skill.ddl">
         <replace from="@package_version@" to="version" type="package-info"/>
        </file>
       </dir> <!-- /data/schemas/pgsql -->
      </dir> <!-- /data/schemas -->
      <file role="data" name="piece-orm-mapper.yaml">
+      <replace from="@package_version@" to="version" type="package-info"/>
+     </file>
+     <file role="data" name="piece-orm.yaml">
       <replace from="@package_version@" to="version" type="package-info"/>
      </file>
     </dir> <!-- /data -->
@@ -59,6 +194,57 @@ Piece_ORM uses the stdClass as the default domain model for a mapper, and uses a
        </file>
       </dir> <!-- /Piece/ORM/Config -->
       <dir name="Mapper">
+       <dir name="AssociatedObjectLoader">
+        <file role="php" name="Common.php">
+         <replace from="@package_version@" to="version" type="package-info"/>
+        </file>
+        <file role="php" name="ManyToMany.php">
+         <replace from="@package_version@" to="version" type="package-info"/>
+        </file>
+        <file role="php" name="ManyToOne.php">
+         <replace from="@package_version@" to="version" type="package-info"/>
+        </file>
+        <file role="php" name="OneToMany.php">
+         <replace from="@package_version@" to="version" type="package-info"/>
+        </file>
+        <file role="php" name="OneToOne.php">
+         <replace from="@package_version@" to="version" type="package-info"/>
+        </file>
+       </dir> <!-- /Piece/ORM/Mapper/AssociatedObjectLoader -->
+       <dir name="AssociatedObjectPersister">
+        <file role="php" name="Common.php">
+         <replace from="@package_version@" to="version" type="package-info"/>
+        </file>
+        <file role="php" name="ManyToMany.php">
+         <replace from="@package_version@" to="version" type="package-info"/>
+        </file>
+        <file role="php" name="ManyToOne.php">
+         <replace from="@package_version@" to="version" type="package-info"/>
+        </file>
+        <file role="php" name="OneToMany.php">
+         <replace from="@package_version@" to="version" type="package-info"/>
+        </file>
+        <file role="php" name="OneToOne.php">
+         <replace from="@package_version@" to="version" type="package-info"/>
+        </file>
+       </dir> <!-- /Piece/ORM/Mapper/AssociatedObjectPersister -->
+       <dir name="RelationshipNormalizer">
+        <file role="php" name="Common.php">
+         <replace from="@package_version@" to="version" type="package-info"/>
+        </file>
+        <file role="php" name="ManyToMany.php">
+         <replace from="@package_version@" to="version" type="package-info"/>
+        </file>
+        <file role="php" name="ManyToOne.php">
+         <replace from="@package_version@" to="version" type="package-info"/>
+        </file>
+        <file role="php" name="OneToMany.php">
+         <replace from="@package_version@" to="version" type="package-info"/>
+        </file>
+        <file role="php" name="OneToOne.php">
+         <replace from="@package_version@" to="version" type="package-info"/>
+        </file>
+       </dir> <!-- /Piece/ORM/Mapper/RelationshipNormalizer -->
        <file role="php" name="Common.php">
         <replace from="@package_version@" to="version" type="package-info"/>
        </file>
@@ -66,6 +252,15 @@ Piece_ORM uses the stdClass as the default domain model for a mapper, and uses a
         <replace from="@package_version@" to="version" type="package-info"/>
        </file>
        <file role="php" name="Generator.php">
+        <replace from="@package_version@" to="version" type="package-info"/>
+       </file>
+       <file role="php" name="ObjectLoader.php">
+        <replace from="@package_version@" to="version" type="package-info"/>
+       </file>
+       <file role="php" name="ObjectPersister.php">
+        <replace from="@package_version@" to="version" type="package-info"/>
+       </file>
+       <file role="php" name="RelationshipType.php">
         <replace from="@package_version@" to="version" type="package-info"/>
        </file>
       </dir> <!-- /Piece/ORM/Mapper -->
@@ -84,6 +279,9 @@ Piece_ORM uses the stdClass as the default domain model for a mapper, and uses a
        <replace from="@package_version@" to="version" type="package-info"/>
       </file>
       <file role="php" name="Inflector.php">
+       <replace from="@package_version@" to="version" type="package-info"/>
+      </file>
+      <file role="php" name="MDB2Helper.php">
        <replace from="@package_version@" to="version" type="package-info"/>
       </file>
       <file role="php" name="Metadata.php">
@@ -117,6 +315,39 @@ Piece_ORM uses the stdClass as the default domain model for a mapper, and uses a
          </file>
         </dir> <!-- /tests/Piece/ORM/Mapper/FactoryTestCase -->
         <dir name="MysqlTestCase">
+         <dir name="ManyToManyRelationships">
+          <file role="test" name="Department.yaml">
+           <replace from="@package_version@" to="version" type="package-info"/>
+          </file>
+          <file role="test" name="Employee.yaml">
+           <replace from="@package_version@" to="version" type="package-info"/>
+          </file>
+          <file role="test" name="EmployeeDepartment.yaml">
+           <replace from="@package_version@" to="version" type="package-info"/>
+          </file>
+          <file role="test" name="EmployeeSkill.yaml">
+           <replace from="@package_version@" to="version" type="package-info"/>
+          </file>
+          <file role="test" name="Skill.yaml">
+           <replace from="@package_version@" to="version" type="package-info"/>
+          </file>
+         </dir> <!-- /tests/Piece/ORM/Mapper/MysqlTestCase/ManyToManyRelationships -->
+         <dir name="OneToManyRelationships">
+          <file role="test" name="Album.yaml">
+           <replace from="@package_version@" to="version" type="package-info"/>
+          </file>
+          <file role="test" name="Artist.yaml">
+           <replace from="@package_version@" to="version" type="package-info"/>
+          </file>
+         </dir> <!-- /tests/Piece/ORM/Mapper/MysqlTestCase/OneToManyRelationships -->
+         <dir name="OneToOneRelationships">
+          <file role="test" name="Place.yaml">
+           <replace from="@package_version@" to="version" type="package-info"/>
+          </file>
+          <file role="test" name="Restaurant.yaml">
+           <replace from="@package_version@" to="version" type="package-info"/>
+          </file>
+         </dir> <!-- /tests/Piece/ORM/Mapper/MysqlTestCase/OneToOneRelationships -->
          <dir name="Overwrite">
           <file role="test" name="Person.yaml">
            <replace from="@package_version@" to="version" type="package-info"/>
@@ -125,14 +356,53 @@ Piece_ORM uses the stdClass as the default domain model for a mapper, and uses a
          <file role="test" name="Person.yaml">
           <replace from="@package_version@" to="version" type="package-info"/>
          </file>
+         <file role="test" name="Service.yaml">
+          <replace from="@package_version@" to="version" type="package-info"/>
+         </file>
         </dir> <!-- /tests/Piece/ORM/Mapper/MysqlTestCase -->
         <dir name="PgsqlTestCase">
+         <dir name="ManyToManyRelationships">
+          <file role="test" name="Department.yaml">
+           <replace from="@package_version@" to="version" type="package-info"/>
+          </file>
+          <file role="test" name="Employee.yaml">
+           <replace from="@package_version@" to="version" type="package-info"/>
+          </file>
+          <file role="test" name="EmployeeDepartment.yaml">
+           <replace from="@package_version@" to="version" type="package-info"/>
+          </file>
+          <file role="test" name="EmployeeSkill.yaml">
+           <replace from="@package_version@" to="version" type="package-info"/>
+          </file>
+          <file role="test" name="Skill.yaml">
+           <replace from="@package_version@" to="version" type="package-info"/>
+          </file>
+         </dir> <!-- /tests/Piece/ORM/Mapper/PgsqlTestCase/ManyToManyRelationships -->
+         <dir name="OneToManyRelationships">
+          <file role="test" name="Album.yaml">
+           <replace from="@package_version@" to="version" type="package-info"/>
+          </file>
+          <file role="test" name="Artist.yaml">
+           <replace from="@package_version@" to="version" type="package-info"/>
+          </file>
+         </dir> <!-- /tests/Piece/ORM/Mapper/PgsqlTestCase/OneToManyRelationships -->
+         <dir name="OneToOneRelationships">
+          <file role="test" name="Place.yaml">
+           <replace from="@package_version@" to="version" type="package-info"/>
+          </file>
+          <file role="test" name="Restaurant.yaml">
+           <replace from="@package_version@" to="version" type="package-info"/>
+          </file>
+         </dir> <!-- /tests/Piece/ORM/Mapper/PgsqlTestCase/OneToOneRelationships -->
          <dir name="Overwrite">
           <file role="test" name="Person.yaml">
            <replace from="@package_version@" to="version" type="package-info"/>
           </file>
          </dir> <!-- /tests/Piece/ORM/Mapper/PgsqlTestCase/Overwrite -->
          <file role="test" name="Person.yaml">
+          <replace from="@package_version@" to="version" type="package-info"/>
+         </file>
+         <file role="test" name="Service.yaml">
           <replace from="@package_version@" to="version" type="package-info"/>
          </file>
         </dir> <!-- /tests/Piece/ORM/Mapper/PgsqlTestCase -->
@@ -171,6 +441,11 @@ Piece_ORM uses the stdClass as the default domain model for a mapper, and uses a
        </file>
       </dir> <!-- /tests/Piece/ORM -->
       <dir name="ORMTestCase">
+       <dir name="SetDatabase">
+        <file role="test" name="piece-orm-config.yaml">
+         <replace from="@package_version@" to="version" type="package-info"/>
+        </file>
+       </dir> <!-- /tests/Piece/ORMTestCase/SetDatabase -->
        <file role="test" name="Person.yaml">
         <replace from="@package_version@" to="version" type="package-info"/>
        </file>
@@ -193,6 +468,80 @@ Piece_ORM uses the stdClass as the default domain model for a mapper, and uses a
   </filelist>
  </release>
  <changelog>
+   <release>
+    <version>0.2.0</version>
+    <date>2007-05-09</date>
+    <license>BSD License (revised)</license>
+    <state>beta</state>
+    <notes>This is the first beta release of Piece_ORM.
+
+What&apos;s New in Piece_ORM 0.2.0
+
+* Relationships: Many-to-Many, One-to-Many, Many-to-One, and One-to-One relationships are supported on object loading/saving.
+* Simple configuration: Piece_ORM::configure() requires only three arguments.
+* Limit and offset: LIMIT and OFFSET are supported by Piece_ORM_Mapper_XXX::setLimit().
+* Sorting orders: ORDER BY clause is supported by Piece_ORM_Mapper_XXX::addOrder().
+* Object creation: Piece_ORM::createObject() and Piece_ORM_Mapper_XXX::createObject() can be used to create an object from metadata.
+* Object conversion: Piece_ORM::dressObject() can be used to convert an object into a specified object.
+
+See the following release notes for details.
+
+Enhancements
+============ 
+
+Mappers:
+
+- Added a feature so as to throw an exception if detecting problem when building a query. (Ticket #9)
+- Changed the method naming convention to not require &quot;By&quot; for findXXX/findAllXXX methods like &quot;findByXXX&quot;, &quot;findAllByXXX&quot;.
+- Added support for relationships.
+- Added support for LIMIT and OFFSET with setLimit(). (Ticket #14)
+- Added support ORDER BY clause with addOrder(). (Ticket #21)
+- Added support for Identity Map. (Ticket #23)
+- Added createObject() to create an object from metadata.
+- Moved _executeQuery() to public.
+- Added findWithQuery() to find an object with a query.
+- Added method name validation.
+- Changed delete() so that its argument can only be specified an object.
+- Added createObject() to create an object from metadata.
+- Changed behavior for creating/getting mapper objects so that the factory sets the current database handle to a mapper object every time it is called.
+- Removed the method element.
+
+Entry Point:
+
+- Removed a Piece_ORM_Config object from the arguments of configure().
+- Added getConfiguration() to get the Piece_ORM_Config object after calling configure().
+- Updated getMapper()/getConfiguration() so as to return null if calling their methods before calling configure().
+- Removed two the cache directories for mappers/metadata from the arguments of configure(). Now, the caches of mappers/metadata are stored in the same directory where a Piece_ORM_Config object is cached in.
+- Updated configure() so as to set the current database explicitly.
+- Added setDatabase() for setting a database as the current database.
+- Added createObject() to create an object from metadata.
+- Added dressObject() to convert an object into a specified object.
+
+Metadata:
+
+- Added hasField() for checking whether a table has the given field.
+
+Kernel:
+
+- Removed the default value from getDSN()/getOptions(). (Piece_ORM_Config)
+- Changed the way of configuration. Now setDSN(), setOptions(), and setDirectorySuffix() methods are used for configuration instead of addConfiguration(). (Piece_ORM_Config)
+- Removed addConfiguration(). (Piece_ORM_Config)
+- Added getDefaultDatabase() for getting the default database. (Piece_ORM_Config)
+- Adjusted to the new way of configuration. (Piece_ORM_Config_Factory)
+- Added setMapperConfigDirectory() for setting the configuration directory for the mapper configuration. (Piece_ORM_Context)
+- Updated setDatabase() so as to set the configuration directory with a directory suffix for the mapper configuration. (Piece_ORM_Context)
+- Added an error code PIECE_ORM_ERROR_INVALID_CONFIGURATION. (Piece_ORM_Error)
+- Added support for PostgreSQL &quot;timestamp with time zone&quot;.
+
+Defect Fixes
+============ 
+
+Mappers:
+
+- Fixed a problem that a built-in query is overwritten if only the relationship element is given for a built-in method.
+- Fixed a problem that a literal as a criterion cannot use with user-defined method.
+    </notes>
+   </release>
    <release>
     <version>0.1.0</version>
     <date>2007-03-09</date>
