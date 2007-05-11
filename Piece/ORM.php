@@ -139,11 +139,9 @@ class Piece_ORM
     function &getMapper($mapperName)
     {
         if (!$GLOBALS['PIECE_ORM_Configured']) {
-            Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
             Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_OPERATION,
                                   __FUNCTION__ . ' method must be called after calling configure().'
                                   );
-            Piece_ORM_Error::popCallback();
             $return = null;
             return $return;
         }
@@ -163,11 +161,9 @@ class Piece_ORM
     function &getConfiguration()
     {
         if (!$GLOBALS['PIECE_ORM_Configured']) {
-            Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
             Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_OPERATION,
                                   __FUNCTION__ . ' method must be called after calling configure().'
                                   );
-            Piece_ORM_Error::popCallback();
             $return = null;
             return $return;
         }
@@ -188,11 +184,9 @@ class Piece_ORM
     function setDatabase($database)
     {
         if (!$GLOBALS['PIECE_ORM_Configured']) {
-            Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
             Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_OPERATION,
                                   __FUNCTION__ . ' method must be called after calling configure().'
                                   );
-            Piece_ORM_Error::popCallback();
             return;
         }
 
@@ -219,11 +213,9 @@ class Piece_ORM
     function &createObject($mapperName)
     {
         if (!$GLOBALS['PIECE_ORM_Configured']) {
-            Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
             Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_OPERATION,
                                   __FUNCTION__ . ' method must be called after calling configure().'
                                   );
-            Piece_ORM_Error::popCallback();
             $return = null;
             return $return;
         }

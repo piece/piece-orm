@@ -175,6 +175,7 @@ class Piece_ORMTestCase extends PHPUnit_TestCase
 
     function testGetMapperBeforeCallingConfigure()
     {
+        Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
         $mapper = &Piece_ORM::getMapper('Person');
 
         $this->assertNull($mapper);
@@ -183,10 +184,13 @@ class Piece_ORMTestCase extends PHPUnit_TestCase
         $error = Piece_ORM_Error::pop();
 
         $this->assertEquals(PIECE_ORM_ERROR_INVALID_OPERATION, $error['code']);
+
+        Piece_ORM_Error::popCallback();
     }
 
     function testGetConfigurationBeforeCallingConfigure()
     {
+        Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
         $config = &Piece_ORM::getConfiguration();
 
         $this->assertNull($config);
@@ -195,6 +199,8 @@ class Piece_ORMTestCase extends PHPUnit_TestCase
         $error = Piece_ORM_Error::pop();
 
         $this->assertEquals(PIECE_ORM_ERROR_INVALID_OPERATION, $error['code']);
+
+        Piece_ORM_Error::popCallback();
     }
 
     function testSetDatabase()
@@ -263,6 +269,7 @@ class Piece_ORMTestCase extends PHPUnit_TestCase
 
     function testSetDatabaseBeforeCallingConfigure()
     {
+        Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
         Piece_ORM::setDatabase('database2');
 
         $this->assertTrue(Piece_ORM_Error::hasErrors('exception'));
@@ -270,10 +277,13 @@ class Piece_ORMTestCase extends PHPUnit_TestCase
         $error = Piece_ORM_Error::pop();
 
         $this->assertEquals(PIECE_ORM_ERROR_INVALID_OPERATION, $error['code']);
+
+        Piece_ORM_Error::popCallback();
     }
 
     function testCreateObjectBeforeCallingConfigure()
     {
+        Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
         $person = &Piece_ORM::createObject('Person');
 
         $this->assertNull($person);
@@ -282,6 +292,8 @@ class Piece_ORMTestCase extends PHPUnit_TestCase
         $error = Piece_ORM_Error::pop();
 
         $this->assertEquals(PIECE_ORM_ERROR_INVALID_OPERATION, $error['code']);
+
+        Piece_ORM_Error::popCallback();
     }
 
     /**#@-*/
