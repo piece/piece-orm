@@ -146,8 +146,7 @@ class Piece_ORM
             return $return;
         }
 
-        $mapper = &Piece_ORM_Mapper_Factory::factory($mapperName);
-        return $mapper;
+        return Piece_ORM_Mapper_Factory::factory($mapperName);
     }
 
     // }}}
@@ -169,8 +168,7 @@ class Piece_ORM
         }
 
         $context = &Piece_ORM_Context::singleton();
-        $config = &$context->getConfiguration();
-        return $config;
+        return $context->getConfiguration();
     }
 
     // }}}
@@ -226,8 +224,7 @@ class Piece_ORM
             return $return;
         }
 
-        $object = &$mapper->createObject();
-        return $object;
+        return $mapper->createObject();
     }
 
     // }}}

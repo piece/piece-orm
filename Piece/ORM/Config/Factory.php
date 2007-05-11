@@ -166,8 +166,7 @@ class Piece_ORM_Config_Factory
             return $config;
         }
 
-        $config = &Piece_ORM_Config_Factory::_getConfiguration($configFile, $cacheDirectory);
-        return $config;
+        return Piece_ORM_Config_Factory::_getConfiguration($configFile, $cacheDirectory);
     }
 
     /**#@-*/

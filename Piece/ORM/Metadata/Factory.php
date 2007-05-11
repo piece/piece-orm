@@ -276,8 +276,7 @@ class Piece_ORM_Metadata_Factory
                                   );
             Piece_ORM_Error::popCallback();
 
-            $metadata = &Piece_ORM_Metadata_Factory::_createMetadataFromDatabase($tableName);
-            return $metadata;
+            return Piece_ORM_Metadata_Factory::_createMetadataFromDatabase($tableName);
         }
 
         if (!is_readable($GLOBALS['PIECE_ORM_Metadata_CacheDirectory']) || !is_writable($GLOBALS['PIECE_ORM_Metadata_CacheDirectory'])) {
@@ -288,12 +287,10 @@ class Piece_ORM_Metadata_Factory
                                   );
             Piece_ORM_Error::popCallback();
 
-            $metadata = &Piece_ORM_Metadata_Factory::_createMetadataFromDatabase($tableName);
-            return $metadata;
+            return Piece_ORM_Metadata_Factory::_createMetadataFromDatabase($tableName);
         }
 
-        $metadata = &Piece_ORM_Metadata_Factory::_getMetadata($tableName, $tableID);
-        return $metadata;
+        return Piece_ORM_Metadata_Factory::_getMetadata($tableName, $tableID);
     }
 
     /**#@-*/

@@ -289,8 +289,7 @@ class Piece_ORM_Mapper_Common
      */
     function &getLoadedObject($primaryKeyValue)
     {
-        $object = &$this->_loadedObjects[$primaryKeyValue];
-        return $object;
+        return $this->_loadedObjects[$primaryKeyValue];
     }
 
     // }}}
@@ -493,8 +492,7 @@ class Piece_ORM_Mapper_Common
             $this->_orders = array();
         }
 
-        $result = &$this->executeQuery($query, $isManip);
-        return $result;
+        return $this->executeQuery($query, $isManip);
     }
 
     // }}}
