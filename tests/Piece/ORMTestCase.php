@@ -178,7 +178,7 @@ class Piece_ORMTestCase extends PHPUnit_TestCase
         $mapper = &Piece_ORM::getMapper('Person');
 
         $this->assertNull($mapper);
-        $this->assertTrue(Piece_ORM_Error::hasErrors('warning'));
+        $this->assertTrue(Piece_ORM_Error::hasErrors('exception'));
 
         $error = Piece_ORM_Error::pop();
 
@@ -190,7 +190,7 @@ class Piece_ORMTestCase extends PHPUnit_TestCase
         $config = &Piece_ORM::getConfiguration();
 
         $this->assertNull($config);
-        $this->assertTrue(Piece_ORM_Error::hasErrors('warning'));
+        $this->assertTrue(Piece_ORM_Error::hasErrors('exception'));
 
         $error = Piece_ORM_Error::pop();
 
@@ -259,6 +259,29 @@ class Piece_ORMTestCase extends PHPUnit_TestCase
 
         $this->assertTrue(array_key_exists('foo', $realPerson->object));
         $this->assertEquals('bar', $realPerson->object->foo);
+    }
+
+    function testSetDatabaseBeforeCallingConfigure()
+    {
+        Piece_ORM::setDatabase('database2');
+
+        $this->assertTrue(Piece_ORM_Error::hasErrors('exception'));
+
+        $error = Piece_ORM_Error::pop();
+
+        $this->assertEquals(PIECE_ORM_ERROR_INVALID_OPERATION, $error['code']);
+    }
+
+    function testCreateObjectBeforeCallingConfigure()
+    {
+        $person = &Piece_ORM::createObject('Person');
+
+        $this->assertNull($person);
+        $this->assertTrue(Piece_ORM_Error::hasErrors('exception'));
+
+        $error = Piece_ORM_Error::pop();
+
+        $this->assertEquals(PIECE_ORM_ERROR_INVALID_OPERATION, $error['code']);
     }
 
     /**#@-*/

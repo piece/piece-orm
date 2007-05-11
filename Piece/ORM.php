@@ -141,8 +141,7 @@ class Piece_ORM
         if (!$GLOBALS['PIECE_ORM_Configured']) {
             Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
             Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_OPERATION,
-                                  __FUNCTION__ . ' method must be called after calling configure().',
-                                  'warning'
+                                  __FUNCTION__ . ' method must be called after calling configure().'
                                   );
             Piece_ORM_Error::popCallback();
             $return = null;
@@ -166,8 +165,7 @@ class Piece_ORM
         if (!$GLOBALS['PIECE_ORM_Configured']) {
             Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
             Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_OPERATION,
-                                  __FUNCTION__ . ' method must be called after calling configure().',
-                                  'warning'
+                                  __FUNCTION__ . ' method must be called after calling configure().'
                                   );
             Piece_ORM_Error::popCallback();
             $return = null;
@@ -189,6 +187,15 @@ class Piece_ORM
      */
     function setDatabase($database)
     {
+        if (!$GLOBALS['PIECE_ORM_Configured']) {
+            Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
+            Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_OPERATION,
+                                  __FUNCTION__ . ' method must be called after calling configure().'
+                                  );
+            Piece_ORM_Error::popCallback();
+            return;
+        }
+
         $context = &Piece_ORM_Context::singleton();
         $context->setDatabase($database);
     }
@@ -214,8 +221,7 @@ class Piece_ORM
         if (!$GLOBALS['PIECE_ORM_Configured']) {
             Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
             Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_OPERATION,
-                                  __FUNCTION__ . ' method must be called after calling configure().',
-                                  'warning'
+                                  __FUNCTION__ . ' method must be called after calling configure().'
                                   );
             Piece_ORM_Error::popCallback();
             $return = null;
@@ -224,7 +230,8 @@ class Piece_ORM
 
         $mapper = &Piece_ORM_Mapper_Factory::factory($mapperName);
         if (Piece_ORM_Error::hasErrors('exception')) {
-            return;
+            $return = null;
+            return $return;
         }
 
         $object = &$mapper->createObject();
