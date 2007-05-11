@@ -210,9 +210,12 @@ class Piece_ORM_Mapper_FactoryTestCase extends PHPUnit_TestCase
     function testInstanceCache()
     {
         $mapper1 = &Piece_ORM_Mapper_Factory::factory('Person');
-        $mapper1->foo = 'bar';
         $mapper2 = &Piece_ORM_Mapper_Factory::factory('Person');
 
+        $mapper1->foo = 'bar';
+
+        $this->assertTrue(array_key_exists('foo', $mapper1));
+        $this->assertEquals('bar', $mapper1->foo);
         $this->assertTrue(array_key_exists('foo', $mapper2));
         $this->assertEquals('bar', $mapper2->foo);
     }
