@@ -609,7 +609,7 @@ class Piece_ORM_Mapper_Common
                     $criteria->$key = $this->quote($value, $field);
                 } else {
                     if (!is_null($value)) {
-                        $criteria->$key = $this->_dbh->quote($value, 'text');
+                        $criteria->$key = $this->_dbh->quote($value);
                     }
                 }
             } else {
