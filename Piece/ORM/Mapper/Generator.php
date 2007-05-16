@@ -212,8 +212,7 @@ class Piece_ORM_Mapper_Generator
         $this->_methodDefinitions[$methodName] = "
     function &$methodName(\$criteria)
     {
-        \$object = &\$this->_find('$methodName', \$criteria);
-        return \$object;
+        return \$this->_find('$methodName', \$criteria);
     }";
     }
 
@@ -264,8 +263,7 @@ class Piece_ORM_Mapper_Generator
         $this->_methodDefinitions[$methodName] = "
     function $methodName(\$criteria = null)
     {
-        \$objects = \$this->_findAll('$methodName', \$criteria);
-        return \$objects;
+        return \$this->_findAll('$methodName', \$criteria);
     }";
     }
 
@@ -468,7 +466,7 @@ class Piece_ORM_Mapper_Generator
         if (is_null($query)) {
             return "    var \$__query__{$propertyName};";
         } else {
-            return "    var \$__query__{$propertyName} = '$query';";
+            return "    var \$__query__{$propertyName} = '" . addslashes($query) . "';";
         }
     }
 
