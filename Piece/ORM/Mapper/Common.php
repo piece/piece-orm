@@ -572,7 +572,7 @@ class Piece_ORM_Mapper_Common
     function getCount()
     {
         if (!is_null($this->_lastQueryForGetCount)) {
-            $result = &$this->executeQuery(preg_replace('/^\s*SELECT\s+.+\s+FROM\s+(.+)\s*$/is',
+            $result = &$this->executeQuery(preg_replace('/^\s*SELECT\s+.+?\s+FROM\s+(.+)\s*$/is',
                                                         'SELECT COUNT(*) FROM $1',
                                                         $this->_lastQueryForGetCount)
                                            );
