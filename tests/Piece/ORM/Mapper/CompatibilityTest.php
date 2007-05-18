@@ -1015,6 +1015,26 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         $this->assertNull($restaurantMapper->findByPlaceId($baz->id));
     }
 
+    function testGetCount()
+    {
+        $this->_configure('ManyToManyRelationships');
+        $this->_setupManyToManyRelationships();
+
+        $mapper = &Piece_ORM_Mapper_Factory::factory('Employee');
+
+        $this->assertNull($mapper->getCount());
+
+        $mapper->findAllWithMultipleRelationships();
+
+        $this->assertEquals(4, $mapper->getCount());
+
+        $mapper->setLimit(2);
+        $people = $mapper->findAllWithMultipleRelationships();
+
+        $this->assertEquals(2, count($people));
+        $this->assertEquals(4, $mapper->getCount());
+    }
+
     /**#@-*/
 
     /**#@+

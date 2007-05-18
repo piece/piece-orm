@@ -80,6 +80,7 @@ class Piece_ORM_Mapper_Common
     var $_preloadCallback;
     var $_preloadCallbackArgs;
     var $_useIdentityMap = true;
+    var $_lastQueryForGetCount;
 
     /**#@-*/
 
@@ -424,6 +425,7 @@ class Piece_ORM_Mapper_Common
         PEAR::staticPopErrorHandling();
 
         $this->_lastQuery = $this->_dbh->last_query;
+        $this->_lastQueryForGetCount = null;
 
         if (MDB2::isError($result)) {
             Piece_ORM_Error::pushPEARError($result,
@@ -492,7 +494,16 @@ class Piece_ORM_Mapper_Common
             $this->_orders = array();
         }
 
-        return $this->executeQuery($query, $isManip);
+        $result = &$this->executeQuery($query, $isManip);
+        if (preg_match('/^findAll.+$/', $methodName)) {
+            $this->_lastQueryForGetCount = $query;
+        }
+
+        if (Piece_ORM_Error::hasErrors('exception')) {
+            return;
+        }
+
+        return $result;
     }
 
     // }}}
@@ -546,6 +557,42 @@ class Piece_ORM_Mapper_Common
     function setConnection(&$dbh)
     {
         $this->_dbh = &$dbh;
+    }
+
+    // }}}
+    // {{{ getCount()
+
+    /**
+     * Gets the number of rows a query would have returned without a LIMIT
+     * clause in the latest findAll method execution.
+     *
+     * @return integer
+     * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
+     */
+    function getCount()
+    {
+        if (!is_null($this->_lastQueryForGetCount)) {
+            $result = &$this->executeQuery(preg_replace('/^\s*SELECT\s+.+\s+FROM\s+(.+)\s*$/is',
+                                                        'SELECT COUNT(*) FROM $1',
+                                                        $this->_lastQueryForGetCount)
+                                           );
+            if (Piece_ORM_Error::hasErrors('exception')) {
+                return;
+            }
+
+            PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
+            $count = $result->fetchOne();
+            PEAR::staticPopErrorHandling();
+            if (MDB2::isError($count)) {
+                Piece_ORM_Error::pushPEARError($count,
+                                               PIECE_ORM_ERROR_INVOCATION_FAILED,
+                                               'Failed to invoke MDB2_Driver_' . $this->getDriverName() . '::fetchOne() for any reasons.'
+                                               );
+                return;
+            }
+
+            return $count;
+        }
     }
 
     /**#@-*/
@@ -714,7 +761,7 @@ class Piece_ORM_Mapper_Common
      */
     function &_createCriteria($methodName, $criterion)
     {
-        if (preg_match('/By(.+)$/i', $methodName, $matches)) {
+        if (preg_match('/By(.+)$/', $methodName, $matches)) {
             $criteria = &new stdClass();
             $criteria->{ Piece_ORM_Inflector::lowercaseFirstLetter($matches[1]) } = $criterion;
             return $criteria;
