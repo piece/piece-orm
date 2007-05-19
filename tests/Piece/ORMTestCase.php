@@ -267,6 +267,9 @@ class Piece_ORMTestCase extends PHPUnit_TestCase
         $this->assertEquals('bar', $realPerson->object->foo);
     }
 
+    /**
+     * @since Method available since Release 0.3.0
+     */
     function testSetDatabaseBeforeCallingConfigure()
     {
         Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
@@ -281,6 +284,9 @@ class Piece_ORMTestCase extends PHPUnit_TestCase
         Piece_ORM_Error::popCallback();
     }
 
+    /**
+     * @since Method available since Release 0.3.0
+     */
     function testCreateObjectBeforeCallingConfigure()
     {
         Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
