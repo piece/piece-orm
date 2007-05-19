@@ -134,7 +134,12 @@ class Piece_ORM_Mapper_AssociatedObjectLoader_Common
      *
      * @param mixed   &$mapper
      * @param integer $relationshipIndex
-     * @throws PIECE_ORM_ERROR_UNEXPECTED_VALUE
+     * @throws PIECE_ORM_ERROR_INVALID_OPERATION
+     * @throws PIECE_ORM_ERROR_NOT_FOUND
+     * @throws PIECE_ORM_ERROR_NOT_READABLE
+     * @throws PIECE_ORM_ERROR_CANNOT_READ
+     * @throws PIECE_ORM_ERROR_CANNOT_WRITE
+     * @throws PIECE_ORM_ERROR_INVALID_MAPPER
      * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
      */
     function loadAll(&$mapper, $relationshipIndex)
