@@ -190,11 +190,16 @@ class Piece_ORM_Mapper_Common
     // {{{ findAllWithQuery()
 
     /**
-     * Finds all objects with a query.
+     * Finds all objects with the given query.
      *
      * @param string $query
      * @return array
-     * @throws PIECE_ORM_ERROR_UNEXPECTED_VALUE
+     * @throws PIECE_ORM_ERROR_INVALID_OPERATION
+     * @throws PIECE_ORM_ERROR_NOT_FOUND
+     * @throws PIECE_ORM_ERROR_NOT_READABLE
+     * @throws PIECE_ORM_ERROR_CANNOT_READ
+     * @throws PIECE_ORM_ERROR_CANNOT_WRITE
+     * @throws PIECE_ORM_ERROR_INVALID_MAPPER
      * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
      */
     function findAllWithQuery($query)
@@ -443,11 +448,16 @@ class Piece_ORM_Mapper_Common
     // {{{ findWithQuery()
 
     /**
-     * Finds an object with a query.
+     * Finds an object with the given query.
      *
      * @param string $query
      * @return stdClass
-     * @throws PIECE_ORM_ERROR_UNEXPECTED_VALUE
+     * @throws PIECE_ORM_ERROR_INVALID_OPERATION
+     * @throws PIECE_ORM_ERROR_NOT_FOUND
+     * @throws PIECE_ORM_ERROR_NOT_READABLE
+     * @throws PIECE_ORM_ERROR_CANNOT_READ
+     * @throws PIECE_ORM_ERROR_CANNOT_WRITE
+     * @throws PIECE_ORM_ERROR_INVALID_MAPPER
      * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
      */
     function &findWithQuery($query)
@@ -573,27 +583,33 @@ class Piece_ORM_Mapper_Common
     function getCount()
     {
         if (!is_null($this->_lastQueryForGetCount)) {
-            $result = &$this->executeQuery(preg_replace('/^\s*SELECT\s+.+?\s+FROM\s+(.+)\s*$/is',
+            return $this->findOneWithQuery(preg_replace('/^\s*SELECT\s+.+?\s+FROM\s+(.+)\s*$/is',
                                                         'SELECT COUNT(*) FROM $1',
                                                         $this->_lastQueryForGetCount)
                                            );
-            if (Piece_ORM_Error::hasErrors('exception')) {
-                return;
-            }
-
-            PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
-            $count = $result->fetchOne();
-            PEAR::staticPopErrorHandling();
-            if (MDB2::isError($count)) {
-                Piece_ORM_Error::pushPEARError($count,
-                                               PIECE_ORM_ERROR_INVOCATION_FAILED,
-                                               'Failed to invoke MDB2_Driver_' . $this->getDriverName() . '::fetchOne() for any reasons.'
-                                               );
-                return;
-            }
-
-            return $count;
         }
+    }
+
+    // }}}
+    // {{{ findOneWithQuery()
+
+    /**
+     * Finds the value from the first column of the first row of the result
+     * set with the given query.
+     *
+     * @param string $query
+     * @return array
+     * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
+     * @since Method available since Release 0.3.0
+     */
+    function findOneWithQuery($query)
+    {
+        $result = &$this->executeQuery($query);
+        if (Piece_ORM_Error::hasErrors('exception')) {
+            return;
+        }
+
+        return $this->_loadValue($result);
     }
 
     /**#@-*/
@@ -613,6 +629,12 @@ class Piece_ORM_Mapper_Common
      * @param mixed  $criteria
      * @return stdClass
      * @throws PIECE_ORM_ERROR_UNEXPECTED_VALUE
+     * @throws PIECE_ORM_ERROR_INVALID_OPERATION
+     * @throws PIECE_ORM_ERROR_NOT_FOUND
+     * @throws PIECE_ORM_ERROR_NOT_READABLE
+     * @throws PIECE_ORM_ERROR_CANNOT_READ
+     * @throws PIECE_ORM_ERROR_CANNOT_WRITE
+     * @throws PIECE_ORM_ERROR_INVALID_MAPPER
      * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
      */
     function &_find($methodName, $criteria)
@@ -692,7 +714,12 @@ class Piece_ORM_Mapper_Common
      * @param MDB2_Result &$result
      * @param array       $relationships
      * @return array
-     * @throws PIECE_ORM_ERROR_UNEXPECTED_VALUE
+     * @throws PIECE_ORM_ERROR_INVALID_OPERATION
+     * @throws PIECE_ORM_ERROR_NOT_FOUND
+     * @throws PIECE_ORM_ERROR_NOT_READABLE
+     * @throws PIECE_ORM_ERROR_CANNOT_READ
+     * @throws PIECE_ORM_ERROR_CANNOT_WRITE
+     * @throws PIECE_ORM_ERROR_INVALID_MAPPER
      * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
      */
     function _loadAllObjects(&$result, $relationships = array())
@@ -714,6 +741,12 @@ class Piece_ORM_Mapper_Common
      * @param stdClass $criteria
      * @return array
      * @throws PIECE_ORM_ERROR_UNEXPECTED_VALUE
+     * @throws PIECE_ORM_ERROR_INVALID_OPERATION
+     * @throws PIECE_ORM_ERROR_NOT_FOUND
+     * @throws PIECE_ORM_ERROR_NOT_READABLE
+     * @throws PIECE_ORM_ERROR_CANNOT_READ
+     * @throws PIECE_ORM_ERROR_CANNOT_WRITE
+     * @throws PIECE_ORM_ERROR_INVALID_MAPPER
      * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
      */
     function _findAll($methodName, $criteria)
@@ -788,6 +821,7 @@ class Piece_ORM_Mapper_Common
      * @return array
      * @throws PIECE_ORM_ERROR_UNEXPECTED_VALUE
      * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
+     * @since Method available since Release 0.3.0
      */
     function _findOne($methodName, $criteria)
     {
@@ -807,6 +841,19 @@ class Piece_ORM_Mapper_Common
             return;
         }
 
+        return $this->_loadValue($result);
+    }
+
+    /**
+     * Loads a value with a result object.
+     *
+     * @param MDB2_Result &$result
+     * @return string
+     * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
+     * @since Method available since Release 0.3.0
+     */
+    function _loadValue(&$result)
+    {
         PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
         $value = $result->fetchOne();
         PEAR::staticPopErrorHandling();
