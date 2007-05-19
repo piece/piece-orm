@@ -1015,6 +1015,9 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         $this->assertNull($restaurantMapper->findByPlaceId($baz->id));
     }
 
+    /**
+     * @since Method available since Release 0.3.0
+     */
     function testGetCount()
     {
         $this->_configure('ManyToManyRelationships');
@@ -1033,6 +1036,24 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
 
         $this->assertEquals(2, count($people));
         $this->assertEquals(4, $mapper->getCount());
+    }
+
+    /**
+     * @since Method available since Release 0.3.0
+     */
+    function testFindOne()
+    {
+        $this->_configure('ManyToManyRelationships');
+        $this->_setupManyToManyRelationships();
+
+        $mapper = &Piece_ORM_Mapper_Factory::factory('Employee');
+
+        $this->assertNull($mapper->findOneForNameByName('NonExisting'));
+
+        $mapper->addOrder('id', true);
+
+        $this->assertEquals('Qux', $mapper->findOneForNameByName((object)array('name' => 'Qux')));
+        $this->assertEquals(4, $mapper->findOneForCount());
     }
 
     /**#@-*/

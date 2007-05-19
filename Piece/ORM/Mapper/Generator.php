@@ -296,6 +296,12 @@ class Piece_ORM_Mapper_Generator
                     return;
                 }
                 break;
+            case 'findOne':
+                $this->_addFindOne($method['name'], @$method['query']);
+                if (Piece_ORM_Error::hasErrors('exception')) {
+                    return;
+                }
+                break;
             case 'find':
                 $this->_addFind($method['name'], @$method['query'], @$method['relationship']);
                 if (Piece_ORM_Error::hasErrors('exception')) {
@@ -463,7 +469,7 @@ class Piece_ORM_Mapper_Generator
      */
     function _getQueryPropertyDeclaration($propertyName, $query)
     {
-        if (is_null($query)) {
+        if (!$query) {
             return "    var \$__query__{$propertyName};";
         } else {
             return "    var \$__query__{$propertyName} = '" . addslashes($query) . "';";
@@ -549,6 +555,8 @@ class Piece_ORM_Mapper_Generator
     {
         if (preg_match('/^findAll.*$/i', $methodName)) {
             return 'findAll';
+        } elseif (preg_match('/^findOne.*$/i', $methodName)) {
+            return 'findOne';
         } elseif (preg_match('/^find.+$/i', $methodName)) {
             return 'find';
         } elseif (preg_match('/^insert$/i', $methodName)) {
@@ -581,6 +589,36 @@ class Piece_ORM_Mapper_Generator
         }
 
         return !in_array($methodName, $this->_baseMapperMethods);
+    }
+
+    // }}}
+    // {{{ _addFindOne()
+
+    /**
+     * Adds a findOneXXX method and its query to the mapper source.
+     *
+     * @param string $methodName
+     * @param string $query
+     * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
+     */
+    function _addFindOne($methodName, $query)
+    {
+        if (!$query) {
+            Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_CONFIGURATION,
+                                  'The element [ query ] or its value is required to generate a findOne method declaration.'
+                                  );
+            return;
+        }
+
+        $propertyName = strtolower($methodName);
+        $this->_propertyDefinitions['query'][$propertyName] =
+            $this->_getQueryPropertyDeclaration($propertyName, $query);
+
+        $this->_methodDefinitions[$methodName] = "
+    function $methodName(\$criteria = null)
+    {
+        return \$this->_findOne('$methodName', \$criteria);
+    }";
     }
 
     /**#@-*/

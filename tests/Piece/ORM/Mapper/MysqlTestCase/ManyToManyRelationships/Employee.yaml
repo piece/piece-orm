@@ -107,6 +107,12 @@
       table: department
       mappedAs: departments
 
+- name: findOneForNameByName
+  query: SELECT name FROM employee WHERE name = $name
+
+- name: findOneForCount
+  query: SELECT COUNT(*) FROM employee
+
 # Local Variables:
 # mode: conf-colon
 # coding: iso-8859-1
