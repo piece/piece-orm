@@ -95,7 +95,7 @@ class Piece_ORM_Mapper_PgsqlTestCase extends Piece_ORM_Mapper_CompatibilityTest
 
     function _assertQueryForTestOverwriteUpdateQuery($query, $domainObject)
     {
-        $this->assertEquals("UPDATE person SET first_name = '{$domainObject->firstName}', last_name = '{$domainObject->lastName}', version = version + 1, mdate = CURRENT_TIMESTAMP WHERE id = {$domainObject->id} AND service_id = {$domainObject->serviceId}", $query);
+        $this->assertEquals("UPDATE person SET first_name = '{$domainObject->firstName}', last_name = '{$domainObject->lastName}', version = version + 1, mdate = CURRENT_TIMESTAMP WHERE id = '{$domainObject->id}' AND service_id = '{$domainObject->serviceId}'", $query);
     }
 
     function _assertQueryForReplaceEmptyStringWithNull($query)

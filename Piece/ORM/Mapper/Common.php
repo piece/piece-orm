@@ -675,13 +675,8 @@ class Piece_ORM_Mapper_Common
     {
         foreach ($criteria as $key => $value) {
             if (is_scalar($value) || is_null($value)) {
-                $field = Piece_ORM_Inflector::underscore($key);
-                if ($this->_metadata->hasField($field)) {
-                    $criteria->$key = $this->quote($value, $field);
-                } else {
-                    if (!is_null($value)) {
-                        $criteria->$key = $this->_dbh->quote($value);
-                    }
+                if (!is_null($value)) {
+                    $criteria->$key = $this->_dbh->quote($value);
                 }
             } else {
                 unset($criteria->$key);
