@@ -110,31 +110,37 @@ class Piece_ORM_Config_FactoryTestCase extends PHPUnit_TestCase
 
     function testConfigurationDirectoryNotFound()
     {
+        Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
         $config = &Piece_ORM_Config_Factory::factory(dirname(__FILE__) . '/foo', $this->_cacheDirectory);
 
-        $this->assertEquals(strtolower('Piece_ORM_Config'), strtolower(get_class($config)));
-        $this->assertTrue(Piece_ORM_Error::hasErrors('warning'));
+        $this->assertNull($config);
+        $this->assertTrue(Piece_ORM_Error::hasErrors('exception'));
 
         $error = Piece_ORM_Error::pop();
 
         $this->assertEquals(PIECE_ORM_ERROR_NOT_FOUND, $error['code']);
+
+        Piece_ORM_Error::popCallback();
     }
 
     function testConfigurationFileNotFound()
     {
+        Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
         $config = &Piece_ORM_Config_Factory::factory(dirname(__FILE__), $this->_cacheDirectory);
 
-        $this->assertEquals(strtolower('Piece_ORM_Config'), strtolower(get_class($config)));
-        $this->assertTrue(Piece_ORM_Error::hasErrors('warning'));
+        $this->assertNull($config);
+        $this->assertTrue(Piece_ORM_Error::hasErrors('exception'));
 
         $error = Piece_ORM_Error::pop();
 
         $this->assertEquals(PIECE_ORM_ERROR_NOT_FOUND, $error['code']);
+
+        Piece_ORM_Error::popCallback();
     }
 
     function testNoCachingIfCacheDirectoryNotFound()
     {
-        $config = &Piece_ORM_Config_Factory::factory(dirname(__FILE__), dirname(__FILE__) . '/foo');
+        $config = &Piece_ORM_Config_Factory::factory($this->_cacheDirectory, dirname(__FILE__) . '/foo');
 
         $this->assertEquals(strtolower('Piece_ORM_Config'), strtolower(get_class($config)));
         $this->assertTrue(Piece_ORM_Error::hasErrors('warning'));
