@@ -352,7 +352,7 @@ class Piece_ORM_Mapper_Factory
 
         if (!is_readable($GLOBALS['PIECE_ORM_Mapper_CacheDirectory']) || !is_writable($GLOBALS['PIECE_ORM_Mapper_CacheDirectory'])) {
             Piece_ORM_Error::push(PIECE_ORM_ERROR_NOT_READABLE,
-                                  "The cache directory [ {$GLOBALS['PIECE_ORM_Mapper_CacheDirectory']} ] was not readable or writable."
+                                  "The cache directory [ {$GLOBALS['PIECE_ORM_Mapper_CacheDirectory']} ] is not readable or writable."
                                   );
             return;
         }
@@ -367,7 +367,7 @@ class Piece_ORM_Mapper_Factory
 
         if (!is_readable($configFile)) {
             Piece_ORM_Error::push(PIECE_ORM_ERROR_NOT_READABLE,
-                                  "The configuration file [ $configFile ] was not readable."
+                                  "The configuration file [ $configFile ] is not readable."
                                   );
             return;
         }
