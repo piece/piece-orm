@@ -282,7 +282,7 @@ class Piece_ORM_Metadata_Factory
         if (!is_readable($GLOBALS['PIECE_ORM_Metadata_CacheDirectory']) || !is_writable($GLOBALS['PIECE_ORM_Metadata_CacheDirectory'])) {
             Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
             Piece_ORM_Error::push(PIECE_ORM_ERROR_NOT_READABLE,
-                                  "The cache directory [ {$GLOBALS['PIECE_ORM_Metadata_CacheDirectory']} ] was not readable or writable.",
+                                  "The cache directory [ {$GLOBALS['PIECE_ORM_Metadata_CacheDirectory']} ] is not readable or writable.",
                                   'warning'
                                   );
             Piece_ORM_Error::popCallback();
