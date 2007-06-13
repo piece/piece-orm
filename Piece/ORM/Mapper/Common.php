@@ -505,12 +505,13 @@ class Piece_ORM_Mapper_Common
         }
 
         $result = &$this->executeQuery($query, $isManip);
-        if (preg_match('/^findAll.+$/', $methodName)) {
+        if (preg_match('/^findAll.*$/', $methodName)) {
             $this->_lastQueryForGetCount = $query;
         }
 
         if (Piece_ORM_Error::hasErrors('exception')) {
-            return;
+            $return = null;
+            return $return;
         }
 
         return $result;
@@ -649,7 +650,8 @@ class Piece_ORM_Mapper_Common
 
         $objects = $this->_findAll($methodName, $criteria);
         if (Piece_ORM_Error::hasErrors('exception')) {
-            return;
+            $return = null;
+            return $return;
         }
 
         if (count($objects)) {

@@ -1056,6 +1056,23 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         $this->assertEquals(4, $mapper->findOneForCount());
     }
 
+    /**
+     * @since Method available since Release 0.4.0
+     */
+    function testGetCountShoudWorkWithFindAll()
+    {
+        $this->_configure('ManyToManyRelationships');
+        $this->_setupManyToManyRelationships();
+
+        $mapper = &Piece_ORM_Mapper_Factory::factory('Employee');
+
+        $this->assertNull($mapper->getCount());
+
+        $mapper->findAll();
+
+        $this->assertEquals(4, $mapper->getCount());
+    }
+
     /**#@-*/
 
     /**#@+
