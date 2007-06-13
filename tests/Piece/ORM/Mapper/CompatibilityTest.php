@@ -1059,7 +1059,7 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
     /**
      * @since Method available since Release 0.4.0
      */
-    function testGetCountShoudWorkWithFindAll()
+    function testGetCountShouldWorkWithFindAll()
     {
         $this->_configure('ManyToManyRelationships');
         $this->_setupManyToManyRelationships();
