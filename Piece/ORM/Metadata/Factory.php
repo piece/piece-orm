@@ -247,7 +247,11 @@ class Piece_ORM_Metadata_Factory
             return $return;
         }
 
-        // Microsoft SQL Server
+        /*
+         * Finds auto increment field when using Microsoft SQL Server.
+         * The MDB2 driver for Microsoft SQL Server cannot detect auto
+         * increment field in the table.
+         */
         if (strtolower(substr(strrchr(get_class($dbh), '_'), 1)) == 'mssql') {
             PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
             $columnInfoForTable = $dbh->queryAll("EXEC SP_COLUMNS[$tableName]", null, MDB2_FETCHMODE_ASSOC);
