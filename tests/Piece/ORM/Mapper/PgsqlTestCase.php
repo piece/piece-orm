@@ -70,6 +70,7 @@ class Piece_ORM_Mapper_PgsqlTestCase extends Piece_ORM_Mapper_CompatibilityTest
      */
 
     var $_dsn = 'pgsql://piece:piece@localhost/piece';
+    var $_type = 'pgsql';
 
     /**#@-*/
 
@@ -82,26 +83,6 @@ class Piece_ORM_Mapper_PgsqlTestCase extends Piece_ORM_Mapper_CompatibilityTest
     /**#@+
      * @access private
      */
-
-    function _assertQueryForTestInsert($query)
-    {
-        $this->assertEquals("INSERT INTO person (first_name, last_name, service_id) VALUES ('Taro', 'ITEMAN', 3)", $query);
-    }
-
-    function _assertQueryForTestOverwriteInsertQuery($query)
-    {
-        $this->assertEquals("INSERT INTO person (first_name, last_name, service_id) VALUES ('Taro', 'ITEMAN', 1)", $query);
-    }
-
-    function _assertQueryForTestOverwriteUpdateQuery($query, $domainObject)
-    {
-        $this->assertEquals("UPDATE person SET first_name = '{$domainObject->firstName}', last_name = '{$domainObject->lastName}', version = version + 1, mdate = CURRENT_TIMESTAMP WHERE id = '{$domainObject->id}' AND service_id = '{$domainObject->serviceId}'", $query);
-    }
-
-    function _assertQueryForReplaceEmptyStringWithNull($query)
-    {
-        $this->assertEquals("INSERT INTO service (name, description) VALUES ('Foo', NULL)", $query);
-    }
 
     /**#@-*/
 

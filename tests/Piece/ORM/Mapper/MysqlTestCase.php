@@ -70,6 +70,7 @@ class Piece_ORM_Mapper_MysqlTestCase extends Piece_ORM_Mapper_CompatibilityTest
      */
 
     var $_dsn = 'mysql://piece:piece@localhost/piece';
+    var $_type = 'mysql';
 
     /**#@-*/
 
@@ -83,29 +84,9 @@ class Piece_ORM_Mapper_MysqlTestCase extends Piece_ORM_Mapper_CompatibilityTest
      * @access private
      */
 
-    function _assertQueryForTestInsert($query)
-    {
-        $this->assertRegexp("/^INSERT INTO person \(first_name, last_name, service_id, rdate\) VALUES \('Taro', 'ITEMAN', 3, '\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}'\)$/", $query);
-    }
-
     function _addMissingPropertyForInsert(&$subject)
     {
         $subject->rdate = date('Y-m-d H:i:s');
-    }
-
-    function _assertQueryForTestOverwriteInsertQuery($query)
-    {
-        $this->assertRegexp("/^INSERT INTO person \(first_name, last_name, service_id, rdate\) VALUES \('Taro', 'ITEMAN', 1, '\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}'\)$/", $query);
-    }
-
-    function _assertQueryForTestOverwriteUpdateQuery($query, $domainObject)
-    {
-        $this->assertEquals("UPDATE person SET first_name = '{$domainObject->firstName}', last_name = '{$domainObject->lastName}', version = version + 1 WHERE id = '{$domainObject->id}' AND service_id = '{$domainObject->serviceId}'", $query);
-    }
-
-    function _assertQueryForReplaceEmptyStringWithNull($query)
-    {
-        $this->assertRegexp("/^INSERT INTO service \(name, description, rdate\) VALUES \('Foo', NULL, '\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}'\)$/", $query);
     }
 
     /**#@-*/

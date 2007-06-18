@@ -93,6 +93,7 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
                          'service',
                          'skill'
                          );
+    var $_type;
 
     /**#@-*/
 
@@ -103,8 +104,7 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
     function setUp()
     {
         Piece_ORM_Error::pushCallback(create_function('$error', 'var_dump($error); return ' . PEAR_ERRORSTACK_DIE . ';'));
-        preg_match('/^.+_(.+)testcase$/i', get_class($this), $matches);
-        $this->_cacheDirectory = dirname(__FILE__) . '/' . ucwords($matches[1]) . 'TestCase';
+        $this->_cacheDirectory = dirname(__FILE__) . '/' . ucwords($this->_type) . 'TestCase';
         $config = &new Piece_ORM_Config();
         $config->setDSN('piece', $this->_dsn);
         $config->setOptions('piece', array('debug' => 2, 'result_buffering' => false));
@@ -121,7 +121,7 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         $context = &Piece_ORM_Context::singleton();
         $dbh = &$context->getConnection();
         foreach ($this->_tables as $table) {
-            $dbh->exec("TRUNCATE $table");
+            $dbh->exec("TRUNCATE TABLE $table");
         }
         $cache = &new Cache_Lite(array('cacheDir' => "{$this->_cacheDirectory}/",
                                        'automaticSerialization' => true,
@@ -142,9 +142,6 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
     {
         $id = $this->_insert();
         $mapper = &Piece_ORM_Mapper_Factory::factory('Person');
-
-        $this->_assertQueryForTestInsert($mapper->getLastQuery());
-
         $person = &$mapper->findById($id);
 
         $this->assertEquals(strtolower('stdClass'), strtolower(get_class($person)));
@@ -302,7 +299,6 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         $person1->firstName = 'Seven';
         $affectedRows = $mapper->update($person1);
 
-        $this->assertEquals("UPDATE person SET first_name = '{$person1->firstName}', last_name = '{$person1->lastName}', service_id = '{$person1->serviceId}', version = '{$person1->version}', rdate = '{$person1->rdate}', mdate = '{$person1->mdate}' WHERE id = '$id'", $mapper->getLastQuery());
         $this->assertEquals(1, $affectedRows);
 
         $person2 = &$mapper->findById($id);
@@ -428,20 +424,20 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
     {
         $this->_configure('Overwrite');
         $id = $this->_insert();
-        $mapper = &Piece_ORM_Mapper_Factory::factory('Person');
 
-        $this->_assertQueryForTestOverwriteInsertQuery($mapper->getLastQuery());
         $this->assertNotNull($id);
 
+        $mapper = &Piece_ORM_Mapper_Factory::factory('Person');
         $person = &$mapper->findById($id);
 
+        $this->assertNotNull($person);
         $this->assertEquals('Taro', $person->firstName);
         $this->assertEquals('ITEMAN', $person->lastName);
         $this->assertEquals(1, $person->serviceId);
 
         $mapper->delete($person);
 
-        $this->assertEquals("DELETE FROM person WHERE id = '{$person->id}' AND service_id = '1'", $mapper->getLastQuery());
+        $this->assertNull($mapper->findById($id));
     }
 
     function testOverwriteUpdateQuery()
@@ -453,16 +449,16 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         $person1->firstName = 'Seven';
         $affectedRows = $mapper->update($person1);
 
-        $this->_assertQueryForTestOverwriteUpdateQuery($mapper->getLastQuery(), $person1);
         $this->assertEquals(1, $affectedRows);
 
         $person2 = &$mapper->findById($id);
 
+        $this->assertNotNull($person2);
         $this->assertEquals('Seven', $person2->firstName);
 
         $mapper->delete($person1);
 
-        $this->assertEquals("DELETE FROM person WHERE id = '{$person1->id}' AND service_id = '{$person1->serviceId}'", $mapper->getLastQuery());
+        $this->assertNull($mapper->findById($id));
     }
 
     function testReplaceEmptyStringWithNull()
@@ -474,7 +470,10 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         $this->_addMissingPropertyForInsert($subject);
         $id = $mapper->insert($subject);
 
-        $this->_assertQueryForReplaceEmptyStringWithNull($mapper->getLastQuery());
+        $service = &$mapper->findById($id);
+
+        $this->assertNotNull($service);
+        $this->assertNull($service->description);
     }
 
     function testThrowExceptionIfDetectingProblemWhenBuildingQuery()
@@ -1090,15 +1089,7 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         return $mapper->insert($subject);
     }
 
-    function _assertQueryForTestInsert($query) {}
-
     function _addMissingPropertyForInsert($subject) {}
-
-    function _assertQueryForTestOverwriteInsertQuery($query) {}
-
-    function _assertQueryForTestOverwriteUpdateQuery($query, $domainObject) {}
-
-    function _assertQueryForReplaceEmptyStringWithNull($query) {}
 
     function _setupManyToManyRelationships()
     {
