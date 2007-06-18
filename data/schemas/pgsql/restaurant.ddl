@@ -1,4 +1,4 @@
-# $Id$
+-- $Id$
 
 CREATE TABLE restaurant (
   id serial,
@@ -10,9 +10,11 @@ CREATE TABLE restaurant (
   PRIMARY KEY(id)
 );
 
-# Local Variables:
-# mode: sql
-# coding: iso-8859-1
-# tab-width: 2
-# indent-tabs-mode: nil
-# End:
+/*
+ * Local Variables:
+ * mode: sql
+ * coding: iso-8859-1
+ * tab-width: 2
+ * indent-tabs-mode: nil
+ * End:
+ */

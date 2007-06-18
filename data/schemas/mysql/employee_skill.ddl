@@ -1,4 +1,4 @@
-# $Id$
+-- $Id$
 
 CREATE TABLE employee_skill (
   id int(11) NOT NULL AUTO_INCREMENT,
@@ -10,9 +10,11 @@ CREATE TABLE employee_skill (
   PRIMARY KEY(id)
 );
 
-# Local Variables:
-# mode: sql
-# coding: iso-8859-1
-# tab-width: 2
-# indent-tabs-mode: nil
-# End:
+/*
+ * Local Variables:
+ * mode: sql
+ * coding: iso-8859-1
+ * tab-width: 2
+ * indent-tabs-mode: nil
+ * End:
+ */

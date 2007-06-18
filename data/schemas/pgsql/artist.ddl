@@ -1,4 +1,4 @@
-# $Id$
+-- $Id$
 
 CREATE TABLE artist (
   id serial,
@@ -9,9 +9,11 @@ CREATE TABLE artist (
   PRIMARY KEY(id)
 );
 
-# Local Variables:
-# mode: sql
-# coding: iso-8859-1
-# tab-width: 2
-# indent-tabs-mode: nil
-# End:
+/*
+ * Local Variables:
+ * mode: sql
+ * coding: iso-8859-1
+ * tab-width: 2
+ * indent-tabs-mode: nil
+ * End:
+ */

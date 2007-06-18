@@ -1,4 +1,4 @@
-# $Id$
+-- $Id$
 
 CREATE TABLE album (
   id serial,
@@ -10,9 +10,11 @@ CREATE TABLE album (
   PRIMARY KEY(id)
 );
 
-# Local Variables:
-# mode: sql
-# coding: iso-8859-1
-# tab-width: 2
-# indent-tabs-mode: nil
-# End:
+/*
+ * Local Variables:
+ * mode: sql
+ * coding: iso-8859-1
+ * tab-width: 2
+ * indent-tabs-mode: nil
+ * End:
+ */

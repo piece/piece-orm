@@ -1,4 +1,4 @@
-# $Id$
+-- $Id$
 
 CREATE TABLE place (
   id serial,
@@ -9,9 +9,11 @@ CREATE TABLE place (
   PRIMARY KEY(id)
 );
 
-# Local Variables:
-# mode: sql
-# coding: iso-8859-1
-# tab-width: 2
-# indent-tabs-mode: nil
-# End:
+/*
+ * Local Variables:
+ * mode: sql
+ * coding: iso-8859-1
+ * tab-width: 2
+ * indent-tabs-mode: nil
+ * End:
+ */
