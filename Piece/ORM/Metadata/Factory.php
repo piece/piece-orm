@@ -29,11 +29,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  * @package    Piece_ORM
- * @author     KUBO Atsuhiro <iteman@users.sourceforge.net>
  * @copyright  2007 KUBO Atsuhiro <iteman@users.sourceforge.net>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License (revised)
  * @version    SVN: $Id$
- * @link       http://piece-framework.com/piece-orm/
  * @since      File available since Release 0.1.0
  */
 
@@ -57,11 +55,9 @@ $GLOBALS['PIECE_ORM_Metadata_CacheDirectory'] = './cache';
  * A factory class to create a Piece_ORM_Metadata object for a table.
  *
  * @package    Piece_ORM
- * @author     KUBO Atsuhiro <iteman@users.sourceforge.net>
  * @copyright  2007 KUBO Atsuhiro <iteman@users.sourceforge.net>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License (revised)
  * @version    Release: @package_version@
- * @link       http://piece-framework.com/piece-orm/
  * @since      Class available since Release 0.1.0
  */
 class Piece_ORM_Metadata_Factory
@@ -249,6 +245,32 @@ class Piece_ORM_Metadata_Factory
                                            );
             $return = null;
             return $return;
+        }
+
+        // Microsoft SQL Server
+        if (strtolower(substr(strrchr(get_class($dbh), '_'), 1)) == 'mssql') {
+            PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
+            $columnInfoForTable = $dbh->queryAll("EXEC SP_COLUMNS[$tableName]", null, MDB2_FETCHMODE_ASSOC);
+            PEAR::staticPopErrorHandling();
+            if (MDB2::isError($columnInfoForTable)) {
+                Piece_ORM_Error::pushPEARError($columnInfoForTable,
+                                               PIECE_ORM_ERROR_INVOCATION_FAILED,
+                                               'Failed to invoke $dbh->queryAll() for any reasons.'
+                                               );
+                $return = null;
+                return $return;
+            }
+
+            foreach ($columnInfoForTable as $columnInfo) {
+                if (strpos($columnInfo['type_name'], 'identity') !== false) {
+                    for ($i = 0; $i < count($tableInfo); ++$i) {
+                        if ($tableInfo[$i]['name'] == $columnInfo['column_name']) {
+                            $tableInfo[$i]['autoincrement'] = true;
+                            break 2;
+                        }
+                    }
+                }
+            }
         }
 
         $metadata = &new Piece_ORM_Metadata($tableInfo);
