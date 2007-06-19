@@ -40,16 +40,16 @@ require_once 'PEAR/PackageFileManager2.php';
 
 PEAR::staticPushErrorHandling(PEAR_ERROR_CALLBACK, create_function('$error', 'var_dump($error); exit();'));
 
-$version = '0.3.0';
+$version = '0.4.0';
 $apiVersion = '0.3.0';
 $apiStability = 'beta';
 $releaseStability = 'beta';
 $notes = 'A new release of Piece_ORM is now available.
 
-What\'s New in Piece_ORM 0.3.0
+What\'s New in Piece_ORM 0.4.0
 
-* getCount method: getCount() is used to get the number of rows a query would have returned without a LIMIT clause in the latest findAll method execution.
-* findOneXxx methods: findOneXxx methods can be defined with arbitrary SQL queries to get the value from the first column of the first row of the result set.
+* Microsoft SQL Server Support: Microsoft SQL Server is supported.
+* A Defect Fix: A defect that getCount() could not work with findAll() is fixed.
 
 See the following release notes for details.
 
@@ -58,16 +58,19 @@ Enhancements
 
 Mappers:
 
-- Added more strict quoting and removing unused properties when building a query.
-- Added getCount() that is used to get the number of rows a query would have returned without a LIMIT clause in the latest findAll method execution. (Ticket #33)
-- Added a feature that findOneXxx methods can be defined with arbitrary SQL queries to get the value from the first column of the first row of the result set. (Ticket #34)
-- Added findOneWithQuery() to get the value from the first column of the first row of the result set with the given query.
+- Changed a portion of the query building process so as to quote based on only real values instead of metadata. (Piece_ORM_Mapper_Common)
+- Added support for Microsoft SQL Server. (Ticket #38)
 
 Kernel:
 
-- Changed the error type on all Piece_ORM_Error::pushError() calls from "warning" to "exception".
-- Updated setDatabase() to throw the same exception as getConfiguration(), getMapper(), etc. have been used.
-- Removed code that avoided calling error handler.';
+- Changed factory() to throw an exception if the configuration directory or the configuration file not found or the configuration file is not readable. (Ticket #37) (Piece_ORM_Config_Factory)
+
+Defect Fixes
+============
+
+Mappers:
+
+- Fixed a defect so that getCount() could not work with findAll(). (Piece_ORM_Mapper_Common)';
 
 $package = new PEAR_PackageFileManager2();
 $package->setOptions(array('filelistgenerator' => 'svn',

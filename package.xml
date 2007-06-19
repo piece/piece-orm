@@ -23,16 +23,16 @@ Piece_ORM is a simple framework based on the DataMapper pattern, and features st
   </maintainer>
   </maintainers>
  <release>
-  <version>0.3.0</version>
-  <date>2007-05-19</date>
+  <version>0.4.0</version>
+  <date>2007-06-19</date>
   <license>BSD License (revised)</license>
   <state>beta</state>
   <notes>A new release of Piece_ORM is now available.
 
-What&apos;s New in Piece_ORM 0.3.0
+What&apos;s New in Piece_ORM 0.4.0
 
-* getCount method: getCount() is used to get the number of rows a query would have returned without a LIMIT clause in the latest findAll method execution.
-* findOneXxx methods: findOneXxx methods can be defined with arbitrary SQL queries to get the value from the first column of the first row of the result set.
+* Microsoft SQL Server Support: Microsoft SQL Server is supported.
+* A Defect Fix: A defect that getCount() could not work with findAll() is fixed.
 
 See the following release notes for details.
 
@@ -41,16 +41,19 @@ Enhancements
 
 Mappers:
 
-- Added more strict quoting and removing unused properties when building a query.
-- Added getCount() that is used to get the number of rows a query would have returned without a LIMIT clause in the latest findAll method execution. (Ticket #33)
-- Added a feature that findOneXxx methods can be defined with arbitrary SQL queries to get the value from the first column of the first row of the result set. (Ticket #34)
-- Added findOneWithQuery() to get the value from the first column of the first row of the result set with the given query.
+- Changed a portion of the query building process so as to quote based on only real values instead of metadata. (Piece_ORM_Mapper_Common)
+- Added support for Microsoft SQL Server. (Ticket #38)
 
 Kernel:
 
-- Changed the error type on all Piece_ORM_Error::pushError() calls from &quot;warning&quot; to &quot;exception&quot;.
-- Updated setDatabase() to throw the same exception as getConfiguration(), getMapper(), etc. have been used.
-- Removed code that avoided calling error handler.
+- Changed factory() to throw an exception if the configuration directory or the configuration file not found or the configuration file is not readable. (Ticket #37) (Piece_ORM_Config_Factory)
+
+Defect Fixes
+============
+
+Mappers:
+
+- Fixed a defect so that getCount() could not work with findAll(). (Piece_ORM_Mapper_Common)
   </notes>
   <deps>
    <dep type="php" rel="ge" version="4.3.0" optional="no"/>
@@ -63,6 +66,41 @@ Kernel:
    <dir name="/" baseinstalldir="/">
     <dir name="data">
      <dir name="schemas">
+      <dir name="mssql">
+       <file role="data" name="album.ddl">
+        <replace from="@package_version@" to="version" type="package-info"/>
+       </file>
+       <file role="data" name="artist.ddl">
+        <replace from="@package_version@" to="version" type="package-info"/>
+       </file>
+       <file role="data" name="department.ddl">
+        <replace from="@package_version@" to="version" type="package-info"/>
+       </file>
+       <file role="data" name="employee.ddl">
+        <replace from="@package_version@" to="version" type="package-info"/>
+       </file>
+       <file role="data" name="employee_department.ddl">
+        <replace from="@package_version@" to="version" type="package-info"/>
+       </file>
+       <file role="data" name="employee_skill.ddl">
+        <replace from="@package_version@" to="version" type="package-info"/>
+       </file>
+       <file role="data" name="person.ddl">
+        <replace from="@package_version@" to="version" type="package-info"/>
+       </file>
+       <file role="data" name="place.ddl">
+        <replace from="@package_version@" to="version" type="package-info"/>
+       </file>
+       <file role="data" name="restaurant.ddl">
+        <replace from="@package_version@" to="version" type="package-info"/>
+       </file>
+       <file role="data" name="service.ddl">
+        <replace from="@package_version@" to="version" type="package-info"/>
+       </file>
+       <file role="data" name="skill.ddl">
+        <replace from="@package_version@" to="version" type="package-info"/>
+       </file>
+      </dir> <!-- /data/schemas/mssql -->
       <dir name="mysql">
        <file role="data" name="album.ddl">
         <replace from="@package_version@" to="version" type="package-info"/>
@@ -367,6 +405,9 @@ Kernel:
         <file role="test" name="FactoryTestCase.php">
          <replace from="@package_version@" to="version" type="package-info"/>
         </file>
+        <file role="test" name="MssqlTestCase.php">
+         <replace from="@package_version@" to="version" type="package-info"/>
+        </file>
         <file role="test" name="MysqlTestCase.php">
          <replace from="@package_version@" to="version" type="package-info"/>
         </file>
@@ -423,6 +464,40 @@ Kernel:
   </filelist>
  </release>
  <changelog>
+   <release>
+    <version>0.4.0</version>
+    <date>2007-06-19</date>
+    <license>BSD License (revised)</license>
+    <state>beta</state>
+    <notes>A new release of Piece_ORM is now available.
+
+What&apos;s New in Piece_ORM 0.4.0
+
+* Microsoft SQL Server Support: Microsoft SQL Server is supported.
+* A Defect Fix: A defect that getCount() could not work with findAll() is fixed.
+
+See the following release notes for details.
+
+Enhancements
+============ 
+
+Mappers:
+
+- Changed a portion of the query building process so as to quote based on only real values instead of metadata. (Piece_ORM_Mapper_Common)
+- Added support for Microsoft SQL Server. (Ticket #38)
+
+Kernel:
+
+- Changed factory() to throw an exception if the configuration directory or the configuration file not found or the configuration file is not readable. (Ticket #37) (Piece_ORM_Config_Factory)
+
+Defect Fixes
+============
+
+Mappers:
+
+- Fixed a defect so that getCount() could not work with findAll(). (Piece_ORM_Mapper_Common)
+    </notes>
+   </release>
    <release>
     <version>0.3.0</version>
     <date>2007-05-19</date>
