@@ -29,12 +29,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  * @package    Piece_ORM
- * @author     KUBO Atsuhiro <iteman@users.sourceforge.net>
  * @copyright  2007 KUBO Atsuhiro <iteman@users.sourceforge.net>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License (revised)
  * @version    SVN: $Id$
- * @link       http://piece-framework.com/piece-orm/
- * @see        Piece_ORM_Mapper_Common
  * @since      File available since Release 0.1.0
  */
 
@@ -46,12 +43,9 @@ require_once dirname(__FILE__) . '/CompatibilityTest.php';
  * TestCase for PostgreSQL.
  *
  * @package    Piece_ORM
- * @author     KUBO Atsuhiro <iteman@users.sourceforge.net>
  * @copyright  2007 KUBO Atsuhiro <iteman@users.sourceforge.net>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License (revised)
  * @version    Release: @package_version@
- * @link       http://piece-framework.com/piece-orm/
- * @see        Piece_ORM_Mapper_Common
  * @since      Class available since Release 0.1.0
  */
 class Piece_ORM_Mapper_MysqlTestCase extends Piece_ORM_Mapper_CompatibilityTest

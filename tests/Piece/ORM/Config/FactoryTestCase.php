@@ -29,12 +29,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  * @package    Piece_ORM
- * @author     KUBO Atsuhiro <iteman@users.sourceforge.net>
  * @copyright  2007 KUBO Atsuhiro <iteman@users.sourceforge.net>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License (revised)
  * @version    SVN: $Id$
- * @link       http://piece-framework.com/piece-orm/
- * @see        Piece_ORM_Config_Factory
  * @since      File available since Release 0.1.0
  */
 
@@ -55,12 +52,9 @@ if (version_compare(phpversion(), '5.0.0', '<')) {
  * TestCase for Piece_ORM_Config_Factory
  *
  * @package    Piece_ORM
- * @author     KUBO Atsuhiro <iteman@users.sourceforge.net>
  * @copyright  2007 KUBO Atsuhiro <iteman@users.sourceforge.net>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License (revised)
  * @version    Release: @package_version@
- * @link       http://piece-framework.com/piece-orm/
- * @see        Piece_ORM_Config_Factory
  * @since      Class available since Release 0.1.0
  */
 class Piece_ORM_Config_FactoryTestCase extends PHPUnit_TestCase

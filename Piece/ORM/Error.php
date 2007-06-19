@@ -29,11 +29,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  * @package    Piece_ORM
- * @author     KUBO Atsuhiro <iteman@users.sourceforge.net>
  * @copyright  2007 KUBO Atsuhiro <iteman@users.sourceforge.net>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License (revised)
  * @version    SVN: $Id$
- * @link       http://piece-framework.com/piece-orm/
  * @since      File available since Release 0.1.0
  */
 
@@ -61,11 +59,9 @@ define('PIECE_ORM_ERROR_INVALID_CONFIGURATION', -9);
  * An error class for Piece_ORM package.
  *
  * @package    Piece_ORM
- * @author     KUBO Atsuhiro <iteman@users.sourceforge.net>
  * @copyright  2007 KUBO Atsuhiro <iteman@users.sourceforge.net>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License (revised)
  * @version    Release: @package_version@
- * @link       http://piece-framework.com/piece-orm/
  * @since      Class available since Release 0.1.0
  */
 class Piece_ORM_Error

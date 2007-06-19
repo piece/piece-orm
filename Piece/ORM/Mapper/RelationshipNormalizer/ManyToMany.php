@@ -29,11 +29,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  * @package    Piece_ORM
- * @author     KUBO Atsuhiro <iteman@users.sourceforge.net>
  * @copyright  2007 KUBO Atsuhiro <iteman@users.sourceforge.net>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License (revised)
  * @version    SVN: $Id$
- * @link       http://piece-framework.com/piece-orm/
  * @since      File available since Release 0.2.0
  */
 
@@ -47,11 +45,9 @@ require_once 'Piece/ORM/Metadata/Factory.php';
  * An relationship normalizer for Many-to-Many relationships.
  *
  * @package    Piece_ORM
- * @author     KUBO Atsuhiro <iteman@users.sourceforge.net>
  * @copyright  2007 KUBO Atsuhiro <iteman@users.sourceforge.net>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License (revised)
  * @version    Release: @package_version@
- * @link       http://piece-framework.com/piece-orm/
  * @since      Class available since Release 0.2.0
  */
 class Piece_ORM_Mapper_RelationshipNormalizer_ManyToMany extends Piece_ORM_Mapper_RelationshipNormalizer_Common
