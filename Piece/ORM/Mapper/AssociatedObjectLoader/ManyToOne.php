@@ -137,7 +137,7 @@ class Piece_ORM_Mapper_AssociatedObjectLoader_ManyToOne extends Piece_ORM_Mapper
      */
     function _associateObject(&$associatedObject, &$mapper, $relationshipKeyPropertyName, $relationshipIndex)
     {
-        for ($i = 0; $i < count($this->_objectIndexes[$relationshipIndex][ $associatedObject->$relationshipKeyPropertyName ]); ++$i) {
+        for ($i = 0, $count = count($this->_objectIndexes[$relationshipIndex][ $associatedObject->$relationshipKeyPropertyName ]); $i < $count; ++$i) {
             $this->_objects[ $this->_objectIndexes[$relationshipIndex][ $associatedObject->$relationshipKeyPropertyName ][$i] ]->{ $this->_relationships[$relationshipIndex]['mappedAs'] } = &$associatedObject;
         }
     }

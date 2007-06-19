@@ -283,7 +283,7 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         $this->assertTrue(is_array($people));
         $this->assertEquals(2, count($people));
 
-        for ($i = 0; $i < count($people); ++$i) {
+        for ($i = 0, $count = count($people); $i < $count; ++$i) {
             foreach ($people[$i] as $key => $value)
             {
                 $this->assertEquals($value, $peopleWithCriteria[$i]->$key);

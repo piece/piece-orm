@@ -164,7 +164,7 @@ class Piece_ORM_Mapper_AssociatedObjectLoader_ManyToMany extends Piece_ORM_Mappe
     {
         $metadata = &$mapper->getMetadata();
         $primaryKey = $metadata->getPrimaryKey();
-        for ($j = 0; $j < count($this->_associations[$relationshipIndex][ $associatedObject->$primaryKey ]); ++$j ) {
+        for ($j = 0, $count = count($this->_associations[$relationshipIndex][ $associatedObject->$primaryKey ]); $j < $count; ++$j) {
             $this->_objects[ $this->_objectIndexes[$relationshipIndex][ $this->_associations[$relationshipIndex][ $associatedObject->$primaryKey ][$j] ] ]->{ $this->_relationships[$relationshipIndex]['mappedAs'] }[] = &$associatedObject;
         }
     }

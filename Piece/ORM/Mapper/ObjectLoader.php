@@ -294,7 +294,7 @@ class Piece_ORM_Mapper_ObjectLoader
                 $this->_objects[] = &$this->_load($row);
             }
 
-            for ($j = 0; $j < count($this->_relationships); ++$j) {
+            for ($j = 0, $count = count($this->_relationships); $j < $count; ++$j) {
                 $this->_associatedObjectLoaders[ $this->_relationships[$j]['type'] ]->prepareLoading($row, $i, $j);
             }
         }
@@ -317,7 +317,7 @@ class Piece_ORM_Mapper_ObjectLoader
      */
     function _loadAssociatedObjects()
     {
-        for ($i = 0; $i < count($this->_relationships); ++$i) {
+        for ($i = 0, $count = count($this->_relationships); $i < $count; ++$i) {
             $mapper = &Piece_ORM_Mapper_Factory::factory(Piece_ORM_Inflector::camelize($this->_relationships[$i]['table']));
             if (Piece_ORM_Error::hasErrors('exception')) {
                 return;

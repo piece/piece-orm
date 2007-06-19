@@ -267,7 +267,7 @@ class Piece_ORM_Metadata_Factory
 
             foreach ($columnInfoForTable as $columnInfo) {
                 if (strpos($columnInfo['type_name'], 'identity') !== false) {
-                    for ($i = 0; $i < count($tableInfo); ++$i) {
+                    for ($i = 0, $count = count($tableInfo); $i < $count; ++$i) {
                         if ($tableInfo[$i]['name'] == $columnInfo['column_name']) {
                             $tableInfo[$i]['autoincrement'] = true;
                             break 2;

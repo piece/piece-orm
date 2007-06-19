@@ -154,7 +154,7 @@ class Piece_ORM_Mapper_AssociatedObjectLoader_Common
 
         $relationshipKeyPropertyName = Piece_ORM_Inflector::camelize($this->_getRelationshipKeyFieldNameInSecondaryQuery($this->_relationships[$relationshipIndex]), true);
 
-        for ($j = 0; $j < count($associatedObjects); ++$j) {
+        for ($j = 0, $count = count($associatedObjects); $j < $count; ++$j) {
             $this->_associateObject($associatedObjects[$j], $mapper, $relationshipKeyPropertyName, $relationshipIndex);
         }
     }

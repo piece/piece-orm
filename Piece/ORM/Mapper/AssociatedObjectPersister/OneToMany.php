@@ -110,7 +110,7 @@ class Piece_ORM_Mapper_AssociatedObjectPersister_OneToMany extends Piece_ORM_Map
         }
 
         $referencedColumnValue = $this->_subject->{ Piece_ORM_Inflector::camelize($relationship['referencedColumn'], true) };
-        for ($i = 0; $i < count($this->_subject->$relationship['mappedAs']); ++$i) {
+        for ($i = 0, $count = count($this->_subject->$relationship['mappedAs']); $i < $count; ++$i) {
             $this->_subject->{ $relationship['mappedAs'] }[$i]->{ Piece_ORM_Inflector::camelize($relationship['column'], true) } = $referencedColumnValue;
             $mapper->insert($this->_subject->{ $relationship['mappedAs'] }[$i]);
             if (Piece_ORM_Error::hasErrors('exception')) {
@@ -165,7 +165,7 @@ class Piece_ORM_Mapper_AssociatedObjectPersister_OneToMany extends Piece_ORM_Map
         $targetsForInsert = array();
         $targetsForUpdate = array();
         $targetsForDelete = array();
-        for ($i = 0; $i < count($this->_subject->$relationship['mappedAs']); ++$i) {
+        for ($i = 0, $count = count($this->_subject->$relationship['mappedAs']); $i < $count; ++$i) {
             if (!array_key_exists($primaryKeyProperty, $this->_subject->{ $relationship['mappedAs'] }[$i])) {
                 $targetsForInsert[] = &$this->_subject->{ $relationship['mappedAs'] }[$i];
                 continue;
