@@ -40,37 +40,24 @@ require_once 'PEAR/PackageFileManager2.php';
 
 PEAR::staticPushErrorHandling(PEAR_ERROR_CALLBACK, create_function('$error', 'var_dump($error); exit();'));
 
-$version = '0.4.0';
+$version = '0.4.1';
 $apiVersion = '0.3.0';
 $apiStability = 'beta';
 $releaseStability = 'beta';
 $notes = 'A new release of Piece_ORM is now available.
 
-What\'s New in Piece_ORM 0.4.0
+What\'s New in Piece_ORM 0.4.1
 
-* Microsoft SQL Server Support: Microsoft SQL Server is supported.
-* A Defect Fix: A defect that getCount() could not work with findAll() is fixed.
+ * A Defect Fix: A defect in executing query is fixed.
 
 See the following release notes for details.
-
-Enhancements
-============ 
-
-Mappers:
-
-- Changed a portion of the query building process so as to quote based on only real values instead of metadata. (Piece_ORM_Mapper_Common)
-- Added support for Microsoft SQL Server. (Ticket #38)
-
-Kernel:
-
-- Changed factory() to throw an exception if the configuration directory or the configuration file not found or the configuration file is not readable. (Ticket #37) (Piece_ORM_Config_Factory)
 
 Defect Fixes
 ============
 
 Mappers:
 
-- Fixed a defect so that getCount() could not work with findAll(). (Piece_ORM_Mapper_Common)';
+- Fixed a defect that caused an exception to raise when executing query with an object which includes one or more PHP NULL values. (Ticket #40)';
 
 $package = new PEAR_PackageFileManager2();
 $package->setOptions(array('filelistgenerator' => 'svn',

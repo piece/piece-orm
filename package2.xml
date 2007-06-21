@@ -22,10 +22,10 @@ Piece_ORM is a simple framework based on the DataMapper pattern, and features st
   <email>matsufuji@users.sourceforge.net</email>
   <active>yes</active>
  </developer>
- <date>2007-06-19</date>
- <time>20:57:52</time>
+ <date>2007-06-21</date>
+ <time>20:35:40</time>
  <version>
-  <release>0.4.0</release>
+  <release>0.4.1</release>
   <api>0.3.0</api>
  </version>
  <stability>
@@ -35,31 +35,18 @@ Piece_ORM is a simple framework based on the DataMapper pattern, and features st
  <license uri="http://www.opensource.org/licenses/bsd-license.php">BSD License (revised)</license>
  <notes>A new release of Piece_ORM is now available.
 
-What&apos;s New in Piece_ORM 0.4.0
+What&apos;s New in Piece_ORM 0.4.1
 
-* Microsoft SQL Server Support: Microsoft SQL Server is supported.
-* A Defect Fix: A defect that getCount() could not work with findAll() is fixed.
+ * A Defect Fix: A defect in executing query is fixed.
 
 See the following release notes for details.
-
-Enhancements
-============ 
-
-Mappers:
-
-- Changed a portion of the query building process so as to quote based on only real values instead of metadata. (Piece_ORM_Mapper_Common)
-- Added support for Microsoft SQL Server. (Ticket #38)
-
-Kernel:
-
-- Changed factory() to throw an exception if the configuration directory or the configuration file not found or the configuration file is not readable. (Ticket #37) (Piece_ORM_Config_Factory)
 
 Defect Fixes
 ============
 
 Mappers:
 
-- Fixed a defect so that getCount() could not work with findAll(). (Piece_ORM_Mapper_Common)</notes>
+- Fixed a defect that caused an exception to raise when executing query with an object which includes one or more PHP NULL values. (Ticket #40)</notes>
  <contents>
   <dir baseinstalldir="/" name="/">
    <dir name="data">
@@ -494,6 +481,32 @@ Mappers:
  </dependencies>
  <phprelease />
  <changelog>
+  <release>
+   <version>
+    <release>0.4.1</release>
+    <api>0.3.0</api>
+   </version>
+   <stability>
+    <release>beta</release>
+    <api>beta</api>
+   </stability>
+   <date>2007-06-21</date>
+   <license uri="http://www.opensource.org/licenses/bsd-license.php">BSD License (revised)</license>
+   <notes>A new release of Piece_ORM is now available.
+
+What&apos;s New in Piece_ORM 0.4.1
+
+ * A Defect Fix: A defect in executing query is fixed.
+
+See the following release notes for details.
+
+Defect Fixes
+============
+
+Mappers:
+
+- Fixed a defect that caused an exception to raise when executing query with an object which includes one or more PHP NULL values. (Ticket #40)</notes>
+  </release>
   <release>
    <version>
     <release>0.4.0</release>
