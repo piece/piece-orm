@@ -485,10 +485,6 @@ class Piece_ORM_Mapper_Common
      */
     function &executeQueryWithCriteria($methodName, $criteria, $isManip = false)
     {
-        if (version_compare(phpversion(), '5.0.0', '>=')) {
-            $criteria = clone($criteria);
-        }
-
         $query = $this->_buildQuery($methodName, $criteria);
         if (Piece_ORM_Error::hasErrors('exception')) {
             $return = null;
@@ -671,17 +667,26 @@ class Piece_ORM_Mapper_Common
      */
     function _buildQuery($methodName, $criteria)
     {
+        if (version_compare(phpversion(), '5.0.0', '>=')) {
+            $criteria = clone($criteria);
+        }
+
         foreach ($criteria as $key => $value) {
             if (is_scalar($value) || is_null($value)) {
-                if (!is_null($value)) {
-                    $criteria->$key = $this->_dbh->quote($value);
-                }
+                $criteria->$key = $this->_dbh->quote($value);
             } else {
                 unset($criteria->$key);
             }
         }
 
         extract((array)$criteria);
+
+        foreach ($criteria as $key => $value) {
+            if ($value == 'NULL') {
+                $criteria->$key = null;
+            }
+        }
+
         $query = '__query__' . strtolower($methodName);
 
         ob_start();

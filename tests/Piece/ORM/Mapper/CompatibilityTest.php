@@ -1064,6 +1064,23 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         $this->assertEquals(4, $mapper->getCount());
     }
 
+    /**
+     * @since Method available since Release 0.4.1
+     */
+    function testPHPNULLShouldBeExtractedAsDatabaseNULL()
+    {
+        Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
+        $mapper = &Piece_ORM_Mapper_Factory::factory('Service');
+        $service = &$mapper->createObject();
+        $service->name = 'foo';
+        $this->_addMissingPropertyForInsert($service);
+        $mapper->insert($service);
+
+        $this->assertFalse(Piece_ORM_Error::hasErrors('exception'));
+
+        Piece_ORM_Error::popCallback();
+    }
+
     /**#@-*/
 
     /**#@+
