@@ -1082,6 +1082,32 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         Piece_ORM_Error::popCallback();
     }
 
+    /**
+     * @since Method available since Release 0.5.0
+     */
+    function testObjectsReturnByFindAllShouldBeCorrectWithNoPrimaryKeysInSQL()
+    {
+        $mapper = &Piece_ORM_Mapper_Factory::factory('Person');
+        $subject = &$mapper->createObject();
+        $subject->firstName = 'Taro';
+        $subject->lastName = 'ITEMAN';
+        $subject->serviceId = 1;
+        $this->_addMissingPropertyForInsert($subject);
+        $mapper->insert($subject);
+        $subject = &$mapper->createObject();
+        $subject->firstName = 'Taro';
+        $subject->lastName = 'ITEMAN';
+        $subject->serviceId = 2;
+        $this->_addMissingPropertyForInsert($subject);
+        $mapper->insert($subject);
+        $mapper->addOrder('id');
+        $people = $mapper->findAllServiceIds();
+
+        $this->assertEquals(2, count($people));
+        $this->assertEquals(1, $people[0]->serviceId);
+        $this->assertEquals(2, $people[1]->serviceId);
+    }
+
     /**#@-*/
 
     /**#@+
