@@ -9,6 +9,9 @@
 - name: findAllByServiceId
   query: SELECT * FROM person WHERE service_id = $serviceId AND version >= 0
 
+- name: findAllServiceIds
+  query: SELECT service_id FROM person
+
 # Local Variables:
 # mode: conf-colon
 # coding: iso-8859-1
