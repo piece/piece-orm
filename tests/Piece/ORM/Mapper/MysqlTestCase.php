@@ -63,7 +63,7 @@ class Piece_ORM_Mapper_MysqlTestCase extends Piece_ORM_Mapper_CompatibilityTest
      * @access private
      */
 
-    var $_dsn = 'mysql://piece:piece@localhost/piece';
+    var $_dsn = 'mysql://piece:piece@pieceorm/piece';
     var $_type = 'mysql';
 
     /**#@-*/

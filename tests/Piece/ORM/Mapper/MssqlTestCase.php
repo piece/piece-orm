@@ -63,7 +63,7 @@ class Piece_ORM_Mapper_MssqlTestCase extends Piece_ORM_Mapper_CompatibilityTest
      * @access private
      */
 
-    var $_dsn = 'mssql://piece:piece@localhost:1433/piece';
+    var $_dsn = 'mssql://piece:piece@pieceorm:1433/piece';
     var $_type = 'pgsql';
 
     /**#@-*/

@@ -1,13 +1,13 @@
 # $Id$
 
 - name: database1
-  dsn: pgsql://piece:piece@localhost/piece
+  dsn: pgsql://piece:piece@pieceorm/piece
   options:
     debug: 2
     result_buffering: false
 
 - name: database2
-  dsn: pgsql://piece:piece@localhost/piece
+  dsn: pgsql://piece:piece@pieceorm/piece
   options:
     debug: 0
     result_buffering: false

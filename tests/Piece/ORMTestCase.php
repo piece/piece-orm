@@ -140,20 +140,20 @@ class Piece_ORMTestCase extends PHPUnit_TestCase
                              $this->_cacheDirectory
                              );
         $config = &Piece_ORM::getConfiguration();
-        $config->setDSN('database1', 'pgsql://piece:piece@localhost/piece');
+        $config->setDSN('database1', 'pgsql://piece:piece@pieceorm/piece');
         $config->setOptions('database1', array('debug' => 5));
-        $config->setDSN('database2', 'pgsql://piece:piece@localhost/piece_test');
+        $config->setDSN('database2', 'pgsql://piece:piece@pieceorm/piece_test');
         $config->setOptions('database2', array('debug' => 0, 'result_buffering' => false));
-        $config->setDSN('piece', 'pgsql://piece:piece@localhost/piece');
+        $config->setDSN('piece', 'pgsql://piece:piece@pieceorm/piece');
         $config->setOptions('piece', array('debug' => 0, 'result_buffering' => false));
 
         $this->assertEquals($yaml[0]['dsn'], $config->getDSN('database1'));
         $this->assertTrue($yaml[0]['options'] != $config->getOptions('database1'));
         $this->assertEquals(array('debug' => 5), $config->getOptions('database1'));
         $this->assertTrue($yaml[1]['dsn'] != $config->getDSN('database2'));
-        $this->assertEquals('pgsql://piece:piece@localhost/piece_test', $config->getDSN('database2'));
+        $this->assertEquals('pgsql://piece:piece@pieceorm/piece_test', $config->getDSN('database2'));
         $this->assertEquals($yaml[1]['options'], $config->getOptions('database2'));
-        $this->assertEquals('pgsql://piece:piece@localhost/piece', $config->getDSN('piece'));
+        $this->assertEquals('pgsql://piece:piece@pieceorm/piece', $config->getDSN('piece'));
         $this->assertEquals(array('debug' => 0, 'result_buffering' => false), $config->getOptions('piece'));
     }
 
