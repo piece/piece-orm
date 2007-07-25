@@ -143,9 +143,10 @@ class Piece_ORM_Mapper_AssociatedObjectPersister_OneToOne extends Piece_ORM_Mapp
         }
 
         $referencedColumnValue = $this->_subject->{ Piece_ORM_Inflector::camelize($relationship['referencedColumn'], true) };
+        $useIdentityMap = $mapper->useIdentityMap();
         $mapper->setUseIdentityMap(false);
         $oldObject = $mapper->findWithQuery("SELECT * FROM {$relationship['table']} WHERE {$relationship['column']} = " . $mapper->quote($referencedColumnValue, $relationship['column']));
-        $mapper->setUseIdentityMap(true);
+        $mapper->setUseIdentityMap($useIdentityMap);
         if (Piece_ORM_Error::hasErrors('exception')) {
             return;
         }

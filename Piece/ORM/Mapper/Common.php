@@ -605,6 +605,19 @@ class Piece_ORM_Mapper_Common
         return $this->_loadValue($result);
     }
 
+    // }}}
+    // {{{ useIdentityMap()
+
+    /**
+     * Returns whether use identity map or not for the next query.
+     *
+     * @return boolean
+     */
+    function useIdentityMap()
+    {
+        return $this->_useIdentityMap;
+    }
+
     /**#@-*/
 
     /**#@+
