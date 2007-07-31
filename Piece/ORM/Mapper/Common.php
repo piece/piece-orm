@@ -491,6 +491,8 @@ class Piece_ORM_Mapper_Common
             return $return;
         }
 
+        $queryForGetCount = $query;
+
         if (!$isManip && count($this->_orders)) {
             $query .= ' ORDER BY ' . implode(', ', $this->_orders);
             $this->_orders = array();
@@ -498,7 +500,7 @@ class Piece_ORM_Mapper_Common
 
         $result = &$this->executeQuery($query, $isManip);
         if (preg_match('/^findAll.*$/', $methodName)) {
-            $this->_lastQueryForGetCount = $query;
+            $this->_lastQueryForGetCount = $queryForGetCount;
         }
 
         if (Piece_ORM_Error::hasErrors('exception')) {
