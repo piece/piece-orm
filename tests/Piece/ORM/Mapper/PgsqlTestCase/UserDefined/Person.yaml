@@ -1,0 +1,17 @@
+# $Id$
+
+- name: insertUserDefined
+  query: INSERT INTO person (first_name, last_name, service_id) VALUES ($firstName, $lastName, 1)
+
+- name: updateUserDefined
+  query: UPDATE person SET first_name = $firstName, last_name = $lastName, version = version + 1, mdate = CURRENT_TIMESTAMP WHERE id = $id AND service_id = $serviceId
+
+- name: deleteUserDefined
+  query: DELETE FROM person WHERE id = $id AND service_id = $serviceId
+
+# Local Variables:
+# mode: conf-colon
+# coding: iso-8859-1
+# tab-width: 2
+# indent-tabs-mode: nil
+# End:

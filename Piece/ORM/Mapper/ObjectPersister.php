@@ -109,6 +109,7 @@ class Piece_ORM_Mapper_ObjectPersister
     /**
      * Inserts an object to a table.
      *
+     * @param string $methodName
      * @return mixed
      * @throws PIECE_ORM_ERROR_UNEXPECTED_VALUE
      * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
@@ -120,23 +121,23 @@ class Piece_ORM_Mapper_ObjectPersister
      * @throws PIECE_ORM_ERROR_INVALID_MAPPER
      * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
      */
-    function insert()
+    function insert($methodName)
     {
         if (is_null($this->_subject)) {
             Piece_ORM_Error::push(PIECE_ORM_ERROR_UNEXPECTED_VALUE,
-                                  "An unexpected value detected. insert() cannot receive null."
+                                  "An unexpected value detected. $methodName() cannot receive null."
                                   );
             return;
         }
 
         if (!is_object($this->_subject)) {
             Piece_ORM_Error::push(PIECE_ORM_ERROR_UNEXPECTED_VALUE,
-                                  "An unexpected value detected. insert() can only receive object."
+                                  "An unexpected value detected. $methodName() can only receive object."
                                   );
             return;
         }
 
-        $this->_mapper->executeQueryWithCriteria('insert', $this->_subject, true);
+        $this->_mapper->executeQueryWithCriteria($methodName, $this->_subject, true);
         if (Piece_ORM_Error::hasErrors('exception')) {
             return;
         }
@@ -173,6 +174,7 @@ class Piece_ORM_Mapper_ObjectPersister
     /**
      * Updates an object in a table.
      *
+     * @param string $methodName
      * @return integer
      * @throws PIECE_ORM_ERROR_UNEXPECTED_VALUE
      * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
@@ -184,37 +186,37 @@ class Piece_ORM_Mapper_ObjectPersister
      * @throws PIECE_ORM_ERROR_INVALID_MAPPER
      * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
      */
-    function update()
+    function update($methodName)
     {
         if (!$this->_metadata->hasPrimaryKey()) {
             Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_OPERATION,
-                                  'The primary key required to invoke update().'
+                                  "The primary key required to invoke $methodName()."
                                   );
             return;
         }
 
         if (is_null($this->_subject)) {
             Piece_ORM_Error::push(PIECE_ORM_ERROR_UNEXPECTED_VALUE,
-                                  'An unexpected value detected. update() cannot receive null.'
+                                  "An unexpected value detected. $methodName() cannot receive null."
                                   );
             return;
         }
 
         if (!is_object($this->_subject)) {
             Piece_ORM_Error::push(PIECE_ORM_ERROR_UNEXPECTED_VALUE,
-                                  'An unexpected value detected. update() cannot receive non-object.'
+                                  "An unexpected value detected. $methodName() cannot receive non-object."
                                   );
             return;
         }
 
         if (!$this->_validatePrimaryKeys()) {
             Piece_ORM_Error::push(PIECE_ORM_ERROR_UNEXPECTED_VALUE,
-                                  'An unexpected value detected. Correct values are required for the primary keys to invoke update().'
+                                  "An unexpected value detected. Correct values are required for the primary keys to invoke $methodName()."
                                   );
             return;
         }
 
-        $affectedRows = $this->_mapper->executeQueryWithCriteria('update', $this->_subject, true);
+        $affectedRows = $this->_mapper->executeQueryWithCriteria($methodName, $this->_subject, true);
         if (Piece_ORM_Error::hasErrors('exception')) {
             return;
         }
@@ -239,6 +241,7 @@ class Piece_ORM_Mapper_ObjectPersister
     /**
      * Removes an object from a table.
      *
+     * @param string $methodName
      * @return integer
      * @throws PIECE_ORM_ERROR_UNEXPECTED_VALUE
      * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
@@ -250,32 +253,32 @@ class Piece_ORM_Mapper_ObjectPersister
      * @throws PIECE_ORM_ERROR_INVALID_MAPPER
      * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
      */
-    function delete()
+    function delete($methodName)
     {
         if (!$this->_metadata->hasPrimaryKey()) {
             Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_OPERATION,
-                                  'The primary key required to invoke delete().'
+                                  "The primary key required to invoke $methodName()."
                                   );
             return;
         }
 
         if (is_null($this->_subject)) {
             Piece_ORM_Error::push(PIECE_ORM_ERROR_UNEXPECTED_VALUE,
-                                  'An unexpected value detected. delete() cannot receive null.'
+                                  "An unexpected value detected. $methodName() cannot receive null."
                                   );
             return;
         }
 
         if (!is_object($this->_subject)) {
             Piece_ORM_Error::push(PIECE_ORM_ERROR_UNEXPECTED_VALUE,
-                                  'An unexpected value detected. delete() cannot receive non-object.'
+                                  "An unexpected value detected. $methodName() cannot receive non-object."
                                   );
             return;
         }
 
         if (!$this->_validatePrimaryKeys()) {
             Piece_ORM_Error::push(PIECE_ORM_ERROR_UNEXPECTED_VALUE,
-                                  'An unexpected value detected. Correct values are required for the primary keys to invoke delete().'
+                                  "An unexpected value detected. Correct values are required for the primary keys to invoke $methodName()."
                                   );
             return;
         }
@@ -287,7 +290,7 @@ class Piece_ORM_Mapper_ObjectPersister
             }
         }
 
-        return $this->_mapper->executeQueryWithCriteria('delete', $this->_subject, true);
+        return $this->_mapper->executeQueryWithCriteria($methodName, $this->_subject, true);
     }
 
     /**#@-*/

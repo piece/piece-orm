@@ -111,78 +111,6 @@ class Piece_ORM_Mapper_Common
     }
 
     // }}}
-    // {{{ insert()
-
-    /**
-     * Inserts an object to a table.
-     *
-     * @param mixed &$subject
-     * @return mixed
-     * @throws PIECE_ORM_ERROR_UNEXPECTED_VALUE
-     * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
-     * @throws PIECE_ORM_ERROR_INVALID_OPERATION
-     * @throws PIECE_ORM_ERROR_NOT_FOUND
-     * @throws PIECE_ORM_ERROR_NOT_READABLE
-     * @throws PIECE_ORM_ERROR_CANNOT_READ
-     * @throws PIECE_ORM_ERROR_CANNOT_WRITE
-     * @throws PIECE_ORM_ERROR_INVALID_MAPPER
-     * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
-     */
-    function insert(&$subject)
-    {
-        $persister = &new Piece_ORM_Mapper_ObjectPersister($this, $subject, $this->__relationship__insert);
-        return $persister->insert();
-    }
-
-    // }}}
-    // {{{ delete()
-
-    /**
-     * Removes an object from a table.
-     *
-     * @param mixed &$subject
-     * @return integer
-     * @throws PIECE_ORM_ERROR_UNEXPECTED_VALUE
-     * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
-     * @throws PIECE_ORM_ERROR_INVALID_OPERATION
-     * @throws PIECE_ORM_ERROR_NOT_FOUND
-     * @throws PIECE_ORM_ERROR_NOT_READABLE
-     * @throws PIECE_ORM_ERROR_CANNOT_READ
-     * @throws PIECE_ORM_ERROR_CANNOT_WRITE
-     * @throws PIECE_ORM_ERROR_INVALID_MAPPER
-     * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
-     */
-    function delete(&$subject)
-    {
-        $persister = &new Piece_ORM_Mapper_ObjectPersister($this, $subject, $this->__relationship__delete);
-        return $persister->delete();
-    }
-
-    // }}}
-    // {{{ update()
-
-    /**
-     * Updates an object in a table.
-     *
-     * @param mixed &$subject
-     * @return integer
-     * @throws PIECE_ORM_ERROR_UNEXPECTED_VALUE
-     * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
-     * @throws PIECE_ORM_ERROR_INVALID_OPERATION
-     * @throws PIECE_ORM_ERROR_NOT_FOUND
-     * @throws PIECE_ORM_ERROR_NOT_READABLE
-     * @throws PIECE_ORM_ERROR_CANNOT_READ
-     * @throws PIECE_ORM_ERROR_CANNOT_WRITE
-     * @throws PIECE_ORM_ERROR_INVALID_MAPPER
-     * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
-     */
-    function update(&$subject)
-    {
-        $persister = &new Piece_ORM_Mapper_ObjectPersister($this, $subject, $this->__relationship__update);
-        return $persister->update();
-    }
-
-    // }}}
     // {{{ findAllWithQuery()
 
     /**
@@ -879,6 +807,81 @@ class Piece_ORM_Mapper_Common
         }
 
         return $value;
+    }
+
+    // }}}
+    // {{{ _insert()
+
+    /**
+     * Inserts an object to a table.
+     *
+     * @param string $methodName
+     * @param mixed &$subject
+     * @return mixed
+     * @throws PIECE_ORM_ERROR_UNEXPECTED_VALUE
+     * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
+     * @throws PIECE_ORM_ERROR_INVALID_OPERATION
+     * @throws PIECE_ORM_ERROR_NOT_FOUND
+     * @throws PIECE_ORM_ERROR_NOT_READABLE
+     * @throws PIECE_ORM_ERROR_CANNOT_READ
+     * @throws PIECE_ORM_ERROR_CANNOT_WRITE
+     * @throws PIECE_ORM_ERROR_INVALID_MAPPER
+     * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
+     */
+    function _insert($methodName, &$subject)
+    {
+        $persister = &new Piece_ORM_Mapper_ObjectPersister($this, $subject, $this->{ '__relationship__' . strtolower($methodName) });
+        return $persister->insert($methodName);
+    }
+
+    // }}}
+    // {{{ _delete()
+
+    /**
+     * Removes an object from a table.
+     *
+     * @param string $methodName
+     * @param mixed &$subject
+     * @return integer
+     * @throws PIECE_ORM_ERROR_UNEXPECTED_VALUE
+     * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
+     * @throws PIECE_ORM_ERROR_INVALID_OPERATION
+     * @throws PIECE_ORM_ERROR_NOT_FOUND
+     * @throws PIECE_ORM_ERROR_NOT_READABLE
+     * @throws PIECE_ORM_ERROR_CANNOT_READ
+     * @throws PIECE_ORM_ERROR_CANNOT_WRITE
+     * @throws PIECE_ORM_ERROR_INVALID_MAPPER
+     * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
+     */
+    function _delete($methodName, &$subject)
+    {
+        $persister = &new Piece_ORM_Mapper_ObjectPersister($this, $subject, $this->{ '__relationship__' . strtolower($methodName) });
+        return $persister->delete($methodName);
+    }
+
+    // }}}
+    // {{{ _update()
+
+    /**
+     * Updates an object in a table.
+     *
+     * @param string $methodName
+     * @param mixed &$subject
+     * @return integer
+     * @throws PIECE_ORM_ERROR_UNEXPECTED_VALUE
+     * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
+     * @throws PIECE_ORM_ERROR_INVALID_OPERATION
+     * @throws PIECE_ORM_ERROR_NOT_FOUND
+     * @throws PIECE_ORM_ERROR_NOT_READABLE
+     * @throws PIECE_ORM_ERROR_CANNOT_READ
+     * @throws PIECE_ORM_ERROR_CANNOT_WRITE
+     * @throws PIECE_ORM_ERROR_INVALID_MAPPER
+     * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
+     */
+    function _update($methodName, &$subject)
+    {
+        $persister = &new Piece_ORM_Mapper_ObjectPersister($this, $subject, $this->{ '__relationship__' . strtolower($methodName) });
+        return $persister->update($methodName);
     }
 
     /**#@-*/

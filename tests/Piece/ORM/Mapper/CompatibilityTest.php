@@ -1126,6 +1126,61 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         $this->assertEquals(4, $mapper->getCount());
     }
 
+    /**
+     * @since Method available since Release 0.5.0
+     */
+    function testInsertQueryShouldBeAbleToDefinedByUser()
+    {
+        $this->_configure('UserDefined');
+
+        $mapper = &Piece_ORM_Mapper_Factory::factory('Person');
+        $subject = &$mapper->createObject();
+        $subject->firstName = 'Taro';
+        $subject->lastName = 'ITEMAN';
+        $subject->serviceId = 3;
+        $this->_addMissingPropertyForInsert($subject);
+
+        $id = $mapper->insertUserDefined($subject);
+
+        $this->assertNotNull($id);
+
+        $mapper = &Piece_ORM_Mapper_Factory::factory('Person');
+        $person = &$mapper->findById($id);
+
+        $this->assertNotNull($person);
+        $this->assertEquals('Taro', $person->firstName);
+        $this->assertEquals('ITEMAN', $person->lastName);
+        $this->assertEquals(1, $person->serviceId);
+
+        $mapper->delete($person);
+
+        $this->assertNull($mapper->findById($id));
+    }
+
+    /**
+     * @since Method available since Release 0.5.0
+     */
+    function testUpdateQueryShouldBeAbleToDefinedByUser()
+    {
+        $this->_configure('UserDefined');
+        $id = $this->_insert();
+        $mapper = &Piece_ORM_Mapper_Factory::factory('Person');
+        $person1 = &$mapper->findById($id);
+        $person1->firstName = 'Seven';
+        $affectedRows = $mapper->updateUserDefined($person1);
+
+        $this->assertEquals(1, $affectedRows);
+
+        $person2 = &$mapper->findById($id);
+
+        $this->assertNotNull($person2);
+        $this->assertEquals('Seven', $person2->firstName);
+
+        $mapper->deleteUserDefined($person1);
+
+        $this->assertNull($mapper->findById($id));
+    }
+
     /**#@-*/
 
     /**#@+
