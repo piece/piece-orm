@@ -222,7 +222,10 @@ class Piece_ORM_Mapper_ObjectPersister
         }
 
         if ($primaryKey = $this->_metadata->getPrimaryKey()) {
-            $this->_mapper->removeLoadedObject($this->_subject->{ Piece_ORM_Inflector::camelize($primaryKey, true) });
+            $propertyName = Piece_ORM_Inflector::camelize($primaryKey, true);
+            if (array_key_exists($propertyName, $this->_subject)) {
+                $this->_mapper->removeLoadedObject($this->_subject->$propertyName);
+            }
         }
 
         foreach ($this->_relationships as $relationship) {
