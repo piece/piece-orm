@@ -609,7 +609,7 @@ class Piece_ORM_Mapper_Generator
     {
         if (preg_match('/^findAll.*$/i', $methodName)) {
             return 'findAll';
-        } elseif (preg_match('/^findOne.*$/i', $methodName)) {
+        } elseif (preg_match('/^findOne.+$/i', $methodName)) {
             return 'findOne';
         } elseif (preg_match('/^find.+$/i', $methodName)) {
             return 'find';
