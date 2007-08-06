@@ -312,7 +312,7 @@ class Piece_ORM_Mapper_ObjectPersister
         foreach ($this->_metadata->getPrimaryKeys() as $primaryKey) {
             $propertyName = Piece_ORM_Inflector::camelize($primaryKey, true);
             if (!array_key_exists($propertyName, $this->_subject)) {
-                return false;
+                continue;
             }
 
             if (!is_scalar($this->_subject->$propertyName)) {

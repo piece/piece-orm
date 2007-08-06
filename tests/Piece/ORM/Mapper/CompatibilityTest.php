@@ -303,7 +303,6 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         $this->assertTrue(array_key_exists('foo', $person1));
         $this->assertEquals('bar', $person1->foo);
         $this->assertFalse(array_key_exists('foo', $person2));
-
     }
 
     function testDeleteByNull()
@@ -1179,6 +1178,49 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         $mapper->deleteUserDefined($person1);
 
         $this->assertNull($mapper->findById($id));
+    }
+
+    /**
+     * @since Method available since Release 0.5.0
+     */
+    function testPrimaryKeyValuesShouldNotBeRequiredWhenExecutingUpdateQuery()
+    {
+        $id1 = $this->_insert();
+        $id2 = $this->_insert();
+        $mapper = &Piece_ORM_Mapper_Factory::factory('Person');
+        $subject = &new stdClass();
+        $subject->serviceId = 1;
+        $subject->oldServiceId = 3;
+        $affectedRows = $mapper->updateByServiceId($subject);
+
+        $this->assertEquals(2, $affectedRows);
+
+        $person1 = &$mapper->findById($id1);
+
+        $this->assertEquals(1, $person1->serviceId);
+
+        $person2 = &$mapper->findById($id2);
+
+        $this->assertEquals(1, $person2->serviceId);
+    }
+
+    /**
+     * @since Method available since Release 0.5.0
+     */
+    function testPrimaryKeyValuesShouldNotBeRequiredWhenExecutingDeleteQuery()
+    {
+        $id1 = $this->_insert();
+        $id2 = $this->_insert();
+        $mapper = &Piece_ORM_Mapper_Factory::factory('Person');
+        $subject = &new stdClass();
+        $subject->serviceId = 3;
+        $affectedRows = $mapper->deleteByServiceId($subject);
+
+        $this->assertEquals(2, $affectedRows);
+
+        $people = $mapper->findAll();
+
+        $this->assertEquals(0, count($people));
     }
 
     /**#@-*/

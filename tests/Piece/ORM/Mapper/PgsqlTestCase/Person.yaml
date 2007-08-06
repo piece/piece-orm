@@ -12,6 +12,12 @@
 - name: findAllServiceIds
   query: SELECT service_id FROM person
 
+- name: updateByServiceId
+  query: UPDATE person SET service_id = $serviceId WHERE service_id = $oldServiceId
+
+- name: deleteByServiceId
+  query: DELETE FROM person WHERE service_id = $serviceId
+
 # Local Variables:
 # mode: conf-colon
 # coding: iso-8859-1
