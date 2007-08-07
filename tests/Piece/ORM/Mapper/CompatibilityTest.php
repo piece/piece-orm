@@ -156,7 +156,7 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
 
         $error = Piece_ORM_Error::pop();
 
-        $this->assertEquals(PIECE_ORM_ERROR_UNEXPECTED_VALUE, $error['code']);
+        $this->assertEquals(PIECE_ORM_ERROR_INVOCATION_FAILED, $error['code']);
 
         Piece_ORM_Error::popCallback();
     }
@@ -317,7 +317,7 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
 
         $error = Piece_ORM_Error::pop();
 
-        $this->assertEquals(PIECE_ORM_ERROR_UNEXPECTED_VALUE, $error['code']);
+        $this->assertEquals(PIECE_ORM_ERROR_INVOCATION_FAILED, $error['code']);
 
         Piece_ORM_Error::popCallback();
     }
@@ -1221,6 +1221,71 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         $people = $mapper->findAll();
 
         $this->assertEquals(0, count($people));
+    }
+
+    /**
+     * @since Method available since Release 0.5.0
+     */
+    function testStaticQueryShouldBeAbleToExecuteWithFind()
+    {
+        $mapper = &Piece_ORM_Mapper_Factory::factory('Person');
+        $person = $mapper->findWithStaticQuery();
+
+        $this->assertEquals(1, $person->one);
+    }
+
+    /**
+     * @since Method available since Release 0.5.0
+     */
+    function testStaticQueryShouldBeAbleToExecuteWithFindAll()
+    {
+        $mapper = &Piece_ORM_Mapper_Factory::factory('Person');
+        $people = $mapper->findAllWithStaticQuery();
+
+        $this->assertEquals(1, count($people));
+        $this->assertEquals(1, $people[0]->one);
+    }
+
+    /**
+     * @since Method available since Release 0.5.0
+     */
+    function testStaticQueryShouldBeAbleToExecuteWithFindOne()
+    {
+        $mapper = &Piece_ORM_Mapper_Factory::factory('Person');
+
+        $this->assertEquals(1, $mapper->findOneWithStaticQuery());
+    }
+
+    /**
+     * @since Method available since Release 0.5.0
+     */
+    function testStaticQueryShouldBeAbleToExecuteWithInsert()
+    {
+        $mapper = &Piece_ORM_Mapper_Factory::factory('Person');
+        $id = @$mapper->insertWithStaticQuery();
+
+        $this->assertNotNull($id);
+        $this->assertTrue(is_int($id));
+    }
+
+    /**
+     * @since Method available since Release 0.5.0
+     */
+    function testStaticQueryShouldBeAbleToExecuteWithUpdate()
+    {
+        $mapper = &Piece_ORM_Mapper_Factory::factory('Person');
+
+        $this->assertEquals(0, @$mapper->updateWithStaticQuery());
+    }
+
+    /**
+     * @since Method available since Release 0.5.0
+     */
+    function testStaticQueryShouldBeAbleToExecuteWithDelete()
+    {
+        $mapper = &Piece_ORM_Mapper_Factory::factory('Person');
+
+        $this->assertEquals(0, @$mapper->deleteWithStaticQuery());
     }
 
     /**#@-*/

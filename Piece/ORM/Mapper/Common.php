@@ -575,14 +575,6 @@ class Piece_ORM_Mapper_Common
      */
     function &_find($methodName, $criteria)
     {
-        if (is_null($criteria)) {
-            Piece_ORM_Error::push(PIECE_ORM_ERROR_UNEXPECTED_VALUE,
-                                  "An unexpected value detected. $methodName() cannot receive null."
-                                  );
-            $return = null;
-            return $return;
-        }
-
         $objects = $this->_findAll($methodName, $criteria);
         if (Piece_ORM_Error::hasErrors('exception')) {
             $return = null;

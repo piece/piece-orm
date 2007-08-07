@@ -89,7 +89,9 @@ class Piece_ORM_Mapper_ObjectPersister
      */
     function Piece_ORM_Mapper_ObjectPersister(&$mapper, &$subject, $relationships)
     {
-        $this->_subject = &$subject;
+        if (is_null($subject)) {
+            $subject = &new stdClass();
+        }
         $this->_relationships = $relationships;
         $this->_metadata = &$mapper->getMetadata();
         $this->_mapper = &$mapper;
@@ -101,6 +103,8 @@ class Piece_ORM_Mapper_ObjectPersister
                 $this->_associatedObjectPersisters[$relationshipType] = &new $associatedObjectsPersisterClass($subject);
             }
         }
+
+        $this->_subject = &$subject;
     }
 
     // }}}
@@ -123,13 +127,6 @@ class Piece_ORM_Mapper_ObjectPersister
      */
     function insert($methodName)
     {
-        if (is_null($this->_subject)) {
-            Piece_ORM_Error::push(PIECE_ORM_ERROR_UNEXPECTED_VALUE,
-                                  "An unexpected value detected. $methodName() cannot receive null."
-                                  );
-            return;
-        }
-
         if (!is_object($this->_subject)) {
             Piece_ORM_Error::push(PIECE_ORM_ERROR_UNEXPECTED_VALUE,
                                   "An unexpected value detected. $methodName() can only receive object."
@@ -195,13 +192,6 @@ class Piece_ORM_Mapper_ObjectPersister
             return;
         }
 
-        if (is_null($this->_subject)) {
-            Piece_ORM_Error::push(PIECE_ORM_ERROR_UNEXPECTED_VALUE,
-                                  "An unexpected value detected. $methodName() cannot receive null."
-                                  );
-            return;
-        }
-
         if (!is_object($this->_subject)) {
             Piece_ORM_Error::push(PIECE_ORM_ERROR_UNEXPECTED_VALUE,
                                   "An unexpected value detected. $methodName() cannot receive non-object."
@@ -261,13 +251,6 @@ class Piece_ORM_Mapper_ObjectPersister
         if (!$this->_metadata->hasPrimaryKey()) {
             Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_OPERATION,
                                   "The primary key required to invoke $methodName()."
-                                  );
-            return;
-        }
-
-        if (is_null($this->_subject)) {
-            Piece_ORM_Error::push(PIECE_ORM_ERROR_UNEXPECTED_VALUE,
-                                  "An unexpected value detected. $methodName() cannot receive null."
                                   );
             return;
         }

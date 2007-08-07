@@ -204,7 +204,7 @@ class Piece_ORM_Mapper_Generator
         }
 
         $this->_methodDefinitions[$methodName] = "
-    function &$methodName(\$criteria)
+    function &$methodName(\$criteria = null)
     {
         return \$this->_find('$methodName', \$criteria);
     }";

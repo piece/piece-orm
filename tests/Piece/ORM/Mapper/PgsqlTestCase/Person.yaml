@@ -18,6 +18,24 @@
 - name: deleteByServiceId
   query: DELETE FROM person WHERE service_id = $serviceId
 
+- name: findWithStaticQuery
+  query: SELECT 1 AS one
+
+- name: findAllWithStaticQuery
+  query: SELECT 1 AS one
+
+- name: findOneWithStaticQuery
+  query: SELECT 1 AS one
+
+- name: insertWithStaticQuery
+  query: INSERT INTO person (first_name, last_name, service_id) VALUES ('foo', 'bar', 1)
+
+- name: updateWithStaticQuery
+  query: UPDATE person SET service_id = 1
+
+- name: deleteWithStaticQuery
+  query: DELETE FROM person
+
 # Local Variables:
 # mode: conf-colon
 # coding: iso-8859-1
