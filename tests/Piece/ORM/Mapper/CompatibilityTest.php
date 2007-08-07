@@ -1128,7 +1128,7 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
     /**
      * @since Method available since Release 0.5.0
      */
-    function testInsertQueryShouldBeAbleToDefinedByUser()
+    function testInsertMethodShouldBeAbleToDefinedByUser()
     {
         $this->_configure('UserDefined');
 
@@ -1159,7 +1159,7 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
     /**
      * @since Method available since Release 0.5.0
      */
-    function testUpdateQueryShouldBeAbleToDefinedByUser()
+    function testUpdateMethodShouldBeAbleToDefinedByUser()
     {
         $this->_configure('UserDefined');
         $id = $this->_insert();
@@ -1183,7 +1183,7 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
     /**
      * @since Method available since Release 0.5.0
      */
-    function testPrimaryKeyValuesShouldNotBeRequiredWhenExecutingUpdateQuery()
+    function testPrimaryKeyValuesShouldNotBeRequiredWhenExecutingUpdate()
     {
         $id1 = $this->_insert();
         $id2 = $this->_insert();
@@ -1207,7 +1207,7 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
     /**
      * @since Method available since Release 0.5.0
      */
-    function testPrimaryKeyValuesShouldNotBeRequiredWhenExecutingDeleteQuery()
+    function testPrimaryKeyValuesShouldNotBeRequiredWhenExecutingDelete()
     {
         $id1 = $this->_insert();
         $id2 = $this->_insert();
