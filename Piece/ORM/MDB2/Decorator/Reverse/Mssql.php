@@ -349,6 +349,7 @@ ORDER BY
         }
 
         $db->setOption('idxname_format', $idxname_format);
+        $res = $this->_findAutoIncrementField($result, $res);
         return $res;
     }
 
@@ -357,6 +358,51 @@ ORDER BY
     /**#@+
      * @access private
      */
+
+    // }}}
+    // {{{ _findAutoIncrementField()
+
+    /**
+     * Finds auto increment field when using Microsoft SQL Server.
+     * The MDB2 driver for Microsoft SQL Server cannot detect auto
+     * increment field in the table.
+     *
+     * @param string $tableName
+     * @param array  $tableInfo
+     * @return array
+     */
+    function _findAutoIncrementField($tableName, $tableInfo)
+    {
+        $context = &Piece_ORM_Context::singleton();
+        $dbh = &$context->getConnection();
+        if (Piece_ORM_Error::hasErrors('exception')) {
+            return;
+        }
+
+        PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
+        $columnInfoForTable = $dbh->queryAll("EXEC SP_COLUMNS[$tableName]", null, MDB2_FETCHMODE_ASSOC);
+        PEAR::staticPopErrorHandling();
+        if (MDB2::isError($columnInfoForTable)) {
+            Piece_ORM_Error::pushPEARError($columnInfoForTable,
+                                           PIECE_ORM_ERROR_INVOCATION_FAILED,
+                                           'Failed to invoke $dbh->queryAll() for any reasons.'
+                                           );
+            return;
+        }
+
+        foreach ($columnInfoForTable as $columnInfo) {
+            if (strpos($columnInfo['type_name'], 'identity') !== false) {
+                for ($i = 0, $count = count($tableInfo); $i < $count; ++$i) {
+                    if ($tableInfo[$i]['name'] == $columnInfo['column_name']) {
+                        $tableInfo[$i]['autoincrement'] = true;
+                        break 2;
+                    }
+                }
+            }
+        }
+
+        return $tableInfo;
+    }
 
     /**#@-*/
 

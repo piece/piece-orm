@@ -252,36 +252,6 @@ class Piece_ORM_Metadata_Factory
             return $return;
         }
 
-        /*
-         * Finds auto increment field when using Microsoft SQL Server.
-         * The MDB2 driver for Microsoft SQL Server cannot detect auto
-         * increment field in the table.
-         */
-        if (strtolower(substr(strrchr(get_class($dbh), '_'), 1)) == 'mssql') {
-            PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
-            $columnInfoForTable = $dbh->queryAll("EXEC SP_COLUMNS[$tableName]", null, MDB2_FETCHMODE_ASSOC);
-            PEAR::staticPopErrorHandling();
-            if (MDB2::isError($columnInfoForTable)) {
-                Piece_ORM_Error::pushPEARError($columnInfoForTable,
-                                               PIECE_ORM_ERROR_INVOCATION_FAILED,
-                                               'Failed to invoke $dbh->queryAll() for any reasons.'
-                                               );
-                $return = null;
-                return $return;
-            }
-
-            foreach ($columnInfoForTable as $columnInfo) {
-                if (strpos($columnInfo['type_name'], 'identity') !== false) {
-                    for ($i = 0, $count = count($tableInfo); $i < $count; ++$i) {
-                        if ($tableInfo[$i]['name'] == $columnInfo['column_name']) {
-                            $tableInfo[$i]['autoincrement'] = true;
-                            break 2;
-                        }
-                    }
-                }
-            }
-        }
-
         $metadata = &new Piece_ORM_Metadata($tableInfo);
         return $metadata;
     }
