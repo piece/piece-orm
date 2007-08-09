@@ -1,15 +1,13 @@
 -- $Id$
 
-CREATE TABLE person (
+CREATE TABLE email (
   id int(11) NOT NULL AUTO_INCREMENT,
-  first_name varchar(255) NOT NULL,
-  last_name varchar(255) NOT NULL,
-  service_id int(11) NOT NULL,
+  email varchar(255) NOT NULL,
   version int4 NOT NULL DEFAULT '0',
   rdate datetime NOT NULL,
   mdate timestamp,
   PRIMARY KEY(id),
-  UNIQUE(login_name)
+  UNIQUE(email)
 );
 
 /*

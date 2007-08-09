@@ -1,0 +1,11 @@
+# $Id$
+
+- name: insert
+  query: INSERT INTO email (email, rdate) VALUES ($email, CURRENT_TIMESTAMP)
+
+# Local Variables:
+# mode: conf-colon
+# coding: iso-8859-1
+# tab-width: 2
+# indent-tabs-mode: nil
+# End:

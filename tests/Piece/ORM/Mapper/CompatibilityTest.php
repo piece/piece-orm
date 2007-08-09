@@ -84,7 +84,8 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
                          'place',
                          'restaurant',
                          'service',
-                         'skill'
+                         'skill',
+                         'email'
                          );
     var $_type;
 
@@ -1286,6 +1287,27 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         $mapper = &Piece_ORM_Mapper_Factory::factory('Person');
 
         $this->assertEquals(0, @$mapper->deleteWithStaticQuery());
+    }
+
+    /**
+     * @since Method available since Release 0.5.0
+     */
+    function testConstraintExceptionShouldBeRaisedWhenUniqueConstraintErrorIsOccurred()
+    {
+        Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
+        $mapper = &Piece_ORM_Mapper_Factory::factory('Email');
+        $email = &$mapper->createObject();
+        $email->email = 'foo@example.org';
+        $mapper->insert($email);
+        $mapper->insert($email);
+
+        $this->assertTrue(Piece_ORM_Error::hasErrors('exception'));
+
+        $error = Piece_ORM_Error::pop();
+
+        $this->assertEquals(PIECE_ORM_ERROR_CONSTRAINT, $error['code']);
+
+        Piece_ORM_Error::popCallback();
     }
 
     /**#@-*/

@@ -357,8 +357,13 @@ class Piece_ORM_Mapper_Common
         $this->_lastQueryForGetCount = null;
 
         if (MDB2::isError($result)) {
+            if ($result->getCode() == MDB2_ERROR_CONSTRAINT) {
+                $code = PIECE_ORM_ERROR_CONSTRAINT;
+            } else {
+                $code = PIECE_ORM_ERROR_INVOCATION_FAILED;
+            }
             Piece_ORM_Error::pushPEARError($result,
-                                           PIECE_ORM_ERROR_INVOCATION_FAILED,
+                                           $code,
                                            'Failed to invoke MDB2_Driver_' . $this->getDriverName() . '::query() for any reasons.'
                                            );
             $return = null;
