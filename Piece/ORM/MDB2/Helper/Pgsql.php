@@ -35,10 +35,10 @@
  * @since      File available since Release 0.2.0
  */
 
-// {{{ Piece_ORM_MDB2Helper
+// {{{ Piece_ORM_MDB2_Helper_Pgsql
 
 /**
- * A helper class for MDB2.
+ * The helper class for the MDB2 PostgreSQL driver.
  *
  * @package    Piece_ORM
  * @copyright  2007 KUBO Atsuhiro <iteman@users.sourceforge.net>
@@ -46,7 +46,7 @@
  * @version    Release: @package_version@
  * @since      Class available since Release 0.2.0
  */
-class Piece_ORM_MDB2Helper
+class Piece_ORM_MDB2_Helper_Pgsql
 {
 
     // {{{ properties

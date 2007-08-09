@@ -39,7 +39,6 @@ require_once 'Piece/ORM/Error.php';
 require_once 'MDB2.php';
 require_once 'PEAR.php';
 require_once 'Piece/ORM/Mapper/Factory.php';
-require_once 'Piece/ORM/MDB2Helper.php';
 
 // {{{ GLOBALS
 
@@ -214,7 +213,8 @@ class Piece_ORM_Context
         $dbh->setFetchMode(MDB2_FETCHMODE_ASSOC);
 
         if (strtolower(substr(strrchr(get_class($dbh), '_'), 1)) == 'pgsql') {
-            $dbh->setOption('nativetype_map_callback', array('timestamptz' => array('Piece_ORM_MDB2Helper', 'mapTimestamptz')));
+            include_once 'Piece/ORM/MDB2/Helper/Pgsql.php';
+            $dbh->setOption('nativetype_map_callback', array('timestamptz' => array('Piece_ORM_MDB2_Helper_Pgsql', 'mapTimestamptz')));
         }
 
         return $dbh;
