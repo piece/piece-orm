@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- $Id$ -->
-<package packagerversion="1.5.4" version="2.0" xmlns="http://pear.php.net/dtd/package-2.0" xmlns:tasks="http://pear.php.net/dtd/tasks-1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://pear.php.net/dtd/tasks-1.0
+<package packagerversion="1.6.1" version="2.0" xmlns="http://pear.php.net/dtd/package-2.0" xmlns:tasks="http://pear.php.net/dtd/tasks-1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://pear.php.net/dtd/tasks-1.0
     http://pear.php.net/dtd/tasks-1.0.xsd
     http://pear.php.net/dtd/package-2.0
     http://pear.php.net/dtd/package-2.0.xsd">
@@ -22,10 +22,16 @@ Piece_ORM is a simple framework based on the DataMapper pattern, and features st
   <email>matsufuji@users.sourceforge.net</email>
   <active>yes</active>
  </developer>
- <date>2007-06-21</date>
- <time>20:35:40</time>
+ <developer>
+  <name>SEKIYAMA Ryusuke</name>
+  <user>sekky</user>
+  <email>sekky@users.sourceforge.net</email>
+  <active>yes</active>
+ </developer>
+ <date>2007-08-10</date>
+ <time>21:24:02</time>
  <version>
-  <release>0.4.1</release>
+  <release>0.5.0</release>
   <api>0.3.0</api>
  </version>
  <stability>
@@ -35,18 +41,34 @@ Piece_ORM is a simple framework based on the DataMapper pattern, and features st
  <license uri="http://www.opensource.org/licenses/bsd-license.php">BSD License (revised)</license>
  <notes>A new release of Piece_ORM is now available.
 
-What&apos;s New in Piece_ORM 0.4.1
+What&apos;s New in Piece_ORM 0.5.0
 
- * A Defect Fix: A defect in executing query is fixed.
+ * insertXXX()/updateXXX()/deleteXXX(): Any methods for data manipulation can be defined by mapper configuration files.
+ * Update and Delete With No Primary Key Values: Primary key values are not required when executing a update or delete query.
+ * Static Queries: Executing static queries with any findXXX, findAllXXX, findOneXXX, insertXXX, and updateXXX methods are now supported.
+ * Unique Constraint Error Detection: A PIECE_ORM_ERROR_CONSTRAINT exception is thrown when unique constraint error is occured.
+ * Environment Settings: A configuration file, a mapper definition file, and the metadata for a table be always read when the current environment is not production.
+ * A few Defect Fixes: A serious defect that caused invalid objects to return when executing findAllXxx() with no primary keys in SQL has been fixed. And other defects have been fixed.
 
 See the following release notes for details.
+
+Enhancements
+============ 
+
+- Changed update() so as to restore the previous identity map setting. (Piece_ORM_Mapper_AssociatedObjectPersister_OneToMany, Piece_ORM_Mapper_AssociatedObjectPersister_OneToOne, Piece_ORM_Mapper_Common)
+- Added support for insertXXX(), updateXXX() and deleteXXX(). (Ticket #43) (Piece_ORM_Mapper_Common, Piece_ORM_Mapper_Generator, Piece_ORM_Mapper_ObjectPersister)
+- Changed code so that the primary key values are not required when executing a update or delete query. (Ticket #46) (Piece_ORM_Mapper_ObjectPersister)
+- Changed update() so as to remove the object from the list of the loaded objects only if the primary key is contained in the given object. (Piece_ORM_Mapper_ObjectPersister)
+- Added support for executing static queries with any findXXX, findAllXXX, findOneXXX, insertXXX, and updateXXX methods. (Ticket #42) (Piece_ORM_Mapper_Common, Piece_ORM_Mapper_Generator, Piece_ORM_Mapper_ObjectPersister)
+- Added code so that a PIECE_ORM_ERROR_CONSTRAINT exception is thrown when unique constraint error is occured. (Ticket #44)
+- Updated code so that a configuration file, a mapper definition file, and the metadata for a table be always read when the current environment is not production. (Ticket #45)
 
 Defect Fixes
 ============
 
-Mappers:
-
-- Fixed a defect that caused an exception to raise when executing query with an object which includes one or more PHP NULL values. (Ticket #40)</notes>
+- Fixed a defect that caused invalid objects to return when executing findAllXxx() with no primary keys in SQL. (Piece_ORM_Mapper_ObjectLoader)
+- Fixed the problem that getCount() could not work with addOrder(). (Piece_ORM_Mapper_Common)
+- Fixed the regexp for findOne. (Piece_ORM_Mapper_Generator)</notes>
  <contents>
   <dir baseinstalldir="/" name="/">
    <dir name="data">
@@ -59,6 +81,9 @@ Mappers:
        <tasks:replace from="@package_version@" to="version" type="package-info" />
       </file>
       <file name="department.ddl" role="data">
+       <tasks:replace from="@package_version@" to="version" type="package-info" />
+      </file>
+      <file name="email.ddl" role="data">
        <tasks:replace from="@package_version@" to="version" type="package-info" />
       </file>
       <file name="employee.ddl" role="data">
@@ -96,6 +121,9 @@ Mappers:
       <file name="department.ddl" role="data">
        <tasks:replace from="@package_version@" to="version" type="package-info" />
       </file>
+      <file name="email.ddl" role="data">
+       <tasks:replace from="@package_version@" to="version" type="package-info" />
+      </file>
       <file name="employee.ddl" role="data">
        <tasks:replace from="@package_version@" to="version" type="package-info" />
       </file>
@@ -129,6 +157,9 @@ Mappers:
        <tasks:replace from="@package_version@" to="version" type="package-info" />
       </file>
       <file name="department.ddl" role="data">
+       <tasks:replace from="@package_version@" to="version" type="package-info" />
+      </file>
+      <file name="email.ddl" role="data">
        <tasks:replace from="@package_version@" to="version" type="package-info" />
       </file>
       <file name="employee.ddl" role="data">
@@ -242,6 +273,20 @@ Mappers:
        <tasks:replace from="@package_version@" to="version" type="package-info" />
       </file>
      </dir> <!-- /Piece/ORM/Mapper -->
+     <dir name="MDB2">
+      <dir name="Decorator">
+       <dir name="Reverse">
+        <file name="Mssql.php" role="php">
+         <tasks:replace from="@package_version@" to="version" type="package-info" />
+        </file>
+       </dir> <!-- /Piece/ORM/MDB2/Decorator/Reverse -->
+      </dir> <!-- /Piece/ORM/MDB2/Decorator -->
+      <dir name="Helper">
+       <file name="Pgsql.php" role="php">
+        <tasks:replace from="@package_version@" to="version" type="package-info" />
+       </file>
+      </dir> <!-- /Piece/ORM/MDB2/Helper -->
+     </dir> <!-- /Piece/ORM/MDB2 -->
      <dir name="Metadata">
       <file name="Factory.php" role="php">
        <tasks:replace from="@package_version@" to="version" type="package-info" />
@@ -253,13 +298,13 @@ Mappers:
      <file name="Context.php" role="php">
       <tasks:replace from="@package_version@" to="version" type="package-info" />
      </file>
+     <file name="Env.php" role="php">
+      <tasks:replace from="@package_version@" to="version" type="package-info" />
+     </file>
      <file name="Error.php" role="php">
       <tasks:replace from="@package_version@" to="version" type="package-info" />
      </file>
      <file name="Inflector.php" role="php">
-      <tasks:replace from="@package_version@" to="version" type="package-info" />
-     </file>
-     <file name="MDB2Helper.php" role="php">
       <tasks:replace from="@package_version@" to="version" type="package-info" />
      </file>
      <file name="Metadata.php" role="php">
@@ -280,9 +325,6 @@ Mappers:
         </file>
        </dir> <!-- /tests/Piece/ORM/Config/FactoryTestCase -->
        <file name="FactoryTestCase.php" role="test">
-        <tasks:replace from="@package_version@" to="version" type="package-info" />
-       </file>
-       <file name="TestRunner.php" role="test">
         <tasks:replace from="@package_version@" to="version" type="package-info" />
        </file>
       </dir> <!-- /tests/Piece/ORM/Config -->
@@ -331,6 +373,14 @@ Mappers:
           <tasks:replace from="@package_version@" to="version" type="package-info" />
          </file>
         </dir> <!-- /tests/Piece/ORM/Mapper/MysqlTestCase/Overwrite -->
+        <dir name="UserDefined">
+         <file name="Person.yaml" role="test">
+          <tasks:replace from="@package_version@" to="version" type="package-info" />
+         </file>
+        </dir> <!-- /tests/Piece/ORM/Mapper/MysqlTestCase/UserDefined -->
+        <file name="Email.yaml" role="test">
+         <tasks:replace from="@package_version@" to="version" type="package-info" />
+        </file>
         <file name="Person.yaml" role="test">
          <tasks:replace from="@package_version@" to="version" type="package-info" />
         </file>
@@ -377,6 +427,14 @@ Mappers:
           <tasks:replace from="@package_version@" to="version" type="package-info" />
          </file>
         </dir> <!-- /tests/Piece/ORM/Mapper/PgsqlTestCase/Overwrite -->
+        <dir name="UserDefined">
+         <file name="Person.yaml" role="test">
+          <tasks:replace from="@package_version@" to="version" type="package-info" />
+         </file>
+        </dir> <!-- /tests/Piece/ORM/Mapper/PgsqlTestCase/UserDefined -->
+        <file name="Email.yaml" role="test">
+         <tasks:replace from="@package_version@" to="version" type="package-info" />
+        </file>
         <file name="Person.yaml" role="test">
          <tasks:replace from="@package_version@" to="version" type="package-info" />
         </file>
@@ -399,15 +457,9 @@ Mappers:
        <file name="PgsqlTestCase.php" role="test">
         <tasks:replace from="@package_version@" to="version" type="package-info" />
        </file>
-       <file name="TestRunner.php" role="test">
-        <tasks:replace from="@package_version@" to="version" type="package-info" />
-       </file>
       </dir> <!-- /tests/Piece/ORM/Mapper -->
       <dir name="Metadata">
        <file name="FactoryTestCase.php" role="test">
-        <tasks:replace from="@package_version@" to="version" type="package-info" />
-       </file>
-       <file name="TestRunner.php" role="test">
         <tasks:replace from="@package_version@" to="version" type="package-info" />
        </file>
       </dir> <!-- /tests/Piece/ORM/Metadata -->
@@ -415,9 +467,6 @@ Mappers:
        <tasks:replace from="@package_version@" to="version" type="package-info" />
       </file>
       <file name="InflectorTestCase.php" role="test">
-       <tasks:replace from="@package_version@" to="version" type="package-info" />
-      </file>
-      <file name="TestRunner.php" role="test">
        <tasks:replace from="@package_version@" to="version" type="package-info" />
       </file>
      </dir> <!-- /tests/Piece/ORM -->
@@ -437,11 +486,8 @@ Mappers:
      <file name="ORMTestCase.php" role="test">
       <tasks:replace from="@package_version@" to="version" type="package-info" />
      </file>
-     <file name="TestRunner.php" role="test">
-      <tasks:replace from="@package_version@" to="version" type="package-info" />
-     </file>
     </dir> <!-- /tests/Piece -->
-    <file name="AllTestRunner.php" role="test">
+    <file name="prepare.php" role="test">
      <tasks:replace from="@package_version@" to="version" type="package-info" />
     </file>
    </dir> <!-- /tests -->
@@ -475,12 +521,59 @@ Mappers:
    <package>
     <name>Stagehand_TestRunner</name>
     <channel>pear.piece-framework.com</channel>
-    <min>0.4.0</min>
+    <min>0.5.0</min>
+   </package>
+   <package>
+    <name>PHPUnit</name>
+    <channel>pear.phpunit.de</channel>
+    <min>1.3.2</min>
    </package>
   </optional>
  </dependencies>
  <phprelease />
  <changelog>
+  <release>
+   <version>
+    <release>0.5.0</release>
+    <api>0.3.0</api>
+   </version>
+   <stability>
+    <release>beta</release>
+    <api>beta</api>
+   </stability>
+   <date>2007-08-10</date>
+   <license uri="http://www.opensource.org/licenses/bsd-license.php">BSD License (revised)</license>
+   <notes>A new release of Piece_ORM is now available.
+
+What&apos;s New in Piece_ORM 0.5.0
+
+ * insertXXX()/updateXXX()/deleteXXX(): Any methods for data manipulation can be defined by mapper configuration files.
+ * Update and Delete With No Primary Key Values: Primary key values are not required when executing a update or delete query.
+ * Static Queries: Executing static queries with any findXXX, findAllXXX, findOneXXX, insertXXX, and updateXXX methods are now supported.
+ * Unique Constraint Error Detection: A PIECE_ORM_ERROR_CONSTRAINT exception is thrown when unique constraint error is occured.
+ * Environment Settings: A configuration file, a mapper definition file, and the metadata for a table be always read when the current environment is not production.
+ * A few Defect Fixes: A serious defect that caused invalid objects to return when executing findAllXxx() with no primary keys in SQL has been fixed. And other defects have been fixed.
+
+See the following release notes for details.
+
+Enhancements
+============ 
+
+- Changed update() so as to restore the previous identity map setting. (Piece_ORM_Mapper_AssociatedObjectPersister_OneToMany, Piece_ORM_Mapper_AssociatedObjectPersister_OneToOne, Piece_ORM_Mapper_Common)
+- Added support for insertXXX(), updateXXX() and deleteXXX(). (Ticket #43) (Piece_ORM_Mapper_Common, Piece_ORM_Mapper_Generator, Piece_ORM_Mapper_ObjectPersister)
+- Changed code so that the primary key values are not required when executing a update or delete query. (Ticket #46) (Piece_ORM_Mapper_ObjectPersister)
+- Changed update() so as to remove the object from the list of the loaded objects only if the primary key is contained in the given object. (Piece_ORM_Mapper_ObjectPersister)
+- Added support for executing static queries with any findXXX, findAllXXX, findOneXXX, insertXXX, and updateXXX methods. (Ticket #42) (Piece_ORM_Mapper_Common, Piece_ORM_Mapper_Generator, Piece_ORM_Mapper_ObjectPersister)
+- Added code so that a PIECE_ORM_ERROR_CONSTRAINT exception is thrown when unique constraint error is occured. (Ticket #44)
+- Updated code so that a configuration file, a mapper definition file, and the metadata for a table be always read when the current environment is not production. (Ticket #45)
+
+Defect Fixes
+============
+
+- Fixed a defect that caused invalid objects to return when executing findAllXxx() with no primary keys in SQL. (Piece_ORM_Mapper_ObjectLoader)
+- Fixed the problem that getCount() could not work with addOrder(). (Piece_ORM_Mapper_Common)
+- Fixed the regexp for findOne. (Piece_ORM_Mapper_Generator)</notes>
+  </release>
   <release>
    <version>
     <release>0.4.1</release>

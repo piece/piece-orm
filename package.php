@@ -32,7 +32,6 @@
  * @copyright  2007 KUBO Atsuhiro <iteman@users.sourceforge.net>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License (revised)
  * @version    SVN: $Id$
- * @see        PEAR_PackageFileManager2
  * @since      File available since Release 0.1.0
  */
 
@@ -40,35 +39,52 @@ require_once 'PEAR/PackageFileManager2.php';
 
 PEAR::staticPushErrorHandling(PEAR_ERROR_CALLBACK, create_function('$error', 'var_dump($error); exit();'));
 
-$version = '0.4.1';
+$releaseVersion = '0.5.0';
+$releaseStability = 'beta';
 $apiVersion = '0.3.0';
 $apiStability = 'beta';
-$releaseStability = 'beta';
 $notes = 'A new release of Piece_ORM is now available.
 
-What\'s New in Piece_ORM 0.4.1
+What\'s New in Piece_ORM 0.5.0
 
- * A Defect Fix: A defect in executing query is fixed.
+ * insertXXX()/updateXXX()/deleteXXX(): Any methods for data manipulation can be defined by mapper configuration files.
+ * Update and Delete With No Primary Key Values: Primary key values are not required when executing a update or delete query.
+ * Static Queries: Executing static queries with any findXXX, findAllXXX, findOneXXX, insertXXX, and updateXXX methods are now supported.
+ * Unique Constraint Error Detection: A PIECE_ORM_ERROR_CONSTRAINT exception is thrown when unique constraint error is occurred.
+ * Environment Settings: A configuration file, a mapper definition file, and the metadata for a table be always read when the current environment is not production.
+ * A few Defect Fixes: A serious defect that caused invalid objects to return when executing findAllXxx() with no primary keys in SQL has been fixed. And other defects have been fixed.
 
 See the following release notes for details.
+
+Enhancements
+============ 
+
+- Changed update() so as to restore the previous identity map setting. (Piece_ORM_Mapper_AssociatedObjectPersister_OneToMany, Piece_ORM_Mapper_AssociatedObjectPersister_OneToOne, Piece_ORM_Mapper_Common)
+- Added support for insertXXX(), updateXXX() and deleteXXX(). (Ticket #43) (Piece_ORM_Mapper_Common, Piece_ORM_Mapper_Generator, Piece_ORM_Mapper_ObjectPersister)
+- Changed code so that the primary key values are not required when executing a update or delete query. (Ticket #46) (Piece_ORM_Mapper_ObjectPersister)
+- Changed update() so as to remove the object from the list of the loaded objects only if the primary key is contained in the given object. (Piece_ORM_Mapper_ObjectPersister)
+- Added support for executing static queries with any findXXX, findAllXXX, findOneXXX, insertXXX, and updateXXX methods. (Ticket #42) (Piece_ORM_Mapper_Common, Piece_ORM_Mapper_Generator, Piece_ORM_Mapper_ObjectPersister)
+- Added code so that a PIECE_ORM_ERROR_CONSTRAINT exception is thrown when unique constraint error is occurred. (Ticket #44)
+- Updated code so that a configuration file, a mapper definition file, and the metadata for a table be always read when the current environment is not production. (Ticket #45)
 
 Defect Fixes
 ============
 
-Mappers:
-
-- Fixed a defect that caused an exception to raise when executing query with an object which includes one or more PHP NULL values. (Ticket #40)';
+- Fixed a defect that caused invalid objects to return when executing findAllXxx() with no primary keys in SQL. (Piece_ORM_Mapper_ObjectLoader)
+- Fixed the problem that getCount() could not work with addOrder(). (Piece_ORM_Mapper_Common)
+- Fixed the regexp for findOne. (Piece_ORM_Mapper_Generator)';
 
 $package = new PEAR_PackageFileManager2();
 $package->setOptions(array('filelistgenerator' => 'svn',
                            'changelogoldtonew' => false,
                            'simpleoutput'      => true,
                            'baseinstalldir'    => '/',
-                           'packagefile'       => 'package2.xml',
+                           'packagefile'       => 'package.xml',
                            'packagedirectory'  => '.',
                            'dir_roles'         => array('data' => 'data',
                                                         'tests' => 'test',
-                                                        'docs' => 'doc'))
+                                                        'docs' => 'doc'),
+                           'ignore'            => array('package.php', 'package.xml'))
                      );
 
 $package->setPackage('Piece_ORM');
@@ -78,12 +94,10 @@ $package->setDescription('Piece_ORM is an object-relational mapping framework fo
 
 Piece_ORM is a simple framework based on the DataMapper pattern, and features stdClass centered approach.');
 $package->setChannel('pear.piece-framework.com');
-$package->setLicense('BSD License (revised)',
-                     'http://www.opensource.org/licenses/bsd-license.php'
-                     );
+$package->setLicense('BSD License (revised)', 'http://www.opensource.org/licenses/bsd-license.php');
 $package->setAPIVersion($apiVersion);
 $package->setAPIStability($apiStability);
-$package->setReleaseVersion($version);
+$package->setReleaseVersion($releaseVersion);
 $package->setReleaseStability($releaseStability);
 $package->setNotes($notes);
 $package->setPhpDep('4.3.0');
@@ -91,22 +105,18 @@ $package->setPearinstallerDep('1.4.3');
 $package->addPackageDepWithChannel('required', 'MDB2', 'pear.php.net', '2.3.0');
 $package->addPackageDepWithChannel('required', 'Cache_Lite', 'pear.php.net', '1.7.0');
 $package->addPackageDepWithChannel('required', 'PEAR', 'pear.php.net', '1.4.3');
-$package->addPackageDepWithChannel('optional', 'Stagehand_TestRunner', 'pear.piece-framework.com', '0.4.0');
+$package->addPackageDepWithChannel('optional', 'Stagehand_TestRunner', 'pear.piece-framework.com', '0.5.0');
+$package->addPackageDepWithChannel('optional', 'PHPUnit', 'pear.phpunit.de', '1.3.2');
 $package->addMaintainer('lead', 'iteman', 'KUBO Atsuhiro', 'iteman@users.sourceforge.net');
 $package->addMaintainer('developer', 'matsufuji', 'MATSUFUJI Hideharu', 'matsufuji@users.sourceforge.net');
-$package->addIgnore(array('package.php', 'package.xml', 'package2.xml'));
+$package->addMaintainer('developer', 'sekky', 'SEKIYAMA Ryusuke', 'sekky@users.sourceforge.net');
 $package->addGlobalReplacement('package-info', '@package_version@', 'version');
 $package->generateContents();
-$package1 = &$package->exportCompatiblePackageFile1();
 
-if (array_key_exists(1, $_SERVER['argv'])
-    && $_SERVER['argv'][1] == 'make'
-    ) {
+if (array_key_exists(1, $_SERVER['argv']) && $_SERVER['argv'][1] == 'make') {
     $package->writePackageFile();
-    $package1->writePackageFile();
 } else {
     $package->debugPackageFile();
-    $package1->debugPackageFile();
 }
 
 exit();
