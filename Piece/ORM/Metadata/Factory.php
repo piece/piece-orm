@@ -42,6 +42,7 @@ require_once 'Cache/Lite.php';
 require_once 'Piece/ORM/Context.php';
 require_once 'PEAR.php';
 require_once 'Piece/ORM/Inflector.php';
+require_once 'Piece/ORM/Env.php';
 
 // {{{ GLOBALS
 
@@ -161,6 +162,10 @@ class Piece_ORM_Metadata_Factory
                                        'automaticSerialization' => true,
                                        'errorHandlingAPIBreak' => true)
                                  );
+
+        if (!Piece_ORM_Env::isProduction()) {
+            $cache->remove($tableID);
+        }
 
         /*
          * The Cache_Lite class always specifies PEAR_ERROR_RETURN when

@@ -49,6 +49,8 @@ if (version_compare(phpversion(), '5.0.0', '<')) {
     require_once 'spyc.php5';
 }
 
+require_once 'Piece/ORM/Env.php';
+
 // {{{ GLOBALS
 
 $GLOBALS['PIECE_ORM_Mapper_Instances'] = array();
@@ -220,6 +222,10 @@ class Piece_ORM_Mapper_Factory
                                             'automaticSerialization' => true,
                                             'errorHandlingAPIBreak' => true)
                                       );
+
+        if (!Piece_ORM_Env::isProduction()) {
+            $cache->remove($mapperID);
+        }
 
         /*
          * The Cache_Lite class always specifies PEAR_ERROR_RETURN when

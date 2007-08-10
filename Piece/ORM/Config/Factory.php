@@ -46,6 +46,8 @@ if (version_compare(phpversion(), '5.0.0', '<')) {
     require_once 'spyc.php5';
 }
 
+require_once 'Piece/ORM/Env.php';
+
 // {{{ Piece_ORM_Config_Factory
 
 /**
@@ -177,6 +179,10 @@ class Piece_ORM_Config_Factory
                                             'automaticSerialization' => true,
                                             'errorHandlingAPIBreak' => true)
                                       );
+
+        if (!Piece_ORM_Env::isProduction()) {
+            $cache->remove($masterFile);
+        }
 
         /*
          * The Cache_Lite class always specifies PEAR_ERROR_RETURN when
