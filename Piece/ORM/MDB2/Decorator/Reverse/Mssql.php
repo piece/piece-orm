@@ -35,11 +35,13 @@
  * @since      File available since Release 0.5.0
  */
 
+require_once 'PEAR.php';
+
 // {{{ Piece_ORM_MDB2_Decorator_Reverse_Mssql
 
 /**
- * The decorator for the MDB2 MSSQL driver's schema reverse engineering
- * module.
+ * The decorator for the schema reverse engineering module of the MDB2
+ * Microsoft SQL Server driver.
  *
  * @package    Piece_ORM
  * @copyright  2007 KUBO Atsuhiro <iteman@users.sourceforge.net>
@@ -117,7 +119,7 @@ class Piece_ORM_MDB2_Decorator_Reverse_Mssql
     // {{{ getTableIndexDefinition()
 
     /**
-     * Delegates to the original object.
+     * Get the structure of an index into an array
      *
      * @param string $table
      * @param string $index_name
@@ -240,6 +242,8 @@ ORDER BY
     // {{{ tableInfo()
 
     /**
+     * Returns information about a table or a result set
+     *
      * @param mixed   $result
      * @param integer $mode
      * @return array
@@ -349,8 +353,7 @@ ORDER BY
         }
 
         $db->setOption('idxname_format', $idxname_format);
-        $res = $this->_findAutoIncrementField($result, $res);
-        return $res;
+        return $this->_findAutoIncrementField($result, $res);
     }
 
     /**#@-*/
@@ -373,21 +376,14 @@ ORDER BY
      */
     function _findAutoIncrementField($tableName, $tableInfo)
     {
-        $context = &Piece_ORM_Context::singleton();
-        $dbh = &$context->getConnection();
-        if (Piece_ORM_Error::hasErrors('exception')) {
-            return;
+        $dbh = &$this->getDBInstance();
+        if (PEAR::isError($dbh)) {
+            return $dbh;
         }
 
-        PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
         $columnInfoForTable = $dbh->queryAll("EXEC SP_COLUMNS[$tableName]", null, MDB2_FETCHMODE_ASSOC);
-        PEAR::staticPopErrorHandling();
-        if (MDB2::isError($columnInfoForTable)) {
-            Piece_ORM_Error::pushPEARError($columnInfoForTable,
-                                           PIECE_ORM_ERROR_INVOCATION_FAILED,
-                                           'Failed to invoke $dbh->queryAll() for any reasons.'
-                                           );
-            return;
+        if (PEAR::isError($columnInfoForTable)) {
+            return $columnInfoForTable;
         }
 
         foreach ($columnInfoForTable as $columnInfo) {
