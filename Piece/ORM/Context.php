@@ -137,7 +137,6 @@ class Piece_ORM_Context
      */
     function clear()
     {
-        unset($GLOBALS['PIECE_ORM_Context_Instance']);
         $GLOBALS['PIECE_ORM_Context_Instance'] = null;
     }
 
