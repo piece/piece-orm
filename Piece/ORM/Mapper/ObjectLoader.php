@@ -242,8 +242,7 @@ class Piece_ORM_Mapper_ObjectLoader
 
         $object = &new stdClass();
         foreach ($row as $key => $value) {
-            $propertyName = Piece_ORM_Inflector::camelize($key, true);
-            $object->$propertyName = $value;
+            $object->{ Piece_ORM_Inflector::camelize($key, true) } = $value;
         }
 
         if ($this->_useIdentityMap && $this->_primaryKey && array_key_exists($this->_primaryKey, $row)) {
