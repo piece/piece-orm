@@ -113,6 +113,25 @@
 - name: findOneForCount
   query: SELECT COUNT(*) FROM employee
 
+- name: insertWithPhones
+  query: INSERT INTO employee (name, rdate) VALUES ($name, CURRENT_TIMESTAMP)
+  relationship:
+    - type: manyToMany
+      table: phone
+      mappedAs: phones
+      through:
+        table: employee_phone
+        inverseColumn: phone_id
+
+- name: findAllWithPhones
+  relationship:
+    - type: manyToMany
+      table: phone
+      mappedAs: phones
+      through:
+        table: employee_phone
+        inverseColumn: phone_id
+
 # Local Variables:
 # mode: conf-colon
 # coding: iso-8859-1

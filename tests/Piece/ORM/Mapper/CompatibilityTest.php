@@ -1340,6 +1340,51 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         $this->assertEquals('DELETE FROM person WHERE id = $id', $mapper->__query__deletewithnoquery);
     }
 
+    /**
+     * @since Method available since Release 0.6.0
+     */
+    function testManyToManyRelationshipsWithUnderscoreSeparatedPrimaryKeyShouldWork()
+    {
+        $this->_configure('ManyToManyRelationships');
+        $phoneMapper = &Piece_ORM_Mapper_Factory::factory('Phone');
+
+        $phone1 = &$phoneMapper->createObject();
+        $phone1->phoneNumber = '1';
+        $phoneMapper->insert($phone1);
+
+        $phone2 = &$phoneMapper->createObject();
+        $phone2->phoneNumber = '2';
+        $phoneMapper->insert($phone2);
+
+        $employeeMapper = &Piece_ORM_Mapper_Factory::factory('Employee');
+
+        $employee = &$employeeMapper->createObject();
+        $employee->name = 'Foo';
+        $employee->phones = array();
+        $employee->phones[] = &$phone1;
+        $employee->phones[] = &$phone2;
+        $employeeMapper->insertWithPhones($employee);
+
+        $employees = $employeeMapper->findAllWithPhones();
+
+        $this->assertEquals(1, count($employees));
+        $this->assertTrue(array_key_exists('phones', $employees[0]));
+        $this->assertTrue(is_array($employees[0]->phones));
+        $this->assertEquals(2, count($employees[0]->phones));
+
+        foreach ($employees as $employee) {
+            foreach ($employee->phones as $phone) {
+                $this->assertEquals(5, count(array_keys((array)$phone)));
+                foreach (array('phoneId', 'phoneNumber', 'version', 'rdate', 'mdate') as $property) {
+                    $this->assertTrue(array_key_exists($property, $phone), $property);
+                }
+            }
+        }
+
+        $this->assertEquals('1', $employees[0]->phones[0]->phoneNumber);
+        $this->assertEquals('2', $employees[0]->phones[1]->phoneNumber);
+    }
+
     /**#@-*/
 
     /**#@+

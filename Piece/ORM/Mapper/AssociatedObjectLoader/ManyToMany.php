@@ -36,6 +36,7 @@
  */
 
 require_once 'Piece/ORM/Mapper/AssociatedObjectLoader/Common.php';
+require_once 'Piece/ORM/Inflector.php';
 
 // {{{ Piece_ORM_Mapper_AssociatedObjectLoader_ManyToMany
 
@@ -163,7 +164,8 @@ class Piece_ORM_Mapper_AssociatedObjectLoader_ManyToMany extends Piece_ORM_Mappe
     function _associateObject(&$associatedObject, &$mapper, $relationshipKeyPropertyName, $relationshipIndex)
     {
         $metadata = &$mapper->getMetadata();
-        $primaryKey = $metadata->getPrimaryKey();
+        $primaryKey = Piece_ORM_Inflector::camelize($metadata->getPrimaryKey(), true);
+
         for ($j = 0, $count = count($this->_associations[$relationshipIndex][ $associatedObject->$primaryKey ]); $j < $count; ++$j) {
             $this->_objects[ $this->_objectIndexes[$relationshipIndex][ $this->_associations[$relationshipIndex][ $associatedObject->$primaryKey ][$j] ] ]->{ $this->_relationships[$relationshipIndex]['mappedAs'] }[] = &$associatedObject;
         }
