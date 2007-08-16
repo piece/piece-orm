@@ -519,11 +519,7 @@ class Piece_ORM_Mapper_Generator
      */
     function _getQueryPropertyDeclaration($propertyName, $query)
     {
-        if (!$query) {
-            return "    var \$__query__{$propertyName};";
-        } else {
-            return "    var \$__query__{$propertyName} = '" . addslashes($query) . "';";
-        }
+        return "    var \$__query__{$propertyName} = " . var_export($query, true) . ';';
     }
 
     // }}}
@@ -703,6 +699,7 @@ class Piece_ORM_Mapper_Generator
      * Generates the default INSERT query.
      *
      * @return string
+     * @since Method available since Release 0.6.0
      */
     function _generateDefaultInsertQuery()
     {
@@ -726,6 +723,7 @@ class Piece_ORM_Mapper_Generator
      * Generates the default DELETE query.
      *
      * @return string
+     * @since Method available since Release 0.6.0
      */
     function _generateDefaultDeleteQuery()
     {
@@ -750,6 +748,7 @@ class Piece_ORM_Mapper_Generator
      * Generates the default UPDATE query.
      *
      * @return string
+     * @since Method available since Release 0.6.0
      */
     function _generateDefaultUpdateQuery()
     {
@@ -786,6 +785,7 @@ class Piece_ORM_Mapper_Generator
      * @param string $propertyName
      * @param string $orderBy
      * @return string
+     * @since Method available since Release 0.6.0
      */
     function _getOrderByPropertyDeclaration($propertyName, $orderBy)
     {
