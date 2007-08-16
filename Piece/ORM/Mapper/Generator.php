@@ -121,8 +121,19 @@ class Piece_ORM_Mapper_Generator
         }
 
         $this->_generateInsert();
+        if (Piece_ORM_Error::hasErrors('exception')) {
+            return;
+        }
+
         $this->_generateDelete();
+        if (Piece_ORM_Error::hasErrors('exception')) {
+            return;
+        }
+
         $this->_generateUpdate();
+        if (Piece_ORM_Error::hasErrors('exception')) {
+            return;
+        }
 
         $this->_generateFromConfiguration();
         if (Piece_ORM_Error::hasErrors('exception')) {
@@ -378,20 +389,14 @@ class Piece_ORM_Mapper_Generator
 
     /**
      * Generates the built-in insert method.
+     *
+     * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
+     * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
+     * @throws PIECE_ORM_ERROR_NOT_FOUND
      */
     function _generateInsert()
     {
-        $fields = array();
-        foreach ($this->_metadata->getFieldNames() as $fieldName) {
-            $default = $this->_metadata->getDefault($fieldName);
-            if (is_null($default) || !strlen($default)) {
-                if (!$this->_metadata->isAutoIncrement($fieldName)) {
-                    $fields[] = $fieldName;
-                }
-            }
-        }
-
-        $this->_addInsert('insert', 'INSERT INTO ' . $this->_metadata->getTableName() . ' (' . implode(", ", $fields) . ') VALUES (' . implode(', ', array_map(create_function('$f', "return '\$' . Piece_ORM_Inflector::camelize(\$f, true);"), $fields)) . ')');
+        $this->_addInsert('insert', $this->_generateDefaultInsertQuery());
     }
 
     // }}}
@@ -399,18 +404,16 @@ class Piece_ORM_Mapper_Generator
 
     /**
      * Generates the built-in delete method.
+     *
+     * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
+     * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
+     * @throws PIECE_ORM_ERROR_NOT_FOUND
      */
     function _generateDelete()
     {
-        if ($this->_metadata->hasPrimaryKey()) {
-            $primaryKeys = $this->_metadata->getPrimaryKeys();
-            $fieldName = array_shift($primaryKeys);
-            $whereClause = "$fieldName = \$" . Piece_ORM_Inflector::camelize($fieldName, true);
-            foreach ($primaryKeys as $complexFieldName) {
-                $whereClause .= "$complexFieldName = \$" . Piece_ORM_Inflector::camelize($complexFieldName, true);
-            }
-
-            $this->_addDelete('delete', 'DELETE FROM ' . $this->_metadata->getTableName() . " WHERE $whereClause");
+        $query = $this->_generateDefaultDeleteQuery();
+        if (!is_null($query)) {
+            $this->_addDelete('delete', $query);
         }
     }
 
@@ -453,27 +456,16 @@ class Piece_ORM_Mapper_Generator
 
     /**
      * Generates the built-in update method.
+     *
+     * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
+     * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
+     * @throws PIECE_ORM_ERROR_NOT_FOUND
      */
     function _generateUpdate()
     {
-        if ($this->_metadata->hasPrimaryKey()) {
-            $primaryKeys = $this->_metadata->getPrimaryKeys();
-            $fieldName = array_shift($primaryKeys);
-            $whereClause = "$fieldName = \$" . Piece_ORM_Inflector::camelize($fieldName, true);
-            foreach ($primaryKeys as $complexFieldName) {
-                $whereClause .= "$complexFieldName = \$" . Piece_ORM_Inflector::camelize($complexFieldName, true);
-            }
-
-            $fields = array();
-            foreach ($this->_metadata->getFieldNames() as $fieldName) {
-                if (!$this->_metadata->isAutoIncrement($fieldName)) {
-                    if (!$this->_metadata->isPartOfPrimaryKey($fieldName)) {
-                        $fields[] = "$fieldName = \$" . Piece_ORM_Inflector::camelize($fieldName, true);
-                    }
-                }
-            }
-
-            $this->_addUpdate('update', 'UPDATE ' . $this->_metadata->getTableName() . ' SET ' . implode(", ", $fields) . " WHERE $whereClause");
+        $query = $this->_generateDefaultUpdateQuery();
+        if (!is_null($query)) {
+            $this->_addUpdate('update', $query);
         }
     }
 
@@ -581,9 +573,33 @@ class Piece_ORM_Mapper_Generator
                 return;
             }
 
-            if ($queryType == 'findAll' || $queryType == 'find') {
-                if (!array_key_exists($propertyName, $this->_propertyDefinitions['query'])) {
+            if (!array_key_exists($propertyName, $this->_propertyDefinitions['query'])) {
+                switch ($queryType) {
+                case 'findAll':
+                case 'find':
                     $query = 'SELECT * FROM ' . $this->_metadata->getTableName();
+                    break;
+                case 'insert':
+                    $query = $this->_generateDefaultInsertQuery();
+                    break;
+                case 'delete':
+                    $query = $this->_generateDefaultDeleteQuery();
+                    if (is_null($query)) {
+                        Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_CONFIGURATION,
+                                              'The element [ query ] is required to generate a delete method declaration since the table [ ' . $this->_metadata->getTableName() . ' ] has no primary keys.'
+                                              );
+                        return;
+                    }
+                    break;
+                case 'update':
+                    $query = $this->_generateDefaultUpdateQuery();
+                    if (is_null($query)) {
+                        Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_CONFIGURATION,
+                                              'The element [ query ] is required to generate a update method declaration since the table [ ' . $this->_metadata->getTableName() . ' ] has no primary keys.'
+                                              );
+                        return;
+                    }
+                    break;
                 }
             }
         }
@@ -673,6 +689,86 @@ class Piece_ORM_Mapper_Generator
     {
         return \$this->_findOne('$methodName', \$criteria);
     }";
+    }
+
+    // }}}
+    // {{{ _generateDefaultInsertQuery()
+
+    /**
+     * Generates the default INSERT query.
+     *
+     * @return string
+     */
+    function _generateDefaultInsertQuery()
+    {
+        $fields = array();
+        foreach ($this->_metadata->getFieldNames() as $fieldName) {
+            $default = $this->_metadata->getDefault($fieldName);
+            if (is_null($default) || !strlen($default)) {
+                if (!$this->_metadata->isAutoIncrement($fieldName)) {
+                    $fields[] = $fieldName;
+                }
+            }
+        }
+
+        return 'INSERT INTO ' . $this->_metadata->getTableName() . ' (' . implode(", ", $fields) . ') VALUES (' . implode(', ', array_map(create_function('$f', "return '\$' . Piece_ORM_Inflector::camelize(\$f, true);"), $fields)) . ')';
+    }
+
+    // }}}
+    // {{{ _generateDefaultDeleteQuery()
+
+    /**
+     * Generates the default DELETE query.
+     *
+     * @return string
+     */
+    function _generateDefaultDeleteQuery()
+    {
+        if ($this->_metadata->hasPrimaryKey()) {
+            $primaryKeys = $this->_metadata->getPrimaryKeys();
+            $fieldName = array_shift($primaryKeys);
+            $whereClause = "$fieldName = \$" . Piece_ORM_Inflector::camelize($fieldName, true);
+            foreach ($primaryKeys as $complexFieldName) {
+                $whereClause .= "$complexFieldName = \$" . Piece_ORM_Inflector::camelize($complexFieldName, true);
+            }
+
+            return 'DELETE FROM ' . $this->_metadata->getTableName() . " WHERE $whereClause";
+        } else {
+            return null;
+        }
+    }
+
+    // }}}
+    // {{{ _generateDefaultUpdateQuery()
+
+    /**
+     * Generates the default UPDATE query.
+     *
+     * @return string
+     */
+    function _generateDefaultUpdateQuery()
+    {
+        if ($this->_metadata->hasPrimaryKey()) {
+            $primaryKeys = $this->_metadata->getPrimaryKeys();
+            $fieldName = array_shift($primaryKeys);
+            $whereClause = "$fieldName = \$" . Piece_ORM_Inflector::camelize($fieldName, true);
+            foreach ($primaryKeys as $complexFieldName) {
+                $whereClause .= "$complexFieldName = \$" . Piece_ORM_Inflector::camelize($complexFieldName, true);
+            }
+
+            $fields = array();
+            foreach ($this->_metadata->getFieldNames() as $fieldName) {
+                if (!$this->_metadata->isAutoIncrement($fieldName)) {
+                    if (!$this->_metadata->isPartOfPrimaryKey($fieldName)) {
+                        $fields[] = "$fieldName = \$" . Piece_ORM_Inflector::camelize($fieldName, true);
+                    }
+                }
+            }
+
+            return 'UPDATE ' . $this->_metadata->getTableName() . ' SET ' . implode(", ", $fields) . " WHERE $whereClause";
+        } else {
+            return null;
+        }
     }
 
     /**#@-*/

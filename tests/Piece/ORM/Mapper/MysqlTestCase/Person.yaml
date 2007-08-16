@@ -36,6 +36,12 @@
 - name: deleteWithStaticQuery
   query: DELETE FROM person
 
+- name: insertWithNoQuery
+
+- name: updateWithNoQuery
+
+- name: deleteWithNoQuery
+
 # Local Variables:
 # mode: conf-colon
 # coding: iso-8859-1

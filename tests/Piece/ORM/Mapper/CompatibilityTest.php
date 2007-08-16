@@ -1310,6 +1310,36 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         Piece_ORM_Error::popCallback();
     }
 
+    /**
+     * @since Method available since Release 0.6.0
+     */
+    function testDefaultQueryShouldBeGeneratedIfQueryForInsertMethodIsNotGiven()
+    {
+        $mapper = &Piece_ORM_Mapper_Factory::factory('Person');
+
+        $this->assertEquals('INSERT INTO person (first_name, last_name, service_id) VALUES ($firstName, $lastName, $serviceId)', $mapper->__query__insertwithnoquery);
+    }
+
+    /**
+     * @since Method available since Release 0.6.0
+     */
+    function testDefaultQueryShouldBeGeneratedIfQueryForUpdateMethodIsNotGiven()
+    {
+        $mapper = &Piece_ORM_Mapper_Factory::factory('Person');
+
+        $this->assertEquals('UPDATE person SET first_name = $firstName, last_name = $lastName, service_id = $serviceId, version = $version, rdate = $rdate, mdate = $mdate WHERE id = $id', $mapper->__query__updatewithnoquery);
+    }
+
+    /**
+     * @since Method available since Release 0.6.0
+     */
+    function testDefaultQueryShouldBeGeneratedIfQueryForDeleteMethodIsNotGiven()
+    {
+        $mapper = &Piece_ORM_Mapper_Factory::factory('Person');
+
+        $this->assertEquals('DELETE FROM person WHERE id = $id', $mapper->__query__deletewithnoquery);
+    }
+
     /**#@-*/
 
     /**#@+

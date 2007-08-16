@@ -72,6 +72,16 @@ class Piece_ORM_Mapper_MysqlTestCase extends Piece_ORM_Mapper_CompatibilityTest
      * @access public
      */
 
+    /**
+     * @since Method available since Release 0.6.0
+     */
+    function testDefaultQueryShouldBeGeneratedIfQueryForInsertMethodIsNotGiven()
+    {
+        $mapper = &Piece_ORM_Mapper_Factory::factory('Person');
+
+        $this->assertEquals('INSERT INTO person (first_name, last_name, service_id, rdate) VALUES ($firstName, $lastName, $serviceId, $rdate)', $mapper->__query__insertwithnoquery);
+    }
+
     /**#@-*/
 
     /**#@+
