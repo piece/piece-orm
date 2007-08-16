@@ -72,7 +72,8 @@ class Piece_ORM_Mapper_Generator
     var $_metadata;
     var $_methodDefinitions = array();
     var $_propertyDefinitions = array('query' => array(),
-                                      'relationship' => array()
+                                      'relationship' => array(),
+                                      'orderBy' => array()
                                       );
     var $_baseMapperMethods;
 
@@ -144,6 +145,7 @@ class Piece_ORM_Mapper_Generator
 {\n" .
             implode("\n", $this->_propertyDefinitions['query']) . "\n" .
             implode("\n", $this->_propertyDefinitions['relationship']) . "\n" .
+            implode("\n", $this->_propertyDefinitions['orderBy']) . "\n" .
             implode("\n", $this->_methodDefinitions) . "\n}";
     }
 
@@ -196,11 +198,12 @@ class Piece_ORM_Mapper_Generator
      * @param string $methodName
      * @param string $query
      * @param array  $relationships
+     * @param string $orderBy
      * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
      * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
      * @throws PIECE_ORM_ERROR_NOT_FOUND
      */
-    function _addFind($methodName, $query, $relationships = null)
+    function _addFind($methodName, $query, $relationships = null, $orderBy = null)
     {
         if (!$this->_validateMethodName($methodName)) {
             Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_CONFIGURATION,
@@ -209,7 +212,7 @@ class Piece_ORM_Mapper_Generator
             return;
         }
 
-        $this->_addPropertyDefinitions($methodName, $query, $relationships);
+        $this->_addPropertyDefinitions($methodName, $query, $relationships, $orderBy);
         if (Piece_ORM_Error::hasErrors('exception')) {
             return;
         }
@@ -264,11 +267,12 @@ class Piece_ORM_Mapper_Generator
      * @param string $methodName
      * @param string $query
      * @param array  $relationships
+     * @param string $orderBy
      * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
      * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
      * @throws PIECE_ORM_ERROR_NOT_FOUND
      */
-    function _addFindAll($methodName, $query = null, $relationships = null)
+    function _addFindAll($methodName, $query = null, $relationships = null, $orderBy = null)
     {
         if (!$this->_validateMethodName($methodName)) {
             Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_CONFIGURATION,
@@ -277,7 +281,7 @@ class Piece_ORM_Mapper_Generator
             return;
         }
 
-        $this->_addPropertyDefinitions($methodName, $query, $relationships);
+        $this->_addPropertyDefinitions($methodName, $query, $relationships, $orderBy);
         if (Piece_ORM_Error::hasErrors('exception')) {
             return;
         }
@@ -313,19 +317,19 @@ class Piece_ORM_Mapper_Generator
 
             switch ($queryType) {
             case 'findAll':
-                $this->_addFindAll($method['name'], @$method['query'], @$method['relationship']);
+                $this->_addFindAll($method['name'], @$method['query'], @$method['relationship'], @$method['orderBy']);
                 if (Piece_ORM_Error::hasErrors('exception')) {
                     return;
                 }
                 break;
             case 'findOne':
-                $this->_addFindOne($method['name'], @$method['query']);
+                $this->_addFindOne($method['name'], @$method['query'], @$method['orderBy']);
                 if (Piece_ORM_Error::hasErrors('exception')) {
                     return;
                 }
                 break;
             case 'find':
-                $this->_addFind($method['name'], @$method['query'], @$method['relationship']);
+                $this->_addFind($method['name'], @$method['query'], @$method['relationship'], @$method['orderBy']);
                 if (Piece_ORM_Error::hasErrors('exception')) {
                     return;
                 }
@@ -559,20 +563,20 @@ class Piece_ORM_Mapper_Generator
      * @param string $methodName
      * @param string $query
      * @param array  $relationships
+     * @param string $orderBy
      * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
      * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
      * @throws PIECE_ORM_ERROR_NOT_FOUND
      */
-    function _addPropertyDefinitions($methodName, $query, $relationships)
+    function _addPropertyDefinitions($methodName, $query, $relationships, $orderBy = null)
     {
         $propertyName = strtolower($methodName);
+        $queryType = $this->_getQueryType($methodName);
+        if (Piece_ORM_Error::hasErrors('exception')) {
+            return;
+        }
 
         if (!$query) {
-            $queryType = $this->_getQueryType($methodName);
-            if (Piece_ORM_Error::hasErrors('exception')) {
-                return;
-            }
-
             if (!array_key_exists($propertyName, $this->_propertyDefinitions['query'])) {
                 switch ($queryType) {
                 case 'findAll':
@@ -605,11 +609,11 @@ class Piece_ORM_Mapper_Generator
         }
 
         if ($query) {
-            $this->_propertyDefinitions['query'][$propertyName] =
-                $this->_getQueryPropertyDeclaration($propertyName, $query);
+            $this->_propertyDefinitions['query'][$propertyName] = $this->_getQueryPropertyDeclaration($propertyName, $query);
         }
 
         $this->_propertyDefinitions['relationship'][$propertyName] = $this->_getRelationshipPropertyDeclaration($propertyName, $relationships);
+        $this->_propertyDefinitions['orderBy'][$propertyName] = $this->_getOrderByPropertyDeclaration($propertyName, $orderBy);
     }
 
     // }}}
@@ -669,9 +673,10 @@ class Piece_ORM_Mapper_Generator
      *
      * @param string $methodName
      * @param string $query
+     * @param string $orderBy
      * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
      */
-    function _addFindOne($methodName, $query)
+    function _addFindOne($methodName, $query, $orderBy)
     {
         if (!$query) {
             Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_CONFIGURATION,
@@ -681,8 +686,8 @@ class Piece_ORM_Mapper_Generator
         }
 
         $propertyName = strtolower($methodName);
-        $this->_propertyDefinitions['query'][$propertyName] =
-            $this->_getQueryPropertyDeclaration($propertyName, $query);
+        $this->_propertyDefinitions['query'][$propertyName] = $this->_getQueryPropertyDeclaration($propertyName, $query);
+        $this->_propertyDefinitions['orderBy'][$propertyName] = $this->_getOrderByPropertyDeclaration($propertyName, $orderBy);
 
         $this->_methodDefinitions[$methodName] = "
     function $methodName(\$criteria = null)
@@ -769,6 +774,22 @@ class Piece_ORM_Mapper_Generator
         } else {
             return null;
         }
+    }
+
+    // }}}
+    // {{{ _getOrderByPropertyDeclaration()
+
+    /**
+     * Gets a property declaration that will be used as the order by clause
+     * for the query for a method.
+     *
+     * @param string $propertyName
+     * @param string $orderBy
+     * @return string
+     */
+    function _getOrderByPropertyDeclaration($propertyName, $orderBy)
+    {
+        return "    var \$__orderBy__{$propertyName} = " . var_export($orderBy, true) . ';';
     }
 
     /**#@-*/

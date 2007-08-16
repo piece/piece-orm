@@ -426,8 +426,12 @@ class Piece_ORM_Mapper_Common
 
         $queryForGetCount = $query;
 
-        if (!$isManip && count($this->_orders)) {
-            $query .= ' ORDER BY ' . implode(', ', $this->_orders);
+        if (!$isManip) {
+            if (count($this->_orders)) {
+                $query .= ' ORDER BY ' . implode(', ', $this->_orders);
+            } elseif (!is_null($this->{ '__orderBy__' . strtolower($methodName) })) {
+                $query .= ' ORDER BY ' . $this->{ '__orderBy__' . strtolower($methodName) };
+            }
             $this->_orders = array();
         }
 

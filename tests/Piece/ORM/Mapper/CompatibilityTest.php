@@ -1387,6 +1387,55 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         $this->assertEquals('2', $employees[0]->phones[1]->phoneNumber);
     }
 
+    /**
+     * @since Method available since Release 0.6.0
+     */
+    function testSortOrderShouldBeAbleToDefinedByMapperDefinitionFile()
+    {
+        $mapper = &Piece_ORM_Mapper_Factory::factory('Email');
+        $email1 = &$mapper->createObject();
+        $email1->email = 'foo@example.org';
+        $mapper->insert($email1);
+        $email2 = &$mapper->createObject();
+        $email2->email = 'bar@example.org';
+        $mapper->insert($email2);
+        $emails = $mapper->findAllOrderByEmail();
+
+        $this->assertEquals(2, count($emails));
+        $this->assertEquals('bar@example.org', $emails[0]->email);
+        $this->assertEquals('foo@example.org', $emails[1]->email);
+
+        $email3 = &$mapper->findOrderByEmail();
+
+        $this->assertNotNull($email3);
+        $this->assertEquals('bar@example.org', $email3->email);
+
+        $email4 = $mapper->findOneOrderByEmail();
+
+        $this->assertNotNull($email4);
+        $this->assertEquals('bar@example.org', $email4);
+    }
+
+    /**
+     * @since Method available since Release 0.6.0
+     */
+    function testDynamicSortOrderShouldBePreferredToStaticSortOrder()
+    {
+        $mapper = &Piece_ORM_Mapper_Factory::factory('Email');
+        $email1 = &$mapper->createObject();
+        $email1->email = 'foo@example.org';
+        $mapper->insert($email1);
+        $email2 = &$mapper->createObject();
+        $email2->email = 'bar@example.org';
+        $mapper->insert($email2);
+        $mapper->addOrder('id');
+        $emails = $mapper->findAllOrderByEmail();
+
+        $this->assertEquals(2, count($emails));
+        $this->assertEquals('bar@example.org', $emails[1]->email);
+        $this->assertEquals('foo@example.org', $emails[0]->email);
+    }
+
     /**#@-*/
 
     /**#@+

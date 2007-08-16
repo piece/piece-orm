@@ -3,6 +3,16 @@
 - name: insert
   query: INSERT INTO email (email, rdate) VALUES ($email, CURRENT_TIMESTAMP)
 
+- name: findAllOrderByEmail
+  orderBy: email
+
+- name: findOrderByEmail
+  orderBy: email
+
+- name: findOneOrderByEmail
+  query: SELECT email FROM email
+  orderBy: email
+
 # Local Variables:
 # mode: conf-colon
 # coding: iso-8859-1

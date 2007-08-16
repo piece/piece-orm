@@ -57,6 +57,7 @@ sequence:
                   "referencedColumn": { type: str, required: no }
                   "inverseColumn": { type: str, required: no }
               "orderBy": { type: str, required: no }
+      "orderBy": { type: str, required: no }
 
 # Local Variables:
 # mode: conf-colon
