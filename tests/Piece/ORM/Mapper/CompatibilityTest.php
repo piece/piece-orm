@@ -85,7 +85,9 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
                          'restaurant',
                          'service',
                          'skill',
-                         'email'
+                         'email',
+                         'phone',
+                         'employee_phone'
                          );
     var $_type;
 
