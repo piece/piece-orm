@@ -211,10 +211,10 @@ class Piece_ORM_Context
 
         $dbh->setFetchMode(MDB2_FETCHMODE_ASSOC);
 
-        if (strtolower(substr(strrchr(get_class($dbh), '_'), 1)) == 'pgsql') {
-            include_once 'Piece/ORM/MDB2/Helper/Pgsql.php';
-            $dbh->setOption('nativetype_map_callback', array('timestamptz' => array('Piece_ORM_MDB2_Helper_Pgsql', 'mapTimestamptz')));
-        }
+        $nativeTypeMapperClass = 'Piece_ORM_MDB2_NativeTypeMapper_' . ucwords(strtolower(substr(strrchr(get_class($dbh), '_'), 1)));
+        include_once str_replace('_', '/', $nativeTypeMapperClass) . '.php';
+        $nativeTypeMapper = &new $nativeTypeMapperClass();
+        $nativeTypeMapper->mapNativeType($dbh);
 
         return $dbh;
     }

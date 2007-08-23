@@ -32,23 +32,28 @@
  * @copyright  2007 KUBO Atsuhiro <iteman@users.sourceforge.net>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License (revised)
  * @version    SVN: $Id$
- * @since      File available since Release 0.1.0
+ * @since      File available since Release 0.7.0
  */
 
-require_once dirname(__FILE__) . '/CompatibilityTest.php';
+require_once 'Piece/ORM/MDB2/NativeTypeMapper/Common.php';
 
-// {{{ Piece_ORM_Mapper_PgsqlTestCase
+// {{{ GLOBALS
+
+$GLOBALS['PIECE_ORM_MDB2_NativeTypeMap']['mysql'] = array();
+
+// }}}
+// {{{ Piece_ORM_MDB2_NativeTypeMapper_Mysql
 
 /**
- * TestCase for PostgreSQL.
+ * A helper class to map native datatypes of MySQL to MDB2 datatypes.
  *
  * @package    Piece_ORM
  * @copyright  2007 KUBO Atsuhiro <iteman@users.sourceforge.net>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License (revised)
  * @version    Release: @package_version@
- * @since      Class available since Release 0.1.0
+ * @since      Class available since Release 0.7.0
  */
-class Piece_ORM_Mapper_PgsqlTestCase extends Piece_ORM_Mapper_CompatibilityTest
+class Piece_ORM_MDB2_NativeTypeMapper_Mysql extends Piece_ORM_MDB2_NativeTypeMapper_Common
 {
 
     // {{{ properties
@@ -63,34 +68,29 @@ class Piece_ORM_Mapper_PgsqlTestCase extends Piece_ORM_Mapper_CompatibilityTest
      * @access private
      */
 
-    var $_dsn = 'pgsql://piece:piece@pieceorm/piece';
-    var $_type = 'pgsql';
-
     /**#@-*/
 
     /**#@+
      * @access public
      */
 
-    /**
-     * @since Method available since Release 0.7.0
-     */
-    function testGeometricTypesShouldWork()
-    {
-        $mapper = &Piece_ORM_Mapper_Factory::factory('GeometricTypes');
-        $geometricTypes = &$mapper->createObject();
-        $geometricTypes->pointField = '(1,1)';
-        $geometricTypes->lsegField = '[(1,1),(2,2)]';
-        $geometricTypes->boxField = '(2,2),(1,1)';
-        $geometricTypes->openPathField = '[(1,1),(2,2),(3,1)]';
-        $geometricTypes->closedPathField = '((1,1),(2,2),(3,1),(1,1))';
-        $geometricTypes->polygonField = '((1,1),(2,2),(3,1),(1,1))';
-        $geometricTypes->circleField = '<(1,1),1>';
-        $id = $mapper->insert($geometricTypes);
+    // }}}
+    // {{{ addMap()
 
-        $this->assertNotNull($mapper->findById($id));
-        $this->assertNotNull($mapper->findByBoxField('(3,3),(1,1)'));
-        $this->assertNull($mapper->findByBoxField('(4,4),(3,3)'));
+    /**
+     * Adds an element to the map.
+     *
+     * @param string  $nativeType
+     * @param array   $mdb2Types
+     * @param integer $length
+     * @param boolean $unsigned
+     * @param boolean $fixed
+     * @static
+     */
+    function addMap($nativeType, $mdb2Types, $length = null, $unsigned = null, $fixed = null)
+    {
+        $driverName = strtolower(substr(strrchr(__CLASS__, '_'), 1));
+        parent::addMap($driverName, $nativeType, $mdb2Types, $length, $unsigned, $fixed);
     }
 
     /**#@-*/
