@@ -39,36 +39,14 @@ require_once 'Piece/ORM/MDB2/NativeTypeMapper/Common.php';
 
 // {{{ GLOBALS
 
-$GLOBALS['PIECE_ORM_MDB2_NativeTypeMap']['pgsql'] =
-    array('timestamptz' => array('type'     => array('timestamp'),
-                                 'length'   => null,
-                                 'unsigned' => null,
-                                 'fixed'    => null),
-          'point'       => array('type'     => array('decimal'),
-                                 'length'   => null,
-                                 'unsigned' => null,
-                                 'fixed'    => null),
-          'lseg'        => array('type'     => array('decimal'),
-                                 'length'   => null,
-                                 'unsigned' => null,
-                                 'fixed'    => null),
-          'box'         => array('type'     => array('decimal'),
-                                 'length'   => null,
-                                 'unsigned' => null,
-                                 'fixed'    => null),
-          'path'        => array('type'     => array('decimal'),
-                                 'length'   => null,
-                                 'unsigned' => null,
-                                 'fixed'    => null),
-          'polygon'     => array('type'     => array('decimal'),
-                                 'length'   => null,
-                                 'unsigned' => null,
-                                 'fixed'    => null),
-          'circle'      => array('type'     => array('decimal'),
-                                 'length'   => null,
-                                 'unsigned' => null,
-                                 'fixed'    => null)
-          );
+$GLOBALS['PIECE_ORM_MDB2_NativeTypeMap']['pgsql'] = array('timestamptz' => 'timestamp',
+                                                          'point'       => 'decimal',
+                                                          'lseg'        => 'decimal',
+                                                          'box'         => 'decimal',
+                                                          'path'        => 'decimal',
+                                                          'polygon'     => 'decimal',
+                                                          'circle'      => 'decimal',
+                                                          );
 
 // }}}
 // {{{ Piece_ORM_MDB2_NativeTypeMapper_Pgsql
@@ -109,17 +87,14 @@ class Piece_ORM_MDB2_NativeTypeMapper_Pgsql extends Piece_ORM_MDB2_NativeTypeMap
     /**
      * Adds an element to the map.
      *
-     * @param string  $nativeType
-     * @param array   $mdb2Types
-     * @param integer $length
-     * @param boolean $unsigned
-     * @param boolean $fixed
+     * @param string $nativeType
+     * @param string $mdb2Type
      * @static
      */
-    function addMap($nativeType, $mdb2Types, $length = null, $unsigned = null, $fixed = null)
+    function addMap($nativeType, $mdb2Type)
     {
         $driverName = strtolower(substr(strrchr(__CLASS__, '_'), 1));
-        parent::addMap($driverName, $nativeType, $mdb2Types, $length, $unsigned, $fixed);
+        parent::addMap($driverName, $nativeType, $mdb2Type);
     }
 
     /**#@-*/

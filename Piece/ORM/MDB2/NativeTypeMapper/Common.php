@@ -120,10 +120,10 @@ class Piece_ORM_MDB2_NativeTypeMapper_Common
      */
     function getMDB2TypeInfo(&$dbh, $field)
     {
-        return array($GLOBALS['PIECE_ORM_MDB2_NativeTypeMap'][ $this->_driverName ][ $field['type'] ]['type'],
-                     $GLOBALS['PIECE_ORM_MDB2_NativeTypeMap'][ $this->_driverName ][ $field['type'] ]['length'],
-                     $GLOBALS['PIECE_ORM_MDB2_NativeTypeMap'][ $this->_driverName ][ $field['type'] ]['unsigned'],
-                     $GLOBALS['PIECE_ORM_MDB2_NativeTypeMap'][ $this->_driverName ][ $field['type'] ]['fixed']
+        return array(array($GLOBALS['PIECE_ORM_MDB2_NativeTypeMap'][ $this->_driverName ][ $field['type'] ]),
+                     null,
+                     null,
+                     null
                      );
     }
 
@@ -133,21 +133,14 @@ class Piece_ORM_MDB2_NativeTypeMapper_Common
     /**
      * Adds an element to the map.
      *
-     * @param string  $driverName
-     * @param string  $nativeType
-     * @param array   $mdb2Types
-     * @param integer $length
-     * @param boolean $unsigned
-     * @param boolean $fixed
+     * @param string $driverName
+     * @param string $nativeType
+     * @param string $mdb2Type
      * @static
      */
-    function addMap($driverName, $nativeType, $mdb2Types, $length, $unsigned, $fixed)
+    function addMap($driverName, $nativeType, $mdb2Type)
     {
-        $GLOBALS['PIECE_ORM_MDB2_NativeTypeMap'][$driverName][$nativeType] = array('type'     => $mdb2Types,
-                                                                                   'length'   => $length,
-                                                                                   'unsigned' => $unsigned,
-                                                                                   'fixed'    => $fixed
-                                                                                   );
+        $GLOBALS['PIECE_ORM_MDB2_NativeTypeMap'][$driverName][$nativeType] = $mdb2Type;
     }
 
     /**#@-*/

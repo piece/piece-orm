@@ -80,17 +80,14 @@ class Piece_ORM_MDB2_NativeTypeMapper_Mysql extends Piece_ORM_MDB2_NativeTypeMap
     /**
      * Adds an element to the map.
      *
-     * @param string  $nativeType
-     * @param array   $mdb2Types
-     * @param integer $length
-     * @param boolean $unsigned
-     * @param boolean $fixed
+     * @param string $nativeType
+     * @param string $mdb2Type
      * @static
      */
-    function addMap($nativeType, $mdb2Types, $length = null, $unsigned = null, $fixed = null)
+    function addMap($nativeType, $mdb2Type)
     {
         $driverName = strtolower(substr(strrchr(__CLASS__, '_'), 1));
-        parent::addMap($driverName, $nativeType, $mdb2Types, $length, $unsigned, $fixed);
+        parent::addMap($driverName, $nativeType, $mdb2Type);
     }
 
     /**#@-*/
