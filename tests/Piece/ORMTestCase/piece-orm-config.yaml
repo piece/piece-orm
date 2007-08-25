@@ -12,6 +12,17 @@
     debug: 0
     result_buffering: false
 
+- name: database3
+  dsn:
+    phptype: pgsql
+    hostspec: pieceorm
+    database: piece
+    username: piece
+    password: piece
+  options:
+    debug: 0
+    result_buffering: false
+
 # Local Variables:
 # mode: conf-colon
 # coding: iso-8859-1

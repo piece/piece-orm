@@ -297,6 +297,23 @@ class Piece_ORMTestCase extends PHPUnit_TestCase
         Piece_ORM_Error::popCallback();
     }
 
+    /**
+     * @since Method available since Release 0.7.0
+     */
+    function testDSNShouldBeAbleToSetByArray()
+    {
+        Piece_ORM::configure($this->_cacheDirectory,
+                             $this->_cacheDirectory,
+                             $this->_cacheDirectory
+                             );
+        Piece_ORM::setDatabase('database3');
+        $mapper = &Piece_ORM::getMapper('Person');
+        $count = $mapper->findOneWithQuery('SELECT COUNT(*) FROM person');
+
+        $this->assertNotNull($count);
+        $this->assertEquals(0, $count);
+    }
+
     /**#@-*/
 
     /**#@+
