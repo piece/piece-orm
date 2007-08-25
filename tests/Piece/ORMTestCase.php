@@ -314,6 +314,27 @@ class Piece_ORMTestCase extends PHPUnit_TestCase
         $this->assertEquals(0, $count);
     }
 
+    /**
+     * @since Method available since Release 0.7.0
+     */
+    function testNotFoundExceptionShouldBeRaisedWhenUndefinedDatabaseIsGiven()
+    {
+        Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
+        Piece_ORM::configure($this->_cacheDirectory,
+                             $this->_cacheDirectory,
+                             $this->_cacheDirectory
+                             );
+        Piece_ORM::setDatabase('foo');
+
+        $this->assertTrue(Piece_ORM_Error::hasErrors('exception'));
+
+        $error = Piece_ORM_Error::pop();
+
+        $this->assertEquals(PIECE_ORM_ERROR_NOT_FOUND, $error['code']);
+
+        Piece_ORM_Error::popCallback();
+    }
+
     /**#@-*/
 
     /**#@+

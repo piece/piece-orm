@@ -147,9 +147,17 @@ class Piece_ORM_Context
      * Sets a database as the current database.
      *
      * @param string $database
+     * @throws PIECE_ORM_ERROR_NOT_FOUND
      */
     function setDatabase($database)
     {
+        if (!$this->_config->checkDatabase($database)) {
+            Piece_ORM_Error::push(PIECE_ORM_ERROR_NOT_FOUND,
+                                  "The given database [ $database ] not found in the current configuration."
+                                  );
+            return;
+        }
+
         $this->_database = $database;
 
         $directorySuffix = $this->_config->getDirectorySuffix($this->_database);
@@ -166,7 +174,7 @@ class Piece_ORM_Context
     /**
      * Gets the DSN for the current database.
      *
-     * @return string
+     * @return mixed
      */
     function getDSN()
     {

@@ -76,7 +76,7 @@ class Piece_ORM_Config
      * Gets the DSN for the given database.
      *
      * @param string $database
-     * @return string
+     * @return mixed
      */
     function getDSN($database)
     {
@@ -208,7 +208,7 @@ class Piece_ORM_Config
      * Sets the DSN for a given database.
      *
      * @param string $database
-     * @param string $dsn
+     * @param mixed  $dsn
      */
     function setDSN($database, $dsn)
     {
@@ -241,6 +241,21 @@ class Piece_ORM_Config
     function setDirectorySuffix($database, $directorySuffix)
     {
         $this->_configurations[$database]['directorySuffix'] = $directorySuffix;
+    }
+
+    // }}}
+    // {{{ checkDatabase()
+
+    /**
+     * Returns whether the given database exists in the current configuration
+     * or not.
+     *
+     * @param string $database
+     * @return boolean
+     */
+    function checkDatabase($database)
+    {
+        return array_key_exists($database, $this->_configurations);
     }
 
     /**#@-*/
