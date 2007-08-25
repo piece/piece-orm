@@ -93,6 +93,37 @@ class Piece_ORM_Mapper_PgsqlTestCase extends Piece_ORM_Mapper_CompatibilityTest
         $this->assertNull($mapper->findByBoxField('(4,4),(3,3)'));
     }
 
+    /**
+     * @since Method available since Release 0.7.0
+     */
+    function testCharsetShouldBeAbleToSetByDSN()
+    {
+        $config = &new Piece_ORM_Config();
+        $config->setDSN('CharsetShouldBeAbleToSetByDSN', array('phptype'  => 'pgsql',
+                                                               'hostspec' => 'pieceorm',
+                                                               'database' => 'piece',
+                                                               'username' => 'piece',
+                                                               'password' => 'piece',
+                                                               'charset'  => 'Shift_JIS')
+                        );
+        $config->setOptions('piece', array('debug' => 2, 'result_buffering' => false));
+        $context = &Piece_ORM_Context::singleton();
+        $context->setConfiguration($config);
+        $context->setMapperConfigDirectory($this->_cacheDirectory);
+        $context->setDatabase('CharsetShouldBeAbleToSetByDSN');
+        $mapper = &Piece_ORM_Mapper_Factory::factory('Person');
+        $subject = &$mapper->createObject();
+        $subject->firstName = "\x93\xd6\x8c\x5b";
+        $subject->lastName = "\x8b\x76\x95\xdb";
+        $subject->serviceId = 1;
+        $id = $mapper->insert($subject);
+        $person = $mapper->findById($id);
+
+        $this->assertNotNull($person);
+        $this->assertEquals("\x93\xd6\x8c\x5b", $person->firstName);
+        $this->assertEquals("\x8b\x76\x95\xdb", $person->lastName);
+    }
+
     /**#@-*/
 
     /**#@+

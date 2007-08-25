@@ -1436,6 +1436,11 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         $this->assertEquals('foo@example.org', $emails[0]->email);
     }
 
+    /**
+     * @since Method available since Release 0.7.0
+     */
+    function testCharsetShouldBeAbleToSetByDSN() {}
+
     /**#@-*/
 
     /**#@+
