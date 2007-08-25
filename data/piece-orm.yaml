@@ -35,7 +35,7 @@ sequence:
     required: yes
     mapping:
       "name": { type: str, required: yes }
-      "dsn": { type: str, required: yes }
+      "dsn": { type: any, required: yes }
       "options":
         type: map
         required: no
