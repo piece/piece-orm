@@ -108,7 +108,10 @@ class Piece_ORM
         $context = &Piece_ORM_Context::singleton();
         $context->setConfiguration($config);
         $context->setMapperConfigDirectory($mapperConfigDirectory);
-        $context->setDatabase($config->getDefaultDatabase());
+        $defaultDatabase = $config->getDefaultDatabase();
+        if (!is_null($defaultDatabase)) {
+            $context->setDatabase($defaultDatabase);
+        }
 
         Piece_ORM_Mapper_Factory::setCacheDirectory($cacheDirectory);
         Piece_ORM_Metadata_Factory::setCacheDirectory($cacheDirectory);
@@ -152,6 +155,7 @@ class Piece_ORM
      * Gets the Piece_ORM_Config object after calling configure().
      *
      * @return Piece_ORM_Config
+     * @throws PIECE_ORM_ERROR_INVALID_OPERATION
      */
     function &getConfiguration()
     {
@@ -174,6 +178,8 @@ class Piece_ORM
      * Sets a database as the current database.
      *
      * @param string $database
+     * @throws PIECE_ORM_ERROR_INVALID_OPERATION
+     * @throws PIECE_ORM_ERROR_NOT_FOUND
      */
     function setDatabase($database)
     {
