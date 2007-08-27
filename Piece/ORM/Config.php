@@ -84,7 +84,7 @@ class Piece_ORM_Config
             return;
         }
 
-        if (!array_key_exists($database, $this->_configurations)) {
+        if (!$this->checkDatabase($database)) {
             return;
         }
 
@@ -110,7 +110,7 @@ class Piece_ORM_Config
             return;
         }
 
-        if (!array_key_exists($database, $this->_configurations)) {
+        if (!$this->checkDatabase($database)) {
             return;
         }
 
@@ -190,7 +190,7 @@ class Piece_ORM_Config
             return;
         }
 
-        if (!array_key_exists($database, $this->_configurations)) {
+        if (!$this->checkDatabase($database)) {
             return;
         }
 
