@@ -131,13 +131,17 @@ class Piece_ORM_Context
     // {{{ clear()
 
     /**
-     * Removed a single instance safely.
+     * Removed a single instance safely and clears all database handles.
      *
      * @static
+     * @see $GLOBALS['_MDB2_databases']
      */
     function clear()
     {
         $GLOBALS['PIECE_ORM_Context_Instance'] = null;
+        foreach (array_keys($GLOBALS['_MDB2_databases']) as $dbIndex) {
+            unset($GLOBALS['_MDB2_databases'][$dbIndex]);
+        }
     }
 
     // }}}
