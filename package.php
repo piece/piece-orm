@@ -39,30 +39,25 @@ require_once 'PEAR/PackageFileManager2.php';
 
 PEAR::staticPushErrorHandling(PEAR_ERROR_CALLBACK, create_function('$error', 'var_dump($error); exit();'));
 
-$releaseVersion = '0.6.0';
+$releaseVersion = '0.7.0';
 $releaseStability = 'beta';
 $apiVersion = '0.3.0';
 $apiStability = 'beta';
 $notes = 'A new release of Piece_ORM is now available.
 
-What\'s New in Piece_ORM 0.6.0
+What\'s New in Piece_ORM 0.7.0
 
- * Many-to-many relationships defect fixed: A defect that caused many-to-many relationships to fail if a inverse table contained a underscore separated primary key is fixed.
- * Default queries: The default query is automatically generated if the query for a method is not given.
- * Static Sort Orders: Static sort orders can be defined by mapper definition files.
+ * Native datatypes mapping support: Additional mapping from DBMS native datatypes to MDB2 datatypes can be defined by Piece_ORM_MDB2_NativeTypeMapper_XXX::addMap().
 
 See the following release notes for details.
 
 Enhancements
 ============ 
 
-- Added a feature so that the default query is automatically generated if the query for a method is not given.
-- Added support for static sort order by mapper definition files. (Ticket #48)
-
-Defect Fixes
-============
-
-- Fixed a defect that caused many-to-many relationships to fail if a inverse table contained a underscore separated primary key. (#Ticket 49)';
+- Added generic support for mapping from DBMS native datatypes to MDB2 datatypes. (Piece_ORM_Context, Piece_ORM_MDB2_NativeTypeMapper_XXX)
+- Changed configure() so that setDatabase() does not call if no database found in the current configuration. (Piece_ORM)
+- Updated setDatabase() so that a PIECE_ORM_ERROR_NOT_FOUND exception is raised when an undefind database is given. (Piece_ORM_Config, Piece_ORM_Context)
+- Added code so as to clear all database handles in clear(). (Piece_ORM_Context)';
 
 $package = new PEAR_PackageFileManager2();
 $package->setOptions(array('filelistgenerator' => 'svn',

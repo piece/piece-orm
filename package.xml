@@ -28,10 +28,10 @@ Piece_ORM is a simple framework based on the DataMapper pattern, and features st
   <email>sekky@users.sourceforge.net</email>
   <active>yes</active>
  </developer>
- <date>2007-08-16</date>
- <time>18:29:17</time>
+ <date>2007-08-27</date>
+ <time>11:36:44</time>
  <version>
-  <release>0.6.0</release>
+  <release>0.7.0</release>
   <api>0.3.0</api>
  </version>
  <stability>
@@ -41,24 +41,19 @@ Piece_ORM is a simple framework based on the DataMapper pattern, and features st
  <license uri="http://www.opensource.org/licenses/bsd-license.php">BSD License (revised)</license>
  <notes>A new release of Piece_ORM is now available.
 
-What&apos;s New in Piece_ORM 0.6.0
+What&apos;s New in Piece_ORM 0.7.0
 
- * Many-to-many relationships defect fixed: A defect that caused many-to-many relationships to fail if a inverse table contained a underscore separated primary key is fixed.
- * Default queries: The default query is automatically generated if the query for a method is not given.
- * Static Sort Orders: Static sort orders can be defined by mapper definition files.
+ * Native datatypes mapping support: Additional mapping from DBMS native datatypes to MDB2 datatypes can be defined by Piece_ORM_MDB2_NativeTypeMapper_XXX::addMap().
 
 See the following release notes for details.
 
 Enhancements
 ============ 
 
-- Added a feature so that the default query is automatically generated if the query for a method is not given.
-- Added support for static sort order by mapper definition files. (Ticket #48)
-
-Defect Fixes
-============
-
-- Fixed a defect that caused many-to-many relationships to fail if a inverse table contained a underscore separated primary key. (#Ticket 49)</notes>
+- Added generic support for mapping from DBMS native datatypes to MDB2 datatypes. (Piece_ORM_Context, Piece_ORM_MDB2_NativeTypeMapper_XXX)
+- Changed configure() so that setDatabase() does not call if no database found in the current configuration. (Piece_ORM)
+- Updated setDatabase() so that a PIECE_ORM_ERROR_NOT_FOUND exception is raised when an undefind database is given. (Piece_ORM_Config, Piece_ORM_Context)
+- Added code so as to clear all database handles in clear(). (Piece_ORM_Context)</notes>
  <contents>
   <dir baseinstalldir="/" name="/">
    <dir name="data">
@@ -176,6 +171,9 @@ Defect Fixes
       <file name="employee_skill.ddl" role="data">
        <tasks:replace from="@package_version@" to="version" type="package-info" />
       </file>
+      <file name="geometric_types.ddl" role="data">
+       <tasks:replace from="@package_version@" to="version" type="package-info" />
+      </file>
       <file name="person.ddl" role="data">
        <tasks:replace from="@package_version@" to="version" type="package-info" />
       </file>
@@ -289,11 +287,20 @@ Defect Fixes
         </file>
        </dir> <!-- /Piece/ORM/MDB2/Decorator/Reverse -->
       </dir> <!-- /Piece/ORM/MDB2/Decorator -->
-      <dir name="Helper">
+      <dir name="NativeTypeMapper">
+       <file name="Common.php" role="php">
+        <tasks:replace from="@package_version@" to="version" type="package-info" />
+       </file>
+       <file name="Mssql.php" role="php">
+        <tasks:replace from="@package_version@" to="version" type="package-info" />
+       </file>
+       <file name="Mysql.php" role="php">
+        <tasks:replace from="@package_version@" to="version" type="package-info" />
+       </file>
        <file name="Pgsql.php" role="php">
         <tasks:replace from="@package_version@" to="version" type="package-info" />
        </file>
-      </dir> <!-- /Piece/ORM/MDB2/Helper -->
+      </dir> <!-- /Piece/ORM/MDB2/NativeTypeMapper -->
      </dir> <!-- /Piece/ORM/MDB2 -->
      <dir name="Metadata">
       <file name="Factory.php" role="php">
@@ -455,6 +462,9 @@ Defect Fixes
         <file name="Email.yaml" role="test">
          <tasks:replace from="@package_version@" to="version" type="package-info" />
         </file>
+        <file name="GeometricTypes.yaml" role="test">
+         <tasks:replace from="@package_version@" to="version" type="package-info" />
+        </file>
         <file name="Person.yaml" role="test">
          <tasks:replace from="@package_version@" to="version" type="package-info" />
         </file>
@@ -552,6 +562,33 @@ Defect Fixes
  </dependencies>
  <phprelease />
  <changelog>
+  <release>
+   <version>
+    <release>0.7.0</release>
+    <api>0.3.0</api>
+   </version>
+   <stability>
+    <release>beta</release>
+    <api>beta</api>
+   </stability>
+   <date>2007-08-27</date>
+   <license uri="http://www.opensource.org/licenses/bsd-license.php">BSD License (revised)</license>
+   <notes>A new release of Piece_ORM is now available.
+
+What&apos;s New in Piece_ORM 0.7.0
+
+ * Native datatypes mapping support: Additional mapping from DBMS native datatypes to MDB2 datatypes can be defined by Piece_ORM_MDB2_NativeTypeMapper_XXX::addMap().
+
+See the following release notes for details.
+
+Enhancements
+============ 
+
+- Added generic support for mapping from DBMS native datatypes to MDB2 datatypes. (Piece_ORM_Context, Piece_ORM_MDB2_NativeTypeMapper_XXX)
+- Changed configure() so that setDatabase() does not call if no database found in the current configuration. (Piece_ORM)
+- Updated setDatabase() so that a PIECE_ORM_ERROR_NOT_FOUND exception is raised when an undefind database is given. (Piece_ORM_Config, Piece_ORM_Context)
+- Added code so as to clear all database handles in clear(). (Piece_ORM_Context)</notes>
+  </release>
   <release>
    <version>
     <release>0.6.0</release>
