@@ -185,13 +185,6 @@ class Piece_ORM_Mapper_ObjectPersister
      */
     function update($methodName)
     {
-        if (!$this->_metadata->hasPrimaryKey()) {
-            Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_OPERATION,
-                                  "The primary key required to invoke $methodName()."
-                                  );
-            return;
-        }
-
         if (!is_object($this->_subject)) {
             Piece_ORM_Error::push(PIECE_ORM_ERROR_UNEXPECTED_VALUE,
                                   "An unexpected value detected. $methodName() cannot receive non-object."
@@ -199,7 +192,7 @@ class Piece_ORM_Mapper_ObjectPersister
             return;
         }
 
-        if (!$this->_validatePrimaryKeys()) {
+        if ($this->_metadata->hasPrimaryKey() && !$this->_validatePrimaryKeys()) {
             Piece_ORM_Error::push(PIECE_ORM_ERROR_UNEXPECTED_VALUE,
                                   "An unexpected value detected. Correct values are required for the primary keys to invoke $methodName()."
                                   );
@@ -248,13 +241,6 @@ class Piece_ORM_Mapper_ObjectPersister
      */
     function delete($methodName)
     {
-        if (!$this->_metadata->hasPrimaryKey()) {
-            Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_OPERATION,
-                                  "The primary key required to invoke $methodName()."
-                                  );
-            return;
-        }
-
         if (!is_object($this->_subject)) {
             Piece_ORM_Error::push(PIECE_ORM_ERROR_UNEXPECTED_VALUE,
                                   "An unexpected value detected. $methodName() cannot receive non-object."
@@ -262,7 +248,7 @@ class Piece_ORM_Mapper_ObjectPersister
             return;
         }
 
-        if (!$this->_validatePrimaryKeys()) {
+        if ($this->_metadata->hasPrimaryKey() && !$this->_validatePrimaryKeys()) {
             Piece_ORM_Error::push(PIECE_ORM_ERROR_UNEXPECTED_VALUE,
                                   "An unexpected value detected. Correct values are required for the primary keys to invoke $methodName()."
                                   );

@@ -87,7 +87,8 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
                          'skill',
                          'email',
                          'phone',
-                         'employee_phone'
+                         'employee_phone',
+                         'nonprimarykeys'
                          );
     var $_type;
 
@@ -1440,6 +1441,47 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
      * @since Method available since Release 0.7.0
      */
     function testCharsetShouldBeAbleToSetByDSN() {}
+
+    /**
+     * @since Method available since Release 0.8.0
+     */
+    function testUpdateShouldWorkWithTableWhichHasNoPrimaryKeys()
+    {
+       Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
+        $mapper = &Piece_ORM_Mapper_Factory::factory('Nonprimarykeys');
+        $subject1 = &$mapper->createObject();
+        $subject1->memberId = 1;
+        $subject1->serviceId = 1;
+        $mapper->insert($subject1);
+        $subject2 = &$mapper->findByMemberIdAndServiceId($subject1);
+        $subject2->point += 50;
+        $affectedRows = $mapper->updateByMemberIdAndServiceId($subject2);
+
+        $this->assertFalse(Piece_ORM_Error::hasErrors('exception'));
+        $this->assertEquals(1, $affectedRows);
+
+        Piece_ORM_Error::popCallback();
+    }
+
+    /**
+     * @since Method available since Release 0.8.0
+     */
+    function testDeleteShouldWorkWithTableWhichHasNoPrimaryKeys()
+    {
+        Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
+        $mapper = &Piece_ORM_Mapper_Factory::factory('Nonprimarykeys');
+        $subject1 = &$mapper->createObject();
+        $subject1->memberId = 1;
+        $subject1->serviceId = 1;
+        $mapper->insert($subject1);
+        $subject2 = &$mapper->findByMemberIdAndServiceId($subject1);
+        $affectedRows = $mapper->deleteByMemberIdAndServiceId($subject2);
+
+        $this->assertFalse(Piece_ORM_Error::hasErrors('exception'));
+        $this->assertEquals(1, $affectedRows);
+
+        Piece_ORM_Error::popCallback();
+    }
 
     /**#@-*/
 

@@ -1,0 +1,17 @@
+# $Id$
+
+- name: findByMemberIdAndServiceId
+  query: SELECT * FROM nonprimarykeys WHERE member_id = $memberId AND service_id = $serviceId
+
+- name: updateByMemberIdAndServiceId
+  query: UPDATE nonprimarykeys SET point = $point WHERE member_id = $memberId AND service_id = $serviceId AND version = $version
+
+- name: deleteByMemberIdAndServiceId
+  query: DELETE FROM nonprimarykeys WHERE member_id = $memberId AND service_id = $serviceId AND version = $version
+
+# Local Variables:
+# mode: conf-colon
+# coding: iso-8859-1
+# tab-width: 2
+# indent-tabs-mode: nil
+# End:
