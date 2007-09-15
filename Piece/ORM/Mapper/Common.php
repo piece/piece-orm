@@ -639,7 +639,7 @@ class Piece_ORM_Mapper_Common
         ob_end_clean();
         if (strlen($contents)) {
             Piece_ORM_Error::push(PIECE_ORM_ERROR_INVOCATION_FAILED,
-                                  "Failed to build a query for any reasons. See below for more details.
+                                  "Failed to build a query for the method [ $methodName ] for any reasons. See below for more details.
  $contents");
             return;
         }
