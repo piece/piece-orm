@@ -194,8 +194,8 @@ class Piece_ORM_Config_FactoryTestCase extends PHPUnit_TestCase
                     break;
                 }
 
-                if (filetype("{$this->_cacheDirectory}/$file") == 'file') {
-                    if (preg_match('/^cache_*/', $file)) {
+                if (filetype("$directory/$file") == 'file') {
+                    if (preg_match('/^cache_.+/', $file)) {
                         ++$cacheFileCount;
                     }
                 }
