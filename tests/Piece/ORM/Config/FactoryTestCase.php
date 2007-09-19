@@ -184,6 +184,9 @@ class Piece_ORM_Config_FactoryTestCase extends PHPUnit_TestCase
      * @access private
      */
 
+    /**
+     * @since Method available since Release 0.8.0
+     */
     function _getCacheFileCount($directory)
     {
         $cacheFileCount = 0;
