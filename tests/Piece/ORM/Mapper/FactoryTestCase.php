@@ -234,11 +234,58 @@ class Piece_ORM_Mapper_FactoryTestCase extends PHPUnit_TestCase
         $this->assertEquals('bar', $mapper2->foo);
     }
 
+    /**
+     * @since Method available since Release 0.8.0
+     */
+    function testCacheIDsShouldUniqueInOneCacheDirectory()
+    {
+        $oldDirectory = getcwd();
+        chdir("{$this->_cacheDirectory}/CacheIDsShouldUniqueInOneCacheDirectory1");
+        Piece_ORM_Mapper_Factory::setConfigDirectory('.');
+        $mapper = &Piece_ORM_Mapper_Factory::factory('Person');
+
+        $this->assertEquals(2, $this->_getCacheFileCount($this->_cacheDirectory));
+
+        chdir("{$this->_cacheDirectory}/CacheIDsShouldUniqueInOneCacheDirectory2");
+        Piece_ORM_Mapper_Factory::setConfigDirectory('.');
+        $mapper = &Piece_ORM_Mapper_Factory::factory('Person');
+
+        $this->assertEquals(3, $this->_getCacheFileCount($this->_cacheDirectory));
+
+        chdir($oldDirectory);
+    }
+
     /**#@-*/
 
     /**#@+
      * @access private
      */
+
+    /**
+     * @since Method available since Release 0.8.0
+     */
+    function _getCacheFileCount($directory)
+    {
+        $cacheFileCount = 0;
+        if ($dh = opendir($directory)) {
+            while (true) {
+                $file = readdir($dh);
+                if ($file === false) {
+                    break;
+                }
+
+                if (filetype("$directory/$file") == 'file') {
+                    if (preg_match('/^cache_.+/', $file)) {
+                        ++$cacheFileCount;
+                    }
+                }
+            }
+
+            closedir($dh);
+        }
+
+        return $cacheFileCount;
+    }
 
     /**#@-*/
 

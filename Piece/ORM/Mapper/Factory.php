@@ -110,7 +110,7 @@ class Piece_ORM_Mapper_Factory
     function &factory($mapperName)
     {
         $context = &Piece_ORM_Context::singleton();
-        $mapperID = sha1($context->getDSN() . ".$mapperName.{$GLOBALS['PIECE_ORM_Mapper_ConfigDirectory']}");
+        $mapperID = sha1($context->getDSN() . ".$mapperName." . realpath($GLOBALS['PIECE_ORM_Mapper_ConfigDirectory']));
         if (!array_key_exists($mapperID, $GLOBALS['PIECE_ORM_Mapper_Instances'])) {
             Piece_ORM_Mapper_Factory::_load($mapperID, $mapperName);
             if (Piece_ORM_Error::hasErrors('exception')) {
