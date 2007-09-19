@@ -174,6 +174,7 @@ class Piece_ORM_Config_Factory
      */
     function &_getConfiguration($masterFile, $cacheDirectory)
     {
+        $masterFile = realpath($masterFile);
         $cache = &new Cache_Lite_File(array('cacheDir' => "$cacheDirectory/",
                                             'masterFile' => $masterFile,
                                             'automaticSerialization' => true,

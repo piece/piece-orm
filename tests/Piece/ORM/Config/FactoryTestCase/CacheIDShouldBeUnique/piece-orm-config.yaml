@@ -1,0 +1,11 @@
+# $Id$
+
+- name: database3
+  dsn: pgsql://piece:piece@pieceorm/piece
+
+# Local Variables:
+# mode: conf-colon
+# coding: iso-8859-1
+# tab-width: 2
+# indent-tabs-mode: nil
+# End:
