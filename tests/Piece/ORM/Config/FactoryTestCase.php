@@ -161,56 +161,19 @@ class Piece_ORM_Config_FactoryTestCase extends PHPUnit_TestCase
     /**
      * @since Method available since Release 0.8.0
      */
-    function testCacheIDShouldBeUniqueInOneDirectory()
+    function testCacheIDsShouldBeUniqueInOneCacheDirectory()
     {
         $oldDirectory = getcwd();
         chdir($this->_cacheDirectory);
         $config = &Piece_ORM_Config_Factory::factory('.', $this->_cacheDirectory);
 
-        $cacheFiles = array();
-        if ($dh = opendir($this->_cacheDirectory)) {
-            while (true) {
-                $file = readdir($dh);
-                if ($file === false) {
-                    break;
-                }
-
-                if (filetype("{$this->_cacheDirectory}/$file") == 'file') {
-                    if (preg_match('/^cache_*/', $file)) {
-                        if (!in_array($file, $cacheFiles)) {
-                            $cacheFiles[] = $file;
-                        }
-                    }
-                }
-            }
-            closedir($dh);
-        }
-
-        $this->assertEquals(1, count($cacheFiles));
+        $this->assertEquals(1, $this->_getCacheFileCount($this->_cacheDirectory));
 
         chdir("{$this->_cacheDirectory}/CacheIDShouldBeUnique");
 
         $config = &Piece_ORM_Config_Factory::factory('.', $this->_cacheDirectory);
 
-        if ($dh = opendir($this->_cacheDirectory)) {
-            while (true) {
-                $file = readdir($dh);
-                if ($file === false) {
-                    break;
-                }
-
-                if (filetype("{$this->_cacheDirectory}/$file") == 'file') {
-                    if (preg_match('/^cache_*/', $file)) {
-                        if (!in_array($file, $cacheFiles)) {
-                            $cacheFiles[] = $file;
-                        }
-                    }
-                }
-            }
-            closedir($dh);
-        }
-
-        $this->assertEquals(2, count($cacheFiles));
+        $this->assertEquals(2, $this->_getCacheFileCount($this->_cacheDirectory));
 
         chdir($oldDirectory);
     }
@@ -220,6 +183,29 @@ class Piece_ORM_Config_FactoryTestCase extends PHPUnit_TestCase
     /**#@+
      * @access private
      */
+
+    function _getCacheFileCount($directory)
+    {
+        $cacheFileCount = 0;
+        if ($dh = opendir($directory)) {
+            while (true) {
+                $file = readdir($dh);
+                if ($file === false) {
+                    break;
+                }
+
+                if (filetype("{$this->_cacheDirectory}/$file") == 'file') {
+                    if (preg_match('/^cache_*/', $file)) {
+                        ++$cacheFileCount;
+                    }
+                }
+            }
+
+            closedir($dh);
+        }
+
+        return $cacheFileCount;
+    }
 
     /**#@-*/
 
