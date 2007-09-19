@@ -161,16 +161,15 @@ class Piece_ORM_Config_FactoryTestCase extends PHPUnit_TestCase
     /**
      * @since Method available since Release 0.8.0
      */
-    function testCacheIDsShouldBeUniqueInOneCacheDirectory()
+    function testCacheIDsShouldUniqueInOneCacheDirectory()
     {
         $oldDirectory = getcwd();
-        chdir($this->_cacheDirectory);
+        chdir("{$this->_cacheDirectory}/CacheIDsShouldBeUniqueInOneCacheDirectory1");
         $config = &Piece_ORM_Config_Factory::factory('.', $this->_cacheDirectory);
 
         $this->assertEquals(1, $this->_getCacheFileCount($this->_cacheDirectory));
 
-        chdir("{$this->_cacheDirectory}/CacheIDShouldBeUnique");
-
+        chdir("{$this->_cacheDirectory}/CacheIDsShouldBeUniqueInOneCacheDirectory2");
         $config = &Piece_ORM_Config_Factory::factory('.', $this->_cacheDirectory);
 
         $this->assertEquals(2, $this->_getCacheFileCount($this->_cacheDirectory));
