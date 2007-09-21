@@ -39,25 +39,30 @@ require_once 'PEAR/PackageFileManager2.php';
 
 PEAR::staticPushErrorHandling(PEAR_ERROR_CALLBACK, create_function('$error', 'var_dump($error); exit();'));
 
-$releaseVersion = '0.7.0';
+$releaseVersion = '0.8.0';
 $releaseStability = 'beta';
 $apiVersion = '0.3.0';
 $apiStability = 'beta';
 $notes = 'A new release of Piece_ORM is now available.
 
-What\'s New in Piece_ORM 0.7.0
+What\'s New in Piece_ORM 0.8.0
 
- * Native datatypes mapping support: Additional mapping from DBMS native datatypes to MDB2 datatypes can be defined by Piece_ORM_MDB2_NativeTypeMapper_XXX::addMap().
+ * Enhanced update() and delete(): update() and delete() now work a table which has no primary keys.
+ * A few Defect Fixes: Two minor defects that caused the same cache to be used if the relative paths of the configuration files (or the mapper definition files) are same even though the absolute paths of the configuration files (or the mapper definition files) are different are fixed.
 
 See the following release notes for details.
 
 Enhancements
 ============ 
 
-- Added generic support for mapping from DBMS native datatypes to MDB2 datatypes. (Piece_ORM_Context, Piece_ORM_MDB2_NativeTypeMapper_XXX)
-- Changed configure() so that setDatabase() does not call if no database found in the current configuration. (Piece_ORM)
-- Updated setDatabase() so that a PIECE_ORM_ERROR_NOT_FOUND exception is raised when an undefind database is given. (Piece_ORM_Config, Piece_ORM_Context)
-- Added code so as to clear all database handles in clear(). (Piece_ORM_Context)';
+- Improved the error message for the PIECE_ORM_ERROR_INVOCATION_FAILED exception when building a query. (Piece_ORM_Mapper_Common)
+- Changed update()/delete() so as to work with a table which has no primary keys. (Piece_ORM_Mapper_ObjectPersister)
+
+Defect Fixes
+============
+
+- Fixed the defect that caused the cache IDs to duplicate if the relative paths of the configuration files are same even though the absolute paths of the configuration files are different. (Piece_ORM_Config_Factory)
+- Fixed the defect that caused the cache IDs to duplicate if the relative paths of the mapper definition files are same even though the absolute paths of the mapper definition files are different. (Piece_ORM_Mapper_Factory)';
 
 $package = new PEAR_PackageFileManager2();
 $package->setOptions(array('filelistgenerator' => 'svn',
@@ -90,8 +95,6 @@ $package->setPearinstallerDep('1.4.3');
 $package->addPackageDepWithChannel('required', 'MDB2', 'pear.php.net', '2.3.0');
 $package->addPackageDepWithChannel('required', 'Cache_Lite', 'pear.php.net', '1.7.0');
 $package->addPackageDepWithChannel('required', 'PEAR', 'pear.php.net', '1.4.3');
-$package->addPackageDepWithChannel('optional', 'Stagehand_TestRunner', 'pear.piece-framework.com', '0.5.0');
-$package->addPackageDepWithChannel('optional', 'PHPUnit', 'pear.phpunit.de', '1.3.2');
 $package->addMaintainer('lead', 'iteman', 'KUBO Atsuhiro', 'iteman@users.sourceforge.net');
 $package->addMaintainer('developer', 'matsufuji', 'MATSUFUJI Hideharu', 'matsufuji@users.sourceforge.net');
 $package->addMaintainer('developer', 'sekky', 'SEKIYAMA Ryusuke', 'sekky@users.sourceforge.net');
