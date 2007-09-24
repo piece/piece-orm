@@ -77,6 +77,8 @@ class Piece_ORM_Mapper_Common
     var $_preloadCallbackArgs;
     var $_useIdentityMap = true;
     var $_lastQueryForGetCount;
+    var $_methodNameForBuildQuery;
+    var $_criteriaForBuildQuery;
 
     /**#@-*/
 
@@ -611,27 +613,30 @@ class Piece_ORM_Mapper_Common
      */
     function _buildQuery($methodName, $criteria)
     {
+        $this->_methodNameForBuildQuery = $methodName;
         if (version_compare(phpversion(), '5.0.0', '>=')) {
-            $criteria = clone($criteria);
+            $this->_criteriaForBuildQuery = clone($criteria);
+        } else {
+            $this->_criteriaForBuildQuery = $criteria;
         }
 
-        foreach ($criteria as $key => $value) {
+        foreach ($this->_criteriaForBuildQuery as $key => $value) {
             if (is_scalar($value) || is_null($value)) {
-                $criteria->$key = $this->_dbh->quote($value);
+                $this->_criteriaForBuildQuery->$key = $this->_dbh->quote($value);
             } else {
-                unset($criteria->$key);
+                unset($this->_criteriaForBuildQuery->$key);
             }
         }
 
-        extract((array)$criteria);
+        extract((array)$this->_criteriaForBuildQuery);
 
-        foreach ($criteria as $key => $value) {
+        foreach ($this->_criteriaForBuildQuery as $key => $value) {
             if ($value == 'NULL') {
-                $criteria->$key = null;
+                $this->_criteriaForBuildQuery->$key = null;
             }
         }
 
-        $query = '__query__' . strtolower($methodName);
+        $query = '__query__' . strtolower($this->_methodNameForBuildQuery);
 
         ob_start();
         eval("\$query = \"{$this->$query}\";");
@@ -639,7 +644,7 @@ class Piece_ORM_Mapper_Common
         ob_end_clean();
         if (strlen($contents)) {
             Piece_ORM_Error::push(PIECE_ORM_ERROR_INVOCATION_FAILED,
-                                  "Failed to build a query for the method [ $methodName ] for any reasons. See below for more details.
+                                  "Failed to build a query for the method [ {$this->_methodNameForBuildQuery} ] for any reasons. See below for more details.
  $contents");
             return;
         }

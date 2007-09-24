@@ -48,7 +48,7 @@ $notes = 'A new release of Piece_ORM is now available.
 What\'s New in Piece_ORM 0.8.0
 
  * Enhanced update() and delete(): update() and delete() now work a table which has no primary keys.
- * A few Defect Fixes: Two minor defects that caused the same cache to be used if the relative paths of the configuration files (or the mapper definition files) are same even though the absolute paths of the configuration files (or the mapper definition files) are different are fixed.
+ * A few Defect Fixes: Two minor defects that caused the same cache to be used if the relative paths of the configuration files (or the mapper definition files) are same even though the absolute paths of the configuration files (or the mapper definition files) are different are fixed. And also a defect that caused variables to be tainted if the given object has "criteria" or "methodName" properties is fixed.
 
 See the following release notes for details.
 
@@ -62,7 +62,8 @@ Defect Fixes
 ============
 
 - Fixed the defect that caused the cache IDs to duplicate if the relative paths of the configuration files are same even though the absolute paths of the configuration files are different. (Piece_ORM_Config_Factory)
-- Fixed the defect that caused the cache IDs to duplicate if the relative paths of the mapper definition files are same even though the absolute paths of the mapper definition files are different. (Piece_ORM_Mapper_Factory)';
+- Fixed the defect that caused the cache IDs to duplicate if the relative paths of the mapper definition files are same even though the absolute paths of the mapper definition files are different. (Piece_ORM_Mapper_Factory)
+- Fixed the defect that caused variables to be tainted if the given object has "criteria" or "methodName" properties. (Piece_ORM_Mapper_Common)';
 
 $package = new PEAR_PackageFileManager2();
 $package->setOptions(array('filelistgenerator' => 'svn',
