@@ -1447,7 +1447,7 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
      */
     function testUpdateShouldWorkWithTableWhichHasNoPrimaryKeys()
     {
-       Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
+        Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
         $mapper = &Piece_ORM_Mapper_Factory::factory('Nonprimarykeys');
         $subject1 = &$mapper->createObject();
         $subject1->memberId = 1;
