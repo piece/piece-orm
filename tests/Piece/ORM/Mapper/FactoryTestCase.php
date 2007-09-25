@@ -242,13 +242,13 @@ class Piece_ORM_Mapper_FactoryTestCase extends PHPUnit_TestCase
         $oldDirectory = getcwd();
         chdir("{$this->_cacheDirectory}/CacheIDsShouldUniqueInOneCacheDirectory1");
         Piece_ORM_Mapper_Factory::setConfigDirectory('.');
-        $mapper = &Piece_ORM_Mapper_Factory::factory('Person');
+        Piece_ORM_Mapper_Factory::factory('Person');
 
         $this->assertEquals(1, $this->_getCacheFileCount($this->_cacheDirectory) - 1);
 
         chdir("{$this->_cacheDirectory}/CacheIDsShouldUniqueInOneCacheDirectory2");
         Piece_ORM_Mapper_Factory::setConfigDirectory('.');
-        $mapper = &Piece_ORM_Mapper_Factory::factory('Person');
+        Piece_ORM_Mapper_Factory::factory('Person');
 
         $this->assertEquals(2, $this->_getCacheFileCount($this->_cacheDirectory) - 1);
 
