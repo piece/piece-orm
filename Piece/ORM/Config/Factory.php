@@ -136,8 +136,7 @@ class Piece_ORM_Config_Factory
                                   );
             Piece_ORM_Error::popCallback();
 
-            $config = &Piece_ORM_Config_Factory::_createConfigurationFromFile($configFile);
-            return $config;
+            return Piece_ORM_Config_Factory::_createConfigurationFromFile($configFile);
         }
 
         if (!is_readable($cacheDirectory) || !is_writable($cacheDirectory)) {
@@ -148,8 +147,7 @@ class Piece_ORM_Config_Factory
                                   );
             Piece_ORM_Error::popCallback();
 
-            $config = &Piece_ORM_Config_Factory::_createConfigurationFromFile($configFile);
-            return $config;
+            return Piece_ORM_Config_Factory::_createConfigurationFromFile($configFile);
         }
 
         return Piece_ORM_Config_Factory::_getConfiguration($configFile, $cacheDirectory);
@@ -198,8 +196,7 @@ class Piece_ORM_Config_Factory
                                   );
             Piece_ORM_Error::popCallback();
 
-            $config = &Piece_ORM_Config_Factory::_createConfigurationFromFile($masterFile);
-            return $config;
+            return Piece_ORM_Config_Factory::_createConfigurationFromFile($masterFile);
         }
 
         if (!$config) {
