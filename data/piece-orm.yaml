@@ -26,8 +26,8 @@
 # POSSIBILITY OF SUCH DAMAGE.
 ######################################################################
 
-name: config
-desc: the definition of Piece_ORM configuration file.
+name: piece-orm
+desc: Piece_ORM 0.7.0 YAML Schema Definition
 type: seq
 required: yes
 sequence:

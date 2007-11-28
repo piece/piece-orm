@@ -26,8 +26,8 @@
 # POSSIBILITY OF SUCH DAMAGE.
 ######################################################################
 
-name: mapper
-desc: the definition of Piece_ORM mapper configuration file.
+name: piece-orm-mapper
+desc: Piece_ORM Mapper 0.6.0 YAML Schema Definition
 type: seq
 required: no
 sequence:
