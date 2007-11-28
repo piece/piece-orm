@@ -705,11 +705,8 @@ class Piece_ORM_Mapper_Generator
     {
         $fields = array();
         foreach ($this->_metadata->getFieldNames() as $fieldName) {
-            $default = $this->_metadata->getDefault($fieldName);
-            if (is_null($default) || !strlen($default)) {
-                if (!$this->_metadata->isAutoIncrement($fieldName)) {
-                    $fields[] = $fieldName;
-                }
+            if (!$this->_metadata->hasDefault($fieldName) && !$this->_metadata->isAutoIncrement($fieldName)) {
+                $fields[] = $fieldName;
             }
         }
 

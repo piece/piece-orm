@@ -165,20 +165,6 @@ class Piece_ORM_Metadata
     }
 
     // }}}
-    // {{{ getDefault()
-
-    /**
-     * Gets the default value for a given field name.
-     *
-     * @param string $fieldName
-     * @return string
-     */
-    function getDefault($fieldName)
-    {
-        return $this->_tableInfo[$fieldName]['default'];
-    }
-
-    // }}}
     // {{{ isAutoIncrement()
 
     /**
@@ -267,6 +253,22 @@ class Piece_ORM_Metadata
             $primaryKeys = $this->_primaryKey;
             return $primaryKeys[0];
         }
+    }
+
+    // }}}
+    // {{{ hasDefault()
+
+    /**
+     * Returns whether the given field has the default value or not.
+     *
+     * @param string $fieldName
+     * @return boolean
+     * @since Method available since Release 1.0.0
+     */
+    function hasDefault($fieldName)
+    {
+        return !is_null($this->_tableInfo[$fieldName]['default'])
+            && strlen($this->_tableInfo[$fieldName]['default']);
     }
 
     /**#@-*/
