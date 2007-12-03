@@ -233,7 +233,7 @@ class Piece_ORM_Mapper_ObjectLoader
             return $row;
         }
 
-        if ($this->_useIdentityMap && $this->_primaryKey && array_key_exists($this->_primaryKey, $row)) {
+        if ($this->_useIdentityMap && !is_null($this->_primaryKey) && array_key_exists($this->_primaryKey, $row)) {
             $loadedObject = &$this->_mapper->getLoadedObject($row[$this->_primaryKey]);
             if (!is_null($loadedObject)) {
                 return $loadedObject;
@@ -245,7 +245,7 @@ class Piece_ORM_Mapper_ObjectLoader
             $object->{ Piece_ORM_Inflector::camelize($key, true) } = $value;
         }
 
-        if ($this->_useIdentityMap && $this->_primaryKey && array_key_exists($this->_primaryKey, $row)) {
+        if ($this->_useIdentityMap && !is_null($this->_primaryKey) && array_key_exists($this->_primaryKey, $row)) {
             $this->_mapper->addLoadedObject($row[$this->_primaryKey], $object);
         }
 
