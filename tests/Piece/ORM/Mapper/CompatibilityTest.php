@@ -1501,7 +1501,6 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         $this->assertEquals(1, count($subjects1));
 
         if (!count($subjects1)) {
-            Piece_ORM_Error::popCallback();
             return;
         }
 
@@ -1520,7 +1519,6 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         $this->assertEquals(1, count($subjects2));
 
         if (!count($subjects2)) {
-            Piece_ORM_Error::popCallback();
             return;
         }
 
@@ -1531,6 +1529,46 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         $subjects3 = $mapper->findAllBySong('Intro: Over The Rainbow / Kill The King');
 
         $this->assertEquals(0, count($subjects3));
+    }
+
+    /**
+     * @since Method available since Release 1.0.0
+     */
+    function testIdentityMapShouldNotUseWhenTableHasCompositePrimaryKey()
+    {
+        $mapper = &Piece_ORM_Mapper_Factory::factory('Compositeprimarykey');
+        $subject1 = &$mapper->createObject();
+        $subject1->album = 'On Stage';
+        $subject1->artist = 'Rainbow';
+        $subject1->track = 1;
+        $subject1->song = 'Kill the King';
+        $subject2 = &$mapper->createObject();
+        $subject2->album = 'On Stage';
+        $subject2->artist = 'Rainbow';
+        $subject2->track = 2;
+        $subject2->song = 'Medley: Man on the Silver Mountain/Blues/Starstruck';
+        $mapper->insert($subject1);
+        $mapper->insert($subject2);
+
+        $mapper->addOrder('track');
+        $subjects = $mapper->findAll();
+
+        $this->assertEquals(2, count($subjects));
+
+        if (count($subjects) != 2) {
+            return;
+        }
+
+        $this->assertEquals('On Stage', $subjects[0]->album);
+        $this->assertEquals('Rainbow', $subjects[0]->artist);
+        $this->assertEquals(1, $subjects[0]->track);
+        $this->assertEquals('Kill the King', $subjects[0]->song);
+        $this->assertEquals('On Stage', $subjects[1]->album);
+        $this->assertEquals('Rainbow', $subjects[1]->artist);
+        $this->assertEquals(2, $subjects[1]->track);
+        $this->assertEquals('Medley: Man on the Silver Mountain/Blues/Starstruck',
+                            $subjects[1]->song
+                            );
     }
 
     /**#@-*/

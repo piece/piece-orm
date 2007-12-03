@@ -288,7 +288,7 @@ class Piece_ORM_Metadata
     function _hasCompositePrimaryKey()
     {
         if ($this->hasPrimaryKey()) {
-            return (boolean)count($this->_primaryKey) > 1;
+            return (boolean)(count($this->_primaryKey) > 1);
         } else {
             return false;
         }
