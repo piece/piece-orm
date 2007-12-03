@@ -728,8 +728,8 @@ class Piece_ORM_Mapper_Generator
             $primaryKeys = $this->_metadata->getPrimaryKeys();
             $fieldName = array_shift($primaryKeys);
             $whereClause = "$fieldName = \$" . Piece_ORM_Inflector::camelize($fieldName, true);
-            foreach ($primaryKeys as $complexFieldName) {
-                $whereClause .= "$complexFieldName = \$" . Piece_ORM_Inflector::camelize($complexFieldName, true);
+            foreach ($primaryKeys as $partOfPrimeryKey) {
+                $whereClause .= " AND $partOfPrimeryKey = \$" . Piece_ORM_Inflector::camelize($partOfPrimeryKey, true);
             }
 
             return 'DELETE FROM ' . $this->_metadata->getTableName() . " WHERE $whereClause";
@@ -753,8 +753,8 @@ class Piece_ORM_Mapper_Generator
             $primaryKeys = $this->_metadata->getPrimaryKeys();
             $fieldName = array_shift($primaryKeys);
             $whereClause = "$fieldName = \$" . Piece_ORM_Inflector::camelize($fieldName, true);
-            foreach ($primaryKeys as $complexFieldName) {
-                $whereClause .= "$complexFieldName = \$" . Piece_ORM_Inflector::camelize($complexFieldName, true);
+            foreach ($primaryKeys as $partOfPrimeryKey) {
+                $whereClause .= " AND $partOfPrimeryKey = \$" . Piece_ORM_Inflector::camelize($partOfPrimeryKey, true);
             }
 
             $fields = array();

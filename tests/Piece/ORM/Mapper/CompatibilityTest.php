@@ -88,7 +88,8 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
                          'email',
                          'phone',
                          'employee_phone',
-                         'nonprimarykeys'
+                         'nonprimarykeys',
+                         'compositeprimarykey'
                          );
     var $_type;
 
@@ -1481,6 +1482,55 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         $this->assertEquals(1, $affectedRows);
 
         Piece_ORM_Error::popCallback();
+    }
+
+    /**
+     * @since Method available since Release 1.0.0
+     */
+    function testCompositePrimaryKeyShouldWork()
+    {
+        $mapper = &Piece_ORM_Mapper_Factory::factory('Compositeprimarykey');
+        $subject = &$mapper->createObject();
+        $subject->album = 'On Stage';
+        $subject->artist = 'Rainbow';
+        $subject->track = 1;
+        $subject->song = 'Kill the King';
+        $mapper->insert($subject);
+        $subjects1 = $mapper->findAll();
+
+        $this->assertEquals(1, count($subjects1));
+
+        if (!count($subjects1)) {
+            Piece_ORM_Error::popCallback();
+            return;
+        }
+
+        $this->assertEquals('On Stage', $subjects1[0]->album);
+        $this->assertEquals('Rainbow', $subjects1[0]->artist);
+        $this->assertEquals(1, $subjects1[0]->track);
+        $this->assertEquals('Kill the King', $subjects1[0]->song);
+
+        $subjects1[0]->song = 'Intro: Over The Rainbow / Kill The King';
+        $affectedRows = $mapper->update($subjects1[0]);
+
+        $this->assertEquals(1, $affectedRows);
+
+        $subjects2 = $mapper->findAllBySong('Intro: Over The Rainbow / Kill The King');
+
+        $this->assertEquals(1, count($subjects2));
+
+        if (!count($subjects2)) {
+            Piece_ORM_Error::popCallback();
+            return;
+        }
+
+        $affectedRows = $mapper->delete($subjects2[0]);
+
+        $this->assertEquals(1, $affectedRows);
+
+        $subjects3 = $mapper->findAllBySong('Intro: Over The Rainbow / Kill The King');
+
+        $this->assertEquals(0, count($subjects3));
     }
 
     /**#@-*/
