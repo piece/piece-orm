@@ -79,6 +79,7 @@ class Piece_ORM_Mapper_Common
     var $_lastQueryForGetCount;
     var $_methodNameForBuildQuery;
     var $_criteriaForBuildQuery;
+    var $_errorsInEval = array();
 
     /**#@-*/
 
@@ -559,6 +560,21 @@ class Piece_ORM_Mapper_Common
         return $this->_useIdentityMap;
     }
 
+    // }}}
+    // {{{ handleErrorInEval()
+
+    /**
+     * Collects error messages raised in eval().
+     *
+     * @param integer $errno
+     * @param string  $errstr
+     * @since Method available since Release 1.0.0
+     */
+    function handleErrorInEval($errno, $errstr)
+    {
+        $this->_errorsInEval[] = $errstr;
+    }
+
     /**#@-*/
 
     /**#@+
@@ -638,14 +654,15 @@ class Piece_ORM_Mapper_Common
 
         $query = '__query__' . strtolower($this->_methodNameForBuildQuery);
 
-        ob_start();
+        set_error_handler(array(&$this, 'handleErrorInEval'));
         eval("\$query = \"{$this->$query}\";");
-        $contents = ob_get_contents();
-        ob_end_clean();
-        if (strlen($contents)) {
+        restore_error_handler();
+        if (count($this->_errorsInEval)) {
+            $message = implode("\n", $this->_errorsInEval);
+            $this->_errorsInEval = array();
             Piece_ORM_Error::push(PIECE_ORM_ERROR_INVOCATION_FAILED,
                                   "Failed to build a query for the method [ {$this->_methodNameForBuildQuery} ] for any reasons. See below for more details.
- $contents");
+ $message");
             return;
         }
 
