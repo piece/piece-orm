@@ -249,7 +249,7 @@ class Piece_ORM_Metadata
      */
     function getPrimaryKey()
     {
-        if ($this->hasPrimaryKey() && !$this->_hasComplexPrimaryKey()) {
+        if ($this->hasPrimaryKey() && !$this->_hasCompositePrimaryKey()) {
             $primaryKeys = $this->_primaryKey;
             return $primaryKeys[0];
         }
@@ -278,14 +278,14 @@ class Piece_ORM_Metadata
      */
 
     // }}}
-    // {{{ _hasComplexPrimaryKey()
+    // {{{ _hasCompositePrimaryKey()
 
     /**
-     * Returns whether a table has the complex primary key.
+     * Returns whether a table has the composite primary key.
      *
      * @return boolean
      */
-    function _hasComplexPrimaryKey()
+    function _hasCompositePrimaryKey()
     {
         if ($this->hasPrimaryKey()) {
             return (boolean)count($this->_primaryKey) > 1;
