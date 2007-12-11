@@ -89,7 +89,11 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
                          'phone',
                          'employee_phone',
                          'nonprimarykeys',
-                         'compositeprimarykey'
+                         'compositeprimarykey',
+                         'unusualname12',
+                         'unusualname1_2',
+                         'unusualname1_2_unusualname_12',
+                         'unusualname_12'
                          );
     var $_type;
 
@@ -1569,6 +1573,43 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         $this->assertEquals('Medley: Man on the Silver Mountain/Blues/Starstruck',
                             $subjects[1]->song
                             );
+    }
+
+    /**
+     * @since Method available since Release 1.0.0
+     */
+    function testUnusualNamesShouldWork()
+    {
+        $inverseMapper = &Piece_ORM_Mapper_Factory::factory('Unusualname_12');
+        $inverseSubject = &$inverseMapper->createObject();
+        $inverseSubject->name = 'foo';
+        $inverseMapper->insert($inverseSubject);
+
+        $this->assertEquals(1, count($inverseMapper->findAll()));
+
+        $mapper = &Piece_ORM_Mapper_Factory::factory('Unusualname1_2');
+        $subject = &$mapper->createObject();
+        $subject->name = 'bar';
+        $subject->baz = array();
+        $subject->baz[] = &$inverseSubject;
+        $mapper->insert($subject);
+
+        $objects = $mapper->findAll();
+
+        $this->assertEquals(1, count($objects));
+        $this->assertEquals('bar', $objects[0]->name);
+
+        $this->assertEquals(1, count($objects[0]->baz));
+        $this->assertEquals('foo', $objects[0]->baz[0]->name);
+
+        $throughMapper = &Piece_ORM_Mapper_Factory::factory('Unusualname1_2_unusualname_12');
+        $objects = $throughMapper->findAll();
+
+        $this->assertEquals(1, count($objects));
+        $this->assertEquals(3, count(array_keys((array)$objects[0])));
+        $this->assertTrue(array_key_exists('id', $objects[0]));
+        $this->assertTrue(array_key_exists('unusualname1_2_id', $objects[0]));
+        $this->assertTrue(array_key_exists('unusualname_12_id', $objects[0]));
     }
 
     /**#@-*/

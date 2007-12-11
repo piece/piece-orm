@@ -81,7 +81,7 @@ class Piece_ORM_Inflector
      */
     function camelize($word, $lowercaseFirstLetter = false)
     {
-        $camelizedWord = str_replace(' ', '', ucwords(preg_replace('/[^A-Z^a-z^0-9]+/', ' ', $word)));
+        $camelizedWord = str_replace(' ', '', ucwords(preg_replace('/(?:(?<!\d)[^A-Z^a-z^0-9](?!\d))+/', ' ', $word)));
         if (!$lowercaseFirstLetter) {
             return $camelizedWord;
         } else {

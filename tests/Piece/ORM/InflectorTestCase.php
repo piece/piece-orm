@@ -74,10 +74,13 @@ class Piece_ORM_InflectorTestCase extends PHPUnit_TestCase
     function testWordShouldUnderscore()
     {
         $this->assertEquals('keyword_id', Piece_ORM_Inflector::underscore('keywordId'));
+        $this->assertEquals('keyword1_id', Piece_ORM_Inflector::underscore('keyword1_id'));
         $this->assertEquals('keyword1_id', Piece_ORM_Inflector::underscore('keyword1Id'));
         $this->assertEquals('foo_123', Piece_ORM_Inflector::underscore('Foo_123'));
         $this->assertEquals('foo1_23', Piece_ORM_Inflector::underscore('Foo1_23'));
         $this->assertEquals('foo123', Piece_ORM_Inflector::underscore('Foo123'));
+        $this->assertEquals('unusualname1_2_unusualname_12', Piece_ORM_Inflector::underscore('Unusualname1_2_unusualname_12'));
+        $this->assertEquals('unusualname1_2_unusualname_12', Piece_ORM_Inflector::underscore('Unusualname1_2Unusualname_12'));
     }
 
     /**
@@ -85,12 +88,15 @@ class Piece_ORM_InflectorTestCase extends PHPUnit_TestCase
      */
     function testWordShouldCamelize()
     {
-        $this->assertEquals('Foo123', Piece_ORM_Inflector::camelize('foo_123', false));
-        $this->assertEquals('Foo123', Piece_ORM_Inflector::camelize('foo1_23', false));
+        $this->assertEquals('keywordId', Piece_ORM_Inflector::camelize('keyword_id', true));
+        $this->assertEquals('keyword1_id', Piece_ORM_Inflector::camelize('keyword1_id', true));
+        $this->assertEquals('Foo_123', Piece_ORM_Inflector::camelize('foo_123', false));
+        $this->assertEquals('Foo1_23', Piece_ORM_Inflector::camelize('foo1_23', false));
         $this->assertEquals('Foo123', Piece_ORM_Inflector::camelize('foo123', false));
-        $this->assertEquals('foo123', Piece_ORM_Inflector::camelize('foo_123', true));
-        $this->assertEquals('foo123', Piece_ORM_Inflector::camelize('foo1_23', true));
+        $this->assertEquals('foo_123', Piece_ORM_Inflector::camelize('foo_123', true));
+        $this->assertEquals('foo1_23', Piece_ORM_Inflector::camelize('foo1_23', true));
         $this->assertEquals('foo123', Piece_ORM_Inflector::camelize('foo123', true));
+        $this->assertEquals('Unusualname1_2_unusualname_12', Piece_ORM_Inflector::camelize('unusualname1_2_unusualname_12', false));
     }
 
     /**#@-*/
