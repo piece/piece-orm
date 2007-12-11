@@ -71,10 +71,26 @@ class Piece_ORM_InflectorTestCase extends PHPUnit_TestCase
      * @access public
      */
 
-    function testUnderscore()
+    function testWordShouldUnderscore()
     {
         $this->assertEquals('keyword_id', Piece_ORM_Inflector::underscore('keywordId'));
         $this->assertEquals('keyword1_id', Piece_ORM_Inflector::underscore('keyword1Id'));
+        $this->assertEquals('foo_123', Piece_ORM_Inflector::underscore('Foo_123'));
+        $this->assertEquals('foo1_23', Piece_ORM_Inflector::underscore('Foo1_23'));
+        $this->assertEquals('foo123', Piece_ORM_Inflector::underscore('Foo123'));
+    }
+
+    /**
+     * @since Method available since Release 1.0.0
+     */
+    function testWordShouldCamelize()
+    {
+        $this->assertEquals('Foo123', Piece_ORM_Inflector::camelize('foo_123', false));
+        $this->assertEquals('Foo123', Piece_ORM_Inflector::camelize('foo1_23', false));
+        $this->assertEquals('Foo123', Piece_ORM_Inflector::camelize('foo123', false));
+        $this->assertEquals('foo123', Piece_ORM_Inflector::camelize('foo_123', true));
+        $this->assertEquals('foo123', Piece_ORM_Inflector::camelize('foo1_23', true));
+        $this->assertEquals('foo123', Piece_ORM_Inflector::camelize('foo123', true));
     }
 
     /**#@-*/
