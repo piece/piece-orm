@@ -66,11 +66,11 @@ class Piece_ORM_Mapper_AssociatedObjectLoader_Common
 
     var $_useMultipleIndexes = false;
     var $_defaultValueOfMappedAs;
-    var $_objectLoader;
     var $_relationships;
     var $_relationshipKeys;
     var $_objects;
     var $_objectIndexes;
+    var $_mapper;
 
     /**#@-*/
 
@@ -84,15 +84,19 @@ class Piece_ORM_Mapper_AssociatedObjectLoader_Common
     /**
      * Initializes properties with the given value.
      *
-     * @param Piece_ORM_Mapper_ObjectLoader &$objectLoader
+     * @param array                         $relationships
+     * @param array                         &$relationshipKeys
+     * @param array                         &$objects
+     * @param array                         &$objectIndexes
+     * @param Piece_ORM_Mapper_Common       &$mapper
      */
-    function Piece_ORM_Mapper_AssociatedObjectLoader_Common(&$objectLoader)
+    function Piece_ORM_Mapper_AssociatedObjectLoader_Common($relationships, &$relationshipKeys, &$objects, &$objectIndexes, &$mapper)
     {
-        $this->_relationships = $objectLoader->getRelationships();
-        $this->_relationshipKeys = &$objectLoader->getRelationshipKeys();
-        $this->_objects = &$objectLoader->getObjects();
-        $this->_objectIndexes = &$objectLoader->getObjectIndexes();
-        $this->_objectLoader = &$objectLoader;
+        $this->_relationships = $relationships;
+        $this->_relationshipKeys = &$relationshipKeys;
+        $this->_objects = &$objects;
+        $this->_objectIndexes = &$objectIndexes;
+        $this->_mapper = &$mapper;
     }
 
     // }}}
@@ -110,8 +114,7 @@ class Piece_ORM_Mapper_AssociatedObjectLoader_Common
         $relationshipKeyFieldName = $this->_getRelationshipKeyFieldNameInPrimaryQuery($this->_relationships[$relationshipIndex]);
         $this->_objects[$objectIndex]->{ $this->_relationships[$relationshipIndex]['mappedAs'] } = $this->_defaultValueOfMappedAs;
 
-        $mapper = &$this->_objectLoader->getMapper();
-        $this->_relationshipKeys[$relationshipIndex][] = $mapper->quote($row[$relationshipKeyFieldName], $relationshipKeyFieldName);
+        $this->_relationshipKeys[$relationshipIndex][] = $this->_mapper->quote($row[$relationshipKeyFieldName], $relationshipKeyFieldName);
 
         if (!$this->_useMultipleIndexes) {
             $this->_objectIndexes[$relationshipIndex][ $row[$relationshipKeyFieldName] ] = $objectIndex;

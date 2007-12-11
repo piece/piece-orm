@@ -98,13 +98,12 @@ class Piece_ORM_Mapper_ObjectLoader
     function Piece_ORM_Mapper_ObjectLoader(&$mapper, &$result, $relationships, $useIdentityMap)
     {
         $this->_result = &$result;
-        $this->_relationships = $relationships;
 
-        if (count($this->_relationships)) {
+        if (count($relationships)) {
             foreach (Piece_ORM_Mapper_RelationshipType::getRelationshipTypes() as $relationshipType) {
                 $associatedObjectsLoaderClass = 'Piece_ORM_Mapper_AssociatedObjectLoader_' . ucwords($relationshipType);
                 include_once str_replace('_', '/', $associatedObjectsLoaderClass) . '.php';
-                $this->_associatedObjectLoaders[$relationshipType] = &new $associatedObjectsLoaderClass($this);
+                $this->_associatedObjectLoaders[$relationshipType] = &new $associatedObjectsLoaderClass($relationships, $this->_relationshipKeys, $this->_objects, $this->_objectIndexes, $mapper);
             }
         }
 
@@ -112,6 +111,7 @@ class Piece_ORM_Mapper_ObjectLoader
         $this->_primaryKey = $metadata->getPrimaryKey();
         $this->_mapper = &$mapper;
         $this->_useIdentityMap = $useIdentityMap;
+        $this->_relationships = $relationships;
     }
 
     // }}}
@@ -144,72 +144,6 @@ class Piece_ORM_Mapper_ObjectLoader
         }
 
         return $this->_objects;
-    }
-
-    // }}}
-    // {{{ getRelationships()
-
-    /**
-     * Gets the array of the relationships.
-     *
-     * @return array
-     */
-    function getRelationships()
-    {
-        return $this->_relationships;
-    }
-
-    // }}}
-    // {{{ getObjects()
-
-    /**
-     * Gets the array of loaded objects.
-     *
-     * @return array
-     */
-    function &getObjects()
-    {
-        return $this->_objects;
-    }
-
-    // }}}
-    // {{{ getMapper()
-
-    /**
-     * Gets the mapper object.
-     *
-     * @return mixed
-     */
-    function &getMapper()
-    {
-        return $this->_mapper;
-    }
-
-    // }}}
-    // {{{ getRelationshipKeys()
-
-    /**
-     * Gets the array of the keys which are used for relationships.
-     *
-     * @return array
-     */
-    function &getRelationshipKeys()
-    {
-        return $this->_relationshipKeys;
-    }
-
-    // }}}
-    // {{{ getObjectIndexes()
-
-    /**
-     * Gets the array of the indexes which indicate that target objects which
-     * associated objects are loaded into.
-     *
-     * @return array
-     */
-    function &getObjectIndexes()
-    {
-        return $this->_objectIndexes;
     }
 
     /**#@-*/
