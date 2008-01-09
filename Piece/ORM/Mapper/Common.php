@@ -568,7 +568,7 @@ class Piece_ORM_Mapper_Common
      *
      * @param integer $errno
      * @param string  $errstr
-     * @since Method available since Release 1.0.0
+     * @since Method available since Release 0.8.1
      */
     function handleErrorInEval($errno, $errstr)
     {

@@ -263,7 +263,7 @@ class Piece_ORM_Metadata
      *
      * @param string $fieldName
      * @return boolean
-     * @since Method available since Release 1.0.0
+     * @since Method available since Release 0.8.1
      */
     function hasDefault($fieldName)
     {

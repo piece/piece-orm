@@ -84,7 +84,7 @@ class Piece_ORM_InflectorTestCase extends PHPUnit_TestCase
     }
 
     /**
-     * @since Method available since Release 1.0.0
+     * @since Method available since Release 0.8.1
      */
     function testWordShouldCamelize()
     {
