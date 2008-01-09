@@ -143,8 +143,9 @@ class Piece_ORM_Mapper_AssociatedObjectLoader_Common
     {
         $mapper->setPreloadCallback($this->_getPreloadCallback());
         $mapper->setPreloadCallbackArgs(array($relationshipIndex));
-
         $associatedObjects = $mapper->findAllWithQuery($this->_buildQuery($relationshipIndex) . (is_null($this->_relationships[$relationshipIndex]['orderBy']) ? '' : " ORDER BY {$this->_relationships[$relationshipIndex]['orderBy']}"));
+        $mapper->setPreloadCallback(null);
+        $mapper->setPreloadCallbackArgs(null);
         if (Piece_ORM_Error::hasErrors('exception')) {
             return;
         }

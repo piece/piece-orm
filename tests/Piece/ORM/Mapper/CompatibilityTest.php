@@ -1489,7 +1489,7 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
     }
 
     /**
-     * @since Method available since Release 1.0.0
+     * @since Method available since Release 0.8.1
      */
     function testCompositePrimaryKeyShouldWork()
     {
@@ -1536,7 +1536,7 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
     }
 
     /**
-     * @since Method available since Release 1.0.0
+     * @since Method available since Release 0.8.1
      */
     function testIdentityMapShouldNotUseWhenTableHasCompositePrimaryKey()
     {
@@ -1576,7 +1576,7 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
     }
 
     /**
-     * @since Method available since Release 1.0.0
+     * @since Method available since Release 0.8.1
      */
     function testUnusualNamesShouldWork()
     {
@@ -1610,6 +1610,23 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         $this->assertTrue(array_key_exists('id', $objects[0]));
         $this->assertTrue(array_key_exists('unusualname1_2_id', $objects[0]));
         $this->assertTrue(array_key_exists('unusualname_12_id', $objects[0]));
+    }
+
+    /**
+     * @since Method available since Release 0.8.1
+     */
+    function testShouldWorkAnyFinderMethodCallsForAMapperWhichHasAlreadyUsedInRelationships()
+    {
+        $this->_configure('ManyToManyRelationships');
+        $this->_setupManyToManyRelationships();
+
+        $employeeMapper = &Piece_ORM_Mapper_Factory::factory('Employee');
+        $employeeMapper->findAllWithSkills2();
+        $skillMapper = &Piece_ORM_Mapper_Factory::factory('Skill');
+        $skills = $skillMapper->findAll();
+
+        $this->assertEquals(2, $skillMapper->getCount());
+        $this->assertEquals(2, count($skills));
     }
 
     /**#@-*/
