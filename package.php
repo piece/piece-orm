@@ -61,7 +61,7 @@ Defect Fixes
 - Fixed a defect that caused an error "Fatal error: Cannot redeclare ..." to be raised if there are duplicate method names case insensitive in a configuration. (Ticket #59) (Piece_ORM_Mapper_Generator)';
 
 $package = new PEAR_PackageFileManager2();
-$package->setOptions(array('filelistgenerator' => 'svn',
+$package->setOptions(array('filelistgenerator' => 'file',
                            'changelogoldtonew' => false,
                            'simpleoutput'      => true,
                            'baseinstalldir'    => '/',
