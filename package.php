@@ -47,26 +47,21 @@ $notes = 'A new release of Piece_ORM is now available.
 
 What\'s New in Piece_ORM 0.8.1
 
- * Enhanced update() and delete(): update() and delete() now work a table which has no primary keys.
- * A few Defect Fixes: Two minor defects that caused the same cache to be used if the relative paths of the configuration files (or the mapper definition files) are same even though the absolute paths of the configuration files (or the mapper definition files) are different are fixed. And also a defect that caused variables to be tainted if the given object has "criteria" or "methodName" properties is fixed.
+ * Several Defect Fixes: A defect that caused an error "Fatal error: Cannot redeclare ..." to be raised if there are duplicate method names case insensitive in a configuration and other defects are fixed.
 
 See the following release notes for details.
-
-Enhancements
-============ 
-
-- Improved the error message for the PIECE_ORM_ERROR_INVOCATION_FAILED exception when building a query. (Piece_ORM_Mapper_Common)
-- Changed update()/delete() so as to work with a table which has no primary keys. (Piece_ORM_Mapper_ObjectPersister)
 
 Defect Fixes
 ============
 
-- Fixed the defect that caused the cache IDs to duplicate if the relative paths of the configuration files are same even though the absolute paths of the configuration files are different. (Piece_ORM_Config_Factory)
-- Fixed the defect that caused the cache IDs to duplicate if the relative paths of the mapper definition files are same even though the absolute paths of the mapper definition files are different. (Piece_ORM_Mapper_Factory)
-- Fixed the defect that caused variables to be tainted if the given object has "criteria" or "methodName" properties. (Piece_ORM_Mapper_Common)';
+- Fixed a defect that caused update()/delete() to be failed with a table which has a composite primary key. (Ticket #62) (Piece_ORM_Mapper_Generator)
+- Fixed a defect that caused the result of findXXX()/findAllXXX() to be broken with a table which has a composite primary key. (Ticket #63) (Piece_ORM_Metadata)
+- Fixed a defect that mappers cannot work with a table which includes numbers and underscores in the table name and the column names. (Ticket #65) (Piece_ORM_Inflector)
+- Fixed a defect that caused the result of a finder method call to be broken if the mapper has already used in relationships before. (Ticket #69) (Piece_ORM_Mapper_AssociatedObjectLoader_Common)
+- Fixed a defect that caused an error "Fatal error: Cannot redeclare ..." to be raised if there are duplicate method names case insensitive in a configuration. (Ticket #59) (Piece_ORM_Mapper_Generator)';
 
 $package = new PEAR_PackageFileManager2();
-$package->setOptions(array('filelistgenerator' => 'svn',
+$package->setOptions(array('filelistgenerator' => 'file',
                            'changelogoldtonew' => false,
                            'simpleoutput'      => true,
                            'baseinstalldir'    => '/',
