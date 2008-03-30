@@ -1,14 +1,15 @@
 # $Id$
 
-# - name: findAllOrderByEmail
-#   orderBy: email
-
-# - name: findOrderByEmail
-#   orderBy: email
-
-# - name: findOneOrderByEmail
-#   query: SELECT email FROM email
-#   orderBy: email
+- name: insert
+  query: |
+    INSERT INTO emails (
+      email,
+      created_at
+      )
+    VALUES (
+      $email,
+      CURRENT_TIMESTAMP
+      )
 
 # Local Variables:
 # mode: conf-colon

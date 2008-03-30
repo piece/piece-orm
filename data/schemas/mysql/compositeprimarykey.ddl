@@ -1,11 +1,11 @@
 -- $Id$
 
 CREATE TABLE compositeprimarykey (
-  album varchar(255) NOT NULL,
-  artist varchar(255) NOT NULL,
-  track int(11) NOT NULL,
-  song varchar(255) NOT NULL,
-  PRIMARY KEY(album, artist, track)
+  album varchar (255) NOT NULL,
+  artist varchar (255) NOT NULL,
+  track int (11) NOT NULL,
+  song varchar (255) NOT NULL,
+  PRIMARY KEY (album, artist, track)
 );
 
 /*

@@ -1,12 +1,12 @@
 -- $Id$
 
-CREATE TABLE nonprimarykeys (
-  member_id int (11) NOT NULL,
-  service_id int (11) NOT NULL,
-  point int (11) NOT NULL DEFAULT '0',
+CREATE TABLE emails (
+  emails_id int (11) NOT NULL AUTO_INCREMENT,
+  email varchar (255) NOT NULL,
   created_at datetime NOT NULL,
   updated_at timestamp,
-  UNIQUE (member_id, service_id)
+  PRIMARY KEY (emails_id),
+  UNIQUE (email)
 );
 
 /*

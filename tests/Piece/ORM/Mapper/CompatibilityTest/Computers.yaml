@@ -1,5 +1,18 @@
 # $Id$
 
+- name: insert
+  query: |
+    INSERT INTO computers (
+      name,
+      employees_id,
+      created_at
+      )
+    VALUES (
+      $name,
+      $employeesId,
+      CURRENT_TIMESTAMP
+      )
+
 # Local Variables:
 # mode: conf-colon
 # coding: iso-8859-1

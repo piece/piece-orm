@@ -9,6 +9,19 @@
 - name: deleteByMemberIdAndServiceId
   query: DELETE FROM nonprimarykeys WHERE member_id = $memberId AND service_id = $serviceId
 
+- name: insert
+  query: |
+    INSERT INTO nonprimarykeys (
+      member_id,
+      service_id,
+      created_at
+      )
+    VALUES (
+      $memberId,
+      $serviceId,
+      CURRENT_TIMESTAMP
+      )
+
 # Local Variables:
 # mode: conf-colon
 # coding: iso-8859-1

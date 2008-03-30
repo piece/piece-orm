@@ -29,6 +29,21 @@
         inverseColumn: skills_id
 
 - name: insert
+  query: |
+    INSERT INTO employees (
+      first_name,
+      last_name,
+      note,
+      departments_id,
+      created_at
+      )
+    VALUES (
+      $firstName,
+      $lastName,
+      $note,
+      $departmentsId,
+      CURRENT_TIMESTAMP
+      )
   relationship:
     - type: manyToMany
       table: skills
@@ -170,12 +185,14 @@
     INSERT INTO employees (
       first_name,
       last_name,
-      note
+      note,
+      created_at
       )
     VALUES (
       $firstName,
       $lastName,
-      'Bar'
+      'Bar',
+      CURRENT_TIMESTAMP
       )
 
 - name: updateUserDefined
@@ -224,12 +241,14 @@
     INSERT INTO employees (
       first_name,
       last_name,
-      note
+      note,
+      created_at
       )
     VALUES (
       'Foo',
       'Bar',
-      'Baz'
+      'Baz',
+      CURRENT_TIMESTAMP
       )
 
 - name: updateWithStaticQuery
@@ -249,6 +268,21 @@
 - name: deleteWithNoQuery
 
 - name: insertWithEmails
+  query: |
+    INSERT INTO employees (
+      first_name,
+      last_name,
+      note,
+      departments_id,
+      created_at
+      )
+    VALUES (
+      $firstName,
+      $lastName,
+      $note,
+      $departmentsId,
+      CURRENT_TIMESTAMP
+      )
   relationship:
     - type: manyToMany
       table: emails

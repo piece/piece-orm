@@ -64,7 +64,6 @@ class Piece_ORM_Mapper_MysqlTestCase extends Piece_ORM_Mapper_CompatibilityTest
      */
 
     var $_dsn = 'mysql://piece:piece@pieceorm/piece';
-    var $_type = 'mysql';
 
     /**#@-*/
 
@@ -77,9 +76,9 @@ class Piece_ORM_Mapper_MysqlTestCase extends Piece_ORM_Mapper_CompatibilityTest
      */
     function testDefaultQueryShouldBeGeneratedIfQueryForInsertMethodIsNotGiven()
     {
-        $mapper = &Piece_ORM_Mapper_Factory::factory('Person');
+        $mapper = &Piece_ORM_Mapper_Factory::factory('Employees');
 
-        $this->assertEquals('INSERT INTO person (first_name, last_name, service_id, rdate) VALUES ($firstName, $lastName, $serviceId, $rdate)', $mapper->__query__insertwithnoquery);
+        $this->assertEquals('INSERT INTO employees (first_name, last_name, note, departments_id, created_at) VALUES ($firstName, $lastName, $note, $departmentsId, $createdAt)', $mapper->__query__insertwithnoquery);
     }
 
     /**
@@ -100,18 +99,16 @@ class Piece_ORM_Mapper_MysqlTestCase extends Piece_ORM_Mapper_CompatibilityTest
         $context->setConfiguration($config);
         $context->setMapperConfigDirectory($this->_cacheDirectory);
         $context->setDatabase('CharsetShouldBeAbleToSetByDSN');
-        $mapper = &Piece_ORM_Mapper_Factory::factory('Person');
+        $mapper = &Piece_ORM_Mapper_Factory::factory('Employees');
         $subject = &$mapper->createObject();
         $subject->firstName = "\x93\xd6\x8c\x5b";
         $subject->lastName = "\x8b\x76\x95\xdb";
-        $subject->serviceId = 1;
-        $this->_addMissingPropertyForInsert($subject);
         $id = $mapper->insert($subject);
-        $person = $mapper->findById($id);
+        $employee = $mapper->findById($id);
 
-        $this->assertNotNull($person);
-        $this->assertEquals("\x93\xd6\x8c\x5b", $person->firstName);
-        $this->assertEquals("\x8b\x76\x95\xdb", $person->lastName);
+        $this->assertNotNull($employee);
+        $this->assertEquals("\x93\xd6\x8c\x5b", $employee->firstName);
+        $this->assertEquals("\x8b\x76\x95\xdb", $employee->lastName);
     }
 
     /**#@-*/
@@ -119,11 +116,6 @@ class Piece_ORM_Mapper_MysqlTestCase extends Piece_ORM_Mapper_CompatibilityTest
     /**#@+
      * @access private
      */
-
-    function _addMissingPropertyForInsert(&$subject)
-    {
-        $subject->rdate = date('Y-m-d H:i:s');
-    }
 
     /**#@-*/
 

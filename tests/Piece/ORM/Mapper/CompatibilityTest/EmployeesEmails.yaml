@@ -1,5 +1,18 @@
 # $Id$
 
+- name: insert
+  query: |
+    INSERT INTO employees_emails (
+      employees_id,
+      emails_id,
+      created_at
+      )
+    VALUES (
+      $employeesId,
+      $emailsId,
+      CURRENT_TIMESTAMP
+      )
+
 # Local Variables:
 # mode: conf-colon
 # coding: iso-8859-1

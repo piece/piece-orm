@@ -47,6 +47,17 @@
       table: employees
       mappedAs: employees
 
+- name: insert
+  query: |
+    INSERT INTO departments (
+      name,
+      created_at
+      )
+    VALUES (
+      $name,
+      CURRENT_TIMESTAMP
+      )
+
 # Local Variables:
 # mode: conf-colon
 # coding: iso-8859-1

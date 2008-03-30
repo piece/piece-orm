@@ -466,7 +466,6 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         $subject->firstName = 'Foo';
         $subject->lastName = 'Bar';
         $subject->note = '';
-        $this->_addMissingPropertyForInsert($subject);
         $id = $mapper->insert($subject);
 
         $employee = &$mapper->findById($id);
@@ -1108,7 +1107,6 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         $subject = &$mapper->createObject();
         $subject->firstName = 'Atsuhiro';
         $subject->lastName = 'Kubo';
-        $this->_addMissingPropertyForInsert($subject);
 
         $this->assertNull($subject->note);
 
@@ -1127,13 +1125,11 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         $subject->firstName = 'Taro';
         $subject->lastName = 'ITEMAN';
         $subject->note = 'Foo';
-        $this->_addMissingPropertyForInsert($subject);
         $mapper->insert($subject);
         $subject = &$mapper->createObject();
         $subject->firstName = 'Taro';
         $subject->lastName = 'ITEMAN';
         $subject->note = 'Bar';
-        $this->_addMissingPropertyForInsert($subject);
         $mapper->insert($subject);
         $mapper->addOrder('id');
         $employees = $mapper->findAllNotes();
@@ -1169,7 +1165,6 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         $subject->firstName = 'Taro';
         $subject->lastName = 'ITEMAN';
         $subject->note = 'Foo';
-        $this->_addMissingPropertyForInsert($subject);
 
         $id = $mapper->insertUserDefined($subject);
 
@@ -1414,12 +1409,10 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         $subject = &$mapper->createObject();
         $subject->firstName = 'Bar';
         $subject->lastName = 'Foo';
-        $this->_addMissingPropertyForInsert($subject);
         $mapper->insert($subject);
         $subject = &$mapper->createObject();
         $subject->firstName = 'Baz';
         $subject->lastName = 'Bar';
-        $this->_addMissingPropertyForInsert($subject);
         $mapper->insert($subject);
 
         $employees = $mapper->findAllOrderByLastName();
@@ -1448,12 +1441,10 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         $subject = &$mapper->createObject();
         $subject->firstName = 'Bar';
         $subject->lastName = 'Foo';
-        $this->_addMissingPropertyForInsert($subject);
         $mapper->insert($subject);
         $subject = &$mapper->createObject();
         $subject->firstName = 'Baz';
         $subject->lastName = 'Bar';
-        $this->_addMissingPropertyForInsert($subject);
         $mapper->insert($subject);
         $mapper->addOrder('id');
         $employees = $mapper->findAllOrderByLastName();
@@ -1673,11 +1664,8 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         $subject->firstName = 'Atsuhiro';
         $subject->lastName = 'Kubo';
         $subject->note = 'Foo';
-        $this->_addMissingPropertyForInsert($subject);
         return $mapper->insert($subject);
     }
-
-    function _addMissingPropertyForInsert($subject) {}
 
     function _prepareTableRecords()
     {

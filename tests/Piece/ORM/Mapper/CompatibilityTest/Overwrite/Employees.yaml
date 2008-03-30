@@ -15,12 +15,14 @@
     INSERT INTO employees (
       first_name,
       last_name,
-      note
+      note,
+      created_at
       )
     VALUES (
       $firstName,
       $lastName,
-      'Bar'
+      'Bar',
+      CURRENT_TIMESTAMP
       )
 
 - name: update
