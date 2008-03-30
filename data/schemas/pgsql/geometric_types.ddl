@@ -9,9 +9,8 @@ CREATE TABLE geometric_types (
   closed_path_field path NOT NULL,
   polygon_field polygon NOT NULL,
   circle_field circle NOT NULL,
-  version int4 NOT NULL DEFAULT '0',
-  rdate timestamp with time zone NOT NULL DEFAULT current_timestamp,
-  mdate timestamp with time zone NOT NULL DEFAULT current_timestamp,
+  created_at timestamp with time zone NOT NULL DEFAULT current_timestamp,
+  updated_at timestamp with time zone NOT NULL DEFAULT current_timestamp,
   PRIMARY KEY (id)
 );
 
