@@ -766,7 +766,7 @@ class Piece_ORM_Mapper_Common
             return $criteria;
         } else {
             Piece_ORM_Error::push(PIECE_ORM_ERROR_UNEXPECTED_VALUE,
-                                  "An unexpected value detected. $method() can only receive object or null."
+                                  "An unexpected value detected. $methodName() can only receive object or null. Or the method name does not contain the appropriate field name."
                                   );
             $return = null;
             return $return;
