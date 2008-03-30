@@ -7,8 +7,10 @@ CREATE TABLE nonprimarykeys (
   version int4 NOT NULL DEFAULT '0',
   rdate timestamp with time zone NOT NULL DEFAULT current_timestamp,
   mdate timestamp with time zone NOT NULL DEFAULT current_timestamp,
-  UNIQUE(member_id, service_id)
+  UNIQUE (member_id, service_id)
 );
+
+ALTER TABLE nonprimarykeys OWNER TO piece;
 
 /*
  * Local Variables:

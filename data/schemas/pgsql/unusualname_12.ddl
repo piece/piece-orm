@@ -2,9 +2,11 @@
 
 CREATE TABLE unusualname_12 (
   id serial,
-  name varchar(255) NOT NULL,
-  PRIMARY KEY(id)
+  name varchar (255) NOT NULL,
+  PRIMARY KEY (id)
 );
+
+ALTER TABLE unusualname_12 OWNER TO piece;
 
 /*
  * Local Variables:

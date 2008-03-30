@@ -12,8 +12,10 @@ CREATE TABLE geometric_types (
   version int4 NOT NULL DEFAULT '0',
   rdate timestamp with time zone NOT NULL DEFAULT current_timestamp,
   mdate timestamp with time zone NOT NULL DEFAULT current_timestamp,
-  PRIMARY KEY(id)
+  PRIMARY KEY (id)
 );
+
+ALTER TABLE geometric_types OWNER TO piece;
 
 /*
  * Local Variables:

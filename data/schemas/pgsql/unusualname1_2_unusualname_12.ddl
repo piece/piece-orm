@@ -4,8 +4,10 @@ CREATE TABLE unusualname1_2_unusualname_12 (
   id serial,
   unusualname1_2_id int4 NOT NULL,
   unusualname_12_id int4 NOT NULL,
-  PRIMARY KEY(id)
+  PRIMARY KEY (id)
 );
+
+ALTER TABLE unusualname1_2_unusualname_12 OWNER TO piece;
 
 /*
  * Local Variables:
