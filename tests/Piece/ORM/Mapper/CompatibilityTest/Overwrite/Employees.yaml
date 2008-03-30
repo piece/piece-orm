@@ -1,0 +1,59 @@
+# $Id$
+
+- name: findByFirstName
+  query: |
+    SELECT
+      *
+    FROM
+      employees
+    WHERE
+      first_name = $firstName
+      AND note = $note
+
+- name: insert
+  query: |
+    INSERT INTO employees (
+      first_name,
+      last_name,
+      note
+      )
+    VALUES (
+      $firstName,
+      $lastName,
+      'Bar'
+      )
+
+- name: update
+  query: |
+    UPDATE employees
+    SET
+      first_name = $firstName,
+      last_name = $lastName,
+      updated_at = CURRENT_TIMESTAMP
+    WHERE
+      id = $id
+      AND note = 'Bar'
+
+- name: delete
+  query: |
+    DELETE FROM employees
+    WHERE
+      id = $id
+      AND note = 'Bar'
+
+- name: findbylastname
+  query: |
+    SELECT
+      *
+    FROM
+      employees
+    WHERE
+      last_name = $lastName
+      AND note = 'Bar'
+
+# Local Variables:
+# mode: conf-colon
+# coding: iso-8859-1
+# tab-width: 2
+# indent-tabs-mode: nil
+# End:

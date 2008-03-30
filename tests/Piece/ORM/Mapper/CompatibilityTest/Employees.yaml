@@ -1,0 +1,285 @@
+# $Id$
+
+- name: findByIdAndNote
+  query: |
+    SELECT
+      *
+    FROM
+      employees
+    WHERE
+      id = $id
+      AND note = $note
+
+- name: findAllWithSkills1
+  relationship:
+    - type: manyToMany
+      table: skills
+      mappedAs: skills
+
+- name: findAllWithSkills2
+  relationship:
+    - type: manyToMany
+      table: skills
+      mappedAs: skills
+      column: id
+      through:
+        table: employees_skills
+        column: employees_id
+        referencedColumn: id
+        inverseColumn: skills_id
+
+- name: insert
+  relationship:
+    - type: manyToMany
+      table: skills
+      mappedAs: skills
+    - type: oneToOne
+      table: computers
+      mappedAs: computer
+
+- name: findAllByFirstName
+  relationship:
+    - type: manyToMany
+      table: skills
+      mappedAs: skills
+
+- name: findAllWithDepartment1
+  relationship:
+    - type: manyToOne
+      table: departments
+      mappedAs: department
+
+- name: findAllWithDepartment2
+  relationship:
+    - type: manyToOne
+      table: departments
+      mappedAs: department
+      column: id
+      referencedColumn: departments_id
+
+- name: findAllWithComputer1
+  relationship:
+    - type: oneToOne
+      table: computers
+      mappedAs: computer
+
+- name: findAllWithComputer2
+  relationship:
+    - type: oneToOne
+      table: computers
+      mappedAs: computer
+      column: employees_id
+      referencedColumn: id
+
+- name: findWithDepartmentByFirstName
+  query: |
+    SELECT
+      *
+    FROM
+      employees
+    WHERE
+      first_name = $firstName
+  relationship:
+    - type: manyToOne
+      table: departments
+      mappedAs: department
+
+- name: findAllWithOrderedSkills
+  relationship:
+    - type: manyToMany
+      table: skills
+      mappedAs: skills
+      orderBy: skills.id DESC
+
+- name: findWithOrderedSkills
+  relationship:
+    - type: manyToMany
+      table: skills
+      mappedAs: skills
+      orderBy: skills.id DESC
+
+- name: findWithSkillsByFirstName
+  query: |
+    SELECT
+      *
+    FROM
+      employees
+    WHERE
+      first_name = $firstName
+  relationship:
+    - type: manyToMany
+      table: skills
+      mappedAs: skills
+
+- name: update
+  relationship:
+    - type: manyToMany
+      table: skills
+      mappedAs: skills
+    - type: oneToOne
+      table: computers
+      mappedAs: computer
+
+- name: findWithComputerByFirstName
+  query: |
+    SELECT
+      *
+    FROM
+      employees
+    WHERE
+      first_name = $firstName
+  relationship:
+    - type: oneToOne
+      table: computers
+      mappedAs: computer
+
+- name: delete
+  relationship:
+    - type: manyToMany
+      table: skills
+      mappedAs: skills
+    - type: oneToOne
+      table: computers
+      mappedAs: computer
+
+- name: findOneForFirstNameByFirstName
+  query: |
+    SELECT
+      first_name
+    FROM
+      employees
+    WHERE
+      first_name = $firstName
+
+- name: findOneForCount
+  query: |
+    SELECT
+      COUNT(*)
+    FROM
+      employees
+
+- name: findAllNotes
+  query: |
+    SELECT
+      note
+    FROM
+      employees
+
+- name: insertUserDefined
+  query: |
+    INSERT INTO employees (
+      first_name,
+      last_name,
+      note
+      )
+    VALUES (
+      $firstName,
+      $lastName,
+      'Bar'
+      )
+
+- name: updateUserDefined
+  query: |
+    UPDATE employees
+    SET
+      first_name = $firstName,
+      last_name = $lastName,
+      note = $note,
+      updated_at = CURRENT_TIMESTAMP
+    WHERE
+      id = $id
+
+- name: deleteUserDefined
+  query: |
+    DELETE FROM employees
+    WHERE
+      id = $id
+
+- name: updateNoteByNote
+  query: |
+    UPDATE employees
+    SET
+      note = $note,
+      updated_at = CURRENT_TIMESTAMP
+    WHERE
+      note = $oldNote
+
+- name: deleteByNote
+  query: |
+    DELETE FROM employees
+    WHERE
+      note = $note
+
+- name: findWithStaticQuery
+  query: SELECT 1 AS one
+
+- name: findAllWithStaticQuery
+  query: SELECT 1 AS one
+
+- name: findOneWithStaticQuery
+  query: SELECT 1 AS one
+
+- name: insertWithStaticQuery
+  query: |
+    INSERT INTO employees (
+      first_name,
+      last_name,
+      note
+      )
+    VALUES (
+      'Foo',
+      'Bar',
+      'Baz'
+      )
+
+- name: updateWithStaticQuery
+  query: |
+    UPDATE employees
+    SET
+      note = 'Qux',
+      updated_at = CURRENT_TIMESTAMP
+
+- name: deleteWithStaticQuery
+  query: DELETE FROM employees
+
+- name: insertWithNoQuery
+
+- name: updateWithNoQuery
+
+- name: deleteWithNoQuery
+
+- name: insertWithEmails
+  relationship:
+    - type: manyToMany
+      table: emails
+      mappedAs: emails
+      through:
+        table: employees_emails
+        inverseColumn: emails_id
+
+- name: findAllWithEmails
+  relationship:
+    - type: manyToMany
+      table: emails
+      mappedAs: emails
+      orderBy: emails.emails_id
+      through:
+        table: employees_emails
+        inverseColumn: emails_id
+
+- name: findAllOrderByLastName
+  orderBy: last_name
+
+- name: findOrderByLastName
+  orderBy: last_name
+
+- name: findOneOrderByLastName
+  query: SELECT last_name FROM employees
+  orderBy: last_name
+
+# Local Variables:
+# mode: conf-colon
+# coding: iso-8859-1
+# tab-width: 2
+# indent-tabs-mode: nil
+# End:

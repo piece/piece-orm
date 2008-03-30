@@ -64,7 +64,6 @@ class Piece_ORM_Mapper_PgsqlTestCase extends Piece_ORM_Mapper_CompatibilityTest
      */
 
     var $_dsn = 'pgsql://piece:piece@pieceorm/piece';
-    var $_type = 'pgsql';
 
     /**#@-*/
 
@@ -77,6 +76,11 @@ class Piece_ORM_Mapper_PgsqlTestCase extends Piece_ORM_Mapper_CompatibilityTest
      */
     function testGeometricTypesShouldWork()
     {
+        $this->_tables[] = 'geometric_types';
+        $this->_cacheDirectory = dirname(__FILE__) . '/' . basename(__FILE__, '.php');
+        Piece_ORM_Mapper_Factory::setConfigDirectory($this->_cacheDirectory);
+        Piece_ORM_Mapper_Factory::setCacheDirectory($this->_cacheDirectory);
+        Piece_ORM_Metadata_Factory::setCacheDirectory($this->_cacheDirectory);
         $mapper = &Piece_ORM_Mapper_Factory::factory('GeometricTypes');
         $geometricTypes = &$mapper->createObject();
         $geometricTypes->pointField = '(1,1)';
@@ -111,17 +115,16 @@ class Piece_ORM_Mapper_PgsqlTestCase extends Piece_ORM_Mapper_CompatibilityTest
         $context->setConfiguration($config);
         $context->setMapperConfigDirectory($this->_cacheDirectory);
         $context->setDatabase('CharsetShouldBeAbleToSetByDSN');
-        $mapper = &Piece_ORM_Mapper_Factory::factory('Person');
+        $mapper = &Piece_ORM_Mapper_Factory::factory('Employees');
         $subject = &$mapper->createObject();
         $subject->firstName = "\x93\xd6\x8c\x5b";
         $subject->lastName = "\x8b\x76\x95\xdb";
-        $subject->serviceId = 1;
         $id = $mapper->insert($subject);
-        $person = $mapper->findById($id);
+        $employee = $mapper->findById($id);
 
-        $this->assertNotNull($person);
-        $this->assertEquals("\x93\xd6\x8c\x5b", $person->firstName);
-        $this->assertEquals("\x8b\x76\x95\xdb", $person->lastName);
+        $this->assertNotNull($employee);
+        $this->assertEquals("\x93\xd6\x8c\x5b", $employee->firstName);
+        $this->assertEquals("\x8b\x76\x95\xdb", $employee->lastName);
     }
 
     /**#@-*/

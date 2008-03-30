@@ -1,0 +1,18 @@
+# $Id$
+
+# - name: findAllOrderByEmail
+#   orderBy: email
+
+# - name: findOrderByEmail
+#   orderBy: email
+
+# - name: findOneOrderByEmail
+#   query: SELECT email FROM email
+#   orderBy: email
+
+# Local Variables:
+# mode: conf-colon
+# coding: iso-8859-1
+# tab-width: 2
+# indent-tabs-mode: nil
+# End:
