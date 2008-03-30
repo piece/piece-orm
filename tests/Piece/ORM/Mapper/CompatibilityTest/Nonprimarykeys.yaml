@@ -4,10 +4,10 @@
   query: SELECT * FROM nonprimarykeys WHERE member_id = $memberId AND service_id = $serviceId
 
 - name: updateByMemberIdAndServiceId
-  query: UPDATE nonprimarykeys SET point = $point WHERE member_id = $memberId AND service_id = $serviceId AND version = $version
+  query: UPDATE nonprimarykeys SET point = $point WHERE member_id = $memberId AND service_id = $serviceId
 
 - name: deleteByMemberIdAndServiceId
-  query: DELETE FROM nonprimarykeys WHERE member_id = $memberId AND service_id = $serviceId AND version = $version
+  query: DELETE FROM nonprimarykeys WHERE member_id = $memberId AND service_id = $serviceId
 
 # Local Variables:
 # mode: conf-colon
