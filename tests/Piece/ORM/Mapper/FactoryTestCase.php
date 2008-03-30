@@ -117,7 +117,7 @@ class Piece_ORM_Mapper_FactoryTestCase extends PHPUnit_TestCase
         Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
         $oldConfigDirectory = Piece_ORM_Mapper_Factory::setConfigDirectory(null);
 
-        Piece_ORM_Mapper_Factory::factory('Person');
+        Piece_ORM_Mapper_Factory::factory('Employees');
 
         $this->assertTrue(Piece_ORM_Error::hasErrors('exception'));
 
@@ -134,7 +134,7 @@ class Piece_ORM_Mapper_FactoryTestCase extends PHPUnit_TestCase
         Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
         $oldConfigDirectory = Piece_ORM_Mapper_Factory::setConfigDirectory(dirname(__FILE__) . '/foo');
 
-        Piece_ORM_Mapper_Factory::factory('Person');
+        Piece_ORM_Mapper_Factory::factory('Employees');
 
         $this->assertTrue(Piece_ORM_Error::hasErrors('exception'));
 
@@ -151,7 +151,7 @@ class Piece_ORM_Mapper_FactoryTestCase extends PHPUnit_TestCase
         Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
         $oldCacheDirectory = Piece_ORM_Mapper_Factory::setCacheDirectory(null);
 
-        Piece_ORM_Mapper_Factory::factory('Person');
+        Piece_ORM_Mapper_Factory::factory('Employees');
 
         $this->assertTrue(Piece_ORM_Error::hasErrors('exception'));
 
@@ -168,7 +168,7 @@ class Piece_ORM_Mapper_FactoryTestCase extends PHPUnit_TestCase
         Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
         $oldCacheDirectory = Piece_ORM_Mapper_Factory::setCacheDirectory(dirname(__FILE__) . '/foo');
 
-        Piece_ORM_Mapper_Factory::factory('Person');
+        Piece_ORM_Mapper_Factory::factory('Employees');
 
         $this->assertTrue(Piece_ORM_Error::hasErrors('exception'));
 
@@ -197,15 +197,15 @@ class Piece_ORM_Mapper_FactoryTestCase extends PHPUnit_TestCase
 
     function testFactory()
     {
-        $mapper = &Piece_ORM_Mapper_Factory::factory('Person');
+        $mapper = &Piece_ORM_Mapper_Factory::factory('Employees');
 
         $this->assertTrue(is_subclass_of($mapper, 'Piece_ORM_Mapper_Common'));
     }
 
     function testInstanceCache()
     {
-        $mapper1 = &Piece_ORM_Mapper_Factory::factory('Person');
-        $mapper2 = &Piece_ORM_Mapper_Factory::factory('Person');
+        $mapper1 = &Piece_ORM_Mapper_Factory::factory('Employees');
+        $mapper2 = &Piece_ORM_Mapper_Factory::factory('Employees');
 
         $mapper1->foo = 'bar';
 
@@ -221,13 +221,13 @@ class Piece_ORM_Mapper_FactoryTestCase extends PHPUnit_TestCase
         $config = &$context->getConfiguration();
         $config->setDSN('piece1', 'pgsql://piece:piece@pieceorm/piece');
         $config->setOptions('piece1', array('debug' => 0, 'result_buffering' => false));
-        $mapper1 = &Piece_ORM_Mapper_Factory::factory('Person');
+        $mapper1 = &Piece_ORM_Mapper_Factory::factory('Employees');
 
         $this->assertEquals(2, $mapper1->_dbh->options['debug']);
 
         $mapper1->foo = 'bar';
         $context->setDatabase('piece1');
-        $mapper2 = &Piece_ORM_Mapper_Factory::factory('Person');
+        $mapper2 = &Piece_ORM_Mapper_Factory::factory('Employees');
 
         $this->assertEquals(0, $mapper2->_dbh->options['debug']);
         $this->assertTrue(array_key_exists('foo', $mapper2));
@@ -242,13 +242,13 @@ class Piece_ORM_Mapper_FactoryTestCase extends PHPUnit_TestCase
         $oldDirectory = getcwd();
         chdir("{$this->_cacheDirectory}/CacheIDsShouldUniqueInOneCacheDirectory1");
         Piece_ORM_Mapper_Factory::setConfigDirectory('.');
-        Piece_ORM_Mapper_Factory::factory('Person');
+        Piece_ORM_Mapper_Factory::factory('Employees');
 
         $this->assertEquals(1, $this->_getCacheFileCount($this->_cacheDirectory) - 1);
 
         chdir("{$this->_cacheDirectory}/CacheIDsShouldUniqueInOneCacheDirectory2");
         Piece_ORM_Mapper_Factory::setConfigDirectory('.');
-        Piece_ORM_Mapper_Factory::factory('Person');
+        Piece_ORM_Mapper_Factory::factory('Employees');
 
         $this->assertEquals(2, $this->_getCacheFileCount($this->_cacheDirectory) - 1);
 

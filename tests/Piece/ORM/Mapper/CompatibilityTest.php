@@ -88,6 +88,7 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
                          'unusualname1_2_unusualname_12',
                          'unusualname_12'
                          );
+    var $_initialized = false;
 
     /**#@-*/
 
@@ -109,14 +110,15 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         $this->_oldCacheDirectory = Piece_ORM_Mapper_Factory::setConfigDirectory($this->_cacheDirectory);
         Piece_ORM_Mapper_Factory::setCacheDirectory($this->_cacheDirectory);
         $this->_oldMetadataCacheDirectory = Piece_ORM_Metadata_Factory::setCacheDirectory($this->_cacheDirectory);
-        $dbh = &$context->getConnection();
-        foreach ($this->_tables as $table) {
-            $dbh->exec("TRUNCATE TABLE $table");
+        if (!$this->_initialized) {
+            $this->_clearTableRecords();
+            $this->_initialized = true;
         }
     }
 
     function tearDown()
     {
+        $this->_clearTableRecords();
         $cache = &new Cache_Lite(array('cacheDir' => "{$this->_cacheDirectory}/",
                                        'automaticSerialization' => true,
                                        'errorHandlingAPIBreak' => true)
@@ -1745,6 +1747,15 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         Piece_ORM_Mapper_Factory::setConfigDirectory($this->_cacheDirectory);
         Piece_ORM_Mapper_Factory::setCacheDirectory($this->_cacheDirectory);
         Piece_ORM_Metadata_Factory::setCacheDirectory($this->_cacheDirectory);
+    }
+
+    function _clearTableRecords()
+    {
+        $context = &Piece_ORM_Context::singleton();
+        $dbh = &$context->getConnection();
+        foreach ($this->_tables as $table) {
+            $dbh->exec("TRUNCATE TABLE $table");
+        }
     }
 
     /**#@-*/

@@ -163,7 +163,7 @@ class Piece_ORMTestCase extends PHPUnit_TestCase
                              $this->_cacheDirectory,
                              $this->_cacheDirectory
                              );
-        $mapper = &Piece_ORM::getMapper('Person');
+        $mapper = &Piece_ORM::getMapper('Employees');
 
         $this->assertTrue(is_subclass_of($mapper, 'Piece_ORM_Mapper_Common'));
     }
@@ -171,7 +171,7 @@ class Piece_ORMTestCase extends PHPUnit_TestCase
     function testGetMapperBeforeCallingConfigure()
     {
         Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
-        $mapper = &Piece_ORM::getMapper('Person');
+        $mapper = &Piece_ORM::getMapper('Employees');
 
         $this->assertNull($mapper);
         $this->assertTrue(Piece_ORM_Error::hasErrors('exception'));
@@ -225,17 +225,8 @@ class Piece_ORMTestCase extends PHPUnit_TestCase
                              $this->_cacheDirectory,
                              $this->_cacheDirectory
                              );
-        $person = &Piece_ORM::createObject('Person');
 
-        $this->assertEquals(strtolower('stdClass'), strtolower(get_class($person)));
-        $this->assertEquals(7, count(array_keys((array)($person))));
-        $this->assertTrue(array_key_exists('id', $person));
-        $this->assertTrue(array_key_exists('firstName', $person));
-        $this->assertTrue(array_key_exists('lastName', $person));
-        $this->assertTrue(array_key_exists('serviceId', $person));
-        $this->assertTrue(array_key_exists('version', $person));
-        $this->assertTrue(array_key_exists('rdate', $person));
-        $this->assertTrue(array_key_exists('mdate', $person));
+        $this->assertNotNull(Piece_ORM::createObject('Employees'));
     }
 
     function testDressObject()
@@ -244,22 +235,22 @@ class Piece_ORMTestCase extends PHPUnit_TestCase
                              $this->_cacheDirectory,
                              $this->_cacheDirectory
                              );
-        $person = &Piece_ORM::createObject('Person');
-        $person->firstName = 'Foo';
-        $person->lastName = 'Bar';
-        $person->object = &new stdClass();
-        $realPerson = &Piece_ORM::dressObject($person, new Piece_ORMTestCase_Person());
+        $employee = &Piece_ORM::createObject('Employees');
+        $employee->firstName = 'Foo';
+        $employee->lastName = 'Bar';
+        $employee->object = &new stdClass();
+        $realEmployee = &Piece_ORM::dressObject($employee, new Piece_ORMTestCase_Employee());
 
-        $this->assertEquals(strtolower('Piece_ORMTestCase_Person'), strtolower(get_class($realPerson)));
-        $this->assertTrue(method_exists($realPerson, 'generatePassword'));
-        $this->assertEquals('Foo', $realPerson->firstName);
-        $this->assertTrue(array_key_exists('object', $realPerson));
-        $this->assertEquals(strtolower('stdClass'), strtolower(get_class($realPerson->object)));
+        $this->assertEquals(strtolower('Piece_ORMTestCase_Employee'), strtolower(get_class($realEmployee)));
+        $this->assertTrue(method_exists($realEmployee, 'generatePassword'));
+        $this->assertEquals('Foo', $realEmployee->firstName);
+        $this->assertTrue(array_key_exists('object', $realEmployee));
+        $this->assertEquals(strtolower('stdClass'), strtolower(get_class($realEmployee->object)));
 
-        $person->object->foo = 'bar';
+        $employee->object->foo = 'bar';
 
-        $this->assertTrue(array_key_exists('foo', $realPerson->object));
-        $this->assertEquals('bar', $realPerson->object->foo);
+        $this->assertTrue(array_key_exists('foo', $realEmployee->object));
+        $this->assertEquals('bar', $realEmployee->object->foo);
     }
 
     /**
@@ -285,9 +276,9 @@ class Piece_ORMTestCase extends PHPUnit_TestCase
     function testCreateObjectBeforeCallingConfigure()
     {
         Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
-        $person = &Piece_ORM::createObject('Person');
+        $employee = &Piece_ORM::createObject('Employees');
 
-        $this->assertNull($person);
+        $this->assertNull($employee);
         $this->assertTrue(Piece_ORM_Error::hasErrors('exception'));
 
         $error = Piece_ORM_Error::pop();
@@ -307,8 +298,8 @@ class Piece_ORMTestCase extends PHPUnit_TestCase
                              $this->_cacheDirectory
                              );
         Piece_ORM::setDatabase('database3');
-        $mapper = &Piece_ORM::getMapper('Person');
-        $count = $mapper->findOneWithQuery('SELECT COUNT(*) FROM person');
+        $mapper = &Piece_ORM::getMapper('Employees');
+        $count = $mapper->findOneWithQuery('SELECT COUNT(*) FROM employees');
 
         $this->assertNotNull($count);
         $this->assertEquals(0, $count);
@@ -347,9 +338,9 @@ class Piece_ORMTestCase extends PHPUnit_TestCase
 }
 
 // }}}
-// {{{ Piece_ORMTestCase_Person
+// {{{ Piece_ORMTestCase_Employee
 
-class Piece_ORMTestCase_Person
+class Piece_ORMTestCase_Employee
 {
     function generatePassword() {}
 }
