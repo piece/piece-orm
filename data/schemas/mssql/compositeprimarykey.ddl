@@ -1,10 +1,10 @@
 -- $Id$
 
 CREATE TABLE compositeprimarykey (
-	album varchar(255) COLLATE Japanese_CI_AS NOT NULL,
-	artist varchar(255) COLLATE Japanese_CI_AS NOT NULL,
+	album varchar (255) COLLATE Japanese_CI_AS NOT NULL,
+	artist varchar (255) COLLATE Japanese_CI_AS NOT NULL,
 	track int NOT NULL,
-	song [varchar](255) COLLATE Japanese_CI_AS NOT NULL,
+	song [varchar] (255) COLLATE Japanese_CI_AS NOT NULL,
   CONSTRAINT PK_compositeprimarykey PRIMARY KEY CLUSTERED (album ASC, artist ASC, track ASC) WITH (PAD_INDEX  = OFF, IGNORE_DUP_KEY = OFF) ON [PRIMARY]
 )
 

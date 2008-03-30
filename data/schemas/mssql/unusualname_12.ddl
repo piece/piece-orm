@@ -1,8 +1,8 @@
 -- $Id$
 
 CREATE TABLE unusualname_12 (
-  id int IDENTITY(1,1) NOT NULL,
-  name varchar(255) COLLATE Japanese_CI_AS NOT NULL,
+  id int IDENTITY (1,1) NOT NULL,
+  name varchar (255) COLLATE Japanese_CI_AS NOT NULL,
   CONSTRAINT PK_unusualname_12 PRIMARY KEY CLUSTERED (id ASC) WITH (PAD_INDEX  = OFF, IGNORE_DUP_KEY = OFF) ON [PRIMARY]
 )
 
