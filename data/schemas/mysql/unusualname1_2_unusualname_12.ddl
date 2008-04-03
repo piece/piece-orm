@@ -5,7 +5,7 @@ CREATE TABLE unusualname1_2_unusualname_12 (
   unusualname1_2_id int (11) NOT NULL,
   unusualname_12_id int (11) NOT NULL,
   PRIMARY KEY (id)
-);
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 /*
  * Local Variables:

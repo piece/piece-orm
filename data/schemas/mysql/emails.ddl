@@ -7,7 +7,7 @@ CREATE TABLE emails (
   updated_at timestamp,
   PRIMARY KEY (emails_id),
   UNIQUE (email)
-);
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 /*
  * Local Variables:

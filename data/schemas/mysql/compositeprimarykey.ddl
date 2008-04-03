@@ -6,7 +6,7 @@ CREATE TABLE compositeprimarykey (
   track int (11) NOT NULL,
   song varchar (255) NOT NULL,
   PRIMARY KEY (album, artist, track)
-);
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 /*
  * Local Variables:

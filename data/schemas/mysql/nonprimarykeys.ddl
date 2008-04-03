@@ -7,7 +7,7 @@ CREATE TABLE nonprimarykeys (
   created_at datetime NOT NULL,
   updated_at timestamp,
   UNIQUE (member_id, service_id)
-);
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 /*
  * Local Variables:

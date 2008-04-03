@@ -6,7 +6,7 @@ CREATE TABLE skills (
   created_at datetime NOT NULL,
   updated_at timestamp,
   PRIMARY KEY (id)
-);
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 /*
  * Local Variables:
