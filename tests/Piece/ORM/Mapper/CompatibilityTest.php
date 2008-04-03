@@ -1653,6 +1653,22 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         $this->assertNotNull($mapper->findByLastName((object)array('lastName' => 'Kubo')));
     }
 
+    /**
+     * @since Method available since Release 1.0.0
+     */
+    function testShouldExpandValuesWithACommaIfAPropertyIsAnArray()
+    {
+        $ids = array();
+        $ids[] = $this->_insert();
+        $ids[] = $this->_insert();
+        $this->_insert();
+        $employeesMapper = &Piece_ORM_Mapper_Factory::factory('Employees');
+
+        $this->assertEquals(3, count($employeesMapper->findAll()));
+        $this->assertEquals(2, count($employeesMapper->findAllByIds((object)array('ids' => $ids))));
+        $this->assertTrue(preg_match('/IN \(\d+, \d+\)/', $employeesMapper->getLastQuery()));
+    }
+
     /**#@-*/
 
     /**#@+

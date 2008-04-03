@@ -168,9 +168,13 @@ class Piece_ORM_Mapper_Common
      * @param string $fieldName
      * @return string
      */
-    function quote($value, $fieldName)
+    function quote($value, $fieldName = null)
     {
-        return $this->_dbh->quote($value, $this->_metadata->getDatatype($fieldName));
+        if (is_null($fieldName)) {
+            return $this->_dbh->quote($value);
+        } else {
+            return $this->_dbh->quote($value, $this->_metadata->getDatatype($fieldName));
+        }
     }
 
     // }}}
@@ -575,6 +579,22 @@ class Piece_ORM_Mapper_Common
         $this->_errorsInEval[] = $errstr;
     }
 
+    // }}}
+    // {{{ isQuotable()
+
+    /**
+     * Checks whether a value is quotable or not.
+     *
+     * @param string $value
+     * @return boolean
+     * @static
+     * @since Method available since Release 1.0.0
+     */
+    function isQuotable($value)
+    {
+        return is_scalar($value) || is_null($value);
+    }
+
     /**#@-*/
 
     /**#@+
@@ -639,6 +659,12 @@ class Piece_ORM_Mapper_Common
         foreach ($this->_criteriaForBuildQuery as $key => $value) {
             if (is_scalar($value) || is_null($value)) {
                 $this->_criteriaForBuildQuery->$key = $this->_dbh->quote($value);
+            } elseif (is_array($value)) {
+                $this->_criteriaForBuildQuery->$key =
+                    implode(', ',
+                            array_map(array(&$this, 'quote'),
+                                      array_filter($value, array(__CLASS__, 'isQuotable')))
+                            );
             } else {
                 unset($this->_criteriaForBuildQuery->$key);
             }

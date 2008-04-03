@@ -311,6 +311,15 @@
   query: SELECT last_name FROM employees
   orderBy: last_name
 
+- name: findAllByIds
+  query: |
+    SELECT
+      *
+    FROM
+      employees
+    WHERE
+      id IN ($ids)
+
 # Local Variables:
 # mode: conf-colon
 # coding: iso-8859-1
