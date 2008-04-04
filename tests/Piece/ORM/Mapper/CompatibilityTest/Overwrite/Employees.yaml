@@ -5,14 +5,14 @@
     SELECT
       *
     FROM
-      employees
+      $__table
     WHERE
       first_name = $firstName
       AND note = $note
 
 - name: insert
   query: |
-    INSERT INTO employees (
+    INSERT INTO $__table (
       first_name,
       last_name,
       note,
@@ -27,7 +27,7 @@
 
 - name: update
   query: |
-    UPDATE employees
+    UPDATE $__table
     SET
       first_name = $firstName,
       last_name = $lastName,
@@ -38,7 +38,7 @@
 
 - name: delete
   query: |
-    DELETE FROM employees
+    DELETE FROM $__table
     WHERE
       id = $id
       AND note = 'Bar'
@@ -48,7 +48,7 @@
     SELECT
       *
     FROM
-      employees
+      $__table
     WHERE
       last_name = $lastName
       AND note = 'Bar'

@@ -2,7 +2,7 @@
 
 - name: insert
   query: |
-    INSERT INTO employees_emails (
+    INSERT INTO $__table (
       employees_id,
       emails_id,
       created_at

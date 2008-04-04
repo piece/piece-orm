@@ -1,7 +1,7 @@
 # $Id$
 
 - name: findByBoxField
-  query: SELECT * FROM geometric_types WHERE box_field && box $boxField
+  query: SELECT * FROM $__table WHERE box_field && box $boxField
 
 # Local Variables:
 # mode: conf-colon

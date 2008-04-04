@@ -5,7 +5,7 @@
     SELECT
       *
     FROM
-      employees
+      $__table
     WHERE
       id = $id
       AND note = $note
@@ -30,7 +30,7 @@
 
 - name: insert
   query: |
-    INSERT INTO employees (
+    INSERT INTO $__table (
       first_name,
       last_name,
       note,
@@ -91,7 +91,7 @@
     SELECT
       *
     FROM
-      employees
+      $__table
     WHERE
       first_name = $firstName
   relationship:
@@ -118,7 +118,7 @@
     SELECT
       *
     FROM
-      employees
+      $__table
     WHERE
       first_name = $firstName
   relationship:
@@ -140,7 +140,7 @@
     SELECT
       *
     FROM
-      employees
+      $__table
     WHERE
       first_name = $firstName
   relationship:
@@ -162,7 +162,7 @@
     SELECT
       first_name
     FROM
-      employees
+      $__table
     WHERE
       first_name = $firstName
 
@@ -171,18 +171,18 @@
     SELECT
       COUNT(*)
     FROM
-      employees
+      $__table
 
 - name: findAllNotes
   query: |
     SELECT
       note
     FROM
-      employees
+      $__table
 
 - name: insertUserDefined
   query: |
-    INSERT INTO employees (
+    INSERT INTO $__table (
       first_name,
       last_name,
       note,
@@ -197,7 +197,7 @@
 
 - name: updateUserDefined
   query: |
-    UPDATE employees
+    UPDATE $__table
     SET
       first_name = $firstName,
       last_name = $lastName,
@@ -208,13 +208,13 @@
 
 - name: deleteUserDefined
   query: |
-    DELETE FROM employees
+    DELETE FROM $__table
     WHERE
       id = $id
 
 - name: updateNoteByNote
   query: |
-    UPDATE employees
+    UPDATE $__table
     SET
       note = $note,
       updated_at = CURRENT_TIMESTAMP
@@ -223,7 +223,7 @@
 
 - name: deleteByNote
   query: |
-    DELETE FROM employees
+    DELETE FROM $__table
     WHERE
       note = $note
 
@@ -238,7 +238,7 @@
 
 - name: insertWithStaticQuery
   query: |
-    INSERT INTO employees (
+    INSERT INTO $__table (
       first_name,
       last_name,
       note,
@@ -253,13 +253,13 @@
 
 - name: updateWithStaticQuery
   query: |
-    UPDATE employees
+    UPDATE $__table
     SET
       note = 'Qux',
       updated_at = CURRENT_TIMESTAMP
 
 - name: deleteWithStaticQuery
-  query: DELETE FROM employees
+  query: DELETE FROM $__table
 
 - name: insertWithNoQuery
 
@@ -269,7 +269,7 @@
 
 - name: insertWithEmails
   query: |
-    INSERT INTO employees (
+    INSERT INTO $__table (
       first_name,
       last_name,
       note,
@@ -308,7 +308,7 @@
   orderBy: last_name
 
 - name: findOneOrderByLastName
-  query: SELECT last_name FROM employees
+  query: SELECT last_name FROM $__table
   orderBy: last_name
 
 - name: findAllByIds
@@ -316,7 +316,7 @@
     SELECT
       *
     FROM
-      employees
+      $__table
     WHERE
       id IN ($ids)
 

@@ -669,6 +669,8 @@ class Piece_ORM_Mapper_Common
             }
         }
 
+        $this->_criteriaForBuildQuery->__table = $this->_metadata->getTableName();
+
         extract((array)$this->_criteriaForBuildQuery);
 
         foreach ($this->_criteriaForBuildQuery as $key => $value) {

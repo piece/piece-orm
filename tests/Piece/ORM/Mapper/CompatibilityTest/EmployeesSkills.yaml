@@ -2,7 +2,7 @@
 
 - name: insert
   query: |
-    INSERT INTO employees_skills (
+    INSERT INTO $__table (
       employees_id,
       skills_id,
       created_at

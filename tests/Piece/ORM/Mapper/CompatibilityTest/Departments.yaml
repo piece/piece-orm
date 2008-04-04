@@ -26,7 +26,7 @@
     SELECT
       *
     FROM
-      departments
+      $__table
     WHERE
       name = $name
   relationship:
@@ -49,7 +49,7 @@
 
 - name: insert
   query: |
-    INSERT INTO departments (
+    INSERT INTO $__table (
       name,
       created_at
       )
