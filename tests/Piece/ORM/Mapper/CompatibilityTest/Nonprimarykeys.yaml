@@ -1,13 +1,30 @@
 # $Id$
 
 - name: findByMemberIdAndServiceId
-  query: SELECT * FROM $__table WHERE member_id = $memberId AND service_id = $serviceId
+  query: |
+    SELECT
+      *
+    FROM
+      $__table
+    WHERE
+      member_id = $memberId
+      AND service_id = $serviceId
 
 - name: updateByMemberIdAndServiceId
-  query: UPDATE $__table SET point = $point WHERE member_id = $memberId AND service_id = $serviceId
+  query: |
+    UPDATE $__table
+    SET
+      point = $point
+    WHERE
+      member_id = $memberId
+      AND service_id = $serviceId
 
 - name: deleteByMemberIdAndServiceId
-  query: DELETE FROM $__table WHERE member_id = $memberId AND service_id = $serviceId
+  query: |
+    DELETE FROM $__table
+    WHERE
+      member_id = $memberId
+      AND service_id = $serviceId
 
 - name: insert
   query: |
