@@ -243,7 +243,7 @@ class Piece_ORM_Metadata_Factory
             return $return;
         }
 
-        if (strtolower(substr(strrchr(get_class($dbh), '_'), 1)) == 'mssql') {
+        if ($dbh->phptype == 'mssql') {
             include_once 'Piece/ORM/MDB2/Decorator/Reverse/Mssql.php';
             $reverse = &new Piece_ORM_MDB2_Decorator_Reverse_Mssql($reverse);
         }
