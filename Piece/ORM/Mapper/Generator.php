@@ -373,12 +373,12 @@ class Piece_ORM_Mapper_Generator
             if ($datatype == 'integer' || $datatype == 'text') {
                 
                 $camelizedFieldName = Piece_ORM_Inflector::camelize($fieldName);
-                $this->_addFind("findBy$camelizedFieldName", 'SELECT * FROM ' . $this->_metadata->getTableName() . " WHERE $fieldName = \$" . Piece_ORM_Inflector::lowerCaseFirstLetter($camelizedFieldName));
+                $this->_addFind("findBy$camelizedFieldName", 'SELECT * FROM ' . addslashes($this->_metadata->getTableName()) . " WHERE $fieldName = \$" . Piece_ORM_Inflector::lowerCaseFirstLetter($camelizedFieldName));
                 if (Piece_ORM_Error::hasErrors('exception')) {
                     return;
                 }
 
-                $this->_addFindAll("findAllBy$camelizedFieldName", 'SELECT * FROM ' . $this->_metadata->getTableName() . " WHERE $fieldName = \$" . Piece_ORM_Inflector::lowerCaseFirstLetter($camelizedFieldName));
+                $this->_addFindAll("findAllBy$camelizedFieldName", 'SELECT * FROM ' . addslashes($this->_metadata->getTableName()) . " WHERE $fieldName = \$" . Piece_ORM_Inflector::lowerCaseFirstLetter($camelizedFieldName));
                 if (Piece_ORM_Error::hasErrors('exception')) {
                     return;
                 }
@@ -577,7 +577,7 @@ class Piece_ORM_Mapper_Generator
                 switch ($queryType) {
                 case 'findAll':
                 case 'find':
-                    $query = 'SELECT * FROM ' . $this->_metadata->getTableName();
+                    $query = 'SELECT * FROM ' . addslashes($this->_metadata->getTableName());
                     break;
                 case 'insert':
                     $query = $this->_generateDefaultInsertQuery();
@@ -710,7 +710,7 @@ class Piece_ORM_Mapper_Generator
             }
         }
 
-        return 'INSERT INTO ' . $this->_metadata->getTableName() . ' (' . implode(", ", $fields) . ') VALUES (' . implode(', ', array_map(create_function('$f', "return '\$' . Piece_ORM_Inflector::camelize(\$f, true);"), $fields)) . ')';
+        return 'INSERT INTO ' . addslashes($this->_metadata->getTableName()) . ' (' . implode(", ", $fields) . ') VALUES (' . implode(', ', array_map(create_function('$f', "return '\$' . Piece_ORM_Inflector::camelize(\$f, true);"), $fields)) . ')';
     }
 
     // }}}
@@ -732,7 +732,7 @@ class Piece_ORM_Mapper_Generator
                 $whereClause .= " AND $partOfPrimeryKey = \$" . Piece_ORM_Inflector::camelize($partOfPrimeryKey, true);
             }
 
-            return 'DELETE FROM ' . $this->_metadata->getTableName() . " WHERE $whereClause";
+            return 'DELETE FROM ' . addslashes($this->_metadata->getTableName()) . " WHERE $whereClause";
         } else {
             return null;
         }
@@ -766,7 +766,7 @@ class Piece_ORM_Mapper_Generator
                 }
             }
 
-            return 'UPDATE ' . $this->_metadata->getTableName() . ' SET ' . implode(", ", $fields) . " WHERE $whereClause";
+            return 'UPDATE ' . addslashes($this->_metadata->getTableName()) . ' SET ' . implode(", ", $fields) . " WHERE $whereClause";
         } else {
             return null;
         }

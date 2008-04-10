@@ -4,7 +4,7 @@
 /**
  * PHP versions 4 and 5
  *
- * Copyright (c) 2007 KUBO Atsuhiro <iteman@users.sourceforge.net>,
+ * Copyright (c) 2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>,
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,13 +29,19 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  * @package    Piece_ORM
- * @copyright  2007 KUBO Atsuhiro <iteman@users.sourceforge.net>
+ * @copyright  2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License (revised)
  * @version    SVN: $Id$
  * @since      File available since Release 0.1.0
  */
 
 require_once dirname(__FILE__) . '/CompatibilityTest.php';
+require_once 'MDB2.php';
+require_once 'Piece/ORM/Mapper/Factory.php';
+require_once 'Piece/ORM/Error.php';
+require_once 'Piece/ORM/Config.php';
+require_once 'Piece/ORM/Context.php';
+require_once 'Piece/ORM/Metadata/Factory.php';
 
 // {{{ Piece_ORM_Mapper_MysqlTestCase
 
@@ -43,7 +49,7 @@ require_once dirname(__FILE__) . '/CompatibilityTest.php';
  * TestCase for PostgreSQL.
  *
  * @package    Piece_ORM
- * @copyright  2007 KUBO Atsuhiro <iteman@users.sourceforge.net>
+ * @copyright  2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License (revised)
  * @version    Release: @package_version@
  * @since      Class available since Release 0.1.0
@@ -109,6 +115,35 @@ class Piece_ORM_Mapper_MysqlTestCase extends Piece_ORM_Mapper_CompatibilityTest
         $this->assertNotNull($employee);
         $this->assertEquals("\x93\xd6\x8c\x5b", $employee->firstName);
         $this->assertEquals("\x8b\x76\x95\xdb", $employee->lastName);
+    }
+
+    /**
+     * @since Method available since Release 1.0.0
+     */
+    function testShouldUseAMapperNameAsATableNameIfEnabled()
+    {
+        Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
+        $config = &new Piece_ORM_Config();
+        $config->setDSN('caseSensitive', $this->_dsn);
+        $config->setOptions('caseSensitive', array('debug' => 2, 'result_buffering' => false));
+        $config->setUseMapperNameAsTableName('caseSensitive', true);
+        $context = &Piece_ORM_Context::singleton();
+        $context->setConfiguration($config);
+        $context->setDatabase('caseSensitive');
+        Piece_ORM_Mapper_Factory::setConfigDirectory($this->_cacheDirectory);
+        Piece_ORM_Mapper_Factory::setCacheDirectory($this->_cacheDirectory);
+        Piece_ORM_Metadata_Factory::setCacheDirectory($this->_cacheDirectory);
+        $mapper = &Piece_ORM_Mapper_Factory::factory('Case_Sensitive');
+
+        $this->assertTrue(Piece_ORM_Error::hasErrors('exception'));
+
+        $error = Piece_ORM_Error::pop();
+
+        $this->assertEquals(PIECE_ORM_ERROR_INVOCATION_FAILED, $error['code']);
+        $this->assertEquals(MDB2_ERROR_NOSUCHTABLE, $error['repackage']['code']);
+        $this->assertTrue(preg_match('/\[Last executed query: SHOW COLUMNS FROM Case_Sensitive\]/', $error['repackage']['params']['userinfo']));
+
+        Piece_ORM_Error::popCallback();
     }
 
     /**#@-*/

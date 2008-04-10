@@ -4,7 +4,7 @@
 /**
  * PHP versions 4 and 5
  *
- * Copyright (c) 2007 KUBO Atsuhiro <iteman@users.sourceforge.net>,
+ * Copyright (c) 2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>,
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,7 +29,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  * @package    Piece_ORM
- * @copyright  2007 KUBO Atsuhiro <iteman@users.sourceforge.net>
+ * @copyright  2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License (revised)
  * @version    SVN: $Id$
  * @since      File available since Release 0.1.0
@@ -56,7 +56,7 @@ $GLOBALS['PIECE_ORM_Metadata_CacheDirectory'] = './cache';
  * A factory class to create a Piece_ORM_Metadata object for a table.
  *
  * @package    Piece_ORM
- * @copyright  2007 KUBO Atsuhiro <iteman@users.sourceforge.net>
+ * @copyright  2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License (revised)
  * @version    Release: @package_version@
  * @since      Class available since Release 0.1.0
@@ -95,8 +95,11 @@ class Piece_ORM_Metadata_Factory
      */
     function &factory($tableName)
     {
-        $tableName = Piece_ORM_Inflector::underscore($tableName);
         $context = &Piece_ORM_Context::singleton();
+        if (!$context->getUseMapperNameAsTableName()) {
+            $tableName = Piece_ORM_Inflector::underscore($tableName);
+        }
+
         $tableID = sha1($context->getDSN() . ".$tableName");
         if (!array_key_exists($tableID, $GLOBALS['PIECE_ORM_Metadata_Instances'])) {
             $metadata = &Piece_ORM_Metadata_Factory::_createMetadata($tableName, $tableID);

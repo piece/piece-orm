@@ -42,6 +42,7 @@ require_once 'Piece/ORM/Error.php';
 require_once 'Cache/Lite.php';
 require_once 'Piece/ORM/Context.php';
 require_once 'Piece/ORM/Config.php';
+require_once 'Piece/ORM/Metadata/Factory.php';
 
 // {{{ Piece_ORM_Mapper_APITestCase
 
@@ -1667,6 +1668,27 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         $this->assertEquals(3, count($employeesMapper->findAll()));
         $this->assertEquals(2, count($employeesMapper->findAllByIds((object)array('ids' => $ids))));
         $this->assertTrue(preg_match('/IN \(\d+, \d+\)/', $employeesMapper->getLastQuery()));
+    }
+
+    /**
+     * @since Method available since Release 1.0.0
+     */
+    function testShouldUseAMapperNameAsATableNameIfEnabled()
+    {
+        $config = &new Piece_ORM_Config();
+        $config->setDSN('caseSensitive', $this->_dsn);
+        $config->setOptions('caseSensitive', array('debug' => 2, 'result_buffering' => false));
+        $config->setUseMapperNameAsTableName('caseSensitive', true);
+        $context = &Piece_ORM_Context::singleton();
+        $context->setConfiguration($config);
+        $context->setDatabase('caseSensitive');
+        Piece_ORM_Mapper_Factory::setConfigDirectory($this->_cacheDirectory);
+        Piece_ORM_Mapper_Factory::setCacheDirectory($this->_cacheDirectory);
+        Piece_ORM_Metadata_Factory::setCacheDirectory($this->_cacheDirectory);
+        $mapper = &Piece_ORM_Mapper_Factory::factory('Case_Sensitive');
+        $mapper->findAll();
+
+        $this->assertTrue(preg_match('/FROM ["\[]?Case_Sensitive["\[]?/', $mapper->getLastQuery()));
     }
 
     /**#@-*/

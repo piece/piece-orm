@@ -23,6 +23,13 @@
     debug: 0
     result_buffering: false
 
+- name: caseSensitive
+  dsn: pgsql://piece:piece@pieceorm/piece
+  options:
+    debug: 0
+    result_buffering: false
+  useMapperNameAsTableName: true
+
 # Local Variables:
 # mode: conf-colon
 # coding: iso-8859-1

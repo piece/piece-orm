@@ -4,7 +4,7 @@
 /**
  * PHP versions 4 and 5
  *
- * Copyright (c) 2007 KUBO Atsuhiro <iteman@users.sourceforge.net>,
+ * Copyright (c) 2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>,
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,7 +29,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  * @package    Piece_ORM
- * @copyright  2007 KUBO Atsuhiro <iteman@users.sourceforge.net>
+ * @copyright  2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License (revised)
  * @version    SVN: $Id$
  * @since      File available since Release 0.1.0
@@ -42,6 +42,7 @@ require_once 'Piece/ORM/Context.php';
 require_once 'Piece/ORM/Mapper/Common.php';
 require_once 'Piece/ORM/Mapper/Generator.php';
 require_once 'Piece/ORM/Metadata/Factory.php';
+require_once 'Piece/ORM/Inflector.php';
 
 if (version_compare(phpversion(), '5.0.0', '<')) {
     require_once 'spyc.php';
@@ -64,7 +65,7 @@ $GLOBALS['PIECE_ORM_Mapper_CacheDirectory'] = null;
  * A factory class for creating mapper objects.
  *
  * @package    Piece_ORM
- * @copyright  2007 KUBO Atsuhiro <iteman@users.sourceforge.net>
+ * @copyright  2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License (revised)
  * @version    Release: @package_version@
  * @since      Class available since Release 0.1.0
@@ -110,6 +111,10 @@ class Piece_ORM_Mapper_Factory
     function &factory($mapperName)
     {
         $context = &Piece_ORM_Context::singleton();
+        if (!$context->getUseMapperNameAsTableName()) {
+            $mapperName = Piece_ORM_Inflector::camelize($mapperName);
+        }
+
         $mapperID = sha1($context->getDSN() . ".$mapperName." . realpath($GLOBALS['PIECE_ORM_Mapper_ConfigDirectory']));
         if (!array_key_exists($mapperID, $GLOBALS['PIECE_ORM_Mapper_Instances'])) {
             Piece_ORM_Mapper_Factory::_load($mapperID, $mapperName);

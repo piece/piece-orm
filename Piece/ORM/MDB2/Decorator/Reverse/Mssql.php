@@ -4,7 +4,7 @@
 /**
  * PHP versions 4 and 5
  *
- * Copyright (c) 2007 KUBO Atsuhiro <iteman@users.sourceforge.net>,
+ * Copyright (c) 2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>,
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,7 +29,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  * @package    Piece_ORM
- * @copyright  2007 KUBO Atsuhiro <iteman@users.sourceforge.net>
+ * @copyright  2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License (revised)
  * @version    SVN: $Id$
  * @since      File available since Release 0.5.0
@@ -44,7 +44,7 @@ require_once 'PEAR.php';
  * Microsoft SQL Server driver.
  *
  * @package    Piece_ORM
- * @copyright  2007 KUBO Atsuhiro <iteman@users.sourceforge.net>
+ * @copyright  2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License (revised)
  * @version    Release: @package_version@
  * @since      Class available since Release 0.5.0
@@ -387,6 +387,7 @@ ORDER BY
         }
 
         foreach ($columnInfoForTable as $columnInfo) {
+            $columnInfo = array_change_key_case($columnInfo);
             if (strpos($columnInfo['type_name'], 'identity') !== false) {
                 for ($i = 0, $count = count($tableInfo); $i < $count; ++$i) {
                     if ($tableInfo[$i]['name'] == $columnInfo['column_name']) {

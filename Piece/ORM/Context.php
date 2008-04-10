@@ -4,7 +4,7 @@
 /**
  * PHP versions 4 and 5
  *
- * Copyright (c) 2007 KUBO Atsuhiro <iteman@users.sourceforge.net>,
+ * Copyright (c) 2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>,
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,7 +29,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  * @package    Piece_ORM
- * @copyright  2007 KUBO Atsuhiro <iteman@users.sourceforge.net>
+ * @copyright  2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License (revised)
  * @version    SVN: $Id$
  * @since      File available since Release 0.1.0
@@ -51,7 +51,7 @@ $GLOBALS['PIECE_ORM_Context_Instance'] = null;
  * The mapper context holder for Piece_ORM mappers.
  *
  * @package    Piece_ORM
- * @copyright  2007 KUBO Atsuhiro <iteman@users.sourceforge.net>
+ * @copyright  2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License (revised)
  * @version    Release: @package_version@
  * @since      Class available since Release 0.1.0
@@ -228,6 +228,16 @@ class Piece_ORM_Context
         $nativeTypeMapper = &new $nativeTypeMapperClass();
         $nativeTypeMapper->mapNativeType($dbh);
 
+        if ($this->getUseMapperNameAsTableName()) {
+            if ($dbh->phptype == 'pgsql') {
+                $dbh->options['quote_identifier'] = true;
+            }
+
+            if ($dbh->options['portability'] & MDB2_PORTABILITY_FIX_CASE) {
+                $dbh->options['portability'] -= MDB2_PORTABILITY_FIX_CASE;
+            }
+        }
+
         return $dbh;
     }
 
@@ -242,6 +252,20 @@ class Piece_ORM_Context
     function setMapperConfigDirectory($mapperConfigDirectory)
     {
         $this->_mapperConfigDirectory = $mapperConfigDirectory;
+    }
+
+    // }}}
+    // {{{ getUseMapperNameAsTableName()
+
+    /**
+     * Gets the useMapperNameAsTableName option value for the current database.
+     *
+     * @return boolean
+     * @since Method available since Release 1.0.0
+     */
+    function getUseMapperNameAsTableName()
+    {
+        return $this->_config->getUseMapperNameAsTableName($this->_database);
     }
 
     /**#@-*/

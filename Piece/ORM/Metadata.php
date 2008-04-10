@@ -35,6 +35,9 @@
  * @since      File available since Release 0.1.0
  */
 
+require_once 'Piece/ORM/Context.php';
+require_once 'Piece/ORM/Inflector.php';
+
 // {{{ Piece_ORM_Metadata
 
 /**
@@ -135,7 +138,13 @@ class Piece_ORM_Metadata
      */
     function getTableName()
     {
-        return $this->_tableName;
+        $context = &Piece_ORM_Context::singleton();
+        if (!$context->getUseMapperNameAsTableName()) {
+            return $this->_tableName;
+        } else {
+            $dbh = &$context->getConnection();
+            return $dbh->quoteIdentifier($this->_tableName);
+        }
     }
 
     // }}}

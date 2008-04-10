@@ -27,7 +27,7 @@
 ######################################################################
 
 name: piece-orm
-desc: Piece_ORM 0.7.0 YAML Schema Definition
+desc: Piece_ORM 1.0.0 Configuration DSL Schema Definition
 type: seq
 required: yes
 sequence:
@@ -43,6 +43,7 @@ sequence:
           "debug": { type: int, required: no }
           "result_buffering": { type: bool, required: no }
       "directorySuffix": { type: str, required: no }
+      "useMapperNameAsTableName": { type: bool, required: no }
 
 # Local Variables:
 # mode: conf-colon
