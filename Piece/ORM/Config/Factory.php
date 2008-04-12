@@ -125,7 +125,7 @@ class Piece_ORM_Config_Factory
         }
 
         if (is_null($cacheDirectory)) {
-            $cacheDirectory = './cache';
+            return Piece_ORM_Config_Factory::_createConfigurationFromFile($configFile);
         }
 
         if (!file_exists($cacheDirectory)) {
