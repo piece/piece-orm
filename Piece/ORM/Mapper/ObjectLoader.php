@@ -4,7 +4,7 @@
 /**
  * PHP versions 4 and 5
  *
- * Copyright (c) 2007 KUBO Atsuhiro <iteman@users.sourceforge.net>,
+ * Copyright (c) 2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>,
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,7 +29,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  * @package    Piece_ORM
- * @copyright  2007 KUBO Atsuhiro <iteman@users.sourceforge.net>
+ * @copyright  2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License (revised)
  * @version    SVN: $Id$
  * @since      File available since Release 0.2.0
@@ -48,7 +48,7 @@ require_once 'Piece/ORM/Mapper/Factory.php';
  * An object loader for loading all objects with a result object.
  *
  * @package    Piece_ORM
- * @copyright  2007 KUBO Atsuhiro <iteman@users.sourceforge.net>
+ * @copyright  2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License (revised)
  * @version    Release: @package_version@
  * @since      Class available since Release 0.2.0
@@ -76,7 +76,6 @@ class Piece_ORM_Mapper_ObjectLoader
     var $_objectIndexes = array();
     var $_associatedObjectLoaders = array();
     var $_primaryKey;
-    var $_useIdentityMap;
 
     /**#@-*/
 
@@ -93,9 +92,8 @@ class Piece_ORM_Mapper_ObjectLoader
      * @param Piece_ORM_Mapper_Common &$mapper
      * @param MDB2_Result             &$result
      * @param array                   $relationships
-     * @param boolean                 $useIdentityMap
      */
-    function Piece_ORM_Mapper_ObjectLoader(&$mapper, &$result, $relationships, $useIdentityMap)
+    function Piece_ORM_Mapper_ObjectLoader(&$mapper, &$result, $relationships)
     {
         $this->_result = &$result;
 
@@ -110,7 +108,6 @@ class Piece_ORM_Mapper_ObjectLoader
         $metadata = &$mapper->getMetadata();
         $this->_primaryKey = $metadata->getPrimaryKey();
         $this->_mapper = &$mapper;
-        $this->_useIdentityMap = $useIdentityMap;
         $this->_relationships = $relationships;
     }
 
@@ -167,20 +164,9 @@ class Piece_ORM_Mapper_ObjectLoader
             return $row;
         }
 
-        if ($this->_useIdentityMap && !is_null($this->_primaryKey) && array_key_exists($this->_primaryKey, $row)) {
-            $loadedObject = &$this->_mapper->getLoadedObject($row[$this->_primaryKey]);
-            if (!is_null($loadedObject)) {
-                return $loadedObject;
-            }
-        }
-
         $object = &new stdClass();
         foreach ($row as $key => $value) {
             $object->{ Piece_ORM_Inflector::camelize($key, true) } = $value;
-        }
-
-        if ($this->_useIdentityMap && !is_null($this->_primaryKey) && array_key_exists($this->_primaryKey, $row)) {
-            $this->_mapper->addLoadedObject($row[$this->_primaryKey], $object);
         }
 
         return $object;

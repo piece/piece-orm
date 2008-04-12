@@ -775,37 +775,6 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         $this->assertEquals('Qux', $employees[0]->firstName);
     }
 
-    function testIdentityMap()
-    {
-        $this->_prepareTableRecords();
-        $mapper = &Piece_ORM_Mapper_Factory::factory('Employees');
-        $mapper->addOrder('id');
-        $employees = $mapper->findAllWithSkills1();
-
-        $this->assertTrue(is_array($employees));
-        $this->assertEquals(4, count($employees));
-
-        $this->assertEquals('Bar', $employees[1]->firstName);
-        $this->assertEquals('Foo', $employees[1]->skills[0]->name);
-        $this->assertFalse(array_key_exists('foo', $employees[1]->skills[0]));
-        $this->assertEquals('Qux', $employees[3]->firstName);
-        $this->assertEquals('Foo', $employees[3]->skills[0]->name);
-        $this->assertFalse(array_key_exists('foo', $employees[3]->skills[0]));
-
-        $employees[1]->skills[0]->foo = 'bar';
-
-        $this->assertTrue(array_key_exists('foo', $employees[1]->skills[0]));
-        $this->assertTrue(array_key_exists('foo', $employees[3]->skills[0]));
-
-        $employee = $mapper->findWithDepartmentByFirstName('Bar');
-
-        $this->assertTrue(array_key_exists('department', $employee));
-        $this->assertTrue(array_key_exists('skills', $employee));
-        $this->assertNotNull($employee->department);
-        $this->assertEquals('Foo', $employee->department->name);
-        $this->assertEquals($employee, $employees[1]);
-    }
-
     function testOrderOnManyToManyRelationships()
     {
         $this->_prepareTableRecords();
@@ -1553,46 +1522,6 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
     /**
      * @since Method available since Release 0.8.1
      */
-    function testIdentityMapShouldNotUseWhenTableHasCompositePrimaryKey()
-    {
-        $mapper = &Piece_ORM_Mapper_Factory::factory('Compositeprimarykey');
-        $subject1 = &$mapper->createObject();
-        $subject1->album = 'On Stage';
-        $subject1->artist = 'Rainbow';
-        $subject1->track = 1;
-        $subject1->song = 'Kill the King';
-        $subject2 = &$mapper->createObject();
-        $subject2->album = 'On Stage';
-        $subject2->artist = 'Rainbow';
-        $subject2->track = 2;
-        $subject2->song = 'Medley: Man on the Silver Mountain/Blues/Starstruck';
-        $mapper->insert($subject1);
-        $mapper->insert($subject2);
-
-        $mapper->addOrder('track');
-        $subjects = $mapper->findAll();
-
-        $this->assertEquals(2, count($subjects));
-
-        if (count($subjects) != 2) {
-            return;
-        }
-
-        $this->assertEquals('On Stage', $subjects[0]->album);
-        $this->assertEquals('Rainbow', $subjects[0]->artist);
-        $this->assertEquals(1, $subjects[0]->track);
-        $this->assertEquals('Kill the King', $subjects[0]->song);
-        $this->assertEquals('On Stage', $subjects[1]->album);
-        $this->assertEquals('Rainbow', $subjects[1]->artist);
-        $this->assertEquals(2, $subjects[1]->track);
-        $this->assertEquals('Medley: Man on the Silver Mountain/Blues/Starstruck',
-                            $subjects[1]->song
-                            );
-    }
-
-    /**
-     * @since Method available since Release 0.8.1
-     */
     function testUnusualNamesShouldWork()
     {
         $inverseMapper = &Piece_ORM_Mapper_Factory::factory('Unusualname_12');
@@ -1689,6 +1618,23 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         $mapper->findAll();
 
         $this->assertTrue(preg_match('/FROM ["\[]?Case_Sensitive["\[]?/', $mapper->getLastQuery()));
+    }
+
+    /**
+     * @since Method available since Release 1.0.0
+     */
+    function testShouldWorkAfterInsertUsingAnObjectReturnedFromFind()
+    {
+        $id1 = $this->_insert();
+        $mapper = &Piece_ORM_Mapper_Factory::factory('Employees');
+        $employee = &$mapper->findById($id1);
+        $id2 = $mapper->insert($employee);
+        $mapper->addOrder('id');
+        $employees = $mapper->findAll();
+
+        $this->assertEquals(2, count($employees));
+        $this->assertEquals($id1, $employees[0]->id);
+        $this->assertEquals($id2, $employees[1]->id);
     }
 
     /**#@-*/

@@ -72,10 +72,8 @@ class Piece_ORM_Mapper_Common
     var $_dbh;
     var $_lastQuery;
     var $_orders = array();
-    var $_loadedObjects = array();
     var $_preloadCallback;
     var $_preloadCallbackArgs;
-    var $_useIdentityMap = true;
     var $_lastQueryForGetCount;
     var $_methodNameForBuildQuery;
     var $_criteriaForBuildQuery;
@@ -216,34 +214,6 @@ class Piece_ORM_Mapper_Common
     }
 
     // }}}
-    // {{{ getLoadedObject()
-
-    /**
-     * Gets a loaded object corresponding to the given primary key value.
-     *
-     * @param mixed $primaryKeyValue
-     * @return stdClass
-     */
-    function &getLoadedObject($primaryKeyValue)
-    {
-        return $this->_loadedObjects[$primaryKeyValue];
-    }
-
-    // }}}
-    // {{{ addLoadedObject()
-
-    /**
-     * Adds an object to the list of the loaded objects.
-     *
-     * @param string   $primaryKeyValue
-     * @param stdClass &$object
-     */
-    function addLoadedObject($primaryKeyValue, &$object)
-    {
-        $this->_loadedObjects[$primaryKeyValue] = &$object;
-    }
-
-    // }}}
     // {{{ setPreloadCallback()
 
     /**
@@ -324,19 +294,6 @@ class Piece_ORM_Mapper_Common
         }
 
         return $object;
-    }
-
-    // }}}
-    // {{{ setUseIdentityMap()
-
-    /**
-     * Sets whether use identity map or not for the next query.
-     *
-     * @param boolean $useIdentityMap
-     */
-    function setUseIdentityMap($useIdentityMap)
-    {
-        $this->_useIdentityMap = $useIdentityMap;
     }
 
     // }}}
@@ -483,19 +440,6 @@ class Piece_ORM_Mapper_Common
     }
 
     // }}}
-    // {{{ removeLoadedObject()
-
-    /**
-     * Removes an object from the list of the loaded objects.
-     *
-     * @param string $primaryKeyValue
-     */
-    function removeLoadedObject($primaryKeyValue)
-    {
-        unset($this->_loadedObjects[$primaryKeyValue]);
-    }
-
-    // }}}
     // {{{ setConnection()
 
     /**
@@ -549,19 +493,6 @@ class Piece_ORM_Mapper_Common
         }
 
         return $this->_loadValue($result);
-    }
-
-    // }}}
-    // {{{ useIdentityMap()
-
-    /**
-     * Returns whether use identity map or not for the next query.
-     *
-     * @return boolean
-     */
-    function useIdentityMap()
-    {
-        return $this->_useIdentityMap;
     }
 
     // }}}
@@ -715,7 +646,7 @@ class Piece_ORM_Mapper_Common
      */
     function _loadAllObjects(&$result, $relationships = array())
     {
-        $loader = &new Piece_ORM_Mapper_ObjectLoader($this, $result, $relationships, $this->_useIdentityMap);
+        $loader = &new Piece_ORM_Mapper_ObjectLoader($this, $result, $relationships);
         $objects = $loader->loadAll();
         $this->_loadCallback = null;
         return $objects;
