@@ -88,7 +88,8 @@ class Piece_ORM_Metadata_FactoryTestCase extends PHPUnit_TestCase
         $context = &Piece_ORM_Context::singleton();
         $context->setConfiguration($config);
         $context->setDatabase('piece');
-        $this->_oldCacheDirectory = Piece_ORM_Metadata_Factory::setCacheDirectory($this->_cacheDirectory);
+        $this->_oldCacheDirectory = $GLOBALS['PIECE_ORM_Metadata_CacheDirectory'];
+        Piece_ORM_Metadata_Factory::setCacheDirectory($this->_cacheDirectory);
     }
 
     function tearDown()

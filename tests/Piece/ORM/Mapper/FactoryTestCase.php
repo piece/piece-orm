@@ -90,9 +90,11 @@ class Piece_ORM_Mapper_FactoryTestCase extends PHPUnit_TestCase
         $context->setConfiguration($config);
         $context->setMapperConfigDirectory($this->_cacheDirectory);
         $context->setDatabase('piece');
-        $this->_oldCacheDirectory = Piece_ORM_Mapper_Factory::setConfigDirectory($this->_cacheDirectory);
+        $this->_oldCacheDirectory = $GLOBALS['PIECE_ORM_Mapper_ConfigDirectory'];
+        Piece_ORM_Mapper_Factory::setConfigDirectory($this->_cacheDirectory);
         Piece_ORM_Mapper_Factory::setCacheDirectory($this->_cacheDirectory);
-        $this->_oldMetadataCacheDirectory = Piece_ORM_Metadata_Factory::setCacheDirectory($this->_cacheDirectory);
+        $this->_oldMetadataCacheDirectory = $GLOBALS['PIECE_ORM_Metadata_CacheDirectory'];
+        Piece_ORM_Metadata_Factory::setCacheDirectory($this->_cacheDirectory);
     }
 
     function tearDown()
@@ -115,7 +117,8 @@ class Piece_ORM_Mapper_FactoryTestCase extends PHPUnit_TestCase
     function testConfigurationDirectoryNotSpecified()
     {
         Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
-        $oldConfigDirectory = Piece_ORM_Mapper_Factory::setConfigDirectory(null);
+        $oldConfigDirectory = $GLOBALS['PIECE_ORM_Mapper_ConfigDirectory'];
+        Piece_ORM_Mapper_Factory::setConfigDirectory(null);
 
         Piece_ORM_Mapper_Factory::factory('Employees');
 
@@ -132,7 +135,8 @@ class Piece_ORM_Mapper_FactoryTestCase extends PHPUnit_TestCase
     function testConfigurationDirectoryNotFound()
     {
         Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
-        $oldConfigDirectory = Piece_ORM_Mapper_Factory::setConfigDirectory(dirname(__FILE__) . '/foo');
+        $oldConfigDirectory = $GLOBALS['PIECE_ORM_Mapper_ConfigDirectory'];
+        Piece_ORM_Mapper_Factory::setConfigDirectory(dirname(__FILE__) . '/foo');
 
         Piece_ORM_Mapper_Factory::factory('Employees');
 
@@ -149,7 +153,8 @@ class Piece_ORM_Mapper_FactoryTestCase extends PHPUnit_TestCase
     function testCacheDirectoryNotSpecified()
     {
         Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
-        $oldCacheDirectory = Piece_ORM_Mapper_Factory::setCacheDirectory(null);
+        $oldCacheDirectory = $GLOBALS['PIECE_ORM_Metadata_CacheDirectory'];
+        Piece_ORM_Mapper_Factory::setCacheDirectory(null);
 
         Piece_ORM_Mapper_Factory::factory('Employees');
 
@@ -166,7 +171,8 @@ class Piece_ORM_Mapper_FactoryTestCase extends PHPUnit_TestCase
     function testCacheDirectoryNotFound()
     {
         Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
-        $oldCacheDirectory = Piece_ORM_Mapper_Factory::setCacheDirectory(dirname(__FILE__) . '/foo');
+        $oldCacheDirectory = $GLOBALS['PIECE_ORM_Metadata_CacheDirectory'];
+        Piece_ORM_Mapper_Factory::setCacheDirectory(dirname(__FILE__) . '/foo');
 
         Piece_ORM_Mapper_Factory::factory('Employees');
 

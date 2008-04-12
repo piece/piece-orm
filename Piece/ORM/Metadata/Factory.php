@@ -132,13 +132,10 @@ class Piece_ORM_Metadata_Factory
      * Sets a cache directory.
      *
      * @param string $cacheDirectory
-     * @return string
      */
     function setCacheDirectory($cacheDirectory)
     {
-        $oldCacheDirectory = $GLOBALS['PIECE_ORM_Metadata_CacheDirectory'];
         $GLOBALS['PIECE_ORM_Metadata_CacheDirectory'] = $cacheDirectory;
-        return $oldCacheDirectory;
     }
 
     /**#@-*/

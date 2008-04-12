@@ -124,9 +124,17 @@ class Piece_ORMTestCase extends PHPUnit_TestCase
             $this->assertEquals($configuration['options'], $config->getOptions($configuration['name']));
         }
 
-        $this->assertEquals($this->_cacheDirectory, Piece_ORM_Mapper_Factory::setConfigDirectory('./foo'));
-        $this->assertEquals($this->_cacheDirectory, Piece_ORM_Mapper_Factory::setCacheDirectory('./bar'));
-        $this->assertEquals($this->_cacheDirectory, Piece_ORM_Metadata_Factory::setCacheDirectory('./baz'));
+        $this->assertEquals($this->_cacheDirectory, $GLOBALS['PIECE_ORM_Mapper_ConfigDirectory']);
+        $this->assertEquals($this->_cacheDirectory, $GLOBALS['PIECE_ORM_Mapper_CacheDirectory']);
+        $this->assertEquals($this->_cacheDirectory, $GLOBALS['PIECE_ORM_Metadata_CacheDirectory']);
+
+        Piece_ORM_Mapper_Factory::setConfigDirectory('./foo');
+        Piece_ORM_Mapper_Factory::setCacheDirectory('./bar');
+        Piece_ORM_Metadata_Factory::setCacheDirectory('./baz');
+
+        $this->assertEquals('./foo', $GLOBALS['PIECE_ORM_Mapper_ConfigDirectory']);
+        $this->assertEquals('./bar', $GLOBALS['PIECE_ORM_Mapper_CacheDirectory']);
+        $this->assertEquals('./baz', $GLOBALS['PIECE_ORM_Metadata_CacheDirectory']);
     }
 
     function testDynamicConfiguration()
@@ -214,11 +222,12 @@ class Piece_ORMTestCase extends PHPUnit_TestCase
                              $cacheDirectory
                              );
 
-        $this->assertEquals("$cacheDirectory/database1", Piece_ORM_Mapper_Factory::setConfigDirectory('./foo'));
+        $this->assertEquals("$cacheDirectory/database1", $GLOBALS['PIECE_ORM_Mapper_ConfigDirectory']);
 
+        Piece_ORM_Mapper_Factory::setConfigDirectory('./foo');
         Piece_ORM::setDatabase('database2');
 
-        $this->assertEquals("$cacheDirectory/database2", Piece_ORM_Mapper_Factory::setConfigDirectory('./foo'));
+        $this->assertEquals("$cacheDirectory/database2", $GLOBALS['PIECE_ORM_Mapper_ConfigDirectory']);
 
         $cache = &new Cache_Lite(array('cacheDir' => "$cacheDirectory/",
                                        'automaticSerialization' => true,

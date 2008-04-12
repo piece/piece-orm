@@ -171,13 +171,10 @@ class Piece_ORM_Mapper_Factory
      * Sets a config directory.
      *
      * @param string $configDirectory
-     * @return string
      */
     function setConfigDirectory($configDirectory)
     {
-        $oldConfigDirectory = $GLOBALS['PIECE_ORM_Mapper_ConfigDirectory'];
         $GLOBALS['PIECE_ORM_Mapper_ConfigDirectory'] = $configDirectory;
-        return $oldConfigDirectory;
     }
 
     // }}}
@@ -187,13 +184,10 @@ class Piece_ORM_Mapper_Factory
      * Sets a cache directory.
      *
      * @param string $cacheDirectory
-     * @return string
      */
     function setCacheDirectory($cacheDirectory)
     {
-        $oldCacheDirectory = $GLOBALS['PIECE_ORM_Mapper_CacheDirectory'];
         $GLOBALS['PIECE_ORM_Mapper_CacheDirectory'] = $cacheDirectory;
-        return $oldCacheDirectory;
     }
 
     /**#@-*/

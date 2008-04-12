@@ -108,9 +108,11 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         $context = &Piece_ORM_Context::singleton();
         $context->setConfiguration($config);
         $context->setDatabase('piece');
-        $this->_oldCacheDirectory = Piece_ORM_Mapper_Factory::setConfigDirectory($this->_cacheDirectory);
+        $this->_oldCacheDirectory = $GLOBALS['PIECE_ORM_Mapper_ConfigDirectory'];
+        Piece_ORM_Mapper_Factory::setConfigDirectory($this->_cacheDirectory);
         Piece_ORM_Mapper_Factory::setCacheDirectory($this->_cacheDirectory);
-        $this->_oldMetadataCacheDirectory = Piece_ORM_Metadata_Factory::setCacheDirectory($this->_cacheDirectory);
+        $this->_oldMetadataCacheDirectory = $GLOBALS['PIECE_ORM_Metadata_CacheDirectory'];
+        Piece_ORM_Metadata_Factory::setCacheDirectory($this->_cacheDirectory);
         if (!$this->_initialized) {
             $this->_clearTableRecords();
             $this->_initialized = true;
