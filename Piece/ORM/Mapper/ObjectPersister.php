@@ -205,9 +205,9 @@ class Piece_ORM_Mapper_ObjectPersister
         }
 
         if ($primaryKey = $this->_metadata->getPrimaryKey()) {
-            $propertyName = Piece_ORM_Inflector::camelize($primaryKey, true);
-            if (array_key_exists($propertyName, $this->_subject)) {
-                $this->_mapper->removeLoadedObject($this->_subject->$propertyName);
+            $primaryKeyProperty = Piece_ORM_Inflector::camelize($primaryKey, true);
+            if (array_key_exists($primaryKeyProperty, $this->_subject)) {
+                $this->_mapper->removeLoadedObject($this->_subject->$primaryKeyProperty);
             }
         }
 
@@ -282,16 +282,16 @@ class Piece_ORM_Mapper_ObjectPersister
     function _validatePrimaryKeys()
     {
         foreach ($this->_metadata->getPrimaryKeys() as $primaryKey) {
-            $propertyName = Piece_ORM_Inflector::camelize($primaryKey, true);
-            if (!array_key_exists($propertyName, $this->_subject)) {
+            $primaryKeyProperty = Piece_ORM_Inflector::camelize($primaryKey, true);
+            if (!array_key_exists($primaryKeyProperty, $this->_subject)) {
                 continue;
             }
 
-            if (!is_scalar($this->_subject->$propertyName)) {
+            if (!is_scalar($this->_subject->$primaryKeyProperty)) {
                 return false;
             }
 
-            if (!strlen($this->_subject->$propertyName)) {
+            if (!strlen($this->_subject->$primaryKeyProperty)) {
                 return false;
             }
         }
