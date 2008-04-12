@@ -140,12 +140,16 @@ class Piece_ORMTestCase extends PHPUnit_TestCase
                              $this->_cacheDirectory
                              );
         $config = &Piece_ORM::getConfiguration();
-        $config->setDSN('database1', 'pgsql://piece:piece@pieceorm/piece');
         $config->setOptions('database1', array('debug' => 5));
         $config->setDSN('database2', 'pgsql://piece:piece@pieceorm/piece_test');
         $config->setOptions('database2', array('debug' => 0, 'result_buffering' => false));
         $config->setDSN('piece', 'pgsql://piece:piece@pieceorm/piece');
         $config->setOptions('piece', array('debug' => 0, 'result_buffering' => false));
+        $config->setDSN('database3', 'pgsql://piece:piece@pieceorm/piece');
+        $config->setDSN('database3', 'pgsql://piece:piece@pieceorm/piece');
+        $config->setUseMapperNameAsTableName('database3', true);
+        $config->setUseMapperNameAsTableName('caseSensitive', false);
+        $config->setDirectorySuffix('caseSensitive', 'foo');
 
         $this->assertEquals($yaml[0]['dsn'], $config->getDSN('database1'));
         $this->assertTrue($yaml[0]['options'] != $config->getOptions('database1'));
@@ -155,6 +159,10 @@ class Piece_ORMTestCase extends PHPUnit_TestCase
         $this->assertEquals($yaml[1]['options'], $config->getOptions('database2'));
         $this->assertEquals('pgsql://piece:piece@pieceorm/piece', $config->getDSN('piece'));
         $this->assertEquals(array('debug' => 0, 'result_buffering' => false), $config->getOptions('piece'));
+        $this->assertEquals('pgsql://piece:piece@pieceorm/piece', $config->getDSN('database3'));
+        $this->assertTrue($config->getUseMapperNameAsTableName('database3'));
+        $this->assertFalse($config->getUseMapperNameAsTableName('caseSensitive'));
+        $this->assertEquals('foo', $config->getDirectorySuffix('caseSensitive'));
     }
 
     function testGetMapper()
@@ -340,6 +348,31 @@ class Piece_ORMTestCase extends PHPUnit_TestCase
         $mapper->findAll();
 
         $this->assertTrue(preg_match('/FROM ["\[]?Case_Sensitive["\[]?/', $mapper->getLastQuery()));
+    }
+
+    /**
+     * @since Method available since Release 1.0.0
+     */
+    function testShouldOverwriteTheDirectorySuffixBySetdirectorysuffixMethod()
+    {
+        $cacheDirectory = dirname(__FILE__) . '/' . basename(__FILE__, '.php') . '/SetDatabase';
+        Piece_ORM::configure($cacheDirectory,
+                             $cacheDirectory,
+                             $cacheDirectory
+                             );
+        $config = &Piece_ORM::getConfiguration();
+
+        $this->assertEquals('database1', $config->getDirectorySuffix('database1'));
+
+        $config->setDirectorySuffix('database1', 'foo');
+
+        $this->assertEquals('foo', $config->getDirectorySuffix('database1'));
+
+        $cache = &new Cache_Lite(array('cacheDir' => "$cacheDirectory/",
+                                       'automaticSerialization' => true,
+                                       'errorHandlingAPIBreak' => true)
+                                 );
+        $cache->clean();
     }
 
     /**#@-*/
