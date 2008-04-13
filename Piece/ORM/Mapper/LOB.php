@@ -136,6 +136,7 @@ class Piece_ORM_Mapper_LOB
     /**
      * Gets the unescaped value of this field.
      *
+     * @return string
      * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
      * @throws PIECE_ORM_ERROR_UNEXPECTED_VALUE
      */
