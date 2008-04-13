@@ -41,6 +41,8 @@ require_once 'Piece/ORM/Inflector.php';
 // {{{ Piece_ORM_Metadata
 
 /**
+ * The metadata interface.
+ *
  * @package    Piece_ORM
  * @copyright  2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License (revised)
@@ -112,6 +114,10 @@ class Piece_ORM_Metadata
      */
     function getDatatype($fieldName)
     {
+        if (!$this->hasField($fieldName)) {
+            return;
+        }
+
         return $this->_tableInfo[$fieldName]['mdb2type'];
     }
 
@@ -184,6 +190,10 @@ class Piece_ORM_Metadata
      */
     function isAutoIncrement($fieldName)
     {
+        if (!$this->hasField($fieldName)) {
+            return;
+        }
+
         return array_key_exists('autoincrement', $this->_tableInfo[$fieldName]);
     }
 
@@ -226,6 +236,10 @@ class Piece_ORM_Metadata
      */
     function isPartOfPrimaryKey($fieldName)
     {
+        if (!$this->hasField($fieldName)) {
+            return;
+        }
+
         if ($this->hasPrimaryKey()) {
             return in_array($fieldName, $this->_primaryKey);
         } else {
@@ -276,7 +290,12 @@ class Piece_ORM_Metadata
      */
     function hasDefault($fieldName)
     {
-        return !is_null($this->_tableInfo[$fieldName]['default'])
+        if (!$this->hasField($fieldName)) {
+            return;
+        }
+
+        return array_key_exists('default', $this->_tableInfo[$fieldName])
+            && !is_null($this->_tableInfo[$fieldName]['default'])
             && strlen($this->_tableInfo[$fieldName]['default']);
     }
 
