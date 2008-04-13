@@ -75,7 +75,7 @@ class Piece_ORM_Mapper_ObjectLoader
     var $_objects = array();
     var $_objectIndexes = array();
     var $_associatedObjectLoaders = array();
-    var $_primaryKey;
+    var $_metadata;
 
     /**#@-*/
 
@@ -105,8 +105,7 @@ class Piece_ORM_Mapper_ObjectLoader
             }
         }
 
-        $metadata = &$mapper->getMetadata();
-        $this->_primaryKey = $metadata->getPrimaryKey();
+        $this->_metadata = &$mapper->getMetadata();
         $this->_mapper = &$mapper;
         $this->_relationships = $relationships;
     }
@@ -166,7 +165,14 @@ class Piece_ORM_Mapper_ObjectLoader
 
         $object = &new stdClass();
         foreach ($row as $key => $value) {
-            $object->{ Piece_ORM_Inflector::camelize($key, true) } = $value;
+            if ($this->_metadata->getDatatype($key) != 'blob') {
+                $object->{ Piece_ORM_Inflector::camelize($key, true) } = $value;
+            } else {
+                $lob = &$this->_mapper->createLOB();
+                $lob->setFieldName($key);
+                $lob->setEscapedValue($value);
+                $object->{ Piece_ORM_Inflector::camelize($key, true) } = &$lob;
+            }
         }
 
         return $object;

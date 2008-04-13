@@ -183,6 +183,24 @@ class Piece_ORM_Mapper_Generator
         return $relationshipNormalizer->normalize();
     }
 
+    // }}}
+    // {{{ generateValue()
+
+    /**
+     * @param string $fieldName
+     * @return string
+     * @since Method available since Release 1.0.0
+     */
+    function generateValue($fieldName)
+    {
+        $datatype = $this->_metadata->getDatatype($fieldName);
+        if ($datatype != 'blob') {
+            return '$' . Piece_ORM_Inflector::camelize($fieldName, true);
+        } else {
+            return ":$fieldName";
+        }
+    }
+
     /**#@-*/
 
     /**#@+
@@ -710,7 +728,7 @@ class Piece_ORM_Mapper_Generator
             }
         }
 
-        return 'INSERT INTO ' . addslashes($this->_metadata->getTableName()) . ' (' . implode(", ", $fields) . ') VALUES (' . implode(', ', array_map(create_function('$f', "return '\$' . Piece_ORM_Inflector::camelize(\$f, true);"), $fields)) . ')';
+        return 'INSERT INTO ' . addslashes($this->_metadata->getTableName()) . ' (' . implode(", ", $fields) . ') VALUES (' . implode(', ', array_map(array(&$this, 'generateValue'), $fields)) . ')';
     }
 
     // }}}

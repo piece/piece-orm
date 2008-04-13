@@ -1639,6 +1639,22 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         $this->assertEquals($id2, $employees[1]->id);
     }
 
+    /**
+     * @since Method available since Release 1.0.0
+     */
+    function testShouldSupportLob()
+    {
+        $picturePath = "{$this->_cacheDirectory}/picture.jpg";
+        $mapper = &Piece_ORM_Mapper_Factory::factory('Files');
+        $subject = &$mapper->createObject();
+        $subject->picture = &$mapper->createLOB("file://$picturePath");
+        $id = $mapper->insert($subject);
+        $file = &$mapper->findById($id);
+
+        $this->assertEquals(strtolower('Piece_ORM_Mapper_LOB'), strtolower(get_class($file->picture)));
+        $this->assertEquals(file_get_contents($picturePath), $file->picture->getValue());
+    }
+
     /**#@-*/
 
     /**#@+

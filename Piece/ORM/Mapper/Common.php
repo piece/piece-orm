@@ -41,6 +41,7 @@ require_once 'MDB2.php';
 require_once 'Piece/ORM/Mapper/ObjectLoader.php';
 require_once 'PEAR.php';
 require_once 'Piece/ORM/Mapper/ObjectPersister.php';
+require_once 'Piece/ORM/Mapper/LOB.php';
 
 // {{{ Piece_ORM_Mapper_Common
 
@@ -306,14 +307,27 @@ class Piece_ORM_Mapper_Common
      * @param boolean $isManip
      * @return mixed
      * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
+     * @throws PIECE_ORM_ERROR_UNEXPECTED_VALUE
      */
-    function &executeQuery($query, $isManip = false)
+    function &executeQuery($query, $isManip = false, $sth = null)
     {
         PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
         if (!$isManip) {
             $result = &$this->_dbh->query($query);
         } else {
-            $result = $this->_dbh->exec($query);
+            if (is_null($sth)) {
+                $result = $this->_dbh->exec($query);
+            } else {
+                if (!is_subclass_of($sth, 'MDB2_Statement_Common')) {
+                    PEAR::staticPopErrorHandling();
+                    Piece_ORM_Error::push(PIECE_ORM_ERROR_UNEXPECTED_VALUE,
+                                          'An unexpected value detected. executeQuery() with a prepared statement can only receive a MDB2_Statement_Common object.'
+                                          );
+                    return;
+                }
+
+                $result = $sth->execute();
+            }
         }
         PEAR::staticPopErrorHandling();
 
@@ -399,7 +413,28 @@ class Piece_ORM_Mapper_Common
             $this->_orders = array();
         }
 
-        $result = &$this->executeQuery($query, $isManip);
+        $sth = null;
+        if ($isManip
+            && preg_match_all('/:(\w+)/',
+                              $this->{ '__query__' . strtolower($methodName) },
+                              $allMatches,
+                              PREG_SET_ORDER)
+            ) {
+            $types = array();
+            foreach ($allMatches as $matches) {
+                $types[ $matches[1] ] = $this->_metadata->getDatatype($matches[1]);
+            }
+
+            $sth = $this->_dbh->prepare($query, $types, MDB2_PREPARE_MANIP);
+            foreach (array_keys($types) as $fieldName) {
+                $sth->bindParam($fieldName,
+                                $criteria->{ Piece_ORM_Inflector::camelize($fieldName, true) }->getSource()
+                                );
+            }
+        }
+
+        $result = &$this->executeQuery($query, $isManip, $sth);
+
         if (preg_match('/^findAll.*$/', $methodName)) {
             $this->_lastQueryForGetCount = $queryForGetCount;
         }
@@ -523,6 +558,21 @@ class Piece_ORM_Mapper_Common
     function isQuotable($value)
     {
         return is_scalar($value) || is_null($value);
+    }
+
+    // }}}
+    // {{{ createLOB()
+
+    /**
+     * Creates a LOB object.
+     *
+     * @param string $source
+     * @return Piece_ORM_Mapper_LOB
+     */
+    function &createLOB($source = null)
+    {
+        $lob = &new Piece_ORM_Mapper_LOB($this->_dbh, $source);
+        return $lob;
     }
 
     /**#@-*/
