@@ -191,7 +191,7 @@ class Piece_ORM_Metadata
     function isAutoIncrement($fieldName)
     {
         if (!$this->hasField($fieldName)) {
-            return;
+            return false;
         }
 
         return array_key_exists('autoincrement', $this->_tableInfo[$fieldName]);
@@ -237,7 +237,7 @@ class Piece_ORM_Metadata
     function isPartOfPrimaryKey($fieldName)
     {
         if (!$this->hasField($fieldName)) {
-            return;
+            return false;
         }
 
         if ($this->hasPrimaryKey()) {
@@ -291,7 +291,7 @@ class Piece_ORM_Metadata
     function hasDefault($fieldName)
     {
         if (!$this->hasField($fieldName)) {
-            return;
+            return false;
         }
 
         return array_key_exists('default', $this->_tableInfo[$fieldName])
@@ -312,7 +312,7 @@ class Piece_ORM_Metadata
     {
         $datatype = $this->getDatatype($fieldName);
         if (is_null($datatype)) {
-            return;
+            return false;
         }
 
         return $datatype == 'blob' || $datatype == 'clob';
