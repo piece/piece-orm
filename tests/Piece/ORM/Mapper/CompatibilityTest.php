@@ -87,7 +87,8 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
                          'unusualname12',
                          'unusualname1_2',
                          'unusualname1_2_unusualname_12',
-                         'unusualname_12'
+                         'unusualname_12',
+                         'files'
                          );
     var $_initialized = false;
 
@@ -1649,6 +1650,7 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         $mapper = &Piece_ORM_Mapper_Factory::factory('Files');
         $subject = &$mapper->createObject();
         $subject->picture = &$mapper->createLOB("file://$jpegPath");
+        $subject->createdAt = strftime('%Y-%m-%d %H:%M:%S');
         $id = $mapper->insert($subject);
         $file1 = &$mapper->findById($id);
 
@@ -1656,6 +1658,7 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         $this->assertEquals(file_get_contents($jpegPath), $file1->picture->getValue());
 
         $file1->picture->setSource("file://$pngPath");
+        $file1->updatedAt = strftime('%Y-%m-%d %H:%M:%S');
         $mapper->update($file1);
         $file2 = &$mapper->findById($id);
 
