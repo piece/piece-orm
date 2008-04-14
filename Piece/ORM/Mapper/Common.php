@@ -427,8 +427,9 @@ class Piece_ORM_Mapper_Common
 
             $sth = $this->_dbh->prepare($query, $types, MDB2_PREPARE_MANIP);
             foreach (array_keys($types) as $fieldName) {
-                $sth->bindParam($fieldName,
-                                $criteria->{ Piece_ORM_Inflector::camelize($fieldName, true) }->getSource()
+                $sth->bindParam(":$fieldName",
+                                $criteria->{ Piece_ORM_Inflector::camelize($fieldName, true) }->getSource(),
+                                $types[$fieldName]
                                 );
             }
         }
@@ -571,7 +572,7 @@ class Piece_ORM_Mapper_Common
      */
     function &createLOB($source = null)
     {
-        $lob = &new Piece_ORM_Mapper_LOB($this->_dbh, $source);
+        $lob = &new Piece_ORM_Mapper_LOB($this->_dbh, $this->_metadata, $source);
         return $lob;
     }
 
