@@ -197,7 +197,7 @@ class Piece_ORM_Mapper_ObjectLoader
                 PEAR::staticPopErrorHandling();
                 Piece_ORM_Error::pushPEARError($row,
                                                PIECE_ORM_ERROR_INVOCATION_FAILED,
-                                               'Failed to invoke MDB2_Driver_' . $this->_mapper->getDriverName() . '::fetchRow() for any reasons.'
+                                               "Failed to invoke MDB2_Driver_{$this->_result->db->phptype}::fetchRow() for any reasons."
                                                );
                 return;
             }

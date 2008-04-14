@@ -144,19 +144,6 @@ class Piece_ORM_Mapper_Common
     }
 
     // }}}
-    // {{{ getDriverName()
-
-    /**
-     * Gets the driver name of the database handle for this mapper.
-     *
-     * @return string
-     */
-    function getDriverName()
-    {
-        return substr(strrchr(get_class($this->_dbh), '_'), 1);
-    }
-
-    // }}}
     // {{{ quote()
 
     /**
@@ -194,7 +181,7 @@ class Piece_ORM_Mapper_Common
         if (MDB2::isError($result)) {
             Piece_ORM_Error::pushPEARError($result,
                                            PIECE_ORM_ERROR_INVOCATION_FAILED,
-                                           'Failed to invoke MDB2_Driver_' . $this->getDriverName() . '::setLimit() for any reasons.'
+                                           "Failed to invoke MDB2_Driver_{$this->_dbh->phptype}::setLimit() for any reasons."
                                            );
         }
     }
@@ -342,7 +329,7 @@ class Piece_ORM_Mapper_Common
             }
             Piece_ORM_Error::pushPEARError($result,
                                            $code,
-                                           'Failed to invoke MDB2_Driver_' . $this->getDriverName() . '::query() for any reasons.'
+                                           "Failed to invoke MDB2_Driver_{$this->_dbh->phptype}::query() for any reasons."
                                            );
             $return = null;
             return $return;
@@ -466,7 +453,7 @@ class Piece_ORM_Mapper_Common
             if (MDB2::isError($id)) {
                 Piece_ORM_Error::pushPEARError($id,
                                                PIECE_ORM_ERROR_INVOCATION_FAILED,
-                                               'Failed to invoke MDB2_Driver_' . $this->getDriverName() . '::lastInsertID() for any reasons.'
+                                               "Failed to invoke MDB2_Driver_{$this->_dbh->phptype}::lastInsertID() for any reasons."
                                                );
                 return;
             }
@@ -833,7 +820,7 @@ class Piece_ORM_Mapper_Common
         if (MDB2::isError($value)) {
             Piece_ORM_Error::pushPEARError($value,
                                            PIECE_ORM_ERROR_INVOCATION_FAILED,
-                                           'Failed to invoke MDB2_Driver_' . $this->getDriverName() . '::fetchOne() for any reasons.'
+                                           "Failed to invoke MDB2_Driver_{$this->_dbh->phptype}::fetchOne() for any reasons."
                                            );
             return;
         }
