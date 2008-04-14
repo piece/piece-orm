@@ -115,6 +115,9 @@ class Piece_ORM_Mapper_MysqlTestCase extends Piece_ORM_Mapper_CompatibilityTest
         $this->assertNotNull($employee);
         $this->assertEquals("\x93\xd6\x8c\x5b", $employee->firstName);
         $this->assertEquals("\x8b\x76\x95\xdb", $employee->lastName);
+
+        $dbh = &$context->getConnection();
+        $dbh->setCharset('utf8');
     }
 
     /**
