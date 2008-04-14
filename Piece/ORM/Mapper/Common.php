@@ -409,10 +409,30 @@ class Piece_ORM_Mapper_Common
             ) {
             $types = array();
             foreach ($allMatches as $matches) {
+                $datatype = $this->_metadata->getDatatype($matches[1]);
+                if ($datatype != 'blob' && $datatype != 'clob') {
+                    continue;
+                }
+
+                if (!array_key_exists(Piece_ORM_Inflector::camelize($matches[1], true), $criteria)) {
+                    continue;
+                }
+
                 $types[ $matches[1] ] = $this->_metadata->getDatatype($matches[1]);
             }
 
+            PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
             $sth = $this->_dbh->prepare($query, $types, MDB2_PREPARE_MANIP);
+            PEAR::staticPopErrorHandling();
+            if (MDB2::isError($sth)) {
+                Piece_ORM_Error::pushPEARError($sth,
+                                               PIECE_ORM_ERROR_INVOCATION_FAILED,
+                                               "Failed to invoke MDB2_Driver_{$this->_dbh->phptype}::prepare() for any reasons."
+                                               );
+                $return = null;
+                return $return;
+            }
+
             foreach (array_keys($types) as $fieldName) {
                 $sth->bindParam(":$fieldName",
                                 $criteria->{ Piece_ORM_Inflector::camelize($fieldName, true) }->getSource(),
