@@ -184,14 +184,16 @@ class Piece_ORM_Mapper_Generator
     }
 
     // }}}
-    // {{{ generateValue()
+    // {{{ generateExpression()
 
     /**
+     * Generates an appropriate expression for the given field.
+     *
      * @param string $fieldName
      * @return string
      * @since Method available since Release 1.0.0
      */
-    function generateValue($fieldName)
+    function generateExpression($fieldName)
     {
         $datatype = $this->_metadata->getDatatype($fieldName);
         if ($datatype != 'blob') {
@@ -728,7 +730,7 @@ class Piece_ORM_Mapper_Generator
             }
         }
 
-        return 'INSERT INTO ' . addslashes($this->_metadata->getTableName()) . ' (' . implode(", ", $fields) . ') VALUES (' . implode(', ', array_map(array(&$this, 'generateValue'), $fields)) . ')';
+        return 'INSERT INTO ' . addslashes($this->_metadata->getTableName()) . ' (' . implode(", ", $fields) . ') VALUES (' . implode(', ', array_map(array(&$this, 'generateExpression'), $fields)) . ')';
     }
 
     // }}}
@@ -779,7 +781,7 @@ class Piece_ORM_Mapper_Generator
             foreach ($this->_metadata->getFieldNames() as $fieldName) {
                 if (!$this->_metadata->isAutoIncrement($fieldName)) {
                     if (!$this->_metadata->isPartOfPrimaryKey($fieldName)) {
-                        $fields[] = "$fieldName = " . $this->generateValue($fieldName);
+                        $fields[] = "$fieldName = " . $this->generateExpression($fieldName);
                     }
                 }
             }
