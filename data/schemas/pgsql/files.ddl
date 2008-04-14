@@ -2,7 +2,7 @@
 
 CREATE TABLE files (
   id serial,
-  document text,
+  document_body text,
   picture bytea,
   created_at timestamp with time zone NOT NULL DEFAULT current_timestamp,
   updated_at timestamp with time zone NOT NULL DEFAULT current_timestamp,
