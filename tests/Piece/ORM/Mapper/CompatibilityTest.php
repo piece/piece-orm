@@ -1655,15 +1655,15 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         $file1 = &$mapper->findById($id);
 
         $this->assertEquals(strtolower('Piece_ORM_Mapper_LOB'), strtolower(get_class($file1->picture)));
-        $this->assertEquals(file_get_contents($jpegPath), $file1->picture->getValue());
+        $this->assertEquals(file_get_contents($jpegPath), $file1->picture->load());
 
         $file1->picture->setSource("file://$pngPath");
         $file1->updatedAt = strftime('%Y-%m-%d %H:%M:%S');
         $mapper->update($file1);
         $file2 = &$mapper->findById($id);
 
-        $this->assertTrue(file_get_contents($jpegPath) != $file2->picture->getValue());
-        $this->assertEquals(file_get_contents($pngPath), $file2->picture->getValue());
+        $this->assertTrue(file_get_contents($jpegPath) != $file2->picture->load());
+        $this->assertEquals(file_get_contents($pngPath), $file2->picture->load());
     }
 
     /**#@-*/

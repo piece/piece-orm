@@ -171,7 +171,7 @@ class Piece_ORM_Mapper_ObjectLoader
             } else {
                 $lob = &$this->_mapper->createLOB();
                 $lob->setFieldName($key);
-                $lob->setEscapedValue($value);
+                $lob->setValue($value);
                 $object->{ Piece_ORM_Inflector::camelize($key, true) } = &$lob;
             }
         }

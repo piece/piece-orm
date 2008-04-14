@@ -63,9 +63,9 @@ class Piece_ORM_Mapper_LOB
 
     var $_fieldName;
     var $_source;
-    var $_escapedValue;
-    var $_dbh;
     var $_value;
+    var $_dbh;
+    var $_data;
     var $_metadata;
 
     /**#@-*/
@@ -108,16 +108,16 @@ class Piece_ORM_Mapper_LOB
     }
 
     // }}}
-    // {{{ setEscapedValue()
+    // {{{ setValue()
 
     /**
      * Sets the escaped value of this field.
      *
-     * @param string $escapedValue
+     * @param string $value
      */
-    function setEscapedValue($escapedValue)
+    function setValue($value)
     {
-        $this->_escapedValue = $escapedValue;
+        $this->_value = $value;
     }
 
     // }}}
@@ -134,18 +134,18 @@ class Piece_ORM_Mapper_LOB
     }
 
     // }}}
-    // {{{ getValue()
+    // {{{ load()
 
     /**
-     * Gets the unescaped value of this field.
+     * Loads the LOB data of this field.
      *
      * @return string
      * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
      * @throws PIECE_ORM_ERROR_UNEXPECTED_VALUE
      */
-    function getValue()
+    function load()
     {
-        if (is_null($this->_value)) {
+        if (is_null($this->_data)) {
             PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
             $datatype = &$this->_dbh->loadModule('Datatype');
             PEAR::staticPopErrorHandling();
@@ -158,7 +158,7 @@ class Piece_ORM_Mapper_LOB
             }
 
             PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
-            $lob = $datatype->convertResult($this->_escapedValue,
+            $lob = $datatype->convertResult($this->_value,
                                             $this->_metadata->getDatatype($this->_fieldName)
                                             );
             PEAR::staticPopErrorHandling();
@@ -177,16 +177,16 @@ class Piece_ORM_Mapper_LOB
                 return;
             }
 
-            $this->_value = '';
+            $this->_data = '';
             while (!feof($lob)) {
-                $this->_value .= fread($lob, 8192);
+                $this->_data .= fread($lob, 8192);
             }
 
             $datatype->destroyLOB($lob);
-            $this->_escapedValue = null;
+            $this->_value = null;
         }
 
-        return $this->_value;
+        return $this->_data;
     }
 
     // }}}
