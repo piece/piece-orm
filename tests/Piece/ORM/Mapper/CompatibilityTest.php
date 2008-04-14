@@ -1644,15 +1644,23 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
      */
     function testShouldSupportLob()
     {
-        $picturePath = "{$this->_cacheDirectory}/picture.jpg";
+        $jpegPath = "{$this->_cacheDirectory}/picture.jpg";
+        $pngPath = "{$this->_cacheDirectory}/picture.png";
         $mapper = &Piece_ORM_Mapper_Factory::factory('Files');
         $subject = &$mapper->createObject();
-        $subject->picture = &$mapper->createLOB("file://$picturePath");
+        $subject->picture = &$mapper->createLOB("file://$jpegPath");
         $id = $mapper->insert($subject);
-        $file = &$mapper->findById($id);
+        $file1 = &$mapper->findById($id);
 
-        $this->assertEquals(strtolower('Piece_ORM_Mapper_LOB'), strtolower(get_class($file->picture)));
-        $this->assertEquals(file_get_contents($picturePath), $file->picture->getValue());
+        $this->assertEquals(strtolower('Piece_ORM_Mapper_LOB'), strtolower(get_class($file1->picture)));
+        $this->assertEquals(file_get_contents($jpegPath), $file1->picture->getValue());
+
+        $file1->picture->setSource("file://$pngPath");
+        $mapper->update($file1);
+        $file2 = &$mapper->findById($id);
+
+        $this->assertTrue(file_get_contents($jpegPath) != $file2->picture->getValue());
+        $this->assertEquals(file_get_contents($pngPath), $file2->picture->getValue());
     }
 
     /**#@-*/

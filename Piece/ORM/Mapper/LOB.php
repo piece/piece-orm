@@ -184,6 +184,19 @@ class Piece_ORM_Mapper_LOB
         return $this->_value;
     }
 
+    // }}}
+    // {{{ setSource()
+
+    /**
+     * Sets a LOB source for this field.
+     *
+     * @param string $source
+     */
+    function setSource($source)
+    {
+        $this->_source = $source;
+    }
+
     /**#@-*/
 
     /**#@+

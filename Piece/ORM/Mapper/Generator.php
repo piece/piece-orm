@@ -779,7 +779,7 @@ class Piece_ORM_Mapper_Generator
             foreach ($this->_metadata->getFieldNames() as $fieldName) {
                 if (!$this->_metadata->isAutoIncrement($fieldName)) {
                     if (!$this->_metadata->isPartOfPrimaryKey($fieldName)) {
-                        $fields[] = "$fieldName = \$" . Piece_ORM_Inflector::camelize($fieldName, true);
+                        $fields[] = "$fieldName = " . $this->generateValue($fieldName);
                     }
                 }
             }
