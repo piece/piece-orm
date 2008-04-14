@@ -66,6 +66,7 @@ class Piece_ORM_Mapper_LOB
     var $_escapedValue;
     var $_dbh;
     var $_value;
+    var $_metadata;
 
     /**#@-*/
 
@@ -80,11 +81,13 @@ class Piece_ORM_Mapper_LOB
      * Sets a database handle and a LOB source.
      *
      * @param MDB2_Driver_Common &$dbh
+     * @param Piece_ORM_Metadata &$metadata
      * @param string|resource    $source
      */
-    function Piece_ORM_Mapper_LOB(&$dbh, $source)
+    function Piece_ORM_Mapper_LOB(&$dbh, &$metadata, $source)
     {
         $this->_dbh = &$dbh;
+        $this->_metadata = &$metadata;
 
         if (!is_null($source)) {
             $this->_source = $source;
@@ -155,7 +158,9 @@ class Piece_ORM_Mapper_LOB
             }
 
             PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
-            $lob = $datatype->convertResult($this->_escapedValue, 'blob');
+            $lob = $datatype->convertResult($this->_escapedValue,
+                                            $this->_metadata->getDatatype($this->_fieldName)
+                                            );
             PEAR::staticPopErrorHandling();
             if (MDB2::isError($lob)) {
                 Piece_ORM_Error::pushPEARError($lob,
