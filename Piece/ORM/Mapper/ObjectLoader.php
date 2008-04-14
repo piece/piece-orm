@@ -165,7 +165,8 @@ class Piece_ORM_Mapper_ObjectLoader
 
         $object = &new stdClass();
         foreach ($row as $key => $value) {
-            if ($this->_metadata->getDatatype($key) != 'blob') {
+            $datatype = $this->_metadata->getDatatype($key);
+            if ($datatype != 'blob' && $datatype != 'clob') {
                 $object->{ Piece_ORM_Inflector::camelize($key, true) } = $value;
             } else {
                 $lob = &$this->_mapper->createLOB();

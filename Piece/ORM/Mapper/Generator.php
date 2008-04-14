@@ -196,7 +196,7 @@ class Piece_ORM_Mapper_Generator
     function generateExpression($fieldName)
     {
         $datatype = $this->_metadata->getDatatype($fieldName);
-        if ($datatype != 'blob') {
+        if ($datatype != 'blob' && $datatype != 'clob') {
             return '$' . Piece_ORM_Inflector::camelize($fieldName, true);
         } else {
             return ":$fieldName";
