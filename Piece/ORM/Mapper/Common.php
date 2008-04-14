@@ -409,8 +409,7 @@ class Piece_ORM_Mapper_Common
             ) {
             $types = array();
             foreach ($allMatches as $matches) {
-                $datatype = $this->_metadata->getDatatype($matches[1]);
-                if ($datatype != 'blob' && $datatype != 'clob') {
+                if (!$this->_metadata->isLOB($matches[1])) {
                     continue;
                 }
 

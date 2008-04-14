@@ -299,6 +299,25 @@ class Piece_ORM_Metadata
             && strlen($this->_tableInfo[$fieldName]['default']);
     }
 
+    // }}}
+    // {{{ isLOB()
+
+    /**
+     * Returns whether a field is a LOB field or not.
+     *
+     * @param string $fieldName
+     * @return boolean
+     */
+    function isLOB($fieldName)
+    {
+        $datatype = $this->getDatatype($fieldName);
+        if (is_null($datatype)) {
+            return;
+        }
+
+        return $datatype == 'blob' || $datatype == 'clob';
+    }
+
     /**#@-*/
 
     /**#@+
