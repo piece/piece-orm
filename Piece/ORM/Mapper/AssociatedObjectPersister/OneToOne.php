@@ -79,7 +79,6 @@ class Piece_ORM_Mapper_AssociatedObjectPersister_OneToOne extends Piece_ORM_Mapp
      * Inserts associated objects to a table.
      *
      * @param array $relationship
-     * @return mixed
      * @throws PIECE_ORM_ERROR_UNEXPECTED_VALUE
      * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
      * @throws PIECE_ORM_ERROR_INVALID_OPERATION
@@ -116,7 +115,6 @@ class Piece_ORM_Mapper_AssociatedObjectPersister_OneToOne extends Piece_ORM_Mapp
      * Updates associated objects in a table.
      *
      * @param array $relationship
-     * @return integer
      * @throws PIECE_ORM_ERROR_UNEXPECTED_VALUE
      * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
      * @throws PIECE_ORM_ERROR_INVALID_OPERATION
@@ -169,7 +167,6 @@ class Piece_ORM_Mapper_AssociatedObjectPersister_OneToOne extends Piece_ORM_Mapp
      * Removes associated objects from a table.
      *
      * @param array $relationship
-     * @return integer
      * @throws PIECE_ORM_ERROR_UNEXPECTED_VALUE
      * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
      * @throws PIECE_ORM_ERROR_INVALID_OPERATION

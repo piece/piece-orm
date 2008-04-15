@@ -99,7 +99,7 @@ class Piece_ORM_Mapper_Factory
      * Creates a mapper object for a given mapper name.
      *
      * @param string $mapperName
-     * @return mixed
+     * @return Piece_ORM_Mapper_Common
      * @throws PIECE_ORM_ERROR_INVALID_OPERATION
      * @throws PIECE_ORM_ERROR_NOT_FOUND
      * @throws PIECE_ORM_ERROR_NOT_READABLE

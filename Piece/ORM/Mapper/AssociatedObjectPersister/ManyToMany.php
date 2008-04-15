@@ -4,7 +4,7 @@
 /**
  * PHP versions 4 and 5
  *
- * Copyright (c) 2007 KUBO Atsuhiro <iteman@users.sourceforge.net>,
+ * Copyright (c) 2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>,
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,7 +29,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  * @package    Piece_ORM
- * @copyright  2007 KUBO Atsuhiro <iteman@users.sourceforge.net>
+ * @copyright  2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License (revised)
  * @version    SVN: $Id$
  * @since      File available since Release 0.2.0
@@ -46,7 +46,7 @@ require_once 'Piece/ORM/Inflector.php';
  * An associated object persister for Many-to-Many relationships.
  *
  * @package    Piece_ORM
- * @copyright  2007 KUBO Atsuhiro <iteman@users.sourceforge.net>
+ * @copyright  2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License (revised)
  * @version    Release: @package_version@
  * @since      Class available since Release 0.2.0
@@ -79,7 +79,6 @@ class Piece_ORM_Mapper_AssociatedObjectPersister_ManyToMany extends Piece_ORM_Ma
      * Inserts associated objects to a table.
      *
      * @param array $relationship
-     * @return mixed
      * @throws PIECE_ORM_ERROR_UNEXPECTED_VALUE
      * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
      * @throws PIECE_ORM_ERROR_INVALID_OPERATION
@@ -124,7 +123,6 @@ class Piece_ORM_Mapper_AssociatedObjectPersister_ManyToMany extends Piece_ORM_Ma
      * Updates associated objects in a table.
      *
      * @param array $relationship
-     * @return integer
      * @throws PIECE_ORM_ERROR_UNEXPECTED_VALUE
      * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
      * @throws PIECE_ORM_ERROR_INVALID_OPERATION
@@ -174,7 +172,6 @@ class Piece_ORM_Mapper_AssociatedObjectPersister_ManyToMany extends Piece_ORM_Ma
      * Removes associated objects from a table.
      *
      * @param array $relationship
-     * @return integer
      * @throws PIECE_ORM_ERROR_UNEXPECTED_VALUE
      * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
      * @throws PIECE_ORM_ERROR_INVALID_OPERATION

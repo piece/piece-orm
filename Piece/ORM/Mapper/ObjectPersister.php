@@ -114,7 +114,7 @@ class Piece_ORM_Mapper_ObjectPersister
      * Inserts an object to a table.
      *
      * @param string $methodName
-     * @return mixed
+     * @return integer
      * @throws PIECE_ORM_ERROR_UNEXPECTED_VALUE
      * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
      * @throws PIECE_ORM_ERROR_INVALID_OPERATION

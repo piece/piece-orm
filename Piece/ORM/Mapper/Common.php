@@ -292,7 +292,7 @@ class Piece_ORM_Mapper_Common
      *
      * @param string  $query
      * @param boolean $isManip
-     * @return mixed
+     * @return MDB2_Result_Common|integer
      * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
      * @throws PIECE_ORM_ERROR_UNEXPECTED_VALUE
      */
@@ -378,7 +378,7 @@ class Piece_ORM_Mapper_Common
      * @param string   $methodName
      * @param stdClass $criteria
      * @param boolean  $isManip
-     * @return mixed
+     * @return MDB2_Result_Common|integer
      * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
      */
     function &executeQueryWithCriteria($methodName, $criteria, $isManip = false)
@@ -487,7 +487,7 @@ class Piece_ORM_Mapper_Common
     /**
      * Sets the database handle for this mapper.
      *
-     * @param mixed &$dbh
+     * @param MDB2_Driver_Common &$dbh
      */
     function setConnection(&$dbh)
     {
@@ -855,7 +855,7 @@ class Piece_ORM_Mapper_Common
      *
      * @param string $methodName
      * @param mixed &$subject
-     * @return mixed
+     * @return integer
      * @throws PIECE_ORM_ERROR_UNEXPECTED_VALUE
      * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
      * @throws PIECE_ORM_ERROR_INVALID_OPERATION

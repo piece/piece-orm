@@ -129,8 +129,8 @@ class Piece_ORM_Mapper_AssociatedObjectLoader_Common
     /**
      * Loads all associated objects into appropriate objects.
      *
-     * @param mixed   &$mapper
-     * @param integer $relationshipIndex
+     * @param Piece_ORM_Mapper_Common &$mapper
+     * @param integer                 $relationshipIndex
      * @throws PIECE_ORM_ERROR_INVALID_OPERATION
      * @throws PIECE_ORM_ERROR_NOT_FOUND
      * @throws PIECE_ORM_ERROR_NOT_READABLE
@@ -205,10 +205,10 @@ class Piece_ORM_Mapper_AssociatedObjectLoader_Common
      * Associates an object which are loaded by the secondary query into
      * objects which are loaded by the primary query.
      *
-     * @param stdClass &$associatedObject
-     * @param mixed    &$mapper
-     * @param string   $relationshipKeyPropertyName
-     * @param integer  $relationshipIndex
+     * @param stdClass                &$associatedObject
+     * @param Piece_ORM_Mapper_Common &$mapper
+     * @param string                  $relationshipKeyPropertyName
+     * @param integer                 $relationshipIndex
      */
     function _associateObject(&$associatedObject, &$mapper, $relationshipKeyPropertyName, $relationshipIndex) {}
 

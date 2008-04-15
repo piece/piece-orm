@@ -79,7 +79,6 @@ class Piece_ORM_Mapper_AssociatedObjectPersister_OneToMany extends Piece_ORM_Map
      * Inserts associated objects to a table.
      *
      * @param array $relationship
-     * @return mixed
      * @throws PIECE_ORM_ERROR_UNEXPECTED_VALUE
      * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
      * @throws PIECE_ORM_ERROR_INVALID_OPERATION
@@ -122,7 +121,6 @@ class Piece_ORM_Mapper_AssociatedObjectPersister_OneToMany extends Piece_ORM_Map
      * Updates associated objects in a table.
      *
      * @param array $relationship
-     * @return integer
      * @throws PIECE_ORM_ERROR_UNEXPECTED_VALUE
      * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
      * @throws PIECE_ORM_ERROR_INVALID_OPERATION
@@ -226,7 +224,6 @@ return \$a->$primaryKeyProperty < \$b->$primaryKeyProperty ? -1 : 1;
      * Removes associated objects from a table.
      *
      * @param array $relationship
-     * @return integer
      * @throws PIECE_ORM_ERROR_UNEXPECTED_VALUE
      * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
      * @throws PIECE_ORM_ERROR_INVALID_OPERATION

@@ -4,7 +4,7 @@
 /**
  * PHP versions 4 and 5
  *
- * Copyright (c) 2007 KUBO Atsuhiro <iteman@users.sourceforge.net>,
+ * Copyright (c) 2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>,
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,7 +29,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  * @package    Piece_ORM
- * @copyright  2007 KUBO Atsuhiro <iteman@users.sourceforge.net>
+ * @copyright  2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License (revised)
  * @version    SVN: $Id$
  * @since      File available since Release 0.7.0
@@ -46,7 +46,7 @@ $GLOBALS['PIECE_ORM_MDB2_NativeTypeMap'] = array();
  * A helper class to map native datatypes of the DBMS to MDB2 datatypes.
  *
  * @package    Piece_ORM
- * @copyright  2007 KUBO Atsuhiro <iteman@users.sourceforge.net>
+ * @copyright  2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License (revised)
  * @version    Release: @package_version@
  * @since      Class available since Release 0.7.0
@@ -91,7 +91,7 @@ class Piece_ORM_MDB2_NativeTypeMapper_Common
     /**
      * Maps a native datatype of the DBMS to a MDB2 datatype.
      *
-     * @param mixed &$dbh
+     * @param MDB2_Driver_Common &$dbh
      */
     function mapNativeType(&$dbh)
     {
@@ -114,8 +114,8 @@ class Piece_ORM_MDB2_NativeTypeMapper_Common
      * Gets the MDB2 datatype information of a native array description of
      * a field.
      *
-     * @param mixed &$dbh
-     * @param array $field
+     * @param MDB2_Driver_Common &$dbh
+     * @param array              $field
      * @return array
      */
     function getMDB2TypeInfo(&$dbh, $field)

@@ -80,7 +80,6 @@ class Piece_ORM_MDB2_Decorator_Reverse_Mssql
      *
      * @param MDB2_Driver_Reverse_mssql &$reverse
      * @param string $field
-     * @return mixed
      */
     function Piece_ORM_MDB2_Decorator_Reverse_Mssql(&$reverse)
     {
@@ -93,7 +92,7 @@ class Piece_ORM_MDB2_Decorator_Reverse_Mssql
     /**
      * Delegates to the original object.
      *
-     * @return mixed
+     * @return MDB2_Driver_Common|MDB2_Error
      */
     function &getDBInstance()
     {
@@ -108,7 +107,7 @@ class Piece_ORM_MDB2_Decorator_Reverse_Mssql
      *
      * @param string $table
      * @param string $field
-     * @return mixed
+     * @return array|MDB2_Error
      */
     function getTableFieldDefinition($table, $field)
     {
@@ -123,7 +122,7 @@ class Piece_ORM_MDB2_Decorator_Reverse_Mssql
      *
      * @param string $table
      * @param string $index_name
-     * @return mixed
+     * @return array|MDB2_Error
      * @see MDB2_Driver_Reverse_mssql::getTableIndexDefinition()
      */
     function getTableIndexDefinition($table, $index_name)
@@ -203,7 +202,7 @@ ORDER BY
      *
      * @param string $table
      * @param string $index
-     * @return mixed
+     * @return array|MDB2_Error
      */
     function getTableConstraintDefinition($table, $index)
     {
@@ -217,7 +216,7 @@ ORDER BY
      * Delegates to the original object.
      *
      * @param string $sequence
-     * @return mixed
+     * @return array|MDB2_Error
      */
     function getSequenceDefinition($sequence)
     {
@@ -231,7 +230,7 @@ ORDER BY
      * Delegates to the original object.
      *
      * @param string $trigger
-     * @return mixed
+     * @return array|MDB2_Error
      */
     function getTriggerDefinition($trigger)
     {
@@ -244,9 +243,9 @@ ORDER BY
     /**
      * Returns information about a table or a result set
      *
-     * @param mixed   $result
-     * @param integer $mode
-     * @return array
+     * @param string|MDB2_Result_Common $result
+     * @param integer                   $mode
+     * @return array|MDB2_Error
      * @see MDB2_Driver_Reverse_Common::tableInfo()
      */
     function tableInfo($result, $mode = null)
@@ -372,7 +371,7 @@ ORDER BY
      *
      * @param string $tableName
      * @param array  $tableInfo
-     * @return array
+     * @return array|MDB2_Error
      */
     function _findAutoIncrementField($tableName, $tableInfo)
     {

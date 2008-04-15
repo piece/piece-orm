@@ -4,7 +4,7 @@
 /**
  * PHP versions 4 and 5
  *
- * Copyright (c) 2007 KUBO Atsuhiro <iteman@users.sourceforge.net>,
+ * Copyright (c) 2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>,
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,7 +29,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  * @package    Piece_ORM
- * @copyright  2007 KUBO Atsuhiro <iteman@users.sourceforge.net>
+ * @copyright  2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License (revised)
  * @version    SVN: $Id$
  * @since      File available since Release 0.2.0
@@ -43,7 +43,7 @@ require_once 'Piece/ORM/Mapper/AssociatedObjectLoader/Common.php';
  * An associated object loader for One-to-One relationships.
  *
  * @package    Piece_ORM
- * @copyright  2007 KUBO Atsuhiro <iteman@users.sourceforge.net>
+ * @copyright  2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License (revised)
  * @version    Release: @package_version@
  * @since      Class available since Release 0.2.0
@@ -124,10 +124,10 @@ class Piece_ORM_Mapper_AssociatedObjectLoader_OneToOne extends Piece_ORM_Mapper_
      * Associates an object which are loaded by the secondary query into
      * objects which are loaded by the primary query.
      *
-     * @param stdClass &$associatedObject
-     * @param mixed    &$mapper
-     * @param string   $relationshipKeyPropertyName
-     * @param integer  $relationshipIndex
+     * @param stdClass                &$associatedObject
+     * @param Piece_ORM_Mapper_Common &$mapper
+     * @param string                  $relationshipKeyPropertyName
+     * @param integer                 $relationshipIndex
      */
     function _associateObject(&$associatedObject, &$mapper, $relationshipKeyPropertyName, $relationshipIndex)
     {

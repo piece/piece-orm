@@ -204,7 +204,7 @@ class Piece_ORM_Context
     /**
      * Gets the database handle for the current database.
      *
-     * @return mixed
+     * @return MDB2_Driver_Common
      * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
      */
     function &getConnection()

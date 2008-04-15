@@ -195,7 +195,7 @@ class Piece_ORM_Mapper_LOB
     /**
      * Sets a LOB source for this field.
      *
-     * @param string $source
+     * @param string|resource $source
      */
     function setSource($source)
     {
