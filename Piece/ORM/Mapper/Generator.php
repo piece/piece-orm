@@ -527,25 +527,24 @@ class Piece_ORM_Mapper_Generator
     }
 
     // }}}
-    // {{{ _getQueryPropertyDeclaration()
+    // {{{ _generateQueryPropertyDeclaration()
 
     /**
-     * Gets a property declaration that will be used as the query for
-     * a method.
+     * Generates a property declaration that will be used as the query for a method.
      *
      * @param string $propertyName
      * @param string $query
      */
-    function _getQueryPropertyDeclaration($propertyName, $query)
+    function _generateQueryPropertyDeclaration($propertyName, $query)
     {
         return "    var \$__query__{$propertyName} = " . var_export($query, true) . ';';
     }
 
     // }}}
-    // {{{ _getRelationshipPropertyDeclaration()
+    // {{{ _generateRelationshipPropertyDeclaration()
 
     /**
-     * Gets a property declaration that will be used as the relationship
+     * Generates a property declaration that will be used as the relationship
      * information for a method.
      *
      * @param string $propertyName
@@ -555,7 +554,7 @@ class Piece_ORM_Mapper_Generator
      * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
      * @throws PIECE_ORM_ERROR_NOT_FOUND
      */
-    function _getRelationshipPropertyDeclaration($propertyName, $relationships)
+    function _generateRelationshipPropertyDeclaration($propertyName, $relationships)
     {
         if (is_array($relationships)) {
             $relationships = array_map(array(&$this, 'normalizeRelationshipDefinition'), $relationships);
@@ -624,11 +623,11 @@ class Piece_ORM_Mapper_Generator
         }
 
         if ($query) {
-            $this->_propertyDefinitions['query'][$propertyName] = $this->_getQueryPropertyDeclaration($propertyName, $query);
+            $this->_propertyDefinitions['query'][$propertyName] = $this->_generateQueryPropertyDeclaration($propertyName, $query);
         }
 
-        $this->_propertyDefinitions['relationship'][$propertyName] = $this->_getRelationshipPropertyDeclaration($propertyName, $relationships);
-        $this->_propertyDefinitions['orderBy'][$propertyName] = $this->_getOrderByPropertyDeclaration($propertyName, $orderBy);
+        $this->_propertyDefinitions['relationship'][$propertyName] = $this->_generateRelationshipPropertyDeclaration($propertyName, $relationships);
+        $this->_propertyDefinitions['orderBy'][$propertyName] = $this->_generateOrderByPropertyDeclaration($propertyName, $orderBy);
     }
 
     // }}}
@@ -701,8 +700,8 @@ class Piece_ORM_Mapper_Generator
         }
 
         $propertyName = strtolower($methodName);
-        $this->_propertyDefinitions['query'][$propertyName] = $this->_getQueryPropertyDeclaration($propertyName, $query);
-        $this->_propertyDefinitions['orderBy'][$propertyName] = $this->_getOrderByPropertyDeclaration($propertyName, $orderBy);
+        $this->_propertyDefinitions['query'][$propertyName] = $this->_generateQueryPropertyDeclaration($propertyName, $query);
+        $this->_propertyDefinitions['orderBy'][$propertyName] = $this->_generateOrderByPropertyDeclaration($propertyName, $orderBy);
 
         $this->_methodDefinitions[ strtolower($methodName) ] = "
     function $methodName(\$criteria = null)
@@ -792,18 +791,18 @@ class Piece_ORM_Mapper_Generator
     }
 
     // }}}
-    // {{{ _getOrderByPropertyDeclaration()
+    // {{{ _generateOrderByPropertyDeclaration()
 
     /**
-     * Gets a property declaration that will be used as the order by clause
-     * for the query for a method.
+     * Generates a property declaration that will be used as the order by clause for
+     * the query for a method.
      *
      * @param string $propertyName
      * @param string $orderBy
      * @return string
      * @since Method available since Release 0.6.0
      */
-    function _getOrderByPropertyDeclaration($propertyName, $orderBy)
+    function _generateOrderByPropertyDeclaration($propertyName, $orderBy)
     {
         return "    var \$__orderBy__{$propertyName} = " . var_export($orderBy, true) . ';';
     }
