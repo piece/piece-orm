@@ -38,6 +38,7 @@
 require_once 'Piece/ORM/Inflector.php';
 require_once 'Piece/ORM/Mapper/RelationshipType.php';
 require_once 'Piece/ORM/Mapper/Common.php';
+require_once 'Piece/ORM/Mapper/QueryType.php';
 
 // {{{ Piece_ORM_Mapper_Generator
 
@@ -329,48 +330,44 @@ class Piece_ORM_Mapper_Generator
         }
 
         foreach ($this->_config as $method) {
-            $queryType = $this->_getQueryType($method['name']);
+            do {
+                if (Piece_ORM_Mapper_QueryType::isFindAll($method['name'])) {
+                    $this->_addFindAll($method['name'], @$method['query'], @$method['relationship'], @$method['orderBy']);
+                    break;
+                }
+
+                if (Piece_ORM_Mapper_QueryType::isFindOne($method['name'])) {
+                    $this->_addFindOne($method['name'], @$method['query'], @$method['orderBy']);
+                    break;
+                }
+
+                if (Piece_ORM_Mapper_QueryType::isFind($method['name'])) {
+                    $this->_addFind($method['name'], @$method['query'], @$method['relationship'], @$method['orderBy']);
+                    break;
+                }
+
+                if (Piece_ORM_Mapper_QueryType::isInsert($method['name'])) {
+                    $this->_addInsert($method['name'], @$method['query'], @$method['relationship']);
+                    break;
+                }
+
+                if (Piece_ORM_Mapper_QueryType::isUpdate($method['name'])) {
+                    $this->_addUpdate($method['name'], @$method['query'], @$method['relationship']);
+                    break;
+                }
+
+                if (Piece_ORM_Mapper_QueryType::isDelete($method['name'])) {
+                    $this->_addDelete($method['name'], @$method['query'], @$method['relationship']);
+                    break;
+                }
+
+                Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_CONFIGURATION,
+                                      "Invalid method name [ {$method['name']} ] detected."
+                                      );
+            } while (false);
+
             if (Piece_ORM_Error::hasErrors('exception')) {
                 return;
-            }
-
-            switch ($queryType) {
-            case 'findAll':
-                $this->_addFindAll($method['name'], @$method['query'], @$method['relationship'], @$method['orderBy']);
-                if (Piece_ORM_Error::hasErrors('exception')) {
-                    return;
-                }
-                break;
-            case 'findOne':
-                $this->_addFindOne($method['name'], @$method['query'], @$method['orderBy']);
-                if (Piece_ORM_Error::hasErrors('exception')) {
-                    return;
-                }
-                break;
-            case 'find':
-                $this->_addFind($method['name'], @$method['query'], @$method['relationship'], @$method['orderBy']);
-                if (Piece_ORM_Error::hasErrors('exception')) {
-                    return;
-                }
-                break;
-            case 'insert':
-                $this->_addInsert($method['name'], @$method['query'], @$method['relationship']);
-                if (Piece_ORM_Error::hasErrors('exception')) {
-                    return;
-                }
-                break;
-            case 'update':
-                $this->_addUpdate($method['name'], @$method['query'], @$method['relationship']);
-                if (Piece_ORM_Error::hasErrors('exception')) {
-                    return;
-                }
-                break;
-            case 'delete':
-                $this->_addDelete($method['name'], @$method['query'], @$method['relationship']);
-                if (Piece_ORM_Error::hasErrors('exception')) {
-                    return;
-                }
-                break;
             }
         }
     }
@@ -585,39 +582,51 @@ class Piece_ORM_Mapper_Generator
     function _addPropertyDefinitions($methodName, $query, $relationships, $orderBy = null)
     {
         $propertyName = strtolower($methodName);
-        $queryType = $this->_getQueryType($methodName);
-        if (Piece_ORM_Error::hasErrors('exception')) {
-            return;
-        }
 
         if (!$query) {
             if (!array_key_exists($propertyName, $this->_propertyDefinitions['query'])) {
-                switch ($queryType) {
-                case 'findAll':
-                case 'find':
-                    $query = 'SELECT * FROM ' . addslashes($this->_metadata->getTableName());
-                    break;
-                case 'insert':
-                    $query = $this->_generateDefaultInsertQuery();
-                    break;
-                case 'delete':
-                    $query = $this->_generateDefaultDeleteQuery();
-                    if (is_null($query)) {
-                        Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_CONFIGURATION,
-                                              'The element [ query ] is required to generate a delete method declaration since the table [ ' . $this->_metadata->getTableName() . ' ] has no primary keys.'
-                                              );
-                        return;
+                do {
+                    if (Piece_ORM_Mapper_QueryType::isFindAll($methodName)
+                        || Piece_ORM_Mapper_QueryType::isFind($methodName)
+                        ) {
+                        $query = 'SELECT * FROM ' . addslashes($this->_metadata->getTableName());
+                        break;
                     }
-                    break;
-                case 'update':
-                    $query = $this->_generateDefaultUpdateQuery();
-                    if (is_null($query)) {
-                        Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_CONFIGURATION,
-                                              'The element [ query ] is required to generate a update method declaration since the table [ ' . $this->_metadata->getTableName() . ' ] has no primary keys.'
-                                              );
-                        return;
+
+                    if (Piece_ORM_Mapper_QueryType::isInsert($methodName)) {
+                        $query = $this->_generateDefaultInsertQuery();
+                        break;
                     }
-                    break;
+
+                    if (Piece_ORM_Mapper_QueryType::isDelete($methodName)) {
+                        $query = $this->_generateDefaultDeleteQuery();
+                        if (is_null($query)) {
+                            Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_CONFIGURATION,
+                                                  'The element [ query ] is required to generate a delete method declaration since the table [ ' . $this->_metadata->getTableName() . ' ] has no primary keys.'
+                                                  );
+                        }
+
+                        break;
+                    }
+
+                    if (Piece_ORM_Mapper_QueryType::isUpdate($methodName)) {
+                        $query = $this->_generateDefaultUpdateQuery();
+                        if (is_null($query)) {
+                            Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_CONFIGURATION,
+                                                  'The element [ query ] is required to generate a update method declaration since the table [ ' . $this->_metadata->getTableName() . ' ] has no primary keys.'
+                                                  );
+                        }
+
+                        break;
+                    }
+
+                    Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_CONFIGURATION,
+                                          "Invalid method name [ $methodName ] detected."
+                                          );
+                } while (false);
+
+                if (Piece_ORM_Error::hasErrors('exception')) {
+                    return;
                 }
             }
         }
@@ -628,37 +637,6 @@ class Piece_ORM_Mapper_Generator
 
         $this->_propertyDefinitions['relationship'][$propertyName] = $this->_generateRelationshipPropertyDeclaration($propertyName, $relationships);
         $this->_propertyDefinitions['orderBy'][$propertyName] = $this->_generateOrderByPropertyDeclaration($propertyName, $orderBy);
-    }
-
-    // }}}
-    // {{{ _getQueryType()
-
-    /**
-     * Gets a query type from the given method name.
-     *
-     * @param string $methodName
-     * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
-     */
-    function _getQueryType($methodName)
-    {
-        if (preg_match('/^findAll.*$/i', $methodName)) {
-            return 'findAll';
-        } elseif (preg_match('/^findOne.+$/i', $methodName)) {
-            return 'findOne';
-        } elseif (preg_match('/^find.+$/i', $methodName)) {
-            return 'find';
-        } elseif (preg_match('/^insert.*$/i', $methodName)) {
-            return 'insert';
-        } elseif (preg_match('/^update.*$/i', $methodName)) {
-            return 'update';
-        } elseif (preg_match('/^delete.*$/i', $methodName)) {
-            return 'delete';
-        } else {
-            Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_CONFIGURATION,
-                                  "Invalid method name [ $methodName ] detected."
-                                  );
-            return;
-        }
     }
 
     // }}}

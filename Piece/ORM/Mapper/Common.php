@@ -42,6 +42,7 @@ require_once 'Piece/ORM/Mapper/ObjectLoader.php';
 require_once 'PEAR.php';
 require_once 'Piece/ORM/Mapper/ObjectPersister.php';
 require_once 'Piece/ORM/Mapper/LOB.php';
+require_once 'Piece/ORM/Mapper/QueryType.php';
 
 // {{{ Piece_ORM_Mapper_Common
 
@@ -442,7 +443,7 @@ class Piece_ORM_Mapper_Common
 
         $result = &$this->executeQuery($query, $isManip, $sth);
 
-        if (preg_match('/^findAll.*$/', $methodName)) {
+        if (Piece_ORM_Mapper_QueryType::isFindAll($methodName)) {
             $this->_lastQueryForGetCount = $queryForGetCount;
         }
 
