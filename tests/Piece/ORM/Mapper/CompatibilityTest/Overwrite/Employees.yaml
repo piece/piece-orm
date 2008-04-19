@@ -22,7 +22,7 @@
       $firstName,
       $lastName,
       'Bar',
-      CURRENT_TIMESTAMP
+      $createdAt
       )
 
 - name: update
@@ -31,7 +31,7 @@
     SET
       first_name = $firstName,
       last_name = $lastName,
-      updated_at = CURRENT_TIMESTAMP
+      updated_at = $updatedAt
     WHERE
       id = $id
       AND note = 'Bar'

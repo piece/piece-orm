@@ -658,6 +658,24 @@ class Piece_ORM_Mapper_Common
             }
         }
 
+        if (Piece_ORM_Mapper_QueryType::isInsert($this->_methodNameForBuildQuery)
+            && $this->_metadata->getDatatype('created_at') == 'timestamp'
+            ) {
+            $createdAtProperty = Piece_ORM_Inflector::camelize('created_at', true);
+            if (array_key_exists($createdAtProperty, $this->_criteriaForBuildQuery)) {
+                $this->_criteriaForBuildQuery->$createdAtProperty = 'CURRENT_TIMESTAMP';
+            }
+        }
+
+        if (Piece_ORM_Mapper_QueryType::isUpdate($this->_methodNameForBuildQuery)
+            && $this->_metadata->getDatatype('updated_at') == 'timestamp'
+            ) {
+            $updatedAtProperty = Piece_ORM_Inflector::camelize('updated_at', true);
+            if (array_key_exists($updatedAtProperty, $this->_criteriaForBuildQuery)) {
+                $this->_criteriaForBuildQuery->$updatedAtProperty = 'CURRENT_TIMESTAMP';
+            }
+        }
+
         $this->_criteriaForBuildQuery->__table = $this->_metadata->getTableName();
 
         extract((array)$this->_criteriaForBuildQuery);

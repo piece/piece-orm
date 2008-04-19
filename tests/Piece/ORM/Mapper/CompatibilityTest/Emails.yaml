@@ -1,16 +1,5 @@
 # $Id$
 
-- name: insert
-  query: |
-    INSERT INTO $__table (
-      email,
-      created_at
-      )
-    VALUES (
-      $email,
-      CURRENT_TIMESTAMP
-      )
-
 # Local Variables:
 # mode: conf-colon
 # coding: iso-8859-1

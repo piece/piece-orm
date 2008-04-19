@@ -29,21 +29,6 @@
         inverseColumn: skills_id
 
 - name: insert
-  query: |
-    INSERT INTO $__table (
-      first_name,
-      last_name,
-      note,
-      departments_id,
-      created_at
-      )
-    VALUES (
-      $firstName,
-      $lastName,
-      $note,
-      $departmentsId,
-      CURRENT_TIMESTAMP
-      )
   relationship:
     - type: manyToMany
       table: skills
@@ -192,19 +177,10 @@
       $firstName,
       $lastName,
       'Bar',
-      CURRENT_TIMESTAMP
+      $createdAt
       )
 
 - name: updateUserDefined
-  query: |
-    UPDATE $__table
-    SET
-      first_name = $firstName,
-      last_name = $lastName,
-      note = $note,
-      updated_at = CURRENT_TIMESTAMP
-    WHERE
-      id = $id
 
 - name: deleteUserDefined
   query: |
@@ -217,7 +193,7 @@
     UPDATE $__table
     SET
       note = $note,
-      updated_at = CURRENT_TIMESTAMP
+      updated_at = $updatedAt
     WHERE
       note = $oldNote
 
@@ -268,21 +244,6 @@
 - name: deleteWithNoQuery
 
 - name: insertWithEmails
-  query: |
-    INSERT INTO $__table (
-      first_name,
-      last_name,
-      note,
-      departments_id,
-      created_at
-      )
-    VALUES (
-      $firstName,
-      $lastName,
-      $note,
-      $departmentsId,
-      CURRENT_TIMESTAMP
-      )
   relationship:
     - type: manyToMany
       table: emails

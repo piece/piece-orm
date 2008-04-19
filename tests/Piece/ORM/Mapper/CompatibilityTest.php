@@ -860,7 +860,9 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
 
         unset($employee1->foo);
         unset($employee1->skills);
+        unset($employee1->updatedAt);
         unset($employee2->skills);
+        unset($employee2->updatedAt);
 
         $this->assertEquals($employee1, $employee2);
     }
@@ -906,7 +908,9 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
 
         unset($department1->employees);
         unset($department1->foo);
+        unset($department1->updatedAt);
         unset($department2->employees);
+        unset($department2->updatedAt);
 
         $this->assertEquals($department1, $department2);
     }
@@ -932,7 +936,9 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         $this->assertEquals('Qux', $employee2->computer->name);
 
         unset($employee1->computer);
+        unset($employee1->updatedAt);
         unset($employee2->computer);
+        unset($employee2->updatedAt);
 
         $this->assertEquals($employee1, $employee2);
 
@@ -948,7 +954,9 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         $this->assertNull($employee2->computer);
 
         unset($employee1->computer);
+        unset($employee1->updatedAt);
         unset($employee2->computer);
+        unset($employee2->updatedAt);
 
         $this->assertEquals($employee1, $employee2);
 
@@ -973,7 +981,9 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
 
         unset($employee1->computer);
         unset($employee1->foo);
+        unset($employee1->updatedAt);
         unset($employee2->computer);
+        unset($employee2->updatedAt);
 
         $this->assertEquals($employee1, $employee2);
     }
@@ -1192,6 +1202,7 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         $subject = &new stdClass();
         $subject->note = 'Baz';
         $subject->oldNote = 'Foo';
+        $subject->updatedAt = null;
         $affectedRows = $mapper->updateNoteByNote($subject);
 
         $this->assertEquals(2, $affectedRows);
@@ -1650,7 +1661,6 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         $mapper = &Piece_ORM_Mapper_Factory::factory('Files');
         $subject = &$mapper->createObject();
         $subject->picture = &$mapper->createLOB("file://$jpegPath");
-        $subject->createdAt = strftime('%Y-%m-%d %H:%M:%S');
         $id = $mapper->insert($subject);
         $file1 = &$mapper->findById($id);
 
@@ -1658,12 +1668,38 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         $this->assertEquals(file_get_contents($jpegPath), $file1->picture->load());
 
         $file1->picture->setSource("file://$pngPath");
-        $file1->updatedAt = strftime('%Y-%m-%d %H:%M:%S');
         $mapper->update($file1);
         $file2 = &$mapper->findById($id);
 
         $this->assertTrue(file_get_contents($jpegPath) != $file2->picture->load());
         $this->assertEquals(file_get_contents($pngPath), $file2->picture->load());
+    }
+
+    /**
+     * @since Method available since Release 1.0.0
+     */
+    function testShouldSetAFunctionToGetTheCurrentTimestampToTheCreatedatPropertyWhenInsert()
+    {
+        $mapper = &Piece_ORM_Mapper_Factory::factory('Employees');
+        $subject = &$mapper->createObject();
+        $subject->firstName = 'Foo';
+        $subject->lastName = 'Bar';
+        $mapper->insert($subject);
+
+        $this->assertTrue(preg_match('/CURRENT_TIMESTAMP/', $mapper->getLastQuery()));
+    }
+
+    /**
+     * @since Method available since Release 1.0.0
+     */
+    function testShouldSetAFunctionToGetTheCurrentTimestampToTheUpdatedatPropertyWhenUpdate()
+    {
+        $id = $this->_insert();
+        $mapper = &Piece_ORM_Mapper_Factory::factory('Employees');
+        $employee = $mapper->findById($id);
+        $mapper->update($employee);
+
+        $this->assertTrue(preg_match('/CURRENT_TIMESTAMP/', $mapper->getLastQuery()));
     }
 
     /**#@-*/

@@ -127,6 +127,11 @@ class Piece_ORM_Mapper_PgsqlTestCase extends Piece_ORM_Mapper_CompatibilityTest
         $this->assertEquals("\x8b\x76\x95\xdb", $employee->lastName);
     }
 
+    /**
+     * @since Method available since Release 1.0.0
+     */
+    function testShouldSetAFunctionToGetTheCurrentTimestampToTheCreatedatPropertyWhenInsert() {}
+
     /**#@-*/
 
     /**#@+
