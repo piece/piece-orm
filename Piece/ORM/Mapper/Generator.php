@@ -753,11 +753,21 @@ class Piece_ORM_Mapper_Generator
                 $whereClause .= " AND $partOfPrimeryKey = \$" . Piece_ORM_Inflector::camelize($partOfPrimeryKey, true);
             }
 
+            if ($this->_metadata->getDatatype('lock_version') == 'integer') {
+                $whereClause .= " AND lock_version = " . $this->generateExpression('lock_version');
+            }
+
             $fields = array();
             foreach ($this->_metadata->getFieldNames() as $fieldName) {
                 if (!$this->_metadata->isAutoIncrement($fieldName)) {
                     if (!$this->_metadata->isPartOfPrimaryKey($fieldName)) {
-                        $fields[] = "$fieldName = " . $this->generateExpression($fieldName);
+                        if (!($fieldName == 'lock_version'
+                              && $this->_metadata->getDatatype('lock_version') == 'integer')
+                            ) {
+                            $fields[] = "$fieldName = " . $this->generateExpression($fieldName);
+                        } else {
+                            $fields[] = "$fieldName = $fieldName + 1";
+                        }
                     }
                 }
             }

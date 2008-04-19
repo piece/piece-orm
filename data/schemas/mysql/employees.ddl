@@ -8,6 +8,7 @@ CREATE TABLE employees (
   departments_id int (11),
   created_at datetime NOT NULL,
   updated_at timestamp,
+  lock_version int NOT NULL DEFAULT '0', 
   PRIMARY KEY (id)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 

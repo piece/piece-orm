@@ -150,6 +150,7 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         $this->assertTrue(array_key_exists('lastName', $employee));
         $this->assertTrue(array_key_exists('note', $employee));
         $this->assertTrue(array_key_exists('departmentsId', $employee));
+        $this->assertTrue(array_key_exists('lockVersion', $employee));
         $this->assertTrue(array_key_exists('createdAt', $employee));
         $this->assertTrue(array_key_exists('updatedAt', $employee));
     }
@@ -178,6 +179,7 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         $this->assertTrue(method_exists($mapper, 'findByLastName'));
         $this->assertTrue(method_exists($mapper, 'findByNote'));
         $this->assertTrue(method_exists($mapper, 'findByDepartmentsId'));
+        $this->assertTrue(method_exists($mapper, 'findByLockVersion'));
         $this->assertFalse(method_exists($mapper, 'findByCreatedAt'));
         $this->assertFalse(method_exists($mapper, 'findByUpdatedAt'));
         $this->assertTrue(method_exists($mapper, 'findAll'));
@@ -186,6 +188,7 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         $this->assertTrue(method_exists($mapper, 'findAllByLastName'));
         $this->assertTrue(method_exists($mapper, 'findAllByNote'));
         $this->assertTrue(method_exists($mapper, 'findAllByDepartmentsId'));
+        $this->assertTrue(method_exists($mapper, 'findAllByLockVersion'));
         $this->assertFalse(method_exists($mapper, 'findAllByCreatedAt'));
         $this->assertFalse(method_exists($mapper, 'findAllByUpdatedAt'));
         $this->assertTrue(method_exists($mapper, 'insert'));
@@ -264,6 +267,7 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
             $this->assertTrue(array_key_exists('lastName', $employee));
             $this->assertTrue(array_key_exists('note', $employee));
             $this->assertTrue(array_key_exists('departmentsId', $employee));
+            $this->assertTrue(array_key_exists('lockVersion', $employee));
             $this->assertTrue(array_key_exists('createdAt', $employee));
             $this->assertTrue(array_key_exists('updatedAt', $employee));
         }
@@ -826,12 +830,13 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         $subject = &$mapper->createObject();
 
         $this->assertEquals(strtolower('stdClass'), strtolower(get_class($subject)));
-        $this->assertEquals(7, count(array_keys((array)($subject))));
+        $this->assertEquals(8, count(array_keys((array)($subject))));
         $this->assertTrue(array_key_exists('id', $subject));
         $this->assertTrue(array_key_exists('firstName', $subject));
         $this->assertTrue(array_key_exists('lastName', $subject));
         $this->assertTrue(array_key_exists('note', $subject));
         $this->assertTrue(array_key_exists('departmentsId', $subject));
+        $this->assertTrue(array_key_exists('lockVersion', $subject));
         $this->assertTrue(array_key_exists('createdAt', $subject));
         $this->assertTrue(array_key_exists('updatedAt', $subject));
     }
@@ -861,8 +866,10 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         unset($employee1->foo);
         unset($employee1->skills);
         unset($employee1->updatedAt);
+        unset($employee1->lockVersion);
         unset($employee2->skills);
         unset($employee2->updatedAt);
+        unset($employee2->lockVersion);
 
         $this->assertEquals($employee1, $employee2);
     }
@@ -937,8 +944,10 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
 
         unset($employee1->computer);
         unset($employee1->updatedAt);
+        unset($employee1->lockVersion);
         unset($employee2->computer);
         unset($employee2->updatedAt);
+        unset($employee2->lockVersion);
 
         $this->assertEquals($employee1, $employee2);
 
@@ -955,8 +964,10 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
 
         unset($employee1->computer);
         unset($employee1->updatedAt);
+        unset($employee1->lockVersion);
         unset($employee2->computer);
         unset($employee2->updatedAt);
+        unset($employee2->lockVersion);
 
         $this->assertEquals($employee1, $employee2);
 
@@ -982,8 +993,10 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         unset($employee1->computer);
         unset($employee1->foo);
         unset($employee1->updatedAt);
+        unset($employee1->lockVersion);
         unset($employee2->computer);
         unset($employee2->updatedAt);
+        unset($employee2->lockVersion);
 
         $this->assertEquals($employee1, $employee2);
     }
@@ -1338,7 +1351,7 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
     {
         $mapper = &Piece_ORM_Mapper_Factory::factory('Employees');
 
-        $this->assertEquals('UPDATE employees SET first_name = $firstName, last_name = $lastName, note = $note, departments_id = $departmentsId, created_at = $createdAt, updated_at = $updatedAt WHERE id = $id', $mapper->__query__updatewithnoquery);
+        $this->assertEquals('UPDATE employees SET first_name = $firstName, last_name = $lastName, note = $note, departments_id = $departmentsId, created_at = $createdAt, updated_at = $updatedAt, lock_version = lock_version + 1 WHERE id = $id AND lock_version = $lockVersion', $mapper->__query__updatewithnoquery);
     }
 
     /**
@@ -1678,7 +1691,7 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
     /**
      * @since Method available since Release 1.0.0
      */
-    function testShouldSetAFunctionToGetTheCurrentTimestampToTheCreatedatPropertyWhenInsert()
+    function testShouldSetAFunctionToGetTheCurrentTimestampToTheCreatedatFieldWhenExecutingInsert()
     {
         $mapper = &Piece_ORM_Mapper_Factory::factory('Employees');
         $subject = &$mapper->createObject();
@@ -1692,14 +1705,44 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
     /**
      * @since Method available since Release 1.0.0
      */
-    function testShouldSetAFunctionToGetTheCurrentTimestampToTheUpdatedatPropertyWhenUpdate()
+    function testShouldSetAFunctionToGetTheCurrentTimestampToTheUpdatedatFieldWhenExecutingUpdate()
     {
         $id = $this->_insert();
         $mapper = &Piece_ORM_Mapper_Factory::factory('Employees');
-        $employee = $mapper->findById($id);
+        $employee = &$mapper->findById($id);
         $mapper->update($employee);
 
         $this->assertTrue(preg_match('/CURRENT_TIMESTAMP/', $mapper->getLastQuery()));
+    }
+
+    /**
+     * @since Method available since Release 1.0.0
+     */
+    function testShouldSupportOptimisticLockingByTheLockversionFieldOnlyInDefaultQueries()
+    {
+        $id = $this->_insert();
+        $mapper = &Piece_ORM_Mapper_Factory::factory('Employees');
+        $employee1 = &$mapper->findById($id);
+        $employee2 = &$mapper->findById($id);
+
+        $this->assertEquals(0, $employee1->lockVersion);
+        $this->assertEquals(0, $employee2->lockVersion);
+
+        $affectedRows = $mapper->update($employee1);
+
+        $this->assertEquals(1, $affectedRows);
+
+        $employee1 = &$mapper->findById($id);
+
+        $this->assertEquals(1, $employee1->lockVersion);
+
+        $affectedRows = $mapper->update($employee2);
+
+        $this->assertEquals(0, $affectedRows);
+
+        $employee2 = &$mapper->findById($id);
+
+        $this->assertEquals(1, $employee2->lockVersion);
     }
 
     /**#@-*/

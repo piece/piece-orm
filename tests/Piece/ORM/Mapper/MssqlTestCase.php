@@ -74,7 +74,7 @@ class Piece_ORM_Mapper_MssqlTestCase extends Piece_ORM_Mapper_CompatibilityTest
     /**
      * @since Method available since Release 1.0.0
      */
-    function testShouldSetAFunctionToGetTheCurrentTimestampToTheCreatedatPropertyWhenInsert() {}
+    function testShouldSetAFunctionToGetTheCurrentTimestampToTheCreatedatFieldWhenExecutingInsert() {}
 
     /**#@-*/
 

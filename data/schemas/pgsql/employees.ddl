@@ -8,6 +8,7 @@ CREATE TABLE employees (
   departments_id int4,
   created_at timestamp with time zone NOT NULL DEFAULT current_timestamp,
   updated_at timestamp with time zone NOT NULL DEFAULT current_timestamp,
+  lock_version int4 NOT NULL DEFAULT '0', 
   PRIMARY KEY (id)
 );
 
