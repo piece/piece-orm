@@ -89,14 +89,21 @@ class Piece_ORM_Mapper_ObjectPersister
      */
     function Piece_ORM_Mapper_ObjectPersister(&$mapper, &$subject, $relationships)
     {
+        $metadata = &$mapper->getMetadata();
+
         if (is_null($subject)) {
             $subject = &new stdClass();
-        }
-        $this->_relationships = $relationships;
-        $this->_metadata = &$mapper->getMetadata();
-        $this->_mapper = &$mapper;
 
-        if (count($this->_relationships)) {
+/*             if ($metadata->getDatatype('created_at') == 'timestamp') { */
+/*                 $subject->{ Piece_ORM_Inflector::camelize('created_at', true) } = null; */
+/*             } */
+
+/*             if ($metadata->getDatatype('updated_at') == 'timestamp') { */
+/*                 $subject->{ Piece_ORM_Inflector::camelize('updated_at', true) } = null; */
+/*             } */
+        }
+
+        if (count($relationships)) {
             foreach (Piece_ORM_Mapper_RelationshipType::getRelationshipTypes() as $relationshipType) {
                 $associatedObjectsPersisterClass = 'Piece_ORM_Mapper_AssociatedObjectPersister_' . ucwords($relationshipType);
                 include_once str_replace('_', '/', $associatedObjectsPersisterClass) . '.php';
@@ -104,7 +111,10 @@ class Piece_ORM_Mapper_ObjectPersister
             }
         }
 
+        $this->_mapper = &$mapper;
         $this->_subject = &$subject;
+        $this->_relationships = $relationships;
+        $this->_metadata = &$metadata;
     }
 
     // }}}

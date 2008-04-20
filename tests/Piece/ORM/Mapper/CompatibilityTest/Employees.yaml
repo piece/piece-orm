@@ -224,7 +224,7 @@
       'Foo',
       'Bar',
       'Baz',
-      CURRENT_TIMESTAMP
+      $createdAt
       )
 
 - name: updateWithStaticQuery
@@ -232,7 +232,7 @@
     UPDATE $__table
     SET
       note = 'Qux',
-      updated_at = CURRENT_TIMESTAMP
+      updated_at = $updatedAt
 
 - name: deleteWithStaticQuery
   query: DELETE FROM $__table
