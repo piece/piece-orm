@@ -202,7 +202,7 @@ class Piece_ORM_Mapper_ObjectPersister
             return;
         }
 
-        if ($this->_metadata->hasPrimaryKey() && !$this->_validatePrimaryKeys()) {
+        if ($this->_metadata->hasPrimaryKey() && !$this->_validatePrimaryValues()) {
             Piece_ORM_Error::push(PIECE_ORM_ERROR_UNEXPECTED_VALUE,
                                   "An unexpected value detected. Correct values are required for the primary keys to invoke $methodName()."
                                   );
@@ -251,7 +251,7 @@ class Piece_ORM_Mapper_ObjectPersister
             return;
         }
 
-        if ($this->_metadata->hasPrimaryKey() && !$this->_validatePrimaryKeys()) {
+        if ($this->_metadata->hasPrimaryKey() && !$this->_validatePrimaryValues()) {
             Piece_ORM_Error::push(PIECE_ORM_ERROR_UNEXPECTED_VALUE,
                                   "An unexpected value detected. Correct values are required for the primary keys to invoke $methodName()."
                                   );
@@ -275,14 +275,14 @@ class Piece_ORM_Mapper_ObjectPersister
      */
 
     // }}}
-    // {{{ _validatePrimaryKeys()
+    // {{{ _validatePrimaryValues()
 
     /**
-     * Returns whether a table has valid primary keys.
+     * Returns whether an object has valid values for primary keys.
      *
      * @return boolean
      */
-    function _validatePrimaryKeys()
+    function _validatePrimaryValues()
     {
         foreach ($this->_metadata->getPrimaryKeys() as $primaryKey) {
             $primaryKeyProperty = Piece_ORM_Inflector::camelize($primaryKey, true);
