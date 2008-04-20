@@ -39,26 +39,34 @@ require_once 'PEAR/PackageFileManager2.php';
 
 PEAR::staticPushErrorHandling(PEAR_ERROR_CALLBACK, create_function('$error', 'var_dump($error); exit();'));
 
-$releaseVersion = '0.8.1';
-$releaseStability = 'beta';
+$releaseVersion = '1.0.0';
+$releaseStability = 'stable';
 $apiVersion = '0.3.0';
-$apiStability = 'beta';
-$notes = 'A new release of Piece_ORM is now available.
+$apiStability = 'stable';
+$notes = 'A new release of Piece_ORM is now available. This is the first stable release of Piece_ORM.
 
-What\'s New in Piece_ORM 0.8.1
+What\'s New in Piece_ORM 1.0.0
 
- * Several Defect Fixes: A defect that caused an error "Fatal error: Cannot redeclare ..." to be raised if there are duplicate method names case insensitive in a configuration and other defects are fixed.
+ * Automatic Timestamp: The current timestamp is set to the createdAt/updatedAt property automatically when insert/update if a table has a created_at/updated_at field.
+ * Optimistic Locking: Optimistic Locking by the lock_version field has been supported only in default queries.
+ * LOB support: The LOB support provides easy-to-use interfaces to handle LOBs using mappers.
+ * Array support: Quotable (scalar or null) values in an array are expanded with a comma in a query.
+ * the useMapperNameAsTableName option: If you want to use a mapper name as a table name, set the useMapperNameAsTableName option to true in the piece-orm-config.yaml.
 
 See the following release notes for details.
 
-Defect Fixes
-============
+Enhancements
+============ 
 
-- Fixed a defect that caused update()/delete() to be failed with a table which has a composite primary key. (Ticket #62) (Piece_ORM_Mapper_Generator)
-- Fixed a defect that caused the result of findXXX()/findAllXXX() to be broken with a table which has a composite primary key. (Ticket #63) (Piece_ORM_Metadata)
-- Fixed a defect that mappers cannot work with a table which includes numbers and underscores in the table name and the column names. (Ticket #65) (Piece_ORM_Inflector)
-- Fixed a defect that caused the result of a finder method call to be broken if the mapper has already used in relationships before. (Ticket #69) (Piece_ORM_Mapper_AssociatedObjectLoader_Common)
-- Fixed a defect that caused an error "Fatal error: Cannot redeclare ..." to be raised if there are duplicate method names case insensitive in a configuration. (Ticket #59) (Piece_ORM_Mapper_Generator)';
+- Added a feature so that quotable (scalar or null) values in an array are expanded with a comma in a query. (Piece_ORM_Mapper_Common)
+- Added a built-in variable $__table which is replaced with an appropriate table name in mapper definition files. (Ticket #67) (Piece_ORM_Mapper_Common)
+- Added a feature so as to use a mapper name as a table name by setting the useMapperNameAsTableName option to true in the piece-orm-config.yaml. (Ticket #71)
+- Removed support for Identity Map.
+- Changed factory() so as to use the given cache directory as is. (Ticket #58) (Piece_ORM_Config_Factory)
+- Changed setConfigDirectory()/setCacheDirectory() to not return the previous value. (Ticket #56) (Piece_ORM_Mapper_Factory, Piece_ORM_Metadata_Factory)
+- Added support for LOB.
+- Added a feature so that a DBMS specific function to get the current timestamp is set to the createdAt/updatedAt property automatically when insert/update. (Ticket #81) (Piece_ORM_Mapper_Common)
+- Added support for Optimistic Locking by the lock_version field only in default queries. (Ticket #84) (Piece_ORM_Mapper_Generator)';
 
 $package = new PEAR_PackageFileManager2();
 $package->setOptions(array('filelistgenerator' => 'file',
@@ -92,8 +100,6 @@ $package->addPackageDepWithChannel('required', 'MDB2', 'pear.php.net', '2.3.0');
 $package->addPackageDepWithChannel('required', 'Cache_Lite', 'pear.php.net', '1.7.0');
 $package->addPackageDepWithChannel('required', 'PEAR', 'pear.php.net', '1.4.3');
 $package->addMaintainer('lead', 'iteman', 'KUBO Atsuhiro', 'iteman@users.sourceforge.net');
-$package->addMaintainer('developer', 'matsufuji', 'MATSUFUJI Hideharu', 'matsufuji@users.sourceforge.net');
-$package->addMaintainer('developer', 'sekky', 'SEKIYAMA Ryusuke', 'sekky@users.sourceforge.net');
 $package->addGlobalReplacement('package-info', '@package_version@', 'version');
 $package->generateContents();
 

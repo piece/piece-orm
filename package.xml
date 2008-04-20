@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<package packagerversion="1.6.2" version="2.0" xmlns="http://pear.php.net/dtd/package-2.0" xmlns:tasks="http://pear.php.net/dtd/tasks-1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://pear.php.net/dtd/tasks-1.0
+<package packagerversion="1.7.1" version="2.0" xmlns="http://pear.php.net/dtd/package-2.0" xmlns:tasks="http://pear.php.net/dtd/tasks-1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://pear.php.net/dtd/tasks-1.0
     http://pear.php.net/dtd/tasks-1.0.xsd
     http://pear.php.net/dtd/package-2.0
     http://pear.php.net/dtd/package-2.0.xsd">
@@ -15,96 +15,77 @@ Piece_ORM is a simple framework based on the DataMapper pattern, and features st
   <email>iteman@users.sourceforge.net</email>
   <active>yes</active>
  </lead>
- <developer>
-  <name>MATSUFUJI Hideharu</name>
-  <user>matsufuji</user>
-  <email>matsufuji@users.sourceforge.net</email>
-  <active>yes</active>
- </developer>
- <developer>
-  <name>SEKIYAMA Ryusuke</name>
-  <user>sekky</user>
-  <email>sekky@users.sourceforge.net</email>
-  <active>yes</active>
- </developer>
- <date>2008-01-13</date>
- <time>07:41:57</time>
+ <date>2008-04-20</date>
+ <time>04:25:58</time>
  <version>
-  <release>0.8.1</release>
+  <release>1.0.0</release>
   <api>0.3.0</api>
  </version>
  <stability>
-  <release>beta</release>
-  <api>beta</api>
+  <release>stable</release>
+  <api>stable</api>
  </stability>
  <license uri="http://www.opensource.org/licenses/bsd-license.php">BSD License (revised)</license>
- <notes>A new release of Piece_ORM is now available.
+ <notes>A new release of Piece_ORM is now available. This is the first stable release of Piece_ORM.
 
-What&apos;s New in Piece_ORM 0.8.1
+What&apos;s New in Piece_ORM 1.0.0
 
- * Several Defect Fixes: A defect that caused an error &quot;Fatal error: Cannot redeclare ...&quot; to be raised if there are duplicate method names case insensitive in a configuration and other defects are fixed.
+ * Automatic Timestamp: The current timestamp is set to the createdAt/updatedAt property automatically when insert/update if a table has a created_at/updated_at field.
+ * Optimistic Locking: Optimistic Locking by the lock_version field has been supported only in default queries.
+ * LOB support: The LOB support provides easy-to-use interfaces to handle LOBs using mappers.
+ * Array support: Quotable (scalar or null) values in an array are expanded with a comma in a query.
+ * the useMapperNameAsTableName option: If you want to use a mapper name as a table name, set the useMapperNameAsTableName option to true in the piece-orm-config.yaml.
 
 See the following release notes for details.
 
-Defect Fixes
-============
+Enhancements
+============ 
 
-- Fixed a defect that caused update()/delete() to be failed with a table which has a composite primary key. (Ticket #62) (Piece_ORM_Mapper_Generator)
-- Fixed a defect that caused the result of findXXX()/findAllXXX() to be broken with a table which has a composite primary key. (Ticket #63) (Piece_ORM_Metadata)
-- Fixed a defect that mappers cannot work with a table which includes numbers and underscores in the table name and the column names. (Ticket #65) (Piece_ORM_Inflector)
-- Fixed a defect that caused the result of a finder method call to be broken if the mapper has already used in relationships before. (Ticket #69) (Piece_ORM_Mapper_AssociatedObjectLoader_Common)
-- Fixed a defect that caused an error &quot;Fatal error: Cannot redeclare ...&quot; to be raised if there are duplicate method names case insensitive in a configuration. (Ticket #59) (Piece_ORM_Mapper_Generator)</notes>
+- Added a feature so that quotable (scalar or null) values in an array are expanded with a comma in a query. (Piece_ORM_Mapper_Common)
+- Added a built-in variable $__table which is replaced with an appropriate table name in mapper definition files. (Ticket #67) (Piece_ORM_Mapper_Common)
+- Added a feature so as to use a mapper name as a table name by setting the useMapperNameAsTableName option to true in the piece-orm-config.yaml. (Ticket #71)
+- Removed support for Identity Map.
+- Changed factory() so as to use the given cache directory as is. (Ticket #58) (Piece_ORM_Config_Factory)
+- Changed setConfigDirectory()/setCacheDirectory() to not return the previous value. (Ticket #56) (Piece_ORM_Mapper_Factory, Piece_ORM_Metadata_Factory)
+- Added support for LOB.
+- Added a feature so that a DBMS specific function to get the current timestamp is set to the createdAt/updatedAt property automatically when insert/update. (Ticket #81) (Piece_ORM_Mapper_Common)
+- Added support for Optimistic Locking by the lock_version field only in default queries. (Ticket #84) (Piece_ORM_Mapper_Generator)</notes>
  <contents>
   <dir baseinstalldir="/" name="/">
    <dir name="data">
     <dir name="schemas">
      <dir name="mssql">
-      <file name="album.ddl" role="data">
-       <tasks:replace from="@package_version@" to="version" type="package-info" />
-      </file>
-      <file name="artist.ddl" role="data">
+      <file name="Case_Sensitive.ddl" role="data">
        <tasks:replace from="@package_version@" to="version" type="package-info" />
       </file>
       <file name="compositeprimarykey.ddl" role="data">
        <tasks:replace from="@package_version@" to="version" type="package-info" />
       </file>
-      <file name="department.ddl" role="data">
+      <file name="computers.ddl" role="data">
        <tasks:replace from="@package_version@" to="version" type="package-info" />
       </file>
-      <file name="email.ddl" role="data">
+      <file name="departments.ddl" role="data">
        <tasks:replace from="@package_version@" to="version" type="package-info" />
       </file>
-      <file name="employee.ddl" role="data">
+      <file name="emails.ddl" role="data">
        <tasks:replace from="@package_version@" to="version" type="package-info" />
       </file>
-      <file name="employee_department.ddl" role="data">
+      <file name="employees.ddl" role="data">
        <tasks:replace from="@package_version@" to="version" type="package-info" />
       </file>
-      <file name="employee_phone.ddl" role="data">
+      <file name="employees_emails.ddl" role="data">
        <tasks:replace from="@package_version@" to="version" type="package-info" />
       </file>
-      <file name="employee_skill.ddl" role="data">
+      <file name="employees_skills.ddl" role="data">
+       <tasks:replace from="@package_version@" to="version" type="package-info" />
+      </file>
+      <file name="files.ddl" role="data">
        <tasks:replace from="@package_version@" to="version" type="package-info" />
       </file>
       <file name="nonprimarykeys.ddl" role="data">
        <tasks:replace from="@package_version@" to="version" type="package-info" />
       </file>
-      <file name="person.ddl" role="data">
-       <tasks:replace from="@package_version@" to="version" type="package-info" />
-      </file>
-      <file name="phone.ddl" role="data">
-       <tasks:replace from="@package_version@" to="version" type="package-info" />
-      </file>
-      <file name="place.ddl" role="data">
-       <tasks:replace from="@package_version@" to="version" type="package-info" />
-      </file>
-      <file name="restaurant.ddl" role="data">
-       <tasks:replace from="@package_version@" to="version" type="package-info" />
-      </file>
-      <file name="service.ddl" role="data">
-       <tasks:replace from="@package_version@" to="version" type="package-info" />
-      </file>
-      <file name="skill.ddl" role="data">
+      <file name="skills.ddl" role="data">
        <tasks:replace from="@package_version@" to="version" type="package-info" />
       </file>
       <file name="unusualname1_2.ddl" role="data">
@@ -121,52 +102,34 @@ Defect Fixes
       </file>
      </dir> <!-- /data/schemas/mssql -->
      <dir name="mysql">
-      <file name="album.ddl" role="data">
-       <tasks:replace from="@package_version@" to="version" type="package-info" />
-      </file>
-      <file name="artist.ddl" role="data">
-       <tasks:replace from="@package_version@" to="version" type="package-info" />
-      </file>
       <file name="compositeprimarykey.ddl" role="data">
        <tasks:replace from="@package_version@" to="version" type="package-info" />
       </file>
-      <file name="department.ddl" role="data">
+      <file name="computers.ddl" role="data">
        <tasks:replace from="@package_version@" to="version" type="package-info" />
       </file>
-      <file name="email.ddl" role="data">
+      <file name="departments.ddl" role="data">
        <tasks:replace from="@package_version@" to="version" type="package-info" />
       </file>
-      <file name="employee.ddl" role="data">
+      <file name="emails.ddl" role="data">
        <tasks:replace from="@package_version@" to="version" type="package-info" />
       </file>
-      <file name="employee_department.ddl" role="data">
+      <file name="employees.ddl" role="data">
        <tasks:replace from="@package_version@" to="version" type="package-info" />
       </file>
-      <file name="employee_phone.ddl" role="data">
+      <file name="employees_emails.ddl" role="data">
        <tasks:replace from="@package_version@" to="version" type="package-info" />
       </file>
-      <file name="employee_skill.ddl" role="data">
+      <file name="employees_skills.ddl" role="data">
+       <tasks:replace from="@package_version@" to="version" type="package-info" />
+      </file>
+      <file name="files.ddl" role="data">
        <tasks:replace from="@package_version@" to="version" type="package-info" />
       </file>
       <file name="nonprimarykeys.ddl" role="data">
        <tasks:replace from="@package_version@" to="version" type="package-info" />
       </file>
-      <file name="person.ddl" role="data">
-       <tasks:replace from="@package_version@" to="version" type="package-info" />
-      </file>
-      <file name="phone.ddl" role="data">
-       <tasks:replace from="@package_version@" to="version" type="package-info" />
-      </file>
-      <file name="place.ddl" role="data">
-       <tasks:replace from="@package_version@" to="version" type="package-info" />
-      </file>
-      <file name="restaurant.ddl" role="data">
-       <tasks:replace from="@package_version@" to="version" type="package-info" />
-      </file>
-      <file name="service.ddl" role="data">
-       <tasks:replace from="@package_version@" to="version" type="package-info" />
-      </file>
-      <file name="skill.ddl" role="data">
+      <file name="skills.ddl" role="data">
        <tasks:replace from="@package_version@" to="version" type="package-info" />
       </file>
       <file name="unusualname1_2.ddl" role="data">
@@ -183,31 +146,31 @@ Defect Fixes
       </file>
      </dir> <!-- /data/schemas/mysql -->
      <dir name="pgsql">
-      <file name="album.ddl" role="data">
-       <tasks:replace from="@package_version@" to="version" type="package-info" />
-      </file>
-      <file name="artist.ddl" role="data">
+      <file name="Case_Sensitive.ddl" role="data">
        <tasks:replace from="@package_version@" to="version" type="package-info" />
       </file>
       <file name="compositeprimarykey.ddl" role="data">
        <tasks:replace from="@package_version@" to="version" type="package-info" />
       </file>
-      <file name="department.ddl" role="data">
+      <file name="computers.ddl" role="data">
        <tasks:replace from="@package_version@" to="version" type="package-info" />
       </file>
-      <file name="email.ddl" role="data">
+      <file name="departments.ddl" role="data">
        <tasks:replace from="@package_version@" to="version" type="package-info" />
       </file>
-      <file name="employee.ddl" role="data">
+      <file name="emails.ddl" role="data">
        <tasks:replace from="@package_version@" to="version" type="package-info" />
       </file>
-      <file name="employee_department.ddl" role="data">
+      <file name="employees.ddl" role="data">
        <tasks:replace from="@package_version@" to="version" type="package-info" />
       </file>
-      <file name="employee_phone.ddl" role="data">
+      <file name="employees_emails.ddl" role="data">
        <tasks:replace from="@package_version@" to="version" type="package-info" />
       </file>
-      <file name="employee_skill.ddl" role="data">
+      <file name="employees_skills.ddl" role="data">
+       <tasks:replace from="@package_version@" to="version" type="package-info" />
+      </file>
+      <file name="files.ddl" role="data">
        <tasks:replace from="@package_version@" to="version" type="package-info" />
       </file>
       <file name="geometric_types.ddl" role="data">
@@ -216,22 +179,7 @@ Defect Fixes
       <file name="nonprimarykeys.ddl" role="data">
        <tasks:replace from="@package_version@" to="version" type="package-info" />
       </file>
-      <file name="person.ddl" role="data">
-       <tasks:replace from="@package_version@" to="version" type="package-info" />
-      </file>
-      <file name="phone.ddl" role="data">
-       <tasks:replace from="@package_version@" to="version" type="package-info" />
-      </file>
-      <file name="place.ddl" role="data">
-       <tasks:replace from="@package_version@" to="version" type="package-info" />
-      </file>
-      <file name="restaurant.ddl" role="data">
-       <tasks:replace from="@package_version@" to="version" type="package-info" />
-      </file>
-      <file name="service.ddl" role="data">
-       <tasks:replace from="@package_version@" to="version" type="package-info" />
-      </file>
-      <file name="skill.ddl" role="data">
+      <file name="skills.ddl" role="data">
        <tasks:replace from="@package_version@" to="version" type="package-info" />
       </file>
       <file name="unusualname1_2.ddl" role="data">
@@ -328,10 +276,16 @@ Defect Fixes
       <file name="Generator.php" role="php">
        <tasks:replace from="@package_version@" to="version" type="package-info" />
       </file>
+      <file name="LOB.php" role="php">
+       <tasks:replace from="@package_version@" to="version" type="package-info" />
+      </file>
       <file name="ObjectLoader.php" role="php">
        <tasks:replace from="@package_version@" to="version" type="package-info" />
       </file>
       <file name="ObjectPersister.php" role="php">
+       <tasks:replace from="@package_version@" to="version" type="package-info" />
+      </file>
+      <file name="QueryType.php" role="php">
        <tasks:replace from="@package_version@" to="version" type="package-info" />
       </file>
       <file name="RelationshipType.php" role="php">
@@ -413,197 +367,81 @@ Defect Fixes
        </file>
       </dir> <!-- /tests/Piece/ORM/Config -->
       <dir name="Mapper">
+       <dir name="CompatibilityTest">
+        <dir name="Overwrite">
+         <file name="Employees.yaml" role="test">
+          <tasks:replace from="@package_version@" to="version" type="package-info" />
+         </file>
+        </dir> <!-- /tests/Piece/ORM/Mapper/CompatibilityTest/Overwrite -->
+        <file name="Case_Sensitive.yaml" role="test">
+         <tasks:replace from="@package_version@" to="version" type="package-info" />
+        </file>
+        <file name="Compositeprimarykey.yaml" role="test">
+         <tasks:replace from="@package_version@" to="version" type="package-info" />
+        </file>
+        <file name="Computers.yaml" role="test">
+         <tasks:replace from="@package_version@" to="version" type="package-info" />
+        </file>
+        <file name="Departments.yaml" role="test">
+         <tasks:replace from="@package_version@" to="version" type="package-info" />
+        </file>
+        <file name="Emails.yaml" role="test">
+         <tasks:replace from="@package_version@" to="version" type="package-info" />
+        </file>
+        <file name="Employees.yaml" role="test">
+         <tasks:replace from="@package_version@" to="version" type="package-info" />
+        </file>
+        <file name="EmployeesEmails.yaml" role="test">
+         <tasks:replace from="@package_version@" to="version" type="package-info" />
+        </file>
+        <file name="EmployeesSkills.yaml" role="test">
+         <tasks:replace from="@package_version@" to="version" type="package-info" />
+        </file>
+        <file name="Files.yaml" role="test">
+         <tasks:replace from="@package_version@" to="version" type="package-info" />
+        </file>
+        <file name="Nonprimarykeys.yaml" role="test">
+         <tasks:replace from="@package_version@" to="version" type="package-info" />
+        </file>
+        <file name="picture.jpg" role="test">
+         <tasks:replace from="@package_version@" to="version" type="package-info" />
+        </file>
+        <file name="picture.png" role="test">
+         <tasks:replace from="@package_version@" to="version" type="package-info" />
+        </file>
+        <file name="Skills.yaml" role="test">
+         <tasks:replace from="@package_version@" to="version" type="package-info" />
+        </file>
+        <file name="Unusualname1_2.yaml" role="test">
+         <tasks:replace from="@package_version@" to="version" type="package-info" />
+        </file>
+        <file name="Unusualname1_2_unusualname_12.yaml" role="test">
+         <tasks:replace from="@package_version@" to="version" type="package-info" />
+        </file>
+        <file name="Unusualname12.yaml" role="test">
+         <tasks:replace from="@package_version@" to="version" type="package-info" />
+        </file>
+        <file name="Unusualname_12.yaml" role="test">
+         <tasks:replace from="@package_version@" to="version" type="package-info" />
+        </file>
+       </dir> <!-- /tests/Piece/ORM/Mapper/CompatibilityTest -->
        <dir name="FactoryTestCase">
         <dir name="CacheIDsShouldUniqueInOneCacheDirectory1">
-         <file name="Person.yaml" role="test">
+         <file name="Employees.yaml" role="test">
           <tasks:replace from="@package_version@" to="version" type="package-info" />
          </file>
         </dir> <!-- /tests/Piece/ORM/Mapper/FactoryTestCase/CacheIDsShouldUniqueInOneCacheDirectory1 -->
         <dir name="CacheIDsShouldUniqueInOneCacheDirectory2">
-         <file name="Person.yaml" role="test">
+         <file name="Employees.yaml" role="test">
           <tasks:replace from="@package_version@" to="version" type="package-info" />
          </file>
         </dir> <!-- /tests/Piece/ORM/Mapper/FactoryTestCase/CacheIDsShouldUniqueInOneCacheDirectory2 -->
-        <file name="Person.yaml" role="test">
+        <file name="Employees.yaml" role="test">
          <tasks:replace from="@package_version@" to="version" type="package-info" />
         </file>
        </dir> <!-- /tests/Piece/ORM/Mapper/FactoryTestCase -->
-       <dir name="MysqlTestCase">
-        <dir name="CaseInsensitive">
-         <file name="Person.yaml" role="test">
-          <tasks:replace from="@package_version@" to="version" type="package-info" />
-         </file>
-        </dir> <!-- /tests/Piece/ORM/Mapper/MysqlTestCase/CaseInsensitive -->
-        <dir name="DuplicateMethodNames">
-         <file name="Person.yaml" role="test">
-          <tasks:replace from="@package_version@" to="version" type="package-info" />
-         </file>
-        </dir> <!-- /tests/Piece/ORM/Mapper/MysqlTestCase/DuplicateMethodNames -->
-        <dir name="ManyToManyRelationships">
-         <file name="Department.yaml" role="test">
-          <tasks:replace from="@package_version@" to="version" type="package-info" />
-         </file>
-         <file name="Employee.yaml" role="test">
-          <tasks:replace from="@package_version@" to="version" type="package-info" />
-         </file>
-         <file name="EmployeeDepartment.yaml" role="test">
-          <tasks:replace from="@package_version@" to="version" type="package-info" />
-         </file>
-         <file name="EmployeePhone.yaml" role="test">
-          <tasks:replace from="@package_version@" to="version" type="package-info" />
-         </file>
-         <file name="EmployeeSkill.yaml" role="test">
-          <tasks:replace from="@package_version@" to="version" type="package-info" />
-         </file>
-         <file name="Phone.yaml" role="test">
-          <tasks:replace from="@package_version@" to="version" type="package-info" />
-         </file>
-         <file name="Skill.yaml" role="test">
-          <tasks:replace from="@package_version@" to="version" type="package-info" />
-         </file>
-        </dir> <!-- /tests/Piece/ORM/Mapper/MysqlTestCase/ManyToManyRelationships -->
-        <dir name="OneToManyRelationships">
-         <file name="Album.yaml" role="test">
-          <tasks:replace from="@package_version@" to="version" type="package-info" />
-         </file>
-         <file name="Artist.yaml" role="test">
-          <tasks:replace from="@package_version@" to="version" type="package-info" />
-         </file>
-        </dir> <!-- /tests/Piece/ORM/Mapper/MysqlTestCase/OneToManyRelationships -->
-        <dir name="OneToOneRelationships">
-         <file name="Place.yaml" role="test">
-          <tasks:replace from="@package_version@" to="version" type="package-info" />
-         </file>
-         <file name="Restaurant.yaml" role="test">
-          <tasks:replace from="@package_version@" to="version" type="package-info" />
-         </file>
-        </dir> <!-- /tests/Piece/ORM/Mapper/MysqlTestCase/OneToOneRelationships -->
-        <dir name="Overwrite">
-         <file name="Person.yaml" role="test">
-          <tasks:replace from="@package_version@" to="version" type="package-info" />
-         </file>
-        </dir> <!-- /tests/Piece/ORM/Mapper/MysqlTestCase/Overwrite -->
-        <dir name="UserDefined">
-         <file name="Person.yaml" role="test">
-          <tasks:replace from="@package_version@" to="version" type="package-info" />
-         </file>
-        </dir> <!-- /tests/Piece/ORM/Mapper/MysqlTestCase/UserDefined -->
-        <file name="Compositeprimarykey.yaml" role="test">
-         <tasks:replace from="@package_version@" to="version" type="package-info" />
-        </file>
-        <file name="Email.yaml" role="test">
-         <tasks:replace from="@package_version@" to="version" type="package-info" />
-        </file>
-        <file name="Nonprimarykeys.yaml" role="test">
-         <tasks:replace from="@package_version@" to="version" type="package-info" />
-        </file>
-        <file name="Person.yaml" role="test">
-         <tasks:replace from="@package_version@" to="version" type="package-info" />
-        </file>
-        <file name="Service.yaml" role="test">
-         <tasks:replace from="@package_version@" to="version" type="package-info" />
-        </file>
-        <file name="Unusualname1_2.yaml" role="test">
-         <tasks:replace from="@package_version@" to="version" type="package-info" />
-        </file>
-        <file name="Unusualname1_2_unusualname_12.yaml" role="test">
-         <tasks:replace from="@package_version@" to="version" type="package-info" />
-        </file>
-        <file name="Unusualname12.yaml" role="test">
-         <tasks:replace from="@package_version@" to="version" type="package-info" />
-        </file>
-        <file name="Unusualname_12.yaml" role="test">
-         <tasks:replace from="@package_version@" to="version" type="package-info" />
-        </file>
-       </dir> <!-- /tests/Piece/ORM/Mapper/MysqlTestCase -->
        <dir name="PgsqlTestCase">
-        <dir name="CaseInsensitive">
-         <file name="Person.yaml" role="test">
-          <tasks:replace from="@package_version@" to="version" type="package-info" />
-         </file>
-        </dir> <!-- /tests/Piece/ORM/Mapper/PgsqlTestCase/CaseInsensitive -->
-        <dir name="DuplicateMethodNames">
-         <file name="Person.yaml" role="test">
-          <tasks:replace from="@package_version@" to="version" type="package-info" />
-         </file>
-        </dir> <!-- /tests/Piece/ORM/Mapper/PgsqlTestCase/DuplicateMethodNames -->
-        <dir name="ManyToManyRelationships">
-         <file name="Department.yaml" role="test">
-          <tasks:replace from="@package_version@" to="version" type="package-info" />
-         </file>
-         <file name="Employee.yaml" role="test">
-          <tasks:replace from="@package_version@" to="version" type="package-info" />
-         </file>
-         <file name="EmployeeDepartment.yaml" role="test">
-          <tasks:replace from="@package_version@" to="version" type="package-info" />
-         </file>
-         <file name="EmployeePhone.yaml" role="test">
-          <tasks:replace from="@package_version@" to="version" type="package-info" />
-         </file>
-         <file name="EmployeeSkill.yaml" role="test">
-          <tasks:replace from="@package_version@" to="version" type="package-info" />
-         </file>
-         <file name="Phone.yaml" role="test">
-          <tasks:replace from="@package_version@" to="version" type="package-info" />
-         </file>
-         <file name="Skill.yaml" role="test">
-          <tasks:replace from="@package_version@" to="version" type="package-info" />
-         </file>
-        </dir> <!-- /tests/Piece/ORM/Mapper/PgsqlTestCase/ManyToManyRelationships -->
-        <dir name="OneToManyRelationships">
-         <file name="Album.yaml" role="test">
-          <tasks:replace from="@package_version@" to="version" type="package-info" />
-         </file>
-         <file name="Artist.yaml" role="test">
-          <tasks:replace from="@package_version@" to="version" type="package-info" />
-         </file>
-        </dir> <!-- /tests/Piece/ORM/Mapper/PgsqlTestCase/OneToManyRelationships -->
-        <dir name="OneToOneRelationships">
-         <file name="Place.yaml" role="test">
-          <tasks:replace from="@package_version@" to="version" type="package-info" />
-         </file>
-         <file name="Restaurant.yaml" role="test">
-          <tasks:replace from="@package_version@" to="version" type="package-info" />
-         </file>
-        </dir> <!-- /tests/Piece/ORM/Mapper/PgsqlTestCase/OneToOneRelationships -->
-        <dir name="Overwrite">
-         <file name="Person.yaml" role="test">
-          <tasks:replace from="@package_version@" to="version" type="package-info" />
-         </file>
-        </dir> <!-- /tests/Piece/ORM/Mapper/PgsqlTestCase/Overwrite -->
-        <dir name="UserDefined">
-         <file name="Person.yaml" role="test">
-          <tasks:replace from="@package_version@" to="version" type="package-info" />
-         </file>
-        </dir> <!-- /tests/Piece/ORM/Mapper/PgsqlTestCase/UserDefined -->
-        <file name="Compositeprimarykey.yaml" role="test">
-         <tasks:replace from="@package_version@" to="version" type="package-info" />
-        </file>
-        <file name="Email.yaml" role="test">
-         <tasks:replace from="@package_version@" to="version" type="package-info" />
-        </file>
         <file name="GeometricTypes.yaml" role="test">
-         <tasks:replace from="@package_version@" to="version" type="package-info" />
-        </file>
-        <file name="Nonprimarykeys.yaml" role="test">
-         <tasks:replace from="@package_version@" to="version" type="package-info" />
-        </file>
-        <file name="Person.yaml" role="test">
-         <tasks:replace from="@package_version@" to="version" type="package-info" />
-        </file>
-        <file name="Service.yaml" role="test">
-         <tasks:replace from="@package_version@" to="version" type="package-info" />
-        </file>
-        <file name="Unusualname1_2.yaml" role="test">
-         <tasks:replace from="@package_version@" to="version" type="package-info" />
-        </file>
-        <file name="Unusualname1_2_unusualname_12.yaml" role="test">
-         <tasks:replace from="@package_version@" to="version" type="package-info" />
-        </file>
-        <file name="Unusualname12.yaml" role="test">
-         <tasks:replace from="@package_version@" to="version" type="package-info" />
-        </file>
-        <file name="Unusualname_12.yaml" role="test">
          <tasks:replace from="@package_version@" to="version" type="package-info" />
         </file>
        </dir> <!-- /tests/Piece/ORM/Mapper/PgsqlTestCase -->
@@ -641,7 +479,10 @@ Defect Fixes
         <tasks:replace from="@package_version@" to="version" type="package-info" />
        </file>
       </dir> <!-- /tests/Piece/ORMTestCase/SetDatabase -->
-      <file name="Person.yaml" role="test">
+      <file name="Case_Sensitive.yaml" role="test">
+       <tasks:replace from="@package_version@" to="version" type="package-info" />
+      </file>
+      <file name="Employees.yaml" role="test">
        <tasks:replace from="@package_version@" to="version" type="package-info" />
       </file>
       <file name="piece-orm-config.yaml" role="test">
@@ -685,6 +526,42 @@ Defect Fixes
  </dependencies>
  <phprelease />
  <changelog>
+  <release>
+   <version>
+    <release>1.0.0</release>
+    <api>0.3.0</api>
+   </version>
+   <stability>
+    <release>stable</release>
+    <api>stable</api>
+   </stability>
+   <date>2008-04-20</date>
+   <license uri="http://www.opensource.org/licenses/bsd-license.php">BSD License (revised)</license>
+   <notes>A new release of Piece_ORM is now available. This is the first stable release of Piece_ORM.
+
+What&apos;s New in Piece_ORM 1.0.0
+
+ * Automatic Timestamp: The current timestamp is set to the createdAt/updatedAt property automatically when insert/update if a table has a created_at/updated_at field.
+ * Optimistic Locking: Optimistic Locking by the lock_version field has been supported only in default queries.
+ * LOB support: The LOB support provides easy-to-use interfaces to handle LOBs using mappers.
+ * Array support: Quotable (scalar or null) values in an array are expanded with a comma in a query.
+ * the useMapperNameAsTableName option: If you want to use a mapper name as a table name, set the useMapperNameAsTableName option to true in the piece-orm-config.yaml.
+
+See the following release notes for details.
+
+Enhancements
+============ 
+
+- Added a feature so that quotable (scalar or null) values in an array are expanded with a comma in a query. (Piece_ORM_Mapper_Common)
+- Added a built-in variable $__table which is replaced with an appropriate table name in mapper definition files. (Ticket #67) (Piece_ORM_Mapper_Common)
+- Added a feature so as to use a mapper name as a table name by setting the useMapperNameAsTableName option to true in the piece-orm-config.yaml. (Ticket #71)
+- Removed support for Identity Map.
+- Changed factory() so as to use the given cache directory as is. (Ticket #58) (Piece_ORM_Config_Factory)
+- Changed setConfigDirectory()/setCacheDirectory() to not return the previous value. (Ticket #56) (Piece_ORM_Mapper_Factory, Piece_ORM_Metadata_Factory)
+- Added support for LOB.
+- Added a feature so that a DBMS specific function to get the current timestamp is set to the createdAt/updatedAt property automatically when insert/update. (Ticket #81) (Piece_ORM_Mapper_Common)
+- Added support for Optimistic Locking by the lock_version field only in default queries. (Ticket #84) (Piece_ORM_Mapper_Generator)</notes>
+  </release>
   <release>
    <version>
     <release>0.8.1</release>
