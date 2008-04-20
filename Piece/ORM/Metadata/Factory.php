@@ -47,7 +47,7 @@ require_once 'Piece/ORM/Env.php';
 // {{{ GLOBALS
 
 $GLOBALS['PIECE_ORM_Metadata_Instances'] = array();
-$GLOBALS['PIECE_ORM_Metadata_CacheDirectory'] = './cache';
+$GLOBALS['PIECE_ORM_Metadata_CacheDirectory'] = null;
 
 // }}}
 // {{{ Piece_ORM_Metadata_Factory
