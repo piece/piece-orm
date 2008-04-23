@@ -233,9 +233,7 @@ class Piece_ORM_Context
                 $dbh->options['quote_identifier'] = true;
             }
 
-            if ($dbh->options['portability'] & MDB2_PORTABILITY_FIX_CASE) {
-                $dbh->options['portability'] -= MDB2_PORTABILITY_FIX_CASE;
-            }
+            $dbh->options['portability'] &= ~MDB2_PORTABILITY_FIX_CASE;
         }
 
         return $dbh;
