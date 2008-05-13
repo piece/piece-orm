@@ -1787,15 +1787,12 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
 
         $computer1 = &$computersMapper->createObject();
         $computer1->name = 'Foo';
-        $computersMapper->insert($computer1);
 
         $computer2 = &$computersMapper->createObject();
         $computer2->name = 'Bar';
-        $computersMapper->insert($computer2);
 
         $computer3 = &$computersMapper->createObject();
         $computer3->name = 'Baz';
-        $computersMapper->insert($computer3);
 
         $employeesMapper = &Piece_ORM_Mapper_Factory::factory('Employees');
 
