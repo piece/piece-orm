@@ -398,6 +398,7 @@ class Piece_ORM_Mapper_Common
             } elseif (!is_null($this->{ '__orderBy__' . strtolower($methodName) })) {
                 $query .= ' ORDER BY ' . $this->{ '__orderBy__' . strtolower($methodName) };
             }
+
             $this->_orders = array();
         }
 
@@ -410,27 +411,34 @@ class Piece_ORM_Mapper_Common
             ) {
             $placeHolders = array();
             foreach ($allMatches as $matches) {
-                if (!$this->_metadata->isLOB($matches[1])) {
-                    $placeHolders[ $matches[1] ] = null;
-                    continue;
-                }
+                do {
+                    $placeHolderField = $matches[1];
+                    if (!$this->_metadata->isLOB($placeHolderField)) {
+                        break;
+                    }
 
-                if (!array_key_exists(Piece_ORM_Inflector::camelize($matches[1], true), $criteria)) {
-                    $placeHolders[ $matches[1] ] = null;
-                    continue;
-                }
+                    $placeHolderProperty =
+                        Piece_ORM_Inflector::camelize($placeHolderField, true);
+                    if (!array_key_exists($placeHolderProperty, $criteria)) {
+                        break;
+                    }
 
-                if (is_null($criteria->{ Piece_ORM_Inflector::camelize($matches[1], true) })) {
-                    $placeHolders[ $matches[1] ] = null;
-                    continue;
-                }
+                    if (is_null($criteria->$placeHolderProperty)) {
+                        break;
+                    }
 
-                if (strtolower(get_class($criteria->{ Piece_ORM_Inflector::camelize($matches[1], true) })) != strtolower('Piece_ORM_Mapper_LOB')) {
-                    $placeHolders[ $matches[1] ] = null;
-                    continue;
-                }
+                    if (strtolower(get_class($criteria->$placeHolderProperty)) !=
+                        strtolower('Piece_ORM_Mapper_LOB')
+                        ) {
+                        break;
+                    }
 
-                $placeHolders[ $matches[1] ] = $this->_metadata->getDatatype($matches[1]);
+                    $placeHolders[$placeHolderField] =
+                        $this->_metadata->getDatatype($placeHolderField);
+                    continue 2;
+                } while (false);
+
+                $placeHolders[$placeHolderField] = null;
             }
 
             PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
@@ -447,9 +455,10 @@ class Piece_ORM_Mapper_Common
 
             foreach ($placeHolders as $placeHolder => $type) {
                 if (!is_null($type)) {
-                    $value = $criteria->{ Piece_ORM_Inflector::camelize($placeHolder, true) }->getSource();
+                    $placeHolderProperty = Piece_ORM_Inflector::camelize($placeHolder, true);
+                    $value = $criteria->$placeHolderProperty->getSource();
                     if (is_null($value)) {
-                        $value = $criteria->{ Piece_ORM_Inflector::camelize($placeHolder, true) }->getValue();
+                        $value = $criteria->$placeHolderProperty->getValue();
                     }
                 } else {
                     $value = null;
