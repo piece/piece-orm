@@ -27,7 +27,7 @@
 ######################################################################
 
 name: piece-orm
-desc: Piece_ORM 1.0.0 Configuration DSL Schema Definition
+desc: The Piece_ORM 1.0.0 Configuration DSL Definition
 type: seq
 required: yes
 sequence:
@@ -40,8 +40,7 @@ sequence:
         type: map
         required: no
         mapping:
-          "debug": { type: int, required: no }
-          "result_buffering": { type: bool, required: no }
+          =: { type: any, required: yes }
       "directorySuffix": { type: str, required: no }
       "useMapperNameAsTableName": { type: bool, required: no }
 
