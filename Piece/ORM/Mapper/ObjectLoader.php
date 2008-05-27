@@ -167,6 +167,8 @@ class Piece_ORM_Mapper_ObjectLoader
         foreach ($row as $fieldName => $value) {
             if (!$this->_metadata->isLOB($fieldName)) {
                 $object->{ Piece_ORM_Inflector::camelize($fieldName, true) } = $value;
+            } elseif (is_null($value)) {
+                $object->{ Piece_ORM_Inflector::camelize($fieldName, true) } = null;
             } else {
                 $lob = &$this->_mapper->createLOB();
                 $lob->setFieldName($fieldName);
