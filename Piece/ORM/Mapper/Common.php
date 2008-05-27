@@ -402,69 +402,26 @@ class Piece_ORM_Mapper_Common
             $this->_orders = array();
         }
 
-        $sth = null;
-        if ($isManip
-            && preg_match_all('/:(\w+)/',
-                              $this->{ '__query__' . strtolower($methodName) },
-                              $allMatches,
-                              PREG_SET_ORDER)
+        if (!$isManip
+            || !preg_match_all('/:(\w+)/',
+                               $this->{ '__query__' . strtolower($methodName) },
+                               $allMatches,
+                               PREG_SET_ORDER)
             ) {
-            $placeHolders = array();
+            $sth = null;
+        } else {
+            $placeHolderFields = array();
             foreach ($allMatches as $matches) {
-                do {
-                    $placeHolderField = $matches[1];
-                    if (!$this->_metadata->isLOB($placeHolderField)) {
-                        break;
-                    }
-
-                    $placeHolderProperty =
-                        Piece_ORM_Inflector::camelize($placeHolderField, true);
-                    if (!array_key_exists($placeHolderProperty, $criteria)) {
-                        break;
-                    }
-
-                    if (is_null($criteria->$placeHolderProperty)) {
-                        break;
-                    }
-
-                    if (strtolower(get_class($criteria->$placeHolderProperty)) !=
-                        strtolower('Piece_ORM_Mapper_LOB')
-                        ) {
-                        break;
-                    }
-
-                    $placeHolders[$placeHolderField] =
-                        $this->_metadata->getDatatype($placeHolderField);
-                    continue 2;
-                } while (false);
-
-                $placeHolders[$placeHolderField] = null;
+                $placeHolderFields[] = $matches[1];
             }
 
-            PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
-            $sth = $this->_dbh->prepare($query, $placeHolders, MDB2_PREPARE_MANIP);
-            PEAR::staticPopErrorHandling();
-            if (MDB2::isError($sth)) {
-                Piece_ORM_Error::pushPEARError($sth,
-                                               PIECE_ORM_ERROR_INVOCATION_FAILED,
-                                               "Failed to invoke MDB2_Driver_{$this->_dbh->phptype}::prepare() for any reasons."
-                                               );
+            $sth = &$this->_buildPreparedStatement($criteria,
+                                                   $query,
+                                                   $placeHolderFields
+                                                   );
+            if (Piece_ORM_Error::hasErrors('exception')) {
                 $return = null;
                 return $return;
-            }
-
-            foreach ($placeHolders as $placeHolder => $type) {
-                if (!is_null($type)) {
-                    $placeHolderProperty = Piece_ORM_Inflector::camelize($placeHolder, true);
-                    $value = $criteria->$placeHolderProperty->getSource();
-                    if (is_null($value)) {
-                        $value = $criteria->$placeHolderProperty->getValue();
-                    }
-                } else {
-                    $value = null;
-                }
-
-                $sth->bindParam(":$placeHolder", $value, $type);
             }
         }
 
@@ -966,6 +923,80 @@ class Piece_ORM_Mapper_Common
     {
         $persister = &new Piece_ORM_Mapper_ObjectPersister($this, $subject, $this->{ '__relationship__' . strtolower($methodName) });
         return $persister->update($methodName);
+    }
+
+    // }}}
+    // {{{ _buildPreparedStatement()
+
+    /**
+     * Builds a prepared statement for LOB on insert()/update().
+     *
+     * @param stdClass $criteria
+     * @param string   $query
+     * @param array    $placeHolderFields
+     * @return MDB2_Statement_Common
+     * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
+     */
+    function &_buildPreparedStatement($criteria, $query, $placeHolderFields)
+    {
+        $placeHolders = array();
+        foreach ($placeHolderFields as $placeHolderField) {
+            do {
+                if (!$this->_metadata->isLOB($placeHolderField)) {
+                    break;
+                }
+
+                $placeHolderProperty =
+                    Piece_ORM_Inflector::camelize($placeHolderField, true);
+                if (!array_key_exists($placeHolderProperty, $criteria)) {
+                    break;
+                }
+
+                if (is_null($criteria->$placeHolderProperty)) {
+                    break;
+                }
+
+                if (strtolower(get_class($criteria->$placeHolderProperty)) !=
+                    strtolower('Piece_ORM_Mapper_LOB')
+                    ) {
+                    break;
+                }
+
+                $placeHolders[$placeHolderField] =
+                    $this->_metadata->getDatatype($placeHolderField);
+                continue 2;
+            } while (false);
+
+            $placeHolders[$placeHolderField] = null;
+        }
+
+        PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
+        $sth = $this->_dbh->prepare($query, $placeHolders, MDB2_PREPARE_MANIP);
+        PEAR::staticPopErrorHandling();
+        if (MDB2::isError($sth)) {
+            Piece_ORM_Error::pushPEARError($sth,
+                                           PIECE_ORM_ERROR_INVOCATION_FAILED,
+                                           "Failed to invoke MDB2_Driver_{$this->_dbh->phptype}::prepare() for any reasons."
+                                           );
+            $return = null;
+            return $return;
+        }
+
+        foreach ($placeHolders as $placeHolder => $type) {
+            if (!is_null($type)) {
+                $placeHolderProperty = Piece_ORM_Inflector::camelize($placeHolder, true);
+                $value = $criteria->$placeHolderProperty->getSource();
+                if (is_null($value)) {
+                    $value = $criteria->$placeHolderProperty->getValue();
+                }
+            } else {
+                $value = null;
+            }
+
+            $sth->bindParam(":$placeHolder", $value, $type);
+        }
+
+        return $sth;
     }
 
     /**#@-*/
