@@ -1745,6 +1745,20 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         $this->assertEquals(1, $employee2->lockVersion);
     }
 
+    /**
+     * @since Method available since Release 1.1.0
+     */
+    function testShouldWorkWithNullLobFields()
+    {
+        $jpegPath = "{$this->_cacheDirectory}/picture.jpg";
+        $mapper = &Piece_ORM_Mapper_Factory::factory('Files');
+        $subject = &$mapper->createObject();
+        $id = $mapper->insert($subject);
+        $file = &$mapper->findById($id);
+
+        $this->assertNull($file->picture);
+    }
+
     /**#@-*/
 
     /**#@+

@@ -408,21 +408,33 @@ class Piece_ORM_Mapper_Common
                               $allMatches,
                               PREG_SET_ORDER)
             ) {
-            $types = array();
+            $placeHolders = array();
             foreach ($allMatches as $matches) {
                 if (!$this->_metadata->isLOB($matches[1])) {
+                    $placeHolders[ $matches[1] ] = null;
                     continue;
                 }
 
                 if (!array_key_exists(Piece_ORM_Inflector::camelize($matches[1], true), $criteria)) {
+                    $placeHolders[ $matches[1] ] = null;
                     continue;
                 }
 
-                $types[ $matches[1] ] = $this->_metadata->getDatatype($matches[1]);
+                if (is_null($criteria->{ Piece_ORM_Inflector::camelize($matches[1], true) })) {
+                    $placeHolders[ $matches[1] ] = null;
+                    continue;
+                }
+
+                if (strtolower(get_class($criteria->{ Piece_ORM_Inflector::camelize($matches[1], true) })) != strtolower('Piece_ORM_Mapper_LOB')) {
+                    $placeHolders[ $matches[1] ] = null;
+                    continue;
+                }
+
+                $placeHolders[ $matches[1] ] = $this->_metadata->getDatatype($matches[1]);
             }
 
             PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
-            $sth = $this->_dbh->prepare($query, $types, MDB2_PREPARE_MANIP);
+            $sth = $this->_dbh->prepare($query, $placeHolders, MDB2_PREPARE_MANIP);
             PEAR::staticPopErrorHandling();
             if (MDB2::isError($sth)) {
                 Piece_ORM_Error::pushPEARError($sth,
@@ -433,11 +445,10 @@ class Piece_ORM_Mapper_Common
                 return $return;
             }
 
-            foreach (array_keys($types) as $fieldName) {
-                $sth->bindParam(":$fieldName",
-                                $criteria->{ Piece_ORM_Inflector::camelize($fieldName, true) }->getSource(),
-                                $types[$fieldName]
-                                );
+            foreach ($placeHolders as $placeHolder => $type) {
+                $value = !is_null($type) ? $criteria->{ Piece_ORM_Inflector::camelize($placeHolder, true) }->getSource()
+                                         : null;
+                $sth->bindParam(":$placeHolder", $value, $type);
             }
         }
 
