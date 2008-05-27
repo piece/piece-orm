@@ -446,8 +446,15 @@ class Piece_ORM_Mapper_Common
             }
 
             foreach ($placeHolders as $placeHolder => $type) {
-                $value = !is_null($type) ? $criteria->{ Piece_ORM_Inflector::camelize($placeHolder, true) }->getSource()
-                                         : null;
+                if (!is_null($type)) {
+                    $value = $criteria->{ Piece_ORM_Inflector::camelize($placeHolder, true) }->getSource();
+                    if (is_null($value)) {
+                        $value = $criteria->{ Piece_ORM_Inflector::camelize($placeHolder, true) }->getValue();
+                    }
+                } else {
+                    $value = null;
+                }
+
                 $sth->bindParam(":$placeHolder", $value, $type);
             }
         }

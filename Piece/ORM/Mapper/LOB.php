@@ -183,7 +183,6 @@ class Piece_ORM_Mapper_LOB
             }
 
             $datatype->destroyLOB($lob);
-            $this->_value = null;
         }
 
         return $this->_data;
@@ -200,6 +199,19 @@ class Piece_ORM_Mapper_LOB
     function setSource($source)
     {
         $this->_source = $source;
+    }
+
+    // }}}
+    // {{{ getValue()
+
+    /**
+     * Gets the escaped value of this field.
+     *
+     * @param string $value
+     */
+    function getValue()
+    {
+        return $this->_value;
     }
 
     /**#@-*/
