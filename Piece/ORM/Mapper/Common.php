@@ -939,39 +939,14 @@ class Piece_ORM_Mapper_Common
      */
     function &_buildPreparedStatement($criteria, $query, $placeHolderFields)
     {
-        $placeHolders = array();
+        $types = array();
         foreach ($placeHolderFields as $placeHolderField) {
-            do {
-                if (!$this->_metadata->isLOB($placeHolderField)) {
-                    break;
-                }
-
-                $placeHolderProperty =
-                    Piece_ORM_Inflector::camelize($placeHolderField, true);
-                if (!array_key_exists($placeHolderProperty, $criteria)) {
-                    break;
-                }
-
-                if (is_null($criteria->$placeHolderProperty)) {
-                    break;
-                }
-
-                if (strtolower(get_class($criteria->$placeHolderProperty)) !=
-                    strtolower('Piece_ORM_Mapper_LOB')
-                    ) {
-                    break;
-                }
-
-                $placeHolders[$placeHolderField] =
-                    $this->_metadata->getDatatype($placeHolderField);
-                continue 2;
-            } while (false);
-
-            $placeHolders[$placeHolderField] = null;
+            $types[$placeHolderField] =
+                $this->_metadata->getDatatype($placeHolderField);
         }
 
         PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
-        $sth = $this->_dbh->prepare($query, $placeHolders, MDB2_PREPARE_MANIP);
+        $sth = $this->_dbh->prepare($query, $types, MDB2_PREPARE_MANIP);
         PEAR::staticPopErrorHandling();
         if (MDB2::isError($sth)) {
             Piece_ORM_Error::pushPEARError($sth,
@@ -982,18 +957,31 @@ class Piece_ORM_Mapper_Common
             return $return;
         }
 
-        foreach ($placeHolders as $placeHolder => $type) {
-            if (!is_null($type)) {
-                $placeHolderProperty = Piece_ORM_Inflector::camelize($placeHolder, true);
-                $value = $criteria->$placeHolderProperty->getSource();
-                if (is_null($value)) {
-                    $value = $criteria->$placeHolderProperty->getValue();
-                }
-            } else {
+        foreach ($types as $placeHolderField => $type) {
+            $placeHolderProperty =
+                Piece_ORM_Inflector::camelize($placeHolderField, true);
+            if (!array_key_exists($placeHolderProperty, $criteria)) {
                 $value = null;
+            } elseif (is_null($criteria->$placeHolderProperty)) {
+                $value = null;
+            } else {
+                if ($type == 'blob' || $type == 'clob') {
+                    if (is_object($criteria->$placeHolderProperty)
+                        && (strtolower(get_class($criteria->$placeHolderProperty)) == strtolower('Piece_ORM_Mapper_LOB'))
+                        ) {
+                        $value = $criteria->$placeHolderProperty->getSource();
+                        if (is_null($value)) {
+                            $value = $criteria->$placeHolderProperty->getValue();
+                        }
+                    } else {
+                        $value = null;
+                    }
+                } else {
+                    $value = $criteria->$placeHolderProperty;
+                }
             }
 
-            $sth->bindParam(":$placeHolder", $value, $type);
+            $sth->bindParam(":$placeHolderField", $value, $type);
         }
 
         return $sth;
