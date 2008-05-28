@@ -65,7 +65,6 @@ class Piece_ORM_Mapper_LOB
     var $_source;
     var $_value;
     var $_dbh;
-    var $_data;
     var $_metadata;
 
     /**#@-*/
@@ -145,47 +144,45 @@ class Piece_ORM_Mapper_LOB
      */
     function load()
     {
-        if (is_null($this->_data)) {
-            PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
-            $datatype = &$this->_dbh->loadModule('Datatype');
-            PEAR::staticPopErrorHandling();
-            if (MDB2::isError($datatype)) {
-                Piece_ORM_Error::pushPEARError($datatype,
-                                               PIECE_ORM_ERROR_INVOCATION_FAILED,
-                                               'Failed to invoke $dbh->loadModule() for any reasons.'
-                                               );
-                return;
-            }
-
-            PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
-            $lob = $datatype->convertResult($this->_value,
-                                            $this->_metadata->getDatatype($this->_fieldName)
-                                            );
-            PEAR::staticPopErrorHandling();
-            if (MDB2::isError($lob)) {
-                Piece_ORM_Error::pushPEARError($lob,
-                                               PIECE_ORM_ERROR_INVOCATION_FAILED,
-                                               'Failed to invoke $datatype->convertResult() for any reasons.'
-                                               );
-                return;
-            }
-
-            if (!is_resource($lob)) {
-                Piece_ORM_Error::push(PIECE_ORM_ERROR_UNEXPECTED_VALUE,
-                                      'An unexpected value detected. $datatype->convertResult() should return a resource.'
-                                      );
-                return;
-            }
-
-            $this->_data = '';
-            while (!feof($lob)) {
-                $this->_data .= fread($lob, 8192);
-            }
-
-            $datatype->destroyLOB($lob);
+        PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
+        $datatype = &$this->_dbh->loadModule('Datatype');
+        PEAR::staticPopErrorHandling();
+        if (MDB2::isError($datatype)) {
+            Piece_ORM_Error::pushPEARError($datatype,
+                                           PIECE_ORM_ERROR_INVOCATION_FAILED,
+                                           'Failed to invoke $dbh->loadModule() for any reasons.'
+                                           );
+            return;
         }
 
-        return $this->_data;
+        PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
+        $lob = $datatype->convertResult($this->_value,
+                                        $this->_metadata->getDatatype($this->_fieldName)
+                                        );
+        PEAR::staticPopErrorHandling();
+        if (MDB2::isError($lob)) {
+            Piece_ORM_Error::pushPEARError($lob,
+                                           PIECE_ORM_ERROR_INVOCATION_FAILED,
+                                           'Failed to invoke $datatype->convertResult() for any reasons.'
+                                           );
+            return;
+        }
+
+        if (!is_resource($lob)) {
+            Piece_ORM_Error::push(PIECE_ORM_ERROR_UNEXPECTED_VALUE,
+                                  'An unexpected value detected. $datatype->convertResult() should return a resource.'
+                                  );
+            return;
+        }
+
+        $data = '';
+        while (!feof($lob)) {
+            $data .= fread($lob, 8192);
+        }
+
+        $datatype->destroyLOB($lob);
+
+        return $data;
     }
 
     // }}}
@@ -199,19 +196,6 @@ class Piece_ORM_Mapper_LOB
     function setSource($source)
     {
         $this->_source = $source;
-    }
-
-    // }}}
-    // {{{ getValue()
-
-    /**
-     * Gets the escaped value of this field.
-     *
-     * @param string $value
-     */
-    function getValue()
-    {
-        return $this->_value;
     }
 
     /**#@-*/
