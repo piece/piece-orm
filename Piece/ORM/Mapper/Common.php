@@ -988,7 +988,7 @@ class Piece_ORM_Mapper_Common
 
                 $value = $criteria->$placeHolderProperty->getSource();
                 if (is_null($value)) {
-                    $value = $criteria->$placeHolderProperty->getValue();
+                    $value = $criteria->$placeHolderProperty->load();
                 }
             } while (false);
 
