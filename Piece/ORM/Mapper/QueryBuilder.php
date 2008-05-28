@@ -97,6 +97,10 @@ class Piece_ORM_Mapper_QueryBuilder
         } else {
             $this->_criteria = $criteria;
         }
+
+        $this->_quoteCriteria();
+        $this->_setCurrentTimestampToCriteria();
+        $this->_setTableNameToCriteria();
     }
 
     // }}}
@@ -110,47 +114,7 @@ class Piece_ORM_Mapper_QueryBuilder
      */
     function build()
     {
-        foreach ($this->_criteria as $key => $value) {
-            if ($this->_mapper->isQuotable($value)) {
-                $this->_criteria->$key = $this->_mapper->quote($value);
-            } elseif (is_array($value)) {
-                $this->_criteria->$key =
-                    implode(', ',
-                            array_map(array(&$this->_mapper, 'quote'),
-                                      array_filter($value, array(&$this->_mapper, 'isQuotable')))
-                            );
-            } else {
-                unset($this->_criteria->$key);
-            }
-        }
-
-        if (Piece_ORM_Mapper_QueryType::isInsert($this->_methodName)
-            && $this->_metadata->getDatatype('created_at') == 'timestamp'
-            ) {
-            $createdAtProperty = Piece_ORM_Inflector::camelize('created_at', true);
-            if (array_key_exists($createdAtProperty, $this->_criteria)) {
-                $this->_criteria->$createdAtProperty = 'CURRENT_TIMESTAMP';
-            }
-        }
-
-        if (Piece_ORM_Mapper_QueryType::isUpdate($this->_methodName)
-            && $this->_metadata->getDatatype('updated_at') == 'timestamp'
-            ) {
-            $updatedAtProperty = Piece_ORM_Inflector::camelize('updated_at', true);
-            if (array_key_exists($updatedAtProperty, $this->_criteria)) {
-                $this->_criteria->$updatedAtProperty = 'CURRENT_TIMESTAMP';
-            }
-        }
-
-        $this->_criteria->__table = $this->_metadata->getTableName();
-
         extract((array)$this->_criteria);
-
-        foreach ($this->_criteria as $key => $value) {
-            if ($value == 'NULL') {
-                $this->_criteria->$key = null;
-            }
-        }
 
         $query = '__query__' . strtolower($this->_methodName);
 
@@ -188,6 +152,67 @@ class Piece_ORM_Mapper_QueryBuilder
     /**#@+
      * @access private
      */
+
+    // }}}
+    // {{{ _quoteCriteria()
+
+    /**
+     * Quotes the criteria.
+     */
+    function _quoteCriteria()
+    {
+        foreach ($this->_criteria as $key => $value) {
+            if ($this->_mapper->isQuotable($value)) {
+                $this->_criteria->$key = $this->_mapper->quote($value);
+            } elseif (is_array($value)) {
+                $this->_criteria->$key =
+                    implode(', ',
+                            array_map(array(&$this->_mapper, 'quote'),
+                                      array_filter($value, array(&$this->_mapper, 'isQuotable')))
+                            );
+            } else {
+                unset($this->_criteria->$key);
+            }
+        }
+    }
+
+    // }}}
+    // {{{ _setCurrentTimestampToCriteria()
+
+    /**
+     * Sets the current timestmap to the createdAt/updatedAt property in the criteria.
+     */
+    function _setCurrentTimestampToCriteria()
+    {
+        if (Piece_ORM_Mapper_QueryType::isInsert($this->_methodName)
+            && $this->_metadata->getDatatype('created_at') == 'timestamp'
+            ) {
+            $createdAtProperty = Piece_ORM_Inflector::camelize('created_at', true);
+            if (array_key_exists($createdAtProperty, $this->_criteria)) {
+                $this->_criteria->$createdAtProperty = 'CURRENT_TIMESTAMP';
+            }
+        }
+
+        if (Piece_ORM_Mapper_QueryType::isUpdate($this->_methodName)
+            && $this->_metadata->getDatatype('updated_at') == 'timestamp'
+            ) {
+            $updatedAtProperty = Piece_ORM_Inflector::camelize('updated_at', true);
+            if (array_key_exists($updatedAtProperty, $this->_criteria)) {
+                $this->_criteria->$updatedAtProperty = 'CURRENT_TIMESTAMP';
+            }
+        }
+    }
+
+    // }}}
+    // {{{ _setTableNameToCriteria()
+
+    /**
+     * Sets an appropriate table name as a built-in variable $__table to the criteria.
+     */
+    function _setTableNameToCriteria()
+    {
+        $this->_criteria->__table = $this->_metadata->getTableName();
+    }
 
     /**#@-*/
 
