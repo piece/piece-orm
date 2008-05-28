@@ -958,28 +958,39 @@ class Piece_ORM_Mapper_Common
         }
 
         foreach ($types as $placeHolderField => $type) {
-            $placeHolderProperty =
-                Piece_ORM_Inflector::camelize($placeHolderField, true);
-            if (!array_key_exists($placeHolderProperty, $criteria)) {
-                $value = null;
-            } elseif (is_null($criteria->$placeHolderProperty)) {
-                $value = null;
-            } else {
-                if ($type == 'blob' || $type == 'clob') {
-                    if (is_object($criteria->$placeHolderProperty)
-                        && (strtolower(get_class($criteria->$placeHolderProperty)) == strtolower('Piece_ORM_Mapper_LOB'))
-                        ) {
-                        $value = $criteria->$placeHolderProperty->getSource();
-                        if (is_null($value)) {
-                            $value = $criteria->$placeHolderProperty->getValue();
-                        }
-                    } else {
-                        $value = null;
-                    }
-                } else {
-                    $value = $criteria->$placeHolderProperty;
+            do {
+                $placeHolderProperty =
+                    Piece_ORM_Inflector::camelize($placeHolderField, true);
+                if (!array_key_exists($placeHolderProperty, $criteria)) {
+                    $value = null;
+                    break;
                 }
-            }
+
+                if (is_null($criteria->$placeHolderProperty)) {
+                    $value = null;
+                    break;
+                }
+
+                if ($type != 'blob' && $type != 'clob') {
+                    $value = $criteria->$placeHolderProperty;
+                    break;
+                }
+
+                if (!is_object($criteria->$placeHolderProperty)) {
+                    $value = null;
+                    break;
+                }
+
+                if (strtolower(get_class($criteria->$placeHolderProperty)) != strtolower('Piece_ORM_Mapper_LOB')) {
+                    $value = null;
+                    break;
+                }
+
+                $value = $criteria->$placeHolderProperty->getSource();
+                if (is_null($value)) {
+                    $value = $criteria->$placeHolderProperty->getValue();
+                }
+            } while (false);
 
             $sth->bindParam(":$placeHolderField", $value, $type);
         }
