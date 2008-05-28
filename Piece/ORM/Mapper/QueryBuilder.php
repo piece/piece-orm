@@ -116,7 +116,7 @@ class Piece_ORM_Mapper_QueryBuilder
     {
         extract((array)$this->_criteria);
 
-        $query = '__query__' . strtolower($this->_methodName);
+        $query = $this->_mapper->getQueryProperty($this->_methodName);
 
         set_error_handler(array(&$this, 'handleErrorInEval'));
         eval("\$query = \"{$this->_mapper->$query}\";");

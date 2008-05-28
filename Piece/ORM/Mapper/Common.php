@@ -406,7 +406,7 @@ class Piece_ORM_Mapper_Common
 
         if (!$isManip
             || !preg_match_all('/:(\w+)/',
-                               $this->{ '__query__' . strtolower($methodName) },
+                               $this->{ $this->getQueryProperty($methodName) },
                                $allMatches,
                                PREG_SET_ORDER)
             ) {
@@ -552,6 +552,20 @@ class Piece_ORM_Mapper_Common
     {
         $lob = &new Piece_ORM_Mapper_LOB($this->_dbh, $this->_metadata, $source);
         return $lob;
+    }
+
+    // }}}
+    // {{{ getQueryProperty()
+
+    /**
+     * Gets the query property for a given method name.
+     *
+     * @param string $methodName
+     * @return string
+     */
+    function getQueryProperty($methodName)
+    {
+        return '__query__' . strtolower($methodName);
     }
 
     /**#@-*/
