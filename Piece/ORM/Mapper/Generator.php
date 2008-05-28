@@ -37,7 +37,6 @@
 
 require_once 'Piece/ORM/Inflector.php';
 require_once 'Piece/ORM/Mapper/RelationshipType.php';
-require_once 'Piece/ORM/Mapper/Common.php';
 require_once 'Piece/ORM/Mapper/QueryType.php';
 
 // {{{ Piece_ORM_Mapper_Generator
@@ -94,14 +93,20 @@ class Piece_ORM_Mapper_Generator
      * @param string             $mapperName
      * @param array              $config
      * @param Piece_ORM_Metadata &$metadata
+     * @param array              $baseMapperMethods
      */
-    function Piece_ORM_Mapper_Generator($mapperClass, $mapperName, $config, &$metadata)
+    function Piece_ORM_Mapper_Generator($mapperClass,
+                                        $mapperName,
+                                        $config,
+                                        &$metadata,
+                                        $baseMapperMethods
+                                        )
     {
         $this->_mapperClass = $mapperClass;
         $this->_mapperName  = $mapperName;
         $this->_config      = $config;
         $this->_metadata    = &$metadata;
-        $this->_baseMapperMethods = get_class_methods('Piece_ORM_Mapper_Common');
+        $this->_baseMapperMethods = $baseMapperMethods;
     }
 
     // }}}
@@ -201,6 +206,22 @@ class Piece_ORM_Mapper_Generator
         } else {
             return ":$fieldName";
         }
+    }
+
+    // }}}
+    // {{{ getQueryProperty()
+
+    /**
+     * Gets the query property for a given method name.
+     *
+     * @param string $methodName
+     * @return string
+     * @static
+     * @since Method available since Release 1.1.0
+     */
+    function getQueryProperty($methodName)
+    {
+        return '__query__' . strtolower($methodName);
     }
 
     /**#@-*/
@@ -534,7 +555,11 @@ class Piece_ORM_Mapper_Generator
      */
     function _generateQueryPropertyDeclaration($propertyName, $query)
     {
-        return "    var \$__query__{$propertyName} = " . var_export($query, true) . ';';
+        return '    var $' .
+            $this->getQueryProperty($propertyName) .
+            ' = ' .
+            var_export($query, true) .
+            ';';
     }
 
     // }}}

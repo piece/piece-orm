@@ -277,7 +277,7 @@ class Piece_ORM_Mapper_Factory
             return;
         }
 
-        $generator = &new Piece_ORM_Mapper_Generator(Piece_ORM_Mapper_Factory::_getMapperClass($mapperID), $mapperName, Spyc::YAMLLoad($configFile), $metadata);
+        $generator = &new Piece_ORM_Mapper_Generator(Piece_ORM_Mapper_Factory::_getMapperClass($mapperID), $mapperName, Spyc::YAMLLoad($configFile), $metadata, get_class_methods('Piece_ORM_Mapper_Common'));
         return $generator->generate();
     }
 

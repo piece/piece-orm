@@ -115,11 +115,10 @@ class Piece_ORM_Mapper_QueryBuilder
     function build()
     {
         extract((array)$this->_criteria);
-
-        $query = $this->_mapper->getQueryProperty($this->_methodName);
+        $query = $this->_mapper->getQuery($this->_methodName);
 
         set_error_handler(array(&$this, 'handleErrorInEval'));
-        eval("\$query = \"{$this->_mapper->$query}\";");
+        eval("\$query = \"$query\";");
         restore_error_handler();
         if (count($this->_errorsInEval)) {
             $message = implode("\n", $this->_errorsInEval);

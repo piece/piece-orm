@@ -44,6 +44,7 @@ require_once 'Piece/ORM/Mapper/ObjectPersister.php';
 require_once 'Piece/ORM/Mapper/LOB.php';
 require_once 'Piece/ORM/Mapper/QueryType.php';
 require_once 'Piece/ORM/Mapper/QueryBuilder.php';
+require_once 'Piece/ORM/Mapper/Generator.php';
 
 // {{{ Piece_ORM_Mapper_Common
 
@@ -406,7 +407,7 @@ class Piece_ORM_Mapper_Common
 
         if (!$isManip
             || !preg_match_all('/:(\w+)/',
-                               $this->{ $this->getQueryProperty($methodName) },
+                               $this->getQuery($methodName),
                                $allMatches,
                                PREG_SET_ORDER)
             ) {
@@ -555,17 +556,18 @@ class Piece_ORM_Mapper_Common
     }
 
     // }}}
-    // {{{ getQueryProperty()
+    // {{{ getQuery()
 
     /**
-     * Gets the query property for a given method name.
+     * Gets the query for a given method name.
      *
      * @param string $methodName
      * @return string
+     * @since Method available since Release 1.1.0
      */
-    function getQueryProperty($methodName)
+    function getQuery($methodName)
     {
-        return '__query__' . strtolower($methodName);
+        return $this->{ Piece_ORM_Mapper_Generator::getQueryProperty($methodName) };
     }
 
     /**#@-*/
