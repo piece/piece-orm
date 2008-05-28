@@ -43,6 +43,7 @@ require_once 'PEAR.php';
 require_once 'Piece/ORM/Mapper/ObjectPersister.php';
 require_once 'Piece/ORM/Mapper/LOB.php';
 require_once 'Piece/ORM/Mapper/QueryType.php';
+require_once 'Piece/ORM/Mapper/QueryBuilder.php';
 
 // {{{ Piece_ORM_Mapper_Common
 
@@ -77,9 +78,6 @@ class Piece_ORM_Mapper_Common
     var $_preloadCallback;
     var $_preloadCallbackArgs;
     var $_lastQueryForGetCount;
-    var $_methodNameForBuildQuery;
-    var $_criteriaForBuildQuery;
-    var $_errorsInEval = array();
 
     /**#@-*/
 
@@ -384,7 +382,11 @@ class Piece_ORM_Mapper_Common
      */
     function &executeQueryWithCriteria($methodName, $criteria, $isManip = false)
     {
-        $query = $this->_buildQuery($methodName, $criteria);
+        $queryBuilder = &new Piece_ORM_Mapper_QueryBuilder($this,
+                                                           $methodName,
+                                                           $criteria
+                                                           );
+        $query = $queryBuilder->build();
         if (Piece_ORM_Error::hasErrors('exception')) {
             $return = null;
             return $return;
@@ -523,21 +525,6 @@ class Piece_ORM_Mapper_Common
     }
 
     // }}}
-    // {{{ handleErrorInEval()
-
-    /**
-     * Collects error messages raised in eval().
-     *
-     * @param integer $errno
-     * @param string  $errstr
-     * @since Method available since Release 0.8.1
-     */
-    function handleErrorInEval($errno, $errstr)
-    {
-        $this->_errorsInEval[] = $errstr;
-    }
-
-    // }}}
     // {{{ isQuotable()
 
     /**
@@ -606,85 +593,6 @@ class Piece_ORM_Mapper_Common
             $return = null;
             return $return;
         }
-    }
-
-    // }}}
-    // {{{ _buildQuery()
-
-    /**
-     * Builds a query based on a query source and criteria.
-     *
-     * @param string   $methodName
-     * @param stdClass $criteria
-     * @return string
-     * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
-     */
-    function _buildQuery($methodName, $criteria)
-    {
-        $this->_methodNameForBuildQuery = $methodName;
-        if (version_compare(phpversion(), '5.0.0', '>=')) {
-            $this->_criteriaForBuildQuery = clone($criteria);
-        } else {
-            $this->_criteriaForBuildQuery = $criteria;
-        }
-
-        foreach ($this->_criteriaForBuildQuery as $key => $value) {
-            if ($this->isQuotable($value)) {
-                $this->_criteriaForBuildQuery->$key = $this->quote($value);
-            } elseif (is_array($value)) {
-                $this->_criteriaForBuildQuery->$key =
-                    implode(', ',
-                            array_map(array(&$this, 'quote'),
-                                      array_filter($value, array(&$this, 'isQuotable')))
-                            );
-            } else {
-                unset($this->_criteriaForBuildQuery->$key);
-            }
-        }
-
-        if (Piece_ORM_Mapper_QueryType::isInsert($this->_methodNameForBuildQuery)
-            && $this->_metadata->getDatatype('created_at') == 'timestamp'
-            ) {
-            $createdAtProperty = Piece_ORM_Inflector::camelize('created_at', true);
-            if (array_key_exists($createdAtProperty, $this->_criteriaForBuildQuery)) {
-                $this->_criteriaForBuildQuery->$createdAtProperty = 'CURRENT_TIMESTAMP';
-            }
-        }
-
-        if (Piece_ORM_Mapper_QueryType::isUpdate($this->_methodNameForBuildQuery)
-            && $this->_metadata->getDatatype('updated_at') == 'timestamp'
-            ) {
-            $updatedAtProperty = Piece_ORM_Inflector::camelize('updated_at', true);
-            if (array_key_exists($updatedAtProperty, $this->_criteriaForBuildQuery)) {
-                $this->_criteriaForBuildQuery->$updatedAtProperty = 'CURRENT_TIMESTAMP';
-            }
-        }
-
-        $this->_criteriaForBuildQuery->__table = $this->_metadata->getTableName();
-
-        extract((array)$this->_criteriaForBuildQuery);
-
-        foreach ($this->_criteriaForBuildQuery as $key => $value) {
-            if ($value == 'NULL') {
-                $this->_criteriaForBuildQuery->$key = null;
-            }
-        }
-
-        $query = '__query__' . strtolower($this->_methodNameForBuildQuery);
-
-        set_error_handler(array(&$this, 'handleErrorInEval'));
-        eval("\$query = \"{$this->$query}\";");
-        restore_error_handler();
-        if (count($this->_errorsInEval)) {
-            $message = implode("\n", $this->_errorsInEval);
-            $this->_errorsInEval = array();
-            Piece_ORM_Error::push(PIECE_ORM_ERROR_INVOCATION_FAILED,
-                                  "Failed to build a query for the method [ {$this->_methodNameForBuildQuery} ] for any reasons. See below for more details.
- $message");
-            return;
-        }
-
-        return $query;
     }
 
     // }}}
