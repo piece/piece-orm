@@ -39,34 +39,13 @@ require_once 'PEAR/PackageFileManager2.php';
 
 PEAR::staticPushErrorHandling(PEAR_ERROR_CALLBACK, create_function('$error', 'var_dump($error); exit();'));
 
-$releaseVersion = '1.0.0';
+$releaseVersion = '1.1.0';
 $releaseStability = 'stable';
 $apiVersion = '0.3.0';
 $apiStability = 'stable';
-$notes = 'A new release of Piece_ORM is now available. This is the first stable release of Piece_ORM.
+$notes = 'A new release of Piece_ORM is now available.
 
-What\'s New in Piece_ORM 1.0.0
-
- * Automatic Timestamp: The current timestamp is set to the createdAt/updatedAt property automatically when insert/update if a table has a created_at/updated_at field.
- * Optimistic Locking: Optimistic Locking by the lock_version field has been supported only in default queries.
- * LOB support: The LOB support provides easy-to-use interfaces to handle LOBs using mappers.
- * Array support: Quotable (scalar or null) values in an array are expanded with a comma in a query.
- * the useMapperNameAsTableName option: If you want to use a mapper name as a table name, set the useMapperNameAsTableName option to true in the piece-orm-config.yaml.
-
-See the following release notes for details.
-
-Enhancements
-============ 
-
-- Added a feature so that quotable (scalar or null) values in an array are expanded with a comma in a query. (Piece_ORM_Mapper_Common)
-- Added a built-in variable $__table which is replaced with an appropriate table name in mapper definition files. (Ticket #67) (Piece_ORM_Mapper_Common)
-- Added a feature so as to use a mapper name as a table name by setting the useMapperNameAsTableName option to true in the piece-orm-config.yaml. (Ticket #71)
-- Removed support for Identity Map.
-- Changed factory() so as to use the given cache directory as is. (Ticket #58) (Piece_ORM_Config_Factory)
-- Changed setConfigDirectory()/setCacheDirectory() to not return the previous value. (Ticket #56) (Piece_ORM_Mapper_Factory, Piece_ORM_Metadata_Factory)
-- Added support for LOB.
-- Added a feature so that a DBMS specific function to get the current timestamp is set to the createdAt/updatedAt property automatically when insert/update. (Ticket #81) (Piece_ORM_Mapper_Common)
-- Added support for Optimistic Locking by the lock_version field only in default queries. (Ticket #84) (Piece_ORM_Mapper_Generator)';
+What\'s New in Piece_ORM 1.1.0';
 
 $package = new PEAR_PackageFileManager2();
 $package->setOptions(array('filelistgenerator' => 'file',
@@ -75,10 +54,7 @@ $package->setOptions(array('filelistgenerator' => 'file',
                            'baseinstalldir'    => '/',
                            'packagefile'       => 'package.xml',
                            'packagedirectory'  => '.',
-                           'dir_roles'         => array('data' => 'data',
-                                                        'tests' => 'test',
-                                                        'docs' => 'doc'),
-                           'ignore'            => array('package.php', 'package.xml'))
+                           'ignore'            => array('package.php'))
                      );
 
 $package->setPackage('Piece_ORM');
