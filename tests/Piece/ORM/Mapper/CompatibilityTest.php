@@ -1765,7 +1765,6 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
     function testShouldKeepALobFieldValueAfterInvokingUpdateIfTheValueIsNotChanged()
     {
         $jpegPath = "{$this->_cacheDirectory}/picture.jpg";
-        $pngPath = "{$this->_cacheDirectory}/picture.png";
         $mapper = &Piece_ORM_Mapper_Factory::factory('Files');
         $subject = &$mapper->createObject();
         $subject->picture = &$mapper->createLOB("file://$jpegPath");
