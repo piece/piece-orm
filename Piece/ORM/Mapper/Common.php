@@ -916,7 +916,7 @@ class Piece_ORM_Mapper_Common
                 }
             } while (false);
 
-            $sth->bindParam(":$placeHolderField", $value, $type);
+            $sth->bindValue(":$placeHolderField", $value, $type);
         }
 
         return $sth;

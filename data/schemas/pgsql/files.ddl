@@ -4,6 +4,7 @@ CREATE TABLE files (
   id serial,
   document_body text,
   picture bytea,
+  large_picture bytea,
   created_at timestamp with time zone NOT NULL DEFAULT current_timestamp,
   updated_at timestamp with time zone NOT NULL DEFAULT current_timestamp,
   PRIMARY KEY (id)

@@ -4,6 +4,7 @@ CREATE TABLE files (
   id int (11) NOT NULL AUTO_INCREMENT,
   document_body longtext,
   picture longblob,
+  large_picture longblob,
   created_at datetime NOT NULL,
   updated_at timestamp,
   PRIMARY KEY (id)

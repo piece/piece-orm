@@ -1776,6 +1776,25 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         $this->assertEquals($file1->picture->load(), $file2->picture->load());
     }
 
+    /**
+     * @since Method available since Release 1.1.0
+     */
+    function testShouldTreatIndividualBlobs()
+    {
+        $jpegPath = "{$this->_cacheDirectory}/picture.jpg";
+        $pngPath = "{$this->_cacheDirectory}/picture.png";
+        $mapper = &Piece_ORM_Mapper_Factory::factory('Files');
+        $subject = &$mapper->createObject();
+        $subject->picture = &$mapper->createLOB("file://$jpegPath");
+        $subject->largePicture = &$mapper->createLOB("file://$pngPath");
+        $id = $mapper->insert($subject);
+        $file = &$mapper->findById($id);
+
+        $this->assertTrue(file_get_contents($jpegPath) != file_get_contents($pngPath));
+        $this->assertEquals(file_get_contents($jpegPath), $file->picture->load());
+        $this->assertEquals(file_get_contents($pngPath), $file->largePicture->load());
+    }
+
     /**#@-*/
 
     /**#@+
