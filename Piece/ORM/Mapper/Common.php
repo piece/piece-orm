@@ -399,8 +399,8 @@ class Piece_ORM_Mapper_Common
         if (!$isManip) {
             if (count($this->_orders)) {
                 $query .= ' ORDER BY ' . implode(', ', $this->_orders);
-            } elseif (!is_null($this->{ '__orderBy__' . strtolower($methodName) })) {
-                $query .= ' ORDER BY ' . $this->{ '__orderBy__' . strtolower($methodName) };
+            } elseif (!is_null($this->{ Piece_ORM_Mapper_Generator::getOrderByProperty($methodName) })) {
+                $query .= ' ORDER BY ' . $this->{ Piece_ORM_Mapper_Generator::getOrderByProperty($methodName) };
             }
 
             $this->_orders = array();

@@ -224,6 +224,22 @@ class Piece_ORM_Mapper_Generator
         return '__query__' . strtolower($methodName);
     }
 
+    // }}}
+    // {{{ getOrderByProperty()
+
+    /**
+     * Gets the orderBy property for a given method name.
+     *
+     * @param string $methodName
+     * @return string
+     * @static
+     * @since Method available since Release 1.1.0
+     */
+    function getOrderByProperty($methodName)
+    {
+        return '__orderBy__' . strtolower($methodName);
+    }
+
     /**#@-*/
 
     /**#@+
@@ -817,7 +833,11 @@ class Piece_ORM_Mapper_Generator
      */
     function _generateOrderByPropertyDeclaration($propertyName, $orderBy)
     {
-        return "    var \$__orderBy__{$propertyName} = " . var_export($orderBy, true) . ';';
+        return '    var $' .
+            $this->getOrderByProperty($propertyName) .
+            ' = ' .
+            var_export($orderBy, true) .
+            ';';
     }
 
     /**#@-*/
