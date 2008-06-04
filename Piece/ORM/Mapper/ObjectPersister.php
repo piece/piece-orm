@@ -38,6 +38,8 @@
 require_once 'Piece/ORM/Error.php';
 require_once 'Piece/ORM/Inflector.php';
 require_once 'Piece/ORM/Mapper/RelationshipType.php';
+require_once 'MDB2.php';
+require_once 'PEAR.php';
 
 // {{{ Piece_ORM_Mapper_ObjectPersister
 
