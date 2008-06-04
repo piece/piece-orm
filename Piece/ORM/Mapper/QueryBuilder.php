@@ -146,6 +146,21 @@ class Piece_ORM_Mapper_QueryBuilder
         $this->_errorsInEval[] = $errstr;
     }
 
+    // }}}
+    // {{{ isQuotable()
+
+    /**
+     * Checks whether a value is quotable or not.
+     *
+     * @param string $value
+     * @return boolean
+     * @since Method available since Release 1.1.0
+     */
+    function isQuotable($value)
+    {
+        return is_scalar($value) || is_null($value);
+    }
+
     /**#@-*/
 
     /**#@+
@@ -161,13 +176,13 @@ class Piece_ORM_Mapper_QueryBuilder
     function _quoteCriteria()
     {
         foreach ($this->_criteria as $key => $value) {
-            if ($this->_mapper->isQuotable($value)) {
+            if ($this->isQuotable($value)) {
                 $this->_criteria->$key = $this->_mapper->quote($value);
             } elseif (is_array($value)) {
                 $this->_criteria->$key =
                     implode(', ',
                             array_map(array(&$this->_mapper, 'quote'),
-                                      array_filter($value, array(&$this->_mapper, 'isQuotable')))
+                                      array_filter($value, array(&$this, 'isQuotable')))
                             );
             } else {
                 unset($this->_criteria->$key);

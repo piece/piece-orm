@@ -500,21 +500,6 @@ class Piece_ORM_Mapper_Common
     }
 
     // }}}
-    // {{{ isQuotable()
-
-    /**
-     * Checks whether a value is quotable or not.
-     *
-     * @param string $value
-     * @return boolean
-     * @since Method available since Release 1.0.0
-     */
-    function isQuotable($value)
-    {
-        return is_scalar($value) || is_null($value);
-    }
-
-    // }}}
     // {{{ createLOB()
 
     /**
