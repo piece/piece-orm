@@ -315,8 +315,8 @@ class Piece_ORM_Mapper_ObjectPersister
     function _getLastInsertID()
     {
         if ($this->_metadata->hasID()) {
-            PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
             $dbh = &$this->_mapper->getConnection();
+            PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
             $id = $dbh->lastInsertID($this->_metadata->getTableName(true),
                                      $this->_metadata->getPrimaryKey()
                                      );
