@@ -290,8 +290,9 @@ class Piece_ORM_Mapper_Common
     /**
      * Executes a query.
      *
-     * @param string  $query
-     * @param boolean $isManip
+     * @param string                $query
+     * @param boolean               $isManip
+     * @param MDB2_Statement_Common $sth
      * @return MDB2_Result_Common|integer
      * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
      * @throws PIECE_ORM_ERROR_UNEXPECTED_VALUE
@@ -418,10 +419,10 @@ class Piece_ORM_Mapper_Common
                 $placeHolderFields[] = $matches[1];
             }
 
-            $sth = &$this->_buildPreparedStatement($criteria,
-                                                   $query,
-                                                   $placeHolderFields
-                                                   );
+            $sth = $this->_buildPreparedStatement($criteria,
+                                                  $query,
+                                                  $placeHolderFields
+                                                  );
             if (Piece_ORM_Error::hasErrors('exception')) {
                 $return = null;
                 return $return;
@@ -863,7 +864,7 @@ class Piece_ORM_Mapper_Common
      * @return MDB2_Statement_Common
      * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
      */
-    function &_buildPreparedStatement($criteria, $query, $placeHolderFields)
+    function _buildPreparedStatement($criteria, $query, $placeHolderFields)
     {
         $types = array();
         foreach ($placeHolderFields as $placeHolderField) {
