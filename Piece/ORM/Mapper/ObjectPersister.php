@@ -310,6 +310,7 @@ class Piece_ORM_Mapper_ObjectPersister
      *
      * @return integer
      * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
+     * @since Method available since Release 1.1.0
      */
     function _getLastInsertID()
     {

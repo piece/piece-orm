@@ -536,6 +536,7 @@ class Piece_ORM_Mapper_Common
      * Gets the database handle for this mapper.
      *
      * @return MDB2_Driver_Common
+     * @since Method available since Release 1.1.0
      */
     function &getConnection()
     {
