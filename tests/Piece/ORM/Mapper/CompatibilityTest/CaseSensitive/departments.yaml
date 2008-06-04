@@ -1,0 +1,55 @@
+# $Id$
+
+- name: findAllWithEmployees1
+  relationship:
+    - type: oneToMany
+      table: employees
+      mappedAs: employees
+
+- name: findAllWithEmployees2
+  relationship:
+    - type: oneToMany
+      table: employees
+      mappedAs: employees
+      column: departments_id
+      referencedColumn: id
+
+- name: findAllWithOrderedEmployees
+  relationship:
+    - type: oneToMany
+      table: employees
+      mappedAs: employees
+      orderBy: id DESC
+
+- name: findWithEmployeesByName
+  query: |
+    SELECT
+      *
+    FROM
+      $__table
+    WHERE
+      name = $name
+  relationship:
+    - type: oneToMany
+      table: employees
+      mappedAs: employees
+      orderBy: id DESC
+
+- name: update
+  relationship:
+    - type: oneToMany
+      table: employees
+      mappedAs: employees
+
+- name: delete
+  relationship:
+    - type: oneToMany
+      table: employees
+      mappedAs: employees
+
+# Local Variables:
+# mode: conf-colon
+# coding: iso-8859-1
+# tab-width: 2
+# indent-tabs-mode: nil
+# End:

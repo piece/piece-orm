@@ -507,306 +507,450 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
 
     function testManyToManyRelationships()
     {
-        $this->_prepareTableRecords();
-        $mapper = &Piece_ORM_Mapper_Factory::factory('Employees');
-        $employees = $mapper->findAllWithSkills2();
+        foreach (array(false, true) as $useMapperNameAsTableName) {
+            if ($useMapperNameAsTableName) {
+                $this->_prepareCaseSensitiveContext();
+            }
 
-        $this->assertTrue(is_array($employees));
-        $this->assertEquals(4, count($employees));
+            $this->_prepareTableRecords($useMapperNameAsTableName);
+            $mapperName = !$useMapperNameAsTableName ? 'Employees' : 'employees';
+            $mapper = &Piece_ORM_Mapper_Factory::factory($mapperName);
+            $employees = $mapper->findAllWithSkills2();
 
-        foreach ($employees as $employee) {
-            $this->assertTrue(is_array($employee->skills));
+            $this->assertTrue(is_array($employees));
+            $this->assertEquals(4, count($employees));
 
-            switch ($employee->firstName) {
-            case 'Foo':
-                $this->assertEquals(0, count($employee->skills));
-                break;
-            case 'Bar':
-                $this->assertEquals(1, count($employee->skills));
-                if (count($employee->skills) == 1) {
-                    $this->assertEquals('Foo', $employee->skills[0]->name);
-                } else {
-                    $this->fail('Invalid skills count.');
+            foreach ($employees as $employee) {
+                $this->assertTrue(is_array($employee->skills));
+
+                switch ($employee->firstName) {
+                case 'Foo':
+                    $this->assertEquals(0, count($employee->skills));
+                    break;
+                case 'Bar':
+                    $this->assertEquals(1, count($employee->skills));
+                    if (count($employee->skills) == 1) {
+                        $this->assertEquals('Foo', $employee->skills[0]->name);
+                    } else {
+                        $this->fail('Invalid skills count.');
+                    }
+                    break;
+                case 'Baz':
+                    if (count($employee->skills) == 1) {
+                        $this->assertEquals('Bar', $employee->skills[0]->name);
+                    } else {
+                        $this->fail('Invalid skills count.');
+                    }
+                    break;
+                case 'Qux':
+                    if (count($employee->skills) == 2) {
+                        $this->assertEquals('Foo', $employee->skills[0]->name);
+                        $this->assertEquals('Bar', $employee->skills[1]->name);
+                    } else {
+                        $this->fail('Invalid skills count.');
+                    }
+                    break;
+                default:
+                    $this->fail('Unknown employee name.');
                 }
-                break;
-            case 'Baz':
-                if (count($employee->skills) == 1) {
-                    $this->assertEquals('Bar', $employee->skills[0]->name);
-                } else {
-                    $this->fail('Invalid skills count.');
-                }
-                break;
-            case 'Qux':
-                if (count($employee->skills) == 2) {
-                    $this->assertEquals('Foo', $employee->skills[0]->name);
-                    $this->assertEquals('Bar', $employee->skills[1]->name);
-                } else {
-                    $this->fail('Invalid skills count.');
-                }
-                break;
-            default:
-                $this->fail('Unknown employee name.');
+            }
+
+            $this->assertEquals($employees, $mapper->findAllWithSkills1());
+
+            $this->_clearTableRecords();
+            if ($useMapperNameAsTableName) {
+                $this->_clearCaseSensitiveContext();
             }
         }
-
-        $this->assertEquals($employees, $mapper->findAllWithSkills1());
     }
 
     function testManyToManyRelationshipsWithBuiltinMethod()
     {
-        $this->_prepareTableRecords();
-        $mapper = &Piece_ORM_Mapper_Factory::factory('Employees');
-        $employees = $mapper->findAllByFirstName('Qux');
+        foreach (array(false, true) as $useMapperNameAsTableName) {
+            if ($useMapperNameAsTableName) {
+                $this->_prepareCaseSensitiveContext();
+            }
 
-        $this->assertTrue(is_array($employees));
-        $this->assertEquals(1, count($employees));
-        $this->assertEquals(2, count($employees[0]->skills));
-        $this->assertEquals($employees, $mapper->findAllByFirstName((object)array('firstName' => 'Qux')));
+            $this->_prepareTableRecords($useMapperNameAsTableName);
+            $mapperName = !$useMapperNameAsTableName ? 'Employees' : 'employees';
+            $mapper = &Piece_ORM_Mapper_Factory::factory($mapperName);
+            $employees = $mapper->findAllByFirstName('Qux');
+
+            $this->assertTrue(is_array($employees));
+            $this->assertEquals(1, count($employees));
+            $this->assertEquals(2, count($employees[0]->skills));
+            $this->assertEquals($employees, $mapper->findAllByFirstName((object)array('firstName' => 'Qux')));
+
+            $this->_clearTableRecords();
+            if ($useMapperNameAsTableName) {
+                $this->_clearCaseSensitiveContext();
+            }
+        }
     }
 
     function testOneToManyRelationships()
     {
-        $this->_prepareTableRecords();
-        $mapper = &Piece_ORM_Mapper_Factory::factory('Departments');
-        $departments = $mapper->findAllWithEmployees2();
+        foreach (array(false, true) as $useMapperNameAsTableName) {
+            if ($useMapperNameAsTableName) {
+                $this->_prepareCaseSensitiveContext();
+            }
 
-        $this->assertTrue(is_array($departments));
-        $this->assertEquals(2, count($departments));
+            $this->_prepareTableRecords($useMapperNameAsTableName);
+            $mapperName = !$useMapperNameAsTableName ? 'Departments' : 'departments';
+            $mapper = &Piece_ORM_Mapper_Factory::factory($mapperName);
+            $departments = $mapper->findAllWithEmployees2();
 
-        foreach ($departments as $department) {
-            $this->assertTrue(is_array($department->employees));
+            $this->assertTrue(is_array($departments));
+            $this->assertEquals(2, count($departments));
 
-            switch ($department->name) {
-            case 'Foo':
-                if (count($department->employees) == 1) {
-                    $this->assertEquals('Bar', $department->employees[0]->firstName);
-                } else {
-                    $this->fail('Invalid employees count.');
+            foreach ($departments as $department) {
+                $this->assertTrue(is_array($department->employees));
+
+                switch ($department->name) {
+                case 'Foo':
+                    if (count($department->employees) == 1) {
+                        $this->assertEquals('Bar', $department->employees[0]->firstName);
+                    } else {
+                        $this->fail('Invalid employees count.');
+                    }
+                    break;
+                case 'Bar':
+                    if (count($department->employees) == 2) {
+                        $this->assertEquals('Baz', $department->employees[0]->firstName);
+                        $this->assertEquals('Qux', $department->employees[1]->firstName);
+                    } else {
+                        $this->fail('Invalid employees count.');
+                    }
+                    break;
+                default:
+                    $this->fail('Unknown department name.');
                 }
-                break;
-            case 'Bar':
-                if (count($department->employees) == 2) {
-                    $this->assertEquals('Baz', $department->employees[0]->firstName);
-                    $this->assertEquals('Qux', $department->employees[1]->firstName);
-                } else {
-                    $this->fail('Invalid employees count.');
-                }
-                break;
-            default:
-                $this->fail('Unknown department name.');
+            }
+
+            $this->assertEquals($departments, $mapper->findAllWithEmployees1());
+
+            $this->_clearTableRecords();
+            if ($useMapperNameAsTableName) {
+                $this->_clearCaseSensitiveContext();
             }
         }
-
-        $this->assertEquals($departments, $mapper->findAllWithEmployees1());
     }
 
     function testManyToOneRelationships()
     {
-        $this->_prepareTableRecords();
-        $mapper = &Piece_ORM_Mapper_Factory::factory('Employees');
-        $employees = $mapper->findAllWithDepartment2();
+        foreach (array(false, true) as $useMapperNameAsTableName) {
+            if ($useMapperNameAsTableName) {
+                $this->_prepareCaseSensitiveContext();
+            }
 
-        $this->assertTrue(is_array($employees));
-        $this->assertEquals(4, count($employees));
+            $this->_prepareTableRecords($useMapperNameAsTableName);
+            $mapperName = !$useMapperNameAsTableName ? 'Employees' : 'employees';
+            $mapper = &Piece_ORM_Mapper_Factory::factory($mapperName);
+            $employees = $mapper->findAllWithDepartment2();
 
-        foreach ($employees as $employee) {
-            $this->assertTrue(array_key_exists('department', $employee));
+            $this->assertTrue(is_array($employees));
+            $this->assertEquals(4, count($employees));
 
-            switch ($employee->firstName) {
-            case 'Foo':
-                $this->assertNull($employee->department);
-                break;
-            case 'Bar':
-                if (!is_null($employee->department)) {
-                    $this->assertEquals('Foo', $employee->department->name);
-                } else {
-                    $this->fail('The department field is not found.');
+            foreach ($employees as $employee) {
+                $this->assertTrue(array_key_exists('department', $employee));
+
+                switch ($employee->firstName) {
+                case 'Foo':
+                    $this->assertNull($employee->department);
+                    break;
+                case 'Bar':
+                    if (!is_null($employee->department)) {
+                        $this->assertEquals('Foo', $employee->department->name);
+                    } else {
+                        $this->fail('The department field is not found.');
+                    }
+                    break;
+                case 'Baz':
+                    if (!is_null($employee->department)) {
+                        $this->assertEquals('Bar', $employee->department->name);
+                    } else {
+                        $this->fail('The department field is not found.');
+                    }
+                    break;
+                case 'Qux':
+                    if (!is_null($employee->department)) {
+                        $this->assertEquals('Bar', $employee->department->name);
+                    } else {
+                        $this->fail('The department field is not found.');
+                    }
+                    break;
+                default:
+                    $this->fail('Unknown employee name.');
                 }
-                break;
-            case 'Baz':
-                if (!is_null($employee->department)) {
-                    $this->assertEquals('Bar', $employee->department->name);
-                } else {
-                    $this->fail('The department field is not found.');
-                }
-                break;
-            case 'Qux':
-                if (!is_null($employee->department)) {
-                    $this->assertEquals('Bar', $employee->department->name);
-                } else {
-                    $this->fail('The department field is not found.');
-                }
-                break;
-            default:
-                $this->fail('Unknown employee name.');
+            }
+
+            $this->assertEquals($employees, $mapper->findAllWithDepartment1());
+
+            $this->_clearTableRecords();
+            if ($useMapperNameAsTableName) {
+                $this->_clearCaseSensitiveContext();
             }
         }
-
-        $this->assertEquals($employees, $mapper->findAllWithDepartment1());
     }
 
     function testOneToOneRelationships()
     {
-        $this->_prepareTableRecords();
-        $mapper = &Piece_ORM_Mapper_Factory::factory('Employees');
-        $employees = $mapper->findAllWithComputer2();
+        foreach (array(false, true) as $useMapperNameAsTableName) {
+            if ($useMapperNameAsTableName) {
+                $this->_prepareCaseSensitiveContext();
+            }
 
-        $this->assertTrue(is_array($employees));
-        $this->assertEquals(4, count($employees));
+            $this->_prepareTableRecords($useMapperNameAsTableName);
+            $mapperName = !$useMapperNameAsTableName ? 'Employees' : 'employees';
+            $mapper = &Piece_ORM_Mapper_Factory::factory($mapperName);
+            $employees = $mapper->findAllWithComputer2();
 
-        foreach ($employees as $employee) {
-            $this->assertTrue(array_key_exists('computer', $employee));
+            $this->assertTrue(is_array($employees));
+            $this->assertEquals(4, count($employees));
 
-            switch ($employee->firstName) {
-            case 'Foo':
-                $this->assertNull($employee->computer);
-                break;
-            case 'Bar':
-                if (!is_null($employee->computer)) {
-                    $this->assertEquals('Baz', $employee->computer->name);
-                } else {
-                    $this->fail('The computer field is not found.');
+            foreach ($employees as $employee) {
+                $this->assertTrue(array_key_exists('computer', $employee));
+
+                switch ($employee->firstName) {
+                case 'Foo':
+                    $this->assertNull($employee->computer);
+                    break;
+                case 'Bar':
+                    if (!is_null($employee->computer)) {
+                        $this->assertEquals('Baz', $employee->computer->name);
+                    } else {
+                        $this->fail('The computer field is not found.');
+                    }
+                    break;
+                case 'Baz':
+                    if (!is_null($employee->computer)) {
+                        $this->assertEquals('Bar', $employee->computer->name);
+                    } else {
+                        $this->fail('The computer field is not found.');
+                    }
+                    break;
+                case 'Qux':
+                    if (!is_null($employee->computer)) {
+                        $this->assertEquals('Foo', $employee->computer->name);
+                    } else {
+                        $this->fail('The computer field is not found.');
+                    }
+                    break;
+                default:
+                    $this->fail('Unknown employee name.');
                 }
-                break;
-            case 'Baz':
-                if (!is_null($employee->computer)) {
-                    $this->assertEquals('Bar', $employee->computer->name);
-                } else {
-                    $this->fail('The computer field is not found.');
-                }
-                break;
-            case 'Qux':
-                if (!is_null($employee->computer)) {
-                    $this->assertEquals('Foo', $employee->computer->name);
-                } else {
-                    $this->fail('The computer field is not found.');
-                }
-                break;
-            default:
-                $this->fail('Unknown employee name.');
+            }
+
+            $this->assertEquals($employees, $mapper->findAllWithComputer1());
+
+            $this->_clearTableRecords();
+            if ($useMapperNameAsTableName) {
+                $this->_clearCaseSensitiveContext();
             }
         }
-
-        $this->assertEquals($employees, $mapper->findAllWithComputer1());
     }
 
     function testLimit()
     {
-        $this->_prepareTableRecords();
-        $mapper = &Piece_ORM_Mapper_Factory::factory('Employees');
-        $mapper->setLimit(2);
-        $employees = $mapper->findAllWithSkills1();
+        foreach (array(false, true) as $useMapperNameAsTableName) {
+            if ($useMapperNameAsTableName) {
+                $this->_prepareCaseSensitiveContext();
+            }
 
-        $this->assertTrue(is_array($employees));
-        $this->assertEquals(2, count($employees));
+            $this->_prepareTableRecords($useMapperNameAsTableName);
+            $mapperName = !$useMapperNameAsTableName ? 'Employees' : 'employees';
+            $mapper = &Piece_ORM_Mapper_Factory::factory($mapperName);
+            $mapper->setLimit(2);
+            $employees = $mapper->findAllWithSkills1();
 
-        $employees = $mapper->findAllWithSkills1();
+            $this->assertTrue(is_array($employees));
+            $this->assertEquals(2, count($employees));
 
-        $this->assertEquals(4, count($employees));
+            $employees = $mapper->findAllWithSkills1();
+
+            $this->assertEquals(4, count($employees));
+
+            $this->_clearTableRecords();
+            if ($useMapperNameAsTableName) {
+                $this->_clearCaseSensitiveContext();
+            }
+        }
     }
 
     function testOffset()
     {
-        $this->_prepareTableRecords();
-        $mapper = &Piece_ORM_Mapper_Factory::factory('Employees');
-        $mapper->setLimit(2, 2);
-        $employees = $mapper->findAllWithSkills1();
+        foreach (array(false, true) as $useMapperNameAsTableName) {
+            if ($useMapperNameAsTableName) {
+                $this->_prepareCaseSensitiveContext();
+            }
 
-        $this->assertTrue(is_array($employees));
-        $this->assertEquals(2, count($employees));
-        $this->assertEquals('Baz', $employees[0]->firstName);
-        $this->assertEquals('Qux', $employees[1]->firstName);
+            $this->_prepareTableRecords($useMapperNameAsTableName);
+            $mapperName = !$useMapperNameAsTableName ? 'Employees' : 'employees';
+            $mapper = &Piece_ORM_Mapper_Factory::factory($mapperName);
+            $mapper->setLimit(2, 2);
+            $employees = $mapper->findAllWithSkills1();
+
+            $this->assertTrue(is_array($employees));
+            $this->assertEquals(2, count($employees));
+            $this->assertEquals('Baz', $employees[0]->firstName);
+            $this->assertEquals('Qux', $employees[1]->firstName);
+
+            $this->_clearTableRecords();
+            if ($useMapperNameAsTableName) {
+                $this->_clearCaseSensitiveContext();
+            }
+        }
     }
 
     function testLimitFailure()
     {
-        $this->_prepareTableRecords();
-        $mapper = &Piece_ORM_Mapper_Factory::factory('Employees');
         Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
 
-        $mapper->setLimit(-1);
+        foreach (array(false, true) as $useMapperNameAsTableName) {
+            if ($useMapperNameAsTableName) {
+                $this->_prepareCaseSensitiveContext();
+            }
 
-        $this->assertTrue(Piece_ORM_Error::hasErrors('exception'));
+            $this->_prepareTableRecords($useMapperNameAsTableName);
+            $mapperName = !$useMapperNameAsTableName ? 'Employees' : 'employees';
+            $mapper = &Piece_ORM_Mapper_Factory::factory($mapperName);
+            $mapper->setLimit(-1);
 
-        $error = Piece_ORM_Error::pop();
+            $this->assertTrue(Piece_ORM_Error::hasErrors('exception'));
 
-        $this->assertEquals(PIECE_ORM_ERROR_INVOCATION_FAILED, $error['code']);
+            $error = Piece_ORM_Error::pop();
+
+            $this->assertEquals(PIECE_ORM_ERROR_INVOCATION_FAILED, $error['code']);
+
+            $this->_clearTableRecords();
+            if ($useMapperNameAsTableName) {
+                $this->_clearCaseSensitiveContext();
+            }
+        }
 
         Piece_ORM_Error::popCallback();
     }
 
     function testOffsetFailure()
     {
-        $this->_prepareTableRecords();
-        $mapper = &Piece_ORM_Mapper_Factory::factory('Employees');
         Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
 
-        $mapper->setLimit(2, -1);
+        foreach (array(false, true) as $useMapperNameAsTableName) {
+            if ($useMapperNameAsTableName) {
+                $this->_prepareCaseSensitiveContext();
+            }
 
-        $this->assertTrue(Piece_ORM_Error::hasErrors('exception'));
+            $this->_prepareTableRecords($useMapperNameAsTableName);
+            $mapperName = !$useMapperNameAsTableName ? 'Employees' : 'employees';
+            $mapper = &Piece_ORM_Mapper_Factory::factory($mapperName);
+            $mapper->setLimit(2, -1);
 
-        $error = Piece_ORM_Error::pop();
+            $this->assertTrue(Piece_ORM_Error::hasErrors('exception'));
 
-        $this->assertEquals(PIECE_ORM_ERROR_INVOCATION_FAILED, $error['code']);
+            $error = Piece_ORM_Error::pop();
+
+            $this->assertEquals(PIECE_ORM_ERROR_INVOCATION_FAILED, $error['code']);
+
+            $this->_clearTableRecords();
+            if ($useMapperNameAsTableName) {
+                $this->_clearCaseSensitiveContext();
+            }
+        }
 
         Piece_ORM_Error::popCallback();
     }
 
     function testOrder()
     {
-        $this->_prepareTableRecords();
-        $mapper = &Piece_ORM_Mapper_Factory::factory('Employees');
-        $mapper->addOrder('first_name');
-        $mapper->addOrder('id');
-        $employees = $mapper->findAllWithSkills1();
+        foreach (array(false, true) as $useMapperNameAsTableName) {
+            if ($useMapperNameAsTableName) {
+                $this->_prepareCaseSensitiveContext();
+            }
 
-        $this->assertTrue(is_array($employees));
-        $this->assertEquals(4, count($employees));
+            $this->_prepareTableRecords($useMapperNameAsTableName);
+            $mapperName = !$useMapperNameAsTableName ? 'Employees' : 'employees';
+            $mapper = &Piece_ORM_Mapper_Factory::factory($mapperName);
+            $mapper->addOrder('first_name');
+            $mapper->addOrder('id');
+            $employees = $mapper->findAllWithSkills1();
 
-        $this->assertEquals('Bar', $employees[0]->firstName);
-        $this->assertEquals('Baz', $employees[1]->firstName);
-        $this->assertEquals('Foo', $employees[2]->firstName);
-        $this->assertEquals('Qux', $employees[3]->firstName);
+            $this->assertTrue(is_array($employees));
+            $this->assertEquals(4, count($employees));
 
-        $mapper->addOrder('first_name', true);
-        $mapper->addOrder('id');
+            $this->assertEquals('Bar', $employees[0]->firstName);
+            $this->assertEquals('Baz', $employees[1]->firstName);
+            $this->assertEquals('Foo', $employees[2]->firstName);
+            $this->assertEquals('Qux', $employees[3]->firstName);
 
-        $employees = $mapper->findAllWithSkills1();
+            $mapper->addOrder('first_name', true);
+            $mapper->addOrder('id');
 
-        $this->assertTrue(is_array($employees));
-        $this->assertEquals(4, count($employees));
+            $employees = $mapper->findAllWithSkills1();
 
-        $this->assertEquals('Bar', $employees[3]->firstName);
-        $this->assertEquals('Baz', $employees[2]->firstName);
-        $this->assertEquals('Foo', $employees[1]->firstName);
-        $this->assertEquals('Qux', $employees[0]->firstName);
+            $this->assertTrue(is_array($employees));
+            $this->assertEquals(4, count($employees));
+
+            $this->assertEquals('Bar', $employees[3]->firstName);
+            $this->assertEquals('Baz', $employees[2]->firstName);
+            $this->assertEquals('Foo', $employees[1]->firstName);
+            $this->assertEquals('Qux', $employees[0]->firstName);
+
+            $this->_clearTableRecords();
+            if ($useMapperNameAsTableName) {
+                $this->_clearCaseSensitiveContext();
+            }
+        }
     }
 
     function testOrderOnManyToManyRelationships()
     {
-        $this->_prepareTableRecords();
-        $mapper = &Piece_ORM_Mapper_Factory::factory('Employees');
-        $mapper->addOrder('id');
-        $employees = $mapper->findAllWithOrderedSkills();
+        foreach (array(false, true) as $useMapperNameAsTableName) {
+            if ($useMapperNameAsTableName) {
+                $this->_prepareCaseSensitiveContext();
+            }
 
-        $this->assertTrue(is_array($employees));
-        $this->assertEquals(4, count($employees));
+            $this->_prepareTableRecords($useMapperNameAsTableName);
+            $mapperName = !$useMapperNameAsTableName ? 'Employees' : 'employees';
+            $mapper = &Piece_ORM_Mapper_Factory::factory($mapperName);
+            $mapper->addOrder('id');
+            $employees = $mapper->findAllWithOrderedSkills();
 
-        $this->assertEquals('Bar', $employees[3]->skills[0]->name);
-        $this->assertEquals('Foo', $employees[3]->skills[1]->name);
+            $this->assertTrue(is_array($employees));
+            $this->assertEquals(4, count($employees));
+
+            $this->assertEquals('Bar', $employees[3]->skills[0]->name);
+            $this->assertEquals('Foo', $employees[3]->skills[1]->name);
+
+            $this->_clearTableRecords();
+            if ($useMapperNameAsTableName) {
+                $this->_clearCaseSensitiveContext();
+            }
+        }
     }
 
     function testOrderOnOneToManyRelationships()
     {
-        $this->_prepareTableRecords();
-        $mapper = &Piece_ORM_Mapper_Factory::factory('Departments');
-        $mapper->addOrder('id');
-        $departments = $mapper->findAllWithOrderedEmployees();
+        foreach (array(false, true) as $useMapperNameAsTableName) {
+            if ($useMapperNameAsTableName) {
+                $this->_prepareCaseSensitiveContext();
+            }
 
-        $this->assertTrue(is_array($departments));
-        $this->assertEquals(2, count($departments));
-        $this->assertEquals('Qux', $departments[1]->employees[0]->firstName);
-        $this->assertEquals('Baz', $departments[1]->employees[1]->firstName);
+            $this->_prepareTableRecords($useMapperNameAsTableName);
+            $mapperName = !$useMapperNameAsTableName ? 'Departments' : 'departments';
+            $mapper = &Piece_ORM_Mapper_Factory::factory($mapperName);
+            $mapper->addOrder('id');
+            $departments = $mapper->findAllWithOrderedEmployees();
+
+            $this->assertTrue(is_array($departments));
+            $this->assertEquals(2, count($departments));
+            $this->assertEquals('Qux', $departments[1]->employees[0]->firstName);
+            $this->assertEquals('Baz', $departments[1]->employees[1]->firstName);
+
+            $this->_clearTableRecords();
+            if ($useMapperNameAsTableName) {
+                $this->_clearCaseSensitiveContext();
+            }
+        }
     }
 
     function testDelete()
@@ -825,7 +969,6 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
 
     function testCreateObject()
     {
-        $this->_prepareTableRecords();
         $mapper = &Piece_ORM_Mapper_Factory::factory('Employees');
         $subject = &$mapper->createObject();
 
@@ -843,205 +986,283 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
 
     function testCascadeUpdateOnManyToManyRelationships()
     {
-        $this->_prepareTableRecords();
-        $skillsMapper = &Piece_ORM_Mapper_Factory::factory('Skills');
-        $skills = $skillsMapper->findAll();
-        $employeeMapper = &Piece_ORM_Mapper_Factory::factory('Employees');
-        $employee1 = &$employeeMapper->findWithSkillsByFirstName('Foo');
+        foreach (array(false, true) as $useMapperNameAsTableName) {
+            if ($useMapperNameAsTableName) {
+                $this->_prepareCaseSensitiveContext();
+            }
 
-        $this->assertEquals(0, count($employee1->skills));
+            $this->_prepareTableRecords($useMapperNameAsTableName);
+            $mapperName = !$useMapperNameAsTableName ? 'Skills' : 'skills';
+            $skillsMapper = &Piece_ORM_Mapper_Factory::factory($mapperName);
+            $skills = $skillsMapper->findAll();
+            $mapperName = !$useMapperNameAsTableName ? 'Employees' : 'employees';
+            $employeeMapper = &Piece_ORM_Mapper_Factory::factory($mapperName);
+            $employee1 = &$employeeMapper->findWithSkillsByFirstName('Foo');
 
-        $employee1->skills = $skills;
-        $employeeMapper->update($employee1);
-        $employee2 = &$employeeMapper->findWithSkillsByFirstName('Foo');
+            $this->assertEquals(0, count($employee1->skills));
 
-        $this->assertEquals(2, count($employee2->skills));
+            $employee1->skills = $skills;
+            $employeeMapper->update($employee1);
+            $employee2 = &$employeeMapper->findWithSkillsByFirstName('Foo');
 
-        $employee1->foo = 'bar';
+            $this->assertEquals(2, count($employee2->skills));
 
-        $this->assertTrue(array_key_exists('foo', $employee1));
-        $this->assertEquals('bar', $employee1->foo);
-        $this->assertFalse(array_key_exists('foo', $employee2));
+            $employee1->foo = 'bar';
 
-        unset($employee1->foo);
-        unset($employee1->skills);
-        unset($employee1->updatedAt);
-        unset($employee1->lockVersion);
-        unset($employee2->skills);
-        unset($employee2->updatedAt);
-        unset($employee2->lockVersion);
+            $this->assertTrue(array_key_exists('foo', $employee1));
+            $this->assertEquals('bar', $employee1->foo);
+            $this->assertFalse(array_key_exists('foo', $employee2));
 
-        $this->assertEquals($employee1, $employee2);
+            unset($employee1->foo);
+            unset($employee1->skills);
+            unset($employee1->updatedAt);
+            unset($employee1->lockVersion);
+            unset($employee2->skills);
+            unset($employee2->updatedAt);
+            unset($employee2->lockVersion);
+
+            $this->assertEquals($employee1, $employee2);
+
+            $this->_clearTableRecords();
+            if ($useMapperNameAsTableName) {
+                $this->_clearCaseSensitiveContext();
+            }
+        }
     }
 
     function testCascadeUpdateOnOneToManyRelationships()
     {
-        $this->_prepareTableRecords();
-        $departmentsMapper = &Piece_ORM_Mapper_Factory::factory('Departments');
-        $department1 = &$departmentsMapper->findWithEmployeesByName('Bar');
+        foreach (array(false, true) as $useMapperNameAsTableName) {
+            if ($useMapperNameAsTableName) {
+                $this->_prepareCaseSensitiveContext();
+            }
 
-        $this->assertEquals(2, count($department1->employees));
+            $this->_prepareTableRecords($useMapperNameAsTableName);
+            $mapperName = !$useMapperNameAsTableName ? 'Departments' : 'departments';
+            $departmentsMapper = &Piece_ORM_Mapper_Factory::factory($mapperName);
+            $department1 = &$departmentsMapper->findWithEmployeesByName('Bar');
 
-        $employeesMapper = &Piece_ORM_Mapper_Factory::factory('Employees');
+            $this->assertEquals(2, count($department1->employees));
 
-        $subject1 = &$employeesMapper->createObject();
-        $subject1->firstName = 'Quux';
-        $subject1->lastName = 'Quuux';
-        $department1->employees[] = &$subject1;
-        array_shift($department1->employees);
+            $mapperName = !$useMapperNameAsTableName ? 'Employees' : 'employees';
+            $employeesMapper = &Piece_ORM_Mapper_Factory::factory($mapperName);
 
-        $this->assertEquals('Baz', $department1->employees[0]->firstName);
+            $subject1 = &$employeesMapper->createObject();
+            $subject1->firstName = 'Quux';
+            $subject1->lastName = 'Quuux';
+            $department1->employees[] = &$subject1;
+            array_shift($department1->employees);
 
-        $department1->employees[0]->firstName = 'Qux2';
-        $department1->employees[0]->lastName = 'Quux2';
-        $subject2 = &$employeesMapper->createObject();
-        $subject2->firstName = 'Quuux';
-        $subject2->lastName = 'Quuuux';
-        $department1->employees[] = &$subject2;
-        $departmentsMapper->update($department1);
+            $this->assertEquals('Baz', $department1->employees[0]->firstName);
 
-        $department2 = &$departmentsMapper->findWithEmployeesByName('Bar');
+            $department1->employees[0]->firstName = 'Qux2';
+            $department1->employees[0]->lastName = 'Quux2';
+            $subject2 = &$employeesMapper->createObject();
+            $subject2->firstName = 'Quuux';
+            $subject2->lastName = 'Quuuux';
+            $department1->employees[] = &$subject2;
+            $departmentsMapper->update($department1);
 
-        $this->assertEquals(3, count($department2->employees));
-        $this->assertEquals('Quuux', $department2->employees[0]->firstName);
-        $this->assertEquals('Quux', $department2->employees[1]->firstName);
-        $this->assertEquals('Qux2', $department2->employees[2]->firstName);
+            $department2 = &$departmentsMapper->findWithEmployeesByName('Bar');
 
-        $department1->foo = 'bar';
+            $this->assertEquals(3, count($department2->employees));
+            $this->assertEquals('Quuux', $department2->employees[0]->firstName);
+            $this->assertEquals('Quux', $department2->employees[1]->firstName);
+            $this->assertEquals('Qux2', $department2->employees[2]->firstName);
 
-        $this->assertTrue(array_key_exists('foo', $department1));
-        $this->assertEquals('bar', $department1->foo);
-        $this->assertFalse(array_key_exists('foo', $department2));
+            $department1->foo = 'bar';
 
-        unset($department1->employees);
-        unset($department1->foo);
-        unset($department1->updatedAt);
-        unset($department2->employees);
-        unset($department2->updatedAt);
+            $this->assertTrue(array_key_exists('foo', $department1));
+            $this->assertEquals('bar', $department1->foo);
+            $this->assertFalse(array_key_exists('foo', $department2));
 
-        $this->assertEquals($department1, $department2);
+            unset($department1->employees);
+            unset($department1->foo);
+            unset($department1->updatedAt);
+            unset($department2->employees);
+            unset($department2->updatedAt);
+
+            $this->assertEquals($department1, $department2);
+
+            $this->_clearTableRecords();
+            if ($useMapperNameAsTableName) {
+                $this->_clearCaseSensitiveContext();
+            }
+        }
     }
 
     function testCascadeUpdateOnOneToOneRelationships()
     {
-        $this->_prepareTableRecords();
-        $employeesMapper = &Piece_ORM_Mapper_Factory::factory('Employees');
-        $employee1 = &$employeesMapper->findWithComputerByFirstName('Foo');
+        foreach (array(false, true) as $useMapperNameAsTableName) {
+            if ($useMapperNameAsTableName) {
+                $this->_prepareCaseSensitiveContext();
+            }
 
-        $this->assertNull($employee1->computer);
+            $this->_prepareTableRecords($useMapperNameAsTableName);
+            $mapperName = !$useMapperNameAsTableName ? 'Employees' : 'employees';
+            $employeesMapper = &Piece_ORM_Mapper_Factory::factory($mapperName);
+            $employee1 = &$employeesMapper->findWithComputerByFirstName('Foo');
 
-        $computersMapper = &Piece_ORM_Mapper_Factory::factory('Computers');
+            $this->assertNull($employee1->computer);
 
-        $subject1 = &$computersMapper->createObject();
-        $subject1->name = 'Qux';
-        $employee1->computer = &$subject1;
-        $employeesMapper->update($employee1);
+            $mapperName = !$useMapperNameAsTableName ? 'Computers' : 'computers';
+            $computersMapper = &Piece_ORM_Mapper_Factory::factory($mapperName);
 
-        $employee2 = &$employeesMapper->findWithComputerByFirstName('Foo');
+            $subject1 = &$computersMapper->createObject();
+            $subject1->name = 'Qux';
+            $employee1->computer = &$subject1;
+            $employeesMapper->update($employee1);
 
-        $this->assertNotNull($employee2->computer);
-        $this->assertEquals('Qux', $employee2->computer->name);
+            $employee2 = &$employeesMapper->findWithComputerByFirstName('Foo');
 
-        unset($employee1->computer);
-        unset($employee1->updatedAt);
-        unset($employee1->lockVersion);
-        unset($employee2->computer);
-        unset($employee2->updatedAt);
-        unset($employee2->lockVersion);
+            $this->assertNotNull($employee2->computer);
+            $this->assertEquals('Qux', $employee2->computer->name);
 
-        $this->assertEquals($employee1, $employee2);
+            unset($employee1->computer);
+            unset($employee1->updatedAt);
+            unset($employee1->lockVersion);
+            unset($employee2->computer);
+            unset($employee2->updatedAt);
+            unset($employee2->lockVersion);
 
-        $employee1 = &$employeesMapper->findWithComputerByFirstName('Foo');
+            $this->assertEquals($employee1, $employee2);
 
-        $this->assertNotNull($employee1->computer);
+            $employee1 = &$employeesMapper->findWithComputerByFirstName('Foo');
 
-        $employee1->computer = null;
-        $employeesMapper->update($employee1);
+            $this->assertNotNull($employee1->computer);
 
-        $employee2 = &$employeesMapper->findWithComputerByFirstName('Foo');
+            $employee1->computer = null;
+            $employeesMapper->update($employee1);
 
-        $this->assertNull($employee2->computer);
+            $employee2 = &$employeesMapper->findWithComputerByFirstName('Foo');
 
-        unset($employee1->computer);
-        unset($employee1->updatedAt);
-        unset($employee1->lockVersion);
-        unset($employee2->computer);
-        unset($employee2->updatedAt);
-        unset($employee2->lockVersion);
+            $this->assertNull($employee2->computer);
 
-        $this->assertEquals($employee1, $employee2);
+            unset($employee1->computer);
+            unset($employee1->updatedAt);
+            unset($employee1->lockVersion);
+            unset($employee2->computer);
+            unset($employee2->updatedAt);
+            unset($employee2->lockVersion);
 
-        $employee1 = &$employeesMapper->findWithComputerByFirstName('Bar');
+            $this->assertEquals($employee1, $employee2);
 
-        $this->assertNotNull($employee1->computer);
-        $this->assertEquals('Baz', $employee1->computer->name);
+            $employee1 = &$employeesMapper->findWithComputerByFirstName('Bar');
 
-        $employee1->computer->name = 'Baz2';
-        $employeesMapper->update($employee1);
+            $this->assertNotNull($employee1->computer);
+            $this->assertEquals('Baz', $employee1->computer->name);
 
-        $employee2 = &$employeesMapper->findWithComputerByFirstName('Bar');
+            $employee1->computer->name = 'Baz2';
+            $employeesMapper->update($employee1);
 
-        $this->assertNotNull($employee2->computer);
-        $this->assertEquals('Baz2', $employee2->computer->name);
+            $employee2 = &$employeesMapper->findWithComputerByFirstName('Bar');
 
-        $employee1->foo = 'employee';
+            $this->assertNotNull($employee2->computer);
+            $this->assertEquals('Baz2', $employee2->computer->name);
 
-        $this->assertTrue(array_key_exists('foo', $employee1));
-        $this->assertEquals('employee', $employee1->foo);
-        $this->assertFalse(array_key_exists('foo', $employee2));
+            $employee1->foo = 'employee';
 
-        unset($employee1->computer);
-        unset($employee1->foo);
-        unset($employee1->updatedAt);
-        unset($employee1->lockVersion);
-        unset($employee2->computer);
-        unset($employee2->updatedAt);
-        unset($employee2->lockVersion);
+            $this->assertTrue(array_key_exists('foo', $employee1));
+            $this->assertEquals('employee', $employee1->foo);
+            $this->assertFalse(array_key_exists('foo', $employee2));
 
-        $this->assertEquals($employee1, $employee2);
+            unset($employee1->computer);
+            unset($employee1->foo);
+            unset($employee1->updatedAt);
+            unset($employee1->lockVersion);
+            unset($employee2->computer);
+            unset($employee2->updatedAt);
+            unset($employee2->lockVersion);
+
+            $this->assertEquals($employee1, $employee2);
+
+            $this->_clearTableRecords();
+            if ($useMapperNameAsTableName) {
+                $this->_clearCaseSensitiveContext();
+            }
+        }
     }
 
     function testCascadeDeleteManyToManyRelationships()
     {
-        $this->_prepareTableRecords();
-        $employeesMapper = &Piece_ORM_Mapper_Factory::factory('Employees');
-        $employee = &$employeesMapper->findWithSkillsByFirstName('Qux');
-        $employeesSkillsMapper = &Piece_ORM_Mapper_Factory::factory('EmployeesSkills');
+        foreach (array(false, true) as $useMapperNameAsTableName) {
+            if ($useMapperNameAsTableName) {
+                $this->_prepareCaseSensitiveContext();
+            }
 
-        $this->assertEquals(2, count($employeesSkillsMapper->findAllByEmployeesId($employee->id)));
+            $this->_prepareTableRecords($useMapperNameAsTableName);
+            $mapperName = !$useMapperNameAsTableName ? 'Employees' : 'employees';
+            $employeesMapper = &Piece_ORM_Mapper_Factory::factory($mapperName);
+            $employee = &$employeesMapper->findWithSkillsByFirstName('Qux');
+            $mapperName = !$useMapperNameAsTableName ? 'EmployeesSkills' : 'employees_skills';
+            $employeesSkillsMapper = &Piece_ORM_Mapper_Factory::factory($mapperName);
 
-        $employeesMapper->delete($employee);
+            $this->assertEquals(2, count($employeesSkillsMapper->findAllByEmployeesId($employee->id)));
 
-        $this->assertEquals(0, count($employeesSkillsMapper->findAllByEmployeesId($employee->id)));
+            $employeesMapper->delete($employee);
+
+            $this->assertEquals(0, count($employeesSkillsMapper->findAllByEmployeesId($employee->id)));
+
+            $this->_clearTableRecords();
+            if ($useMapperNameAsTableName) {
+                $this->_clearCaseSensitiveContext();
+            }
+        }
     }
 
     function testCascadeDeleteOnOneToManyRelationships()
     {
-        $this->_prepareTableRecords();
-        $departmentsMapper = &Piece_ORM_Mapper_Factory::factory('Departments');
-        $department = &$departmentsMapper->findWithEmployeesByName('Bar');
-        $departmentsId = $department->id;
-        $employeesMapper = &Piece_ORM_Mapper_Factory::factory('Employees');
+        foreach (array(false, true) as $useMapperNameAsTableName) {
+            if ($useMapperNameAsTableName) {
+                $this->_prepareCaseSensitiveContext();
+            }
 
-        $this->assertEquals(2, count($employeesMapper->findAllByDepartmentsId($department->id)));
+            $this->_prepareTableRecords($useMapperNameAsTableName);
+            $mapperName = !$useMapperNameAsTableName ? 'Departments' : 'departments';
+            $departmentsMapper = &Piece_ORM_Mapper_Factory::factory($mapperName);
+            $department = &$departmentsMapper->findWithEmployeesByName('Bar');
+            $departmentsId = $department->id;
+            $mapperName = !$useMapperNameAsTableName ? 'Employees' : 'employees';
+            $employeesMapper = &Piece_ORM_Mapper_Factory::factory($mapperName);
 
-        $departmentsMapper->delete($department);
+            $this->assertEquals(2, count($employeesMapper->findAllByDepartmentsId($department->id)));
 
-        $this->assertEquals(0, count($employeesMapper->findAllByDepartmentsId($department->id)));
+            $departmentsMapper->delete($department);
+
+            $this->assertEquals(0, count($employeesMapper->findAllByDepartmentsId($department->id)));
+
+            $this->_clearTableRecords();
+            if ($useMapperNameAsTableName) {
+                $this->_clearCaseSensitiveContext();
+            }
+        }
     }
 
     function testCascadeDeleteOnOneToOneRelationships()
     {
-        $this->_prepareTableRecords();
-        $employeesMapper = &Piece_ORM_Mapper_Factory::factory('Employees');
-        $employee = &$employeesMapper->findWithComputerByFirstName('Baz');
-        $computersMapper = &Piece_ORM_Mapper_Factory::factory('Computers');
+        foreach (array(false, true) as $useMapperNameAsTableName) {
+            if ($useMapperNameAsTableName) {
+                $this->_prepareCaseSensitiveContext();
+            }
 
-        $this->assertNotNull($computersMapper->findByEmployeesId($employee->id));
+            $this->_prepareTableRecords($useMapperNameAsTableName);
+            $mapperName = !$useMapperNameAsTableName ? 'Employees' : 'employees';
+            $employeesMapper = &Piece_ORM_Mapper_Factory::factory($mapperName);
+            $employee = &$employeesMapper->findWithComputerByFirstName('Baz');
+            $mapperName = !$useMapperNameAsTableName ? 'Computers' : 'computers';
+            $computersMapper = &Piece_ORM_Mapper_Factory::factory($mapperName);
 
-        $employeesMapper->delete($employee);
+            $this->assertNotNull($computersMapper->findByEmployeesId($employee->id));
 
-        $this->assertNull($computersMapper->findByEmployeesId($employee->id));
+            $employeesMapper->delete($employee);
+
+            $this->assertNull($computersMapper->findByEmployeesId($employee->id));
+
+            $this->_clearTableRecords();
+            if ($useMapperNameAsTableName) {
+                $this->_clearCaseSensitiveContext();
+            }
+        }
     }
 
     /**
@@ -1049,20 +1270,32 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
      */
     function testGetCount()
     {
-        $this->_prepareTableRecords();
-        $mapper = &Piece_ORM_Mapper_Factory::factory('Employees');
+        foreach (array(false, true) as $useMapperNameAsTableName) {
+            if ($useMapperNameAsTableName) {
+                $this->_prepareCaseSensitiveContext();
+            }
 
-        $this->assertNull($mapper->getCount());
+            $this->_prepareTableRecords($useMapperNameAsTableName);
+            $mapperName = !$useMapperNameAsTableName ? 'Employees' : 'employees';
+            $mapper = &Piece_ORM_Mapper_Factory::factory($mapperName);
 
-        $mapper->findAll();
+            $this->assertNull($mapper->getCount());
 
-        $this->assertEquals(4, $mapper->getCount());
+            $mapper->findAll();
 
-        $mapper->setLimit(2);
-        $employees = $mapper->findAll();
+            $this->assertEquals(4, $mapper->getCount());
 
-        $this->assertEquals(2, count($employees));
-        $this->assertEquals(4, $mapper->getCount());
+            $mapper->setLimit(2);
+            $employees = $mapper->findAll();
+
+            $this->assertEquals(2, count($employees));
+            $this->assertEquals(4, $mapper->getCount());
+
+            $this->_clearTableRecords();
+            if ($useMapperNameAsTableName) {
+                $this->_clearCaseSensitiveContext();
+            }
+        }
     }
 
     /**
@@ -1070,15 +1303,27 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
      */
     function testFindOne()
     {
-        $this->_prepareTableRecords();
-        $mapper = &Piece_ORM_Mapper_Factory::factory('Employees');
+        foreach (array(false, true) as $useMapperNameAsTableName) {
+            if ($useMapperNameAsTableName) {
+                $this->_prepareCaseSensitiveContext();
+            }
 
-        $this->assertNull($mapper->findOneForFirstNameByFirstName('NonExisting'));
+            $this->_prepareTableRecords($useMapperNameAsTableName);
+            $mapperName = !$useMapperNameAsTableName ? 'Employees' : 'employees';
+            $mapper = &Piece_ORM_Mapper_Factory::factory($mapperName);
 
-        $mapper->addOrder('id', true);
+            $this->assertNull($mapper->findOneForFirstNameByFirstName('NonExisting'));
 
-        $this->assertEquals('Qux', $mapper->findOneForFirstNameByFirstName((object)array('firstName' => 'Qux')));
-        $this->assertEquals(4, $mapper->findOneForCount());
+            $mapper->addOrder('id', true);
+
+            $this->assertEquals('Qux', $mapper->findOneForFirstNameByFirstName((object)array('firstName' => 'Qux')));
+            $this->assertEquals(4, $mapper->findOneForCount());
+
+            $this->_clearTableRecords();
+            if ($useMapperNameAsTableName) {
+                $this->_clearCaseSensitiveContext();
+            }
+        }
     }
 
     /**
@@ -1086,14 +1331,26 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
      */
     function testGetCountShouldWorkWithFindAll()
     {
-        $this->_prepareTableRecords();
-        $mapper = &Piece_ORM_Mapper_Factory::factory('Employees');
+        foreach (array(false, true) as $useMapperNameAsTableName) {
+            if ($useMapperNameAsTableName) {
+                $this->_prepareCaseSensitiveContext();
+            }
 
-        $this->assertNull($mapper->getCount());
+            $this->_prepareTableRecords($useMapperNameAsTableName);
+            $mapperName = !$useMapperNameAsTableName ? 'Employees' : 'employees';
+            $mapper = &Piece_ORM_Mapper_Factory::factory($mapperName);
 
-        $mapper->findAll();
+            $this->assertNull($mapper->getCount());
 
-        $this->assertEquals(4, $mapper->getCount());
+            $mapper->findAll();
+
+            $this->assertEquals(4, $mapper->getCount());
+
+            $this->_clearTableRecords();
+            if ($useMapperNameAsTableName) {
+                $this->_clearCaseSensitiveContext();
+            }
+        }
     }
 
     /**
@@ -1142,15 +1399,27 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
      */
     function testGetCountShouldWorkWhenOrderIsSet()
     {
-        $this->_prepareTableRecords();
-        $mapper = &Piece_ORM_Mapper_Factory::factory('Employees');
+        foreach (array(false, true) as $useMapperNameAsTableName) {
+            if ($useMapperNameAsTableName) {
+                $this->_prepareCaseSensitiveContext();
+            }
 
-        $this->assertNull($mapper->getCount());
+            $this->_prepareTableRecords($useMapperNameAsTableName);
+            $mapperName = !$useMapperNameAsTableName ? 'Employees' : 'employees';
+            $mapper = &Piece_ORM_Mapper_Factory::factory($mapperName);
 
-        $mapper->addOrder('created_at');
-        $mapper->findAll();
+            $this->assertNull($mapper->getCount());
 
-        $this->assertEquals(4, $mapper->getCount());
+            $mapper->addOrder('created_at');
+            $mapper->findAll();
+
+            $this->assertEquals(4, $mapper->getCount());
+
+            $this->_clearTableRecords();
+            if ($useMapperNameAsTableName) {
+                $this->_clearCaseSensitiveContext();
+            }
+        }
     }
 
     /**
@@ -1369,34 +1638,47 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
      */
     function testManyToManyRelationshipsWithUnderscoreSeparatedPrimaryKeyShouldWork()
     {
-        $emailsMapper = &Piece_ORM_Mapper_Factory::factory('Emails');
+        foreach (array(false, true) as $useMapperNameAsTableName) {
+            if ($useMapperNameAsTableName) {
+                $this->_prepareCaseSensitiveContext();
+            }
 
-        $subject1 = &$emailsMapper->createObject();
-        $subject1->email = 'foo@example.org';
-        $emailsMapper->insert($subject1);
+            $mapperName = !$useMapperNameAsTableName ? 'Emails' : 'emails';
+            $emailsMapper = &Piece_ORM_Mapper_Factory::factory($mapperName);
 
-        $subject2 = &$emailsMapper->createObject();
-        $subject2->email = 'bar@example.org';
-        $emailsMapper->insert($subject2);
+            $subject1 = &$emailsMapper->createObject();
+            $subject1->email = 'foo@example.org';
+            $emailsMapper->insert($subject1);
 
-        $employeesMapper = &Piece_ORM_Mapper_Factory::factory('Employees');
+            $subject2 = &$emailsMapper->createObject();
+            $subject2->email = 'bar@example.org';
+            $emailsMapper->insert($subject2);
 
-        $subject = &$employeesMapper->createObject();
-        $subject->firstName = 'Foo';
-        $subject->lastName = 'Bar';
-        $subject->emails = array();
-        $subject->emails[] = &$subject1;
-        $subject->emails[] = &$subject2;
-        $employeesMapper->insertWithEmails($subject);
+            $mapperName = !$useMapperNameAsTableName ? 'Employees' : 'employees';
+            $employeesMapper = &Piece_ORM_Mapper_Factory::factory($mapperName);
 
-        $employees = $employeesMapper->findAllWithEmails();
+            $subject = &$employeesMapper->createObject();
+            $subject->firstName = 'Foo';
+            $subject->lastName = 'Bar';
+            $subject->emails = array();
+            $subject->emails[] = &$subject1;
+            $subject->emails[] = &$subject2;
+            $employeesMapper->insertWithEmails($subject);
 
-        $this->assertEquals(1, count($employees));
-        $this->assertTrue(array_key_exists('emails', $employees[0]));
-        $this->assertTrue(is_array($employees[0]->emails));
-        $this->assertEquals(2, count($employees[0]->emails));
-        $this->assertEquals('foo@example.org', $employees[0]->emails[0]->email);
-        $this->assertEquals('bar@example.org', $employees[0]->emails[1]->email);
+            $employees = $employeesMapper->findAllWithEmails();
+
+            $this->assertEquals(1, count($employees));
+            $this->assertTrue(array_key_exists('emails', $employees[0]));
+            $this->assertTrue(is_array($employees[0]->emails));
+            $this->assertEquals(2, count($employees[0]->emails));
+            $this->assertEquals('foo@example.org', $employees[0]->emails[0]->email);
+            $this->assertEquals('bar@example.org', $employees[0]->emails[1]->email);
+
+            $this->_clearTableRecords();
+            if ($useMapperNameAsTableName) {
+                $this->_clearCaseSensitiveContext();
+            }
+        }
     }
 
     /**
@@ -1551,36 +1833,50 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
      */
     function testUnusualNamesShouldWork()
     {
-        $inverseMapper = &Piece_ORM_Mapper_Factory::factory('Unusualname_12');
-        $inverseSubject = &$inverseMapper->createObject();
-        $inverseSubject->name = 'foo';
-        $inverseMapper->insert($inverseSubject);
+        foreach (array(false, true) as $useMapperNameAsTableName) {
+            if ($useMapperNameAsTableName) {
+                $this->_prepareCaseSensitiveContext();
+            }
 
-        $this->assertEquals(1, count($inverseMapper->findAll()));
+            $mapperName = !$useMapperNameAsTableName ? 'Unusualname_12' : 'unusualname_12';
+            $inverseMapper = &Piece_ORM_Mapper_Factory::factory($mapperName);
+            $inverseSubject = &$inverseMapper->createObject();
+            $inverseSubject->name = 'foo';
+            $inverseMapper->insert($inverseSubject);
 
-        $mapper = &Piece_ORM_Mapper_Factory::factory('Unusualname1_2');
-        $subject = &$mapper->createObject();
-        $subject->name = 'bar';
-        $subject->baz = array();
-        $subject->baz[] = &$inverseSubject;
-        $mapper->insert($subject);
+            $this->assertEquals(1, count($inverseMapper->findAll()));
 
-        $objects = $mapper->findAll();
+            $mapperName = !$useMapperNameAsTableName ? 'Unusualname1_2' : 'unusualname1_2';
+            $mapper = &Piece_ORM_Mapper_Factory::factory($mapperName);
+            $subject = &$mapper->createObject();
+            $subject->name = 'bar';
+            $subject->baz = array();
+            $subject->baz[] = &$inverseSubject;
+            $mapper->insert($subject);
 
-        $this->assertEquals(1, count($objects));
-        $this->assertEquals('bar', $objects[0]->name);
+            $objects = $mapper->findAll();
 
-        $this->assertEquals(1, count($objects[0]->baz));
-        $this->assertEquals('foo', $objects[0]->baz[0]->name);
+            $this->assertEquals(1, count($objects));
+            $this->assertEquals('bar', $objects[0]->name);
 
-        $throughMapper = &Piece_ORM_Mapper_Factory::factory('Unusualname1_2_unusualname_12');
-        $objects = $throughMapper->findAll();
+            $this->assertEquals(1, count($objects[0]->baz));
+            $this->assertEquals('foo', $objects[0]->baz[0]->name);
 
-        $this->assertEquals(1, count($objects));
-        $this->assertEquals(3, count(array_keys((array)$objects[0])));
-        $this->assertTrue(array_key_exists('id', $objects[0]));
-        $this->assertTrue(array_key_exists('unusualname1_2_id', $objects[0]));
-        $this->assertTrue(array_key_exists('unusualname_12_id', $objects[0]));
+            $mapperName = !$useMapperNameAsTableName ? 'Unusualname1_2_unusualname_12' : 'unusualname1_2_unusualname_12';
+            $throughMapper = &Piece_ORM_Mapper_Factory::factory($mapperName);
+            $objects = $throughMapper->findAll();
+
+            $this->assertEquals(1, count($objects));
+            $this->assertEquals(3, count(array_keys((array)$objects[0])));
+            $this->assertTrue(array_key_exists('id', $objects[0]));
+            $this->assertTrue(array_key_exists('unusualname1_2_id', $objects[0]));
+            $this->assertTrue(array_key_exists('unusualname_12_id', $objects[0]));
+
+            $this->_clearTableRecords();
+            if ($useMapperNameAsTableName) {
+                $this->_clearCaseSensitiveContext();
+            }
+        }
     }
 
     /**
@@ -1588,14 +1884,27 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
      */
     function testShouldWorkAnyFinderMethodCallsForAMapperWhichHasAlreadyUsedInRelationships()
     {
-        $this->_prepareTableRecords();
-        $employeesMapper = &Piece_ORM_Mapper_Factory::factory('Employees');
-        $employeesMapper->findAllWithSkills2();
-        $skillsMapper = &Piece_ORM_Mapper_Factory::factory('Skills');
-        $skills = $skillsMapper->findAll();
+        foreach (array(false, true) as $useMapperNameAsTableName) {
+            if ($useMapperNameAsTableName) {
+                $this->_prepareCaseSensitiveContext();
+            }
 
-        $this->assertEquals(2, $skillsMapper->getCount());
-        $this->assertEquals(2, count($skills));
+            $this->_prepareTableRecords($useMapperNameAsTableName);
+            $mapperName = !$useMapperNameAsTableName ? 'Employees' : 'employees';
+            $employeesMapper = &Piece_ORM_Mapper_Factory::factory($mapperName);
+            $employeesMapper->findAllWithSkills2();
+            $mapperName = !$useMapperNameAsTableName ? 'Skills' : 'skills';
+            $skillsMapper = &Piece_ORM_Mapper_Factory::factory($mapperName);
+            $skills = $skillsMapper->findAll();
+
+            $this->assertEquals(2, $skillsMapper->getCount());
+            $this->assertEquals(2, count($skills));
+
+            $this->_clearTableRecords();
+            if ($useMapperNameAsTableName) {
+                $this->_clearCaseSensitiveContext();
+            }
+        }
     }
 
     /**
@@ -1811,9 +2120,10 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         return $mapper->insert($subject);
     }
 
-    function _prepareTableRecords()
+    function _prepareTableRecords($useMapperNameAsTableName = false)
     {
-        $skillsMapper = &Piece_ORM_Mapper_Factory::factory('Skills');
+        $mapperName = !$useMapperNameAsTableName ? 'Skills' : 'skills';
+        $skillsMapper = &Piece_ORM_Mapper_Factory::factory($mapperName);
 
         $skill1 = &$skillsMapper->createObject();
         $skill1->name = 'Foo';
@@ -1823,7 +2133,8 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         $skill2->name = 'Bar';
         $skillsMapper->insert($skill2);
 
-        $departmentsMapper = &Piece_ORM_Mapper_Factory::factory('Departments');
+        $mapperName = !$useMapperNameAsTableName ? 'Departments' : 'departments';
+        $departmentsMapper = &Piece_ORM_Mapper_Factory::factory($mapperName);
 
         $department1 = &$departmentsMapper->createObject();
         $department1->name = 'Foo';
@@ -1833,7 +2144,8 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         $department2->name = 'Bar';
         $departmentsMapper->insert($department2);
 
-        $computersMapper = &Piece_ORM_Mapper_Factory::factory('Computers');
+        $mapperName = !$useMapperNameAsTableName ? 'Computers' : 'computers';
+        $computersMapper = &Piece_ORM_Mapper_Factory::factory($mapperName);
 
         $computer1 = &$computersMapper->createObject();
         $computer1->name = 'Foo';
@@ -1844,7 +2156,8 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         $computer3 = &$computersMapper->createObject();
         $computer3->name = 'Baz';
 
-        $employeesMapper = &Piece_ORM_Mapper_Factory::factory('Employees');
+        $mapperName = !$useMapperNameAsTableName ? 'Employees' : 'employees';
+        $employeesMapper = &Piece_ORM_Mapper_Factory::factory($mapperName);
 
         $employee1 = &$employeesMapper->createObject();
         $employee1->firstName = 'Foo';
@@ -1895,6 +2208,28 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         foreach ($this->_tables as $table) {
             $dbh->exec("TRUNCATE TABLE $table");
         }
+    }
+
+    function _prepareCaseSensitiveContext()
+    {
+        $config = &new Piece_ORM_Config();
+        $config->setDSN('caseSensitive', $this->_dsn);
+        $config->setUseMapperNameAsTableName('caseSensitive', true);
+        $context = &Piece_ORM_Context::singleton();
+        $context->setConfiguration($config);
+        $context->setDatabase('caseSensitive');
+        Piece_ORM_Mapper_Factory::setConfigDirectory("{$this->_cacheDirectory}/CaseSensitive");
+        Piece_ORM_Mapper_Factory::setCacheDirectory("{$this->_cacheDirectory}/CaseSensitive");
+        Piece_ORM_Metadata_Factory::setCacheDirectory("{$this->_cacheDirectory}/CaseSensitive");
+    }
+
+    function _clearCaseSensitiveContext()
+    {
+        $cache = &new Cache_Lite(array('cacheDir' => "{$this->_cacheDirectory}/CaseSensitive/",
+                                       'automaticSerialization' => true,
+                                       'errorHandlingAPIBreak' => true)
+                                 );
+        $cache->clean();
     }
 
     /**#@-*/

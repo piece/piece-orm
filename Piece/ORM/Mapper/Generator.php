@@ -627,7 +627,7 @@ class Piece_ORM_Mapper_Generator
                         $query = $this->_generateDefaultDeleteQuery();
                         if (is_null($query)) {
                             Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_CONFIGURATION,
-                                                  'The element [ query ] is required to generate a delete method declaration since the table [ ' . $this->_metadata->getTableName() . ' ] has no primary keys.'
+                                                  'The element [ query ] is required to generate a delete method declaration since the table [ ' . $this->_metadata->getTableName(true) . ' ] has no primary keys.'
                                                   );
                         }
 
@@ -638,7 +638,7 @@ class Piece_ORM_Mapper_Generator
                         $query = $this->_generateDefaultUpdateQuery();
                         if (is_null($query)) {
                             Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_CONFIGURATION,
-                                                  'The element [ query ] is required to generate a update method declaration since the table [ ' . $this->_metadata->getTableName() . ' ] has no primary keys.'
+                                                  'The element [ query ] is required to generate a update method declaration since the table [ ' . $this->_metadata->getTableName(true) . ' ] has no primary keys.'
                                                   );
                         }
 

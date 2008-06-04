@@ -4,7 +4,7 @@
 /**
  * PHP versions 4 and 5
  *
- * Copyright (c) 2007 KUBO Atsuhiro <iteman@users.sourceforge.net>,
+ * Copyright (c) 2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>,
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,7 +29,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  * @package    Piece_ORM
- * @copyright  2007 KUBO Atsuhiro <iteman@users.sourceforge.net>
+ * @copyright  2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License (revised)
  * @version    SVN: $Id$
  * @since      File available since Release 0.2.0
@@ -45,7 +45,7 @@ require_once 'Piece/ORM/Metadata/Factory.php';
  * An relationship normalizer for Many-to-Many relationships.
  *
  * @package    Piece_ORM
- * @copyright  2007 KUBO Atsuhiro <iteman@users.sourceforge.net>
+ * @copyright  2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License (revised)
  * @version    Release: @package_version@
  * @since      Class available since Release 0.2.0
@@ -95,8 +95,8 @@ class Piece_ORM_Mapper_RelationshipNormalizer_ManyToMany extends Piece_ORM_Mappe
         }
 
         if (!array_key_exists('table', $this->_relationship['through'])) {
-            $throughTableName1 = $this->_metadata->getTableName() . "_{$this->_relationship['table']}";
-            $throughTableName2 = "{$this->_relationship['table']}_" . $this->_metadata->getTableName();
+            $throughTableName1 = $this->_metadata->getTableName(true) . "_{$this->_relationship['table']}";
+            $throughTableName2 = "{$this->_relationship['table']}_" . $this->_metadata->getTableName(true);
             foreach (array($throughTableName1, $throughTableName2) as $throughTableName) {
                 Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
                 $throughMetadata = &Piece_ORM_Metadata_Factory::factory($throughTableName);
@@ -124,7 +124,7 @@ class Piece_ORM_Mapper_RelationshipNormalizer_ManyToMany extends Piece_ORM_Mappe
 
         if (!array_key_exists('column', $this->_relationship['through'])) {
             if ($primaryKey = $this->_metadata->getPrimaryKey()) {
-                $this->_relationship['through']['column'] = $this->_metadata->getTableName() . "_$primaryKey";
+                $this->_relationship['through']['column'] = $this->_metadata->getTableName(true) . "_$primaryKey";
             } else {
                 Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_CONFIGURATION,
                                       'A single primary key field is required, if the element [ column ] in the element [ through ] omit.'
@@ -135,7 +135,7 @@ class Piece_ORM_Mapper_RelationshipNormalizer_ManyToMany extends Piece_ORM_Mappe
 
         if (!$throughMetadata->hasField($this->_relationship['through']['column'])) {
             Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_CONFIGURATION,
-                                  "The field [ {$this->_relationship['through']['column']} ] not found in the table [ " . $throughMetadata->getTableName() . ' ].'
+                                  "The field [ {$this->_relationship['through']['column']} ] not found in the table [ " . $throughMetadata->getTableName(true) . ' ].'
                                   );
             return;
         }
@@ -153,14 +153,14 @@ class Piece_ORM_Mapper_RelationshipNormalizer_ManyToMany extends Piece_ORM_Mappe
 
         if (!$this->_metadata->hasField($this->_relationship['through']['referencedColumn'])) {
             Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_CONFIGURATION,
-                                  "The field [ {$this->_relationship['through']['referencedColumn']} ] not found in the table [ " . $this->_metadata->getTableName() . ' ].'
+                                  "The field [ {$this->_relationship['through']['referencedColumn']} ] not found in the table [ " . $this->_metadata->getTableName(true) . ' ].'
                                   );
             return;
         }
 
         if (!array_key_exists('inverseColumn', $this->_relationship['through'])) {
             if ($primaryKey = $this->_relationshipMetadata->getPrimaryKey()) {
-                $this->_relationship['through']['inverseColumn'] = $this->_relationshipMetadata->getTableName() . "_$primaryKey";
+                $this->_relationship['through']['inverseColumn'] = $this->_relationshipMetadata->getTableName(true) . "_$primaryKey";
             } else {
                 Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_CONFIGURATION,
                                       'A single primary key field is required, if the element [ column ] in the element [ through ] omit.'
@@ -171,7 +171,7 @@ class Piece_ORM_Mapper_RelationshipNormalizer_ManyToMany extends Piece_ORM_Mappe
 
         if (!$throughMetadata->hasField($this->_relationship['through']['inverseColumn'])) {
             Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_CONFIGURATION,
-                                  "The field [ {$this->_relationship['through']['inverseColumn']} ] not found in the table [ " . $throughMetadata->getTableName() . ' ].'
+                                  "The field [ {$this->_relationship['through']['inverseColumn']} ] not found in the table [ " . $throughMetadata->getTableName(true) . ' ].'
                                   );
             return;
         }

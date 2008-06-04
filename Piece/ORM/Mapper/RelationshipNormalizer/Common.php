@@ -4,7 +4,7 @@
 /**
  * PHP versions 4 and 5
  *
- * Copyright (c) 2007 KUBO Atsuhiro <iteman@users.sourceforge.net>,
+ * Copyright (c) 2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>,
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,7 +29,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  * @package    Piece_ORM
- * @copyright  2007 KUBO Atsuhiro <iteman@users.sourceforge.net>
+ * @copyright  2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License (revised)
  * @version    SVN: $Id$
  * @since      File available since Release 0.2.0
@@ -44,7 +44,7 @@ require_once 'Piece/ORM/Metadata/Factory.php';
  * The base class for relationship normalizers.
  *
  * @package    Piece_ORM
- * @copyright  2007 KUBO Atsuhiro <iteman@users.sourceforge.net>
+ * @copyright  2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License (revised)
  * @version    Release: @package_version@
  * @since      Class available since Release 0.2.0
@@ -125,7 +125,7 @@ class Piece_ORM_Mapper_RelationshipNormalizer_Common
         if ($this->_checkHavingSinglePrimaryKey()) {
             if (!$this->_relationshipMetadata->getPrimaryKey()) {
                 Piece_ORM_Error::push(PIECE_ORM_ERROR_NOT_FOUND,
-                                      'A single primary key field is required in the table [ ' . $this->_relationshipMetadata->getTableName() . ' ].'
+                                      'A single primary key field is required in the table [ ' . $this->_relationshipMetadata->getTableName(true) . ' ].'
                                       );
                 return;
             }
@@ -142,7 +142,7 @@ class Piece_ORM_Mapper_RelationshipNormalizer_Common
 
         if (!$this->_relationshipMetadata->hasField($this->_relationship['column'])) {
             Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_CONFIGURATION,
-                                  "The field [ {$this->_relationship['column']} ] not found in the table [ " . $this->_relationshipMetadata->getTableName() . ' ].'
+                                  "The field [ {$this->_relationship['column']} ] not found in the table [ " . $this->_relationshipMetadata->getTableName(true) . ' ].'
                                   );
             return;
         }
@@ -158,7 +158,7 @@ class Piece_ORM_Mapper_RelationshipNormalizer_Common
 
         if ($this->_referencedColumnRequired && !$this->_metadata->hasField($this->_relationship['referencedColumn'])) {
             Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_CONFIGURATION,
-                                  "The field [ {$this->_relationship['referencedColumn']} ] not found in the table [ " . $this->_metadata->getTableName() . ' ].'
+                                  "The field [ {$this->_relationship['referencedColumn']} ] not found in the table [ " . $this->_metadata->getTableName(true) . ' ].'
                                   );
             return;
         }

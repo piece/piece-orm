@@ -1,0 +1,289 @@
+# $Id$
+
+- name: findByIdAndNote
+  query: |
+    SELECT
+      *
+    FROM
+      $__table
+    WHERE
+      id = $id
+      AND note = $note
+
+- name: findAllWithSkills1
+  relationship:
+    - type: manyToMany
+      table: skills
+      mappedAs: skills
+
+- name: findAllWithSkills2
+  relationship:
+    - type: manyToMany
+      table: skills
+      mappedAs: skills
+      column: id
+      through:
+        table: employees_skills
+        column: employees_id
+        referencedColumn: id
+        inverseColumn: skills_id
+
+- name: insert
+  relationship:
+    - type: manyToMany
+      table: skills
+      mappedAs: skills
+    - type: oneToOne
+      table: computers
+      mappedAs: computer
+
+- name: findAllByFirstName
+  relationship:
+    - type: manyToMany
+      table: skills
+      mappedAs: skills
+
+- name: findAllWithDepartment1
+  relationship:
+    - type: manyToOne
+      table: departments
+      mappedAs: department
+
+- name: findAllWithDepartment2
+  relationship:
+    - type: manyToOne
+      table: departments
+      mappedAs: department
+      column: id
+      referencedColumn: departments_id
+
+- name: findAllWithComputer1
+  relationship:
+    - type: oneToOne
+      table: computers
+      mappedAs: computer
+
+- name: findAllWithComputer2
+  relationship:
+    - type: oneToOne
+      table: computers
+      mappedAs: computer
+      column: employees_id
+      referencedColumn: id
+
+- name: findWithDepartmentByFirstName
+  query: |
+    SELECT
+      *
+    FROM
+      $__table
+    WHERE
+      first_name = $firstName
+  relationship:
+    - type: manyToOne
+      table: departments
+      mappedAs: department
+
+- name: findAllWithOrderedSkills
+  relationship:
+    - type: manyToMany
+      table: skills
+      mappedAs: skills
+      orderBy: skills.id DESC
+
+- name: findWithOrderedSkills
+  relationship:
+    - type: manyToMany
+      table: skills
+      mappedAs: skills
+      orderBy: skills.id DESC
+
+- name: findWithSkillsByFirstName
+  query: |
+    SELECT
+      *
+    FROM
+      $__table
+    WHERE
+      first_name = $firstName
+  relationship:
+    - type: manyToMany
+      table: skills
+      mappedAs: skills
+
+- name: update
+  relationship:
+    - type: manyToMany
+      table: skills
+      mappedAs: skills
+    - type: oneToOne
+      table: computers
+      mappedAs: computer
+
+- name: findWithComputerByFirstName
+  query: |
+    SELECT
+      *
+    FROM
+      $__table
+    WHERE
+      first_name = $firstName
+  relationship:
+    - type: oneToOne
+      table: computers
+      mappedAs: computer
+
+- name: delete
+  relationship:
+    - type: manyToMany
+      table: skills
+      mappedAs: skills
+    - type: oneToOne
+      table: computers
+      mappedAs: computer
+
+- name: findOneForFirstNameByFirstName
+  query: |
+    SELECT
+      first_name
+    FROM
+      $__table
+    WHERE
+      first_name = $firstName
+
+- name: findOneForCount
+  query: |
+    SELECT
+      COUNT(*)
+    FROM
+      $__table
+
+- name: findAllNotes
+  query: |
+    SELECT
+      note
+    FROM
+      $__table
+
+- name: insertUserDefined
+  query: |
+    INSERT INTO $__table (
+      first_name,
+      last_name,
+      note,
+      created_at
+      )
+    VALUES (
+      $firstName,
+      $lastName,
+      'Bar',
+      $createdAt
+      )
+
+- name: updateUserDefined
+
+- name: deleteUserDefined
+  query: |
+    DELETE FROM $__table
+    WHERE
+      id = $id
+
+- name: updateNoteByNote
+  query: |
+    UPDATE $__table
+    SET
+      note = $note,
+      updated_at = $updatedAt
+    WHERE
+      note = $oldNote
+
+- name: deleteByNote
+  query: |
+    DELETE FROM $__table
+    WHERE
+      note = $note
+
+- name: findWithStaticQuery
+  query: SELECT 1 AS one
+
+- name: findAllWithStaticQuery
+  query: SELECT 1 AS one
+
+- name: findOneWithStaticQuery
+  query: SELECT 1 AS one
+
+- name: insertWithStaticQuery
+  query: |
+    INSERT INTO $__table (
+      first_name,
+      last_name,
+      note,
+      created_at
+      )
+    VALUES (
+      'Foo',
+      'Bar',
+      'Baz',
+      $createdAt
+      )
+
+- name: updateWithStaticQuery
+  query: |
+    UPDATE $__table
+    SET
+      note = 'Qux',
+      updated_at = $updatedAt
+
+- name: deleteWithStaticQuery
+  query: DELETE FROM $__table
+
+- name: insertWithNoQuery
+
+- name: updateWithNoQuery
+
+- name: deleteWithNoQuery
+
+- name: insertWithEmails
+  relationship:
+    - type: manyToMany
+      table: emails
+      mappedAs: emails
+      through:
+        table: employees_emails
+        inverseColumn: emails_id
+
+- name: findAllWithEmails
+  relationship:
+    - type: manyToMany
+      table: emails
+      mappedAs: emails
+      orderBy: emails.emails_id
+      through:
+        table: employees_emails
+        inverseColumn: emails_id
+
+- name: findAllOrderByLastName
+  orderBy: last_name
+
+- name: findOrderByLastName
+  orderBy: last_name
+
+- name: findOneOrderByLastName
+  query: SELECT last_name FROM $__table
+  orderBy: last_name
+
+- name: findAllByIds
+  query: |
+    SELECT
+      *
+    FROM
+      $__table
+    WHERE
+      id IN ($ids)
+
+# Local Variables:
+# mode: conf-colon
+# coding: iso-8859-1
+# tab-width: 2
+# indent-tabs-mode: nil
+# End:

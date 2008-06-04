@@ -237,7 +237,7 @@ class Piece_ORM_Mapper_ObjectLoader
     function _loadAssociatedObjects()
     {
         for ($i = 0, $count = count($this->_relationships); $i < $count; ++$i) {
-            $mapper = &Piece_ORM_Mapper_Factory::factory(Piece_ORM_Inflector::camelize($this->_relationships[$i]['table']));
+            $mapper = &Piece_ORM_Mapper_Factory::factory($this->_relationships[$i]['table']);
             if (Piece_ORM_Error::hasErrors('exception')) {
                 return;
             }

@@ -455,7 +455,9 @@ class Piece_ORM_Mapper_Common
     {
         if ($this->_metadata->hasID()) {
             PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
-            $id = $this->_dbh->lastInsertID($this->_metadata->getTableName(), $this->_metadata->getPrimaryKey());
+            $id = $this->_dbh->lastInsertID($this->_metadata->getTableName(true),
+                                            $this->_metadata->getPrimaryKey()
+                                            );
             PEAR::staticPopErrorHandling();
             if (MDB2::isError($id)) {
                 Piece_ORM_Error::pushPEARError($id,

@@ -4,7 +4,7 @@
 /**
  * PHP versions 4 and 5
  *
- * Copyright (c) 2007 KUBO Atsuhiro <iteman@users.sourceforge.net>,
+ * Copyright (c) 2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>,
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,7 +29,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  * @package    Piece_ORM
- * @copyright  2007 KUBO Atsuhiro <iteman@users.sourceforge.net>
+ * @copyright  2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License (revised)
  * @version    SVN: $Id$
  * @since      File available since Release 0.2.0
@@ -44,7 +44,7 @@ require_once 'Piece/ORM/Error.php';
  * An relationship normalizer for One-to-Many relationships.
  *
  * @package    Piece_ORM
- * @copyright  2007 KUBO Atsuhiro <iteman@users.sourceforge.net>
+ * @copyright  2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License (revised)
  * @version    Release: @package_version@
  * @since      Class available since Release 0.2.0
@@ -87,7 +87,7 @@ class Piece_ORM_Mapper_RelationshipNormalizer_OneToMany extends Piece_ORM_Mapper
     function _normalizeColumn()
     {
         if ($primaryKey = $this->_metadata->getPrimaryKey()) {
-            $this->_relationship['column'] = $this->_metadata->getTableName() . "_$primaryKey";
+            $this->_relationship['column'] = $this->_metadata->getTableName(true) . "_$primaryKey";
             return true;
         } else {
             return false;

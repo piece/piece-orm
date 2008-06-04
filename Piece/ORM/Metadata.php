@@ -140,12 +140,13 @@ class Piece_ORM_Metadata
     /**
      * Gets the table name.
      *
+     * @param boolean $notQuoteIdentifier
      * @return string
      */
-    function getTableName()
+    function getTableName($notQuoteIdentifier = false)
     {
         $context = &Piece_ORM_Context::singleton();
-        if (!$context->getUseMapperNameAsTableName()) {
+        if (!$context->getUseMapperNameAsTableName() || $notQuoteIdentifier) {
             return $this->_tableName;
         } else {
             $dbh = &$context->getConnection();

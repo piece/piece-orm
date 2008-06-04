@@ -99,7 +99,7 @@ class Piece_ORM_Mapper_AssociatedObjectPersister_ManyToMany extends Piece_ORM_Ma
             return;
         }
 
-        $mapper = &Piece_ORM_Mapper_Factory::factory(Piece_ORM_Inflector::camelize($relationship['through']['table']));
+        $mapper = &Piece_ORM_Mapper_Factory::factory($relationship['through']['table']);
         if (Piece_ORM_Error::hasErrors('exception')) {
             return;
         }
@@ -143,7 +143,7 @@ class Piece_ORM_Mapper_AssociatedObjectPersister_ManyToMany extends Piece_ORM_Ma
             return;
         }
 
-        $mapper = &Piece_ORM_Mapper_Factory::factory(Piece_ORM_Inflector::camelize($relationship['through']['table']));
+        $mapper = &Piece_ORM_Mapper_Factory::factory($relationship['through']['table']);
         if (Piece_ORM_Error::hasErrors('exception')) {
             return;
         }
@@ -191,7 +191,7 @@ class Piece_ORM_Mapper_AssociatedObjectPersister_ManyToMany extends Piece_ORM_Ma
             return;
         }
 
-        $mapper = &Piece_ORM_Mapper_Factory::factory(Piece_ORM_Inflector::camelize($relationship['through']['table']));
+        $mapper = &Piece_ORM_Mapper_Factory::factory($relationship['through']['table']);
         if (Piece_ORM_Error::hasErrors('exception')) {
             return;
         }
