@@ -444,35 +444,6 @@ class Piece_ORM_Mapper_Common
     }
 
     // }}}
-    // {{{ getLastInsertID()
-
-    /**
-     * Returns the value of an ID field if a table has an ID field.
-     *
-     * @return integer
-     * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
-     */
-    function getLastInsertID()
-    {
-        if ($this->_metadata->hasID()) {
-            PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
-            $id = $this->_dbh->lastInsertID($this->_metadata->getTableName(true),
-                                            $this->_metadata->getPrimaryKey()
-                                            );
-            PEAR::staticPopErrorHandling();
-            if (MDB2::isError($id)) {
-                Piece_ORM_Error::pushPEARError($id,
-                                               PIECE_ORM_ERROR_INVOCATION_FAILED,
-                                               "Failed to invoke MDB2_Driver_{$this->_dbh->phptype}::lastInsertID() for any reasons."
-                                               );
-                return;
-            }
-
-            return $id;
-        }
-    }
-
-    // }}}
     // {{{ setConnection()
 
     /**
@@ -571,6 +542,19 @@ class Piece_ORM_Mapper_Common
     function getQuery($methodName)
     {
         return $this->{ Piece_ORM_Mapper_Generator::getQueryProperty($methodName) };
+    }
+
+    // }}}
+    // {{{ getConnection()
+
+    /**
+     * Gets the database handle for this mapper.
+     *
+     * @return MDB2_Driver_Common
+     */
+    function &getConnection()
+    {
+        return $this->_dbh;
     }
 
     /**#@-*/

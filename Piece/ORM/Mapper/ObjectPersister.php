@@ -155,7 +155,7 @@ class Piece_ORM_Mapper_ObjectPersister
         }
 
         if ($this->_metadata->hasID()) {
-            $id = $this->_mapper->getLastInsertID();
+            $id = $this->_getLastInsertID();
             if (Piece_ORM_Error::hasErrors('exception')) {
                 return;
             }
@@ -300,6 +300,36 @@ class Piece_ORM_Mapper_ObjectPersister
         }
 
         return true;
+    }
+
+    // }}}
+    // {{{ _getLastInsertID()
+
+    /**
+     * Returns the value of an ID field if a table has an ID field.
+     *
+     * @return integer
+     * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
+     */
+    function _getLastInsertID()
+    {
+        if ($this->_metadata->hasID()) {
+            PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
+            $dbh = &$this->_mapper->getConnection();
+            $id = $dbh->lastInsertID($this->_metadata->getTableName(true),
+                                     $this->_metadata->getPrimaryKey()
+                                     );
+            PEAR::staticPopErrorHandling();
+            if (MDB2::isError($id)) {
+                Piece_ORM_Error::pushPEARError($id,
+                                               PIECE_ORM_ERROR_INVOCATION_FAILED,
+                                               "Failed to invoke MDB2_Driver_{$this->_dbh->phptype}::lastInsertID() for any reasons."
+                                               );
+                return;
+            }
+
+            return $id;
+        }
     }
 
     /**#@-*/
