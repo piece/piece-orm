@@ -92,7 +92,11 @@ class Piece_ORM_Mapper_QueryBuilder
      * @param stdClass                &$criteria
      * @param boolean                 $isManip
      */
-    function Piece_ORM_Mapper_QueryBuilder(&$mapper, $methodName, &$criteria, $isManip)
+    function Piece_ORM_Mapper_QueryBuilder(&$mapper,
+                                           $methodName,
+                                           &$criteria,
+                                           $isManip
+                                           )
     {
         $this->_metadata = &$mapper->getMetadata();
         $this->_mapper = &$mapper;

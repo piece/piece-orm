@@ -117,7 +117,8 @@ class Piece_ORM_Mapper_QueryExecutor
                     Piece_ORM_Error::push(PIECE_ORM_ERROR_UNEXPECTED_VALUE,
                                           'An unexpected value detected. executeQuery() with a prepared statement can only receive a MDB2_Statement_Common object.'
                                           );
-                    return;
+                    $return = null;
+                    return $return;
                 }
 
                 $result = $sth->execute();
