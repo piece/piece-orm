@@ -72,6 +72,7 @@ class Piece_ORM_Mapper_QueryBuilder
     var $_criteria;
     var $_errorsInEval = array();
     var $_metadata;
+    var $_isManip;
 
     /**#@-*/
 
@@ -85,14 +86,17 @@ class Piece_ORM_Mapper_QueryBuilder
     /**
      * Initializes properties with the given values.
      *
-     * @param string   $methodName
-     * @param stdClass $criteria
+     * @param Piece_ORM_Mapper_Common &$mapper
+     * @param string                  $methodName
+     * @param stdClass                $criteria
+     * @param boolean                 $isManip
      */
-    function Piece_ORM_Mapper_QueryBuilder(&$mapper, $methodName, $criteria)
+    function Piece_ORM_Mapper_QueryBuilder(&$mapper, $methodName, $criteria, $isManip)
     {
         $this->_metadata = &$mapper->getMetadata();
         $this->_mapper = &$mapper;
         $this->_methodName = $methodName;
+        $this->_isManip = $isManip;
 
         if (version_compare(phpversion(), '5.0.0', '>=')) {
             $this->_criteria = clone($criteria);
@@ -129,6 +133,17 @@ class Piece_ORM_Mapper_QueryBuilder
                                   "Failed to build a query for the method [ {$this->_methodName} ] for any reasons. See below for more details.
  $message");
             return;
+        }
+
+        if (Piece_ORM_Mapper_QueryType::isFindAll($this->_methodName)) {
+            $this->_mapper->setLastQueryForGetCount($query);
+        } else {
+            $this->_mapper->setLastQueryForGetCount(null);
+        }
+
+        if (!$this->_isManip) {
+            $query .= $this->_mapper->getOrderBy($this->_methodName);
+            $this->_mapper->clearOrders();
         }
 
         return $query;

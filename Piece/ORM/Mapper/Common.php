@@ -194,7 +194,6 @@ class Piece_ORM_Mapper_Common
      *
      * @param string  $expression
      * @param boolean $useDescendingOrder
-     * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
      */
     function addOrder($expression, $useDescendingOrder = false)
     {
@@ -320,7 +319,6 @@ class Piece_ORM_Mapper_Common
         PEAR::staticPopErrorHandling();
 
         $this->_lastQuery = $this->_dbh->last_query;
-        $this->_lastQueryForGetCount = null;
 
         if (MDB2::isError($result)) {
             if ($result->getCode() == MDB2_ERROR_CONSTRAINT) {
@@ -386,25 +384,10 @@ class Piece_ORM_Mapper_Common
     {
         $queryBuilder = &new Piece_ORM_Mapper_QueryBuilder($this,
                                                            $methodName,
-                                                           $criteria
+                                                           $criteria,
+                                                           $isManip
                                                            );
         $query = $queryBuilder->build();
-        if (Piece_ORM_Error::hasErrors('exception')) {
-            $return = null;
-            return $return;
-        }
-
-        $queryForGetCount = $query;
-
-        if (!$isManip) {
-            if (count($this->_orders)) {
-                $query .= ' ORDER BY ' . implode(', ', $this->_orders);
-            } elseif (!is_null($this->{ Piece_ORM_Mapper_Generator::getOrderByProperty($methodName) })) {
-                $query .= ' ORDER BY ' . $this->{ Piece_ORM_Mapper_Generator::getOrderByProperty($methodName) };
-            }
-
-            $this->_orders = array();
-        }
 
         if (!$isManip
             || !preg_match_all('/:(\w+)/',
@@ -430,11 +413,6 @@ class Piece_ORM_Mapper_Common
         }
 
         $result = &$this->executeQuery($query, $isManip, $sth);
-
-        if (Piece_ORM_Mapper_QueryType::isFindAll($methodName)) {
-            $this->_lastQueryForGetCount = $queryForGetCount;
-        }
-
         if (Piece_ORM_Error::hasErrors('exception')) {
             $return = null;
             return $return;
@@ -541,6 +519,53 @@ class Piece_ORM_Mapper_Common
     function &getConnection()
     {
         return $this->_dbh;
+    }
+
+    // }}}
+    // {{{ setLastQueryForGetCount()
+
+    /**
+     * Gets the last query for the next getCount() call.
+     *
+     * @param string $lastQueryForGetCount
+     * @since Method available since Release 1.1.0
+     */
+    function setLastQueryForGetCount($lastQueryForGetCount)
+    {
+        $this->_lastQueryForGetCount = $lastQueryForGetCount;
+    }
+
+    // }}}
+    // {{{ getOrderBy()
+
+    /**
+     * Gets the order by clause for the next query.
+     *
+     * @param string $methodName
+     * @since Method available since Release 1.1.0
+     */
+    function getOrderBy($methodName)
+    {
+        if (count($this->_orders)) {
+            return ' ORDER BY ' . implode(', ', $this->_orders);
+        }
+
+        if (!is_null($this->{ Piece_ORM_Mapper_Generator::getOrderByProperty($methodName) })) {
+            return ' ORDER BY ' . $this->{ Piece_ORM_Mapper_Generator::getOrderByProperty($methodName) };
+        }
+    }
+
+    // }}}
+    // {{{ clearOrders()
+
+    /**
+     * Clears the sort order of the next query.
+     *
+     * @since Method available since Release 1.1.0
+     */
+    function clearOrders()
+    {
+        $this->_orders = array();
     }
 
     /**#@-*/
