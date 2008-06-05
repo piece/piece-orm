@@ -387,29 +387,10 @@ class Piece_ORM_Mapper_Common
                                                            $criteria,
                                                            $isManip
                                                            );
-        $query = $queryBuilder->build();
-
-        if (!$isManip
-            || !preg_match_all('/:(\w+)/',
-                               $this->getQuery($methodName),
-                               $allMatches,
-                               PREG_SET_ORDER)
-            ) {
-            $sth = null;
-        } else {
-            $placeHolderFields = array();
-            foreach ($allMatches as $matches) {
-                $placeHolderFields[] = $matches[1];
-            }
-
-            $sth = $queryBuilder->buildPreparedStatement($criteria,
-                                                         $query,
-                                                         $placeHolderFields
-                                                         );
-            if (Piece_ORM_Error::hasErrors('exception')) {
-                $return = null;
-                return $return;
-            }
+        list($query, $sth) = $queryBuilder->build();
+        if (Piece_ORM_Error::hasErrors('exception')) {
+            $return = null;
+            return $return;
         }
 
         $result = &$this->executeQuery($query, $isManip, $sth);
