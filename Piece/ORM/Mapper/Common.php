@@ -253,7 +253,7 @@ class Piece_ORM_Mapper_Common
     }
 
     // }}}
-    // {{{ getPreloadCallbackArgs()
+    // {{{ getMetadata()
 
     /**
      * Gets the metadata object for this mapper.
