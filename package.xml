@@ -15,8 +15,8 @@ Piece_ORM is a simple framework based on the DataMapper pattern, and features st
   <email>iteman@users.sourceforge.net</email>
   <active>yes</active>
  </lead>
- <date>2008-06-01</date>
- <time>15:33:18</time>
+ <date>2008-06-05</date>
+ <time>16:27:50</time>
  <version>
   <release>1.1.0</release>
   <api>0.3.0</api>
@@ -267,6 +267,9 @@ What&apos;s New in Piece_ORM 1.1.0</notes>
       <file name="QueryBuilder.php" role="php">
        <tasks:replace from="@package_version@" to="version" type="package-info" />
       </file>
+      <file name="QueryExecutor.php" role="php">
+       <tasks:replace from="@package_version@" to="version" type="package-info" />
+      </file>
       <file name="QueryType.php" role="php">
        <tasks:replace from="@package_version@" to="version" type="package-info" />
       </file>
@@ -350,6 +353,38 @@ What&apos;s New in Piece_ORM 1.1.0</notes>
       </dir> <!-- /tests/Piece/ORM/Config -->
       <dir name="Mapper">
        <dir name="CompatibilityTest">
+        <dir name="CaseSensitive">
+         <file name="computers.yaml" role="test">
+          <tasks:replace from="@package_version@" to="version" type="package-info" />
+         </file>
+         <file name="departments.yaml" role="test">
+          <tasks:replace from="@package_version@" to="version" type="package-info" />
+         </file>
+         <file name="emails.yaml" role="test">
+          <tasks:replace from="@package_version@" to="version" type="package-info" />
+         </file>
+         <file name="employees.yaml" role="test">
+          <tasks:replace from="@package_version@" to="version" type="package-info" />
+         </file>
+         <file name="employees_emails.yaml" role="test">
+          <tasks:replace from="@package_version@" to="version" type="package-info" />
+         </file>
+         <file name="employees_skills.yaml" role="test">
+          <tasks:replace from="@package_version@" to="version" type="package-info" />
+         </file>
+         <file name="skills.yaml" role="test">
+          <tasks:replace from="@package_version@" to="version" type="package-info" />
+         </file>
+         <file name="unusualname1_2.yaml" role="test">
+          <tasks:replace from="@package_version@" to="version" type="package-info" />
+         </file>
+         <file name="unusualname1_2_unusualname_12.yaml" role="test">
+          <tasks:replace from="@package_version@" to="version" type="package-info" />
+         </file>
+         <file name="unusualname_12.yaml" role="test">
+          <tasks:replace from="@package_version@" to="version" type="package-info" />
+         </file>
+        </dir> <!-- /tests/Piece/ORM/Mapper/CompatibilityTest/CaseSensitive -->
         <dir name="Overwrite">
          <file name="Employees.yaml" role="test">
           <tasks:replace from="@package_version@" to="version" type="package-info" />
@@ -517,7 +552,7 @@ What&apos;s New in Piece_ORM 1.1.0</notes>
     <release>stable</release>
     <api>stable</api>
    </stability>
-   <date>2008-06-01</date>
+   <date>2008-06-05</date>
    <license uri="http://www.opensource.org/licenses/bsd-license.php">BSD License (revised)</license>
    <notes>A new release of Piece_ORM is now available.
 
