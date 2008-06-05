@@ -1291,6 +1291,12 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
             $this->assertEquals(2, count($employees));
             $this->assertEquals(4, $mapper->getCount());
 
+            $employees = $mapper->findAllByFirstName('Qux');
+
+            $this->assertEquals(1, count($employees));
+            $this->assertEquals(2, count($employees[0]->skills));
+            $this->assertEquals(1, $mapper->getCount());
+
             $this->_clearTableRecords();
             if ($useMapperNameAsTableName) {
                 $this->_clearCaseSensitiveContext();
