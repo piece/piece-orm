@@ -43,8 +43,8 @@ require_once 'PEAR.php';
 require_once 'Piece/ORM/Mapper/ObjectPersister.php';
 require_once 'Piece/ORM/Mapper/LOB.php';
 require_once 'Piece/ORM/Mapper/QueryType.php';
-require_once 'Piece/ORM/Mapper/QueryBuilder.php';
 require_once 'Piece/ORM/Mapper/Generator.php';
+require_once 'Piece/ORM/Mapper/QueryExecutor.php';
 
 // {{{ Piece_ORM_Mapper_Common
 
@@ -298,43 +298,8 @@ class Piece_ORM_Mapper_Common
      */
     function &executeQuery($query, $isManip = false, $sth = null)
     {
-        PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
-        if (!$isManip) {
-            $result = &$this->_dbh->query($query);
-        } else {
-            if (is_null($sth)) {
-                $result = $this->_dbh->exec($query);
-            } else {
-                if (!is_subclass_of($sth, 'MDB2_Statement_Common')) {
-                    PEAR::staticPopErrorHandling();
-                    Piece_ORM_Error::push(PIECE_ORM_ERROR_UNEXPECTED_VALUE,
-                                          'An unexpected value detected. executeQuery() with a prepared statement can only receive a MDB2_Statement_Common object.'
-                                          );
-                    return;
-                }
-
-                $result = $sth->execute();
-            }
-        }
-        PEAR::staticPopErrorHandling();
-
-        $this->_lastQuery = $this->_dbh->last_query;
-
-        if (MDB2::isError($result)) {
-            if ($result->getCode() == MDB2_ERROR_CONSTRAINT) {
-                $code = PIECE_ORM_ERROR_CONSTRAINT;
-            } else {
-                $code = PIECE_ORM_ERROR_INVOCATION_FAILED;
-            }
-            Piece_ORM_Error::pushPEARError($result,
-                                           $code,
-                                           "Failed to invoke MDB2_Driver_{$this->_dbh->phptype}::query() for any reasons."
-                                           );
-            $return = null;
-            return $return;
-        }
-
-        return $result;
+        $queryExecutor = &new Piece_ORM_Mapper_QueryExecutor($this, $isManip);
+        return $queryExecutor->execute($query, $sth);
     }
 
     // }}}
@@ -382,24 +347,8 @@ class Piece_ORM_Mapper_Common
      */
     function &executeQueryWithCriteria($methodName, $criteria, $isManip = false)
     {
-        $queryBuilder = &new Piece_ORM_Mapper_QueryBuilder($this,
-                                                           $methodName,
-                                                           $criteria,
-                                                           $isManip
-                                                           );
-        list($query, $sth) = $queryBuilder->build();
-        if (Piece_ORM_Error::hasErrors('exception')) {
-            $return = null;
-            return $return;
-        }
-
-        $result = &$this->executeQuery($query, $isManip, $sth);
-        if (Piece_ORM_Error::hasErrors('exception')) {
-            $return = null;
-            return $return;
-        }
-
-        return $result;
+        $queryExecutor = &new Piece_ORM_Mapper_QueryExecutor($this, $isManip);
+        return $queryExecutor->executeWithCriteria($methodName, $criteria);
     }
 
     // }}}
@@ -547,6 +496,20 @@ class Piece_ORM_Mapper_Common
     function clearOrders()
     {
         $this->_orders = array();
+    }
+
+    // }}}
+    // {{{ setLastQuery()
+
+    /**
+     * Sets the last query of this mapper.
+     *
+     * @param string $lastQuery
+     * @since Method available since Release 1.1.0
+     */
+    function setLastQuery($lastQuery)
+    {
+        $this->_lastQuery = $lastQuery;
     }
 
     /**#@-*/
