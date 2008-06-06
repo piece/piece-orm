@@ -102,7 +102,7 @@ class Piece_ORM_Mapper_QueryExecutor
      * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
      * @throws PIECE_ORM_ERROR_UNEXPECTED_VALUE
      */
-    function &execute($query, $sth = null)
+    function &execute($query, $sth)
     {
         $dbh = &$this->_mapper->getConnection();
         PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
