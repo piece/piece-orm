@@ -257,6 +257,22 @@ class Piece_ORM_Metadata_Factory
             return $return;
         }
 
+        if ($dbh->phptype == 'mysql') {
+            foreach (array_keys($tableInfo) as $fieldName) {
+                if ($tableInfo[$fieldName]['mdb2type'] == 'timestamp'
+                    && $tableInfo[$fieldName]['notnull']
+                    && $tableInfo[$fieldName]['default'] == '0000-00-00 00:00:00'
+                    ) {
+                    $tableInfo[$fieldName]['flags'] =
+                        str_replace('default_0000-00-00%2000%3A00%3A00',
+                                    '',
+                                    $tableInfo[$fieldName]['flags']
+                                    );
+                    $tableInfo[$fieldName]['default'] = '';
+                }
+            }
+        }
+
         $metadata = &new Piece_ORM_Metadata($tableInfo);
         return $metadata;
     }
