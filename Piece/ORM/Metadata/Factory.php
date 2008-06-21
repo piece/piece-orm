@@ -259,7 +259,7 @@ class Piece_ORM_Metadata_Factory
 
         if ($dbh->phptype == 'mysql') {
             foreach (array_keys($tableInfo) as $fieldName) {
-                if ($tableInfo[$fieldName]['mdb2type'] == 'timestamp'
+                if ($tableInfo[$fieldName]['nativetype'] == 'datetime'
                     && $tableInfo[$fieldName]['notnull']
                     && $tableInfo[$fieldName]['default'] == '0000-00-00 00:00:00'
                     ) {
