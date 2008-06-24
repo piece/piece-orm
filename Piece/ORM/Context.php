@@ -205,7 +205,7 @@ class Piece_ORM_Context
      * Gets the database handle for the current database.
      *
      * @return MDB2_Driver_Common
-     * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
+     * @throws PIECE_ORM_ERROR_CANNOT_INVOKE
      */
     function &getConnection()
     {
@@ -214,7 +214,7 @@ class Piece_ORM_Context
         PEAR::staticPopErrorHandling();
         if (MDB2::isError($dbh)) {
             Piece_ORM_Error::pushPEARError($dbh,
-                                           PIECE_ORM_ERROR_INVOCATION_FAILED,
+                                           PIECE_ORM_ERROR_CANNOT_INVOKE,
                                            'Failed to invoke MDB2::singleton() for any reasons.'
                                            );
             $return = null;

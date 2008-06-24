@@ -80,7 +80,7 @@ class Piece_ORM_Mapper_AssociatedObjectPersister_OneToMany extends Piece_ORM_Map
      *
      * @param array $relationship
      * @throws PIECE_ORM_ERROR_UNEXPECTED_VALUE
-     * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
+     * @throws PIECE_ORM_ERROR_CANNOT_INVOKE
      * @throws PIECE_ORM_ERROR_INVALID_OPERATION
      * @throws PIECE_ORM_ERROR_NOT_FOUND
      * @throws PIECE_ORM_ERROR_NOT_READABLE
@@ -122,7 +122,7 @@ class Piece_ORM_Mapper_AssociatedObjectPersister_OneToMany extends Piece_ORM_Map
      *
      * @param array $relationship
      * @throws PIECE_ORM_ERROR_UNEXPECTED_VALUE
-     * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
+     * @throws PIECE_ORM_ERROR_CANNOT_INVOKE
      * @throws PIECE_ORM_ERROR_INVALID_OPERATION
      * @throws PIECE_ORM_ERROR_NOT_FOUND
      * @throws PIECE_ORM_ERROR_NOT_READABLE
@@ -225,7 +225,7 @@ return \$a->$primaryKeyProperty < \$b->$primaryKeyProperty ? -1 : 1;
      *
      * @param array $relationship
      * @throws PIECE_ORM_ERROR_UNEXPECTED_VALUE
-     * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
+     * @throws PIECE_ORM_ERROR_CANNOT_INVOKE
      * @throws PIECE_ORM_ERROR_INVALID_OPERATION
      * @throws PIECE_ORM_ERROR_NOT_FOUND
      * @throws PIECE_ORM_ERROR_NOT_READABLE

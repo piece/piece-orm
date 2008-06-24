@@ -117,7 +117,7 @@ class Piece_ORM_Mapper_Generator
      *
      * @return string
      * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
-     * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
+     * @throws PIECE_ORM_ERROR_CANNOT_INVOKE
      * @throws PIECE_ORM_ERROR_NOT_FOUND
      */
     function generate()
@@ -164,7 +164,7 @@ class Piece_ORM_Mapper_Generator
      * @param array $relationship
      * @return array
      * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
-     * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
+     * @throws PIECE_ORM_ERROR_CANNOT_INVOKE
      * @throws PIECE_ORM_ERROR_NOT_FOUND
      */
     function normalizeRelationshipDefinition($relationship)
@@ -257,7 +257,7 @@ class Piece_ORM_Mapper_Generator
      * @param array  $relationships
      * @param string $orderBy
      * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
-     * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
+     * @throws PIECE_ORM_ERROR_CANNOT_INVOKE
      * @throws PIECE_ORM_ERROR_NOT_FOUND
      */
     function _addFind($methodName, $query, $relationships = null, $orderBy = null)
@@ -291,7 +291,7 @@ class Piece_ORM_Mapper_Generator
      * @param string $query
      * @param array  $relationships
      * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
-     * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
+     * @throws PIECE_ORM_ERROR_CANNOT_INVOKE
      * @throws PIECE_ORM_ERROR_NOT_FOUND
      */
     function _addInsert($methodName, $query, $relationships = null)
@@ -326,7 +326,7 @@ class Piece_ORM_Mapper_Generator
      * @param array  $relationships
      * @param string $orderBy
      * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
-     * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
+     * @throws PIECE_ORM_ERROR_CANNOT_INVOKE
      * @throws PIECE_ORM_ERROR_NOT_FOUND
      */
     function _addFindAll($methodName, $query = null, $relationships = null, $orderBy = null)
@@ -357,7 +357,7 @@ class Piece_ORM_Mapper_Generator
      * Generates methods from configuration.
      *
      * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
-     * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
+     * @throws PIECE_ORM_ERROR_CANNOT_INVOKE
      * @throws PIECE_ORM_ERROR_NOT_FOUND
      */
     function _generateFromConfiguration()
@@ -416,7 +416,7 @@ class Piece_ORM_Mapper_Generator
      * Generates built-in findXXX, findAll, findAllXXX methods.
      *
      * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
-     * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
+     * @throws PIECE_ORM_ERROR_CANNOT_INVOKE
      * @throws PIECE_ORM_ERROR_NOT_FOUND
      */
     function _generateFind()
@@ -448,7 +448,7 @@ class Piece_ORM_Mapper_Generator
      * Generates the built-in insert method.
      *
      * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
-     * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
+     * @throws PIECE_ORM_ERROR_CANNOT_INVOKE
      * @throws PIECE_ORM_ERROR_NOT_FOUND
      */
     function _generateInsert()
@@ -463,7 +463,7 @@ class Piece_ORM_Mapper_Generator
      * Generates the built-in delete method.
      *
      * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
-     * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
+     * @throws PIECE_ORM_ERROR_CANNOT_INVOKE
      * @throws PIECE_ORM_ERROR_NOT_FOUND
      */
     function _generateDelete()
@@ -484,7 +484,7 @@ class Piece_ORM_Mapper_Generator
      * @param string $query
      * @param array  $relationships
      * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
-     * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
+     * @throws PIECE_ORM_ERROR_CANNOT_INVOKE
      * @throws PIECE_ORM_ERROR_NOT_FOUND
      */
     function _addDelete($methodName, $query, $relationships = null)
@@ -515,7 +515,7 @@ class Piece_ORM_Mapper_Generator
      * Generates the built-in update method.
      *
      * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
-     * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
+     * @throws PIECE_ORM_ERROR_CANNOT_INVOKE
      * @throws PIECE_ORM_ERROR_NOT_FOUND
      */
     function _generateUpdate()
@@ -536,7 +536,7 @@ class Piece_ORM_Mapper_Generator
      * @param string $query
      * @param array  $relationships
      * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
-     * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
+     * @throws PIECE_ORM_ERROR_CANNOT_INVOKE
      * @throws PIECE_ORM_ERROR_NOT_FOUND
      */
     function _addUpdate($methodName, $query, $relationships = null)
@@ -589,7 +589,7 @@ class Piece_ORM_Mapper_Generator
      * @param array  $relationships
      * @return string
      * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
-     * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
+     * @throws PIECE_ORM_ERROR_CANNOT_INVOKE
      * @throws PIECE_ORM_ERROR_NOT_FOUND
      */
     function _generateRelationshipPropertyDeclaration($propertyName, $relationships)
@@ -617,7 +617,7 @@ class Piece_ORM_Mapper_Generator
      * @param array  $relationships
      * @param string $orderBy
      * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
-     * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
+     * @throws PIECE_ORM_ERROR_CANNOT_INVOKE
      * @throws PIECE_ORM_ERROR_NOT_FOUND
      */
     function _addPropertyDefinitions($methodName, $query, $relationships, $orderBy = null)

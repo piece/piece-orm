@@ -128,7 +128,7 @@ class Piece_ORM_Mapper_ObjectPersister
      * @param string $methodName
      * @return integer
      * @throws PIECE_ORM_ERROR_UNEXPECTED_VALUE
-     * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
+     * @throws PIECE_ORM_ERROR_CANNOT_INVOKE
      * @throws PIECE_ORM_ERROR_INVALID_OPERATION
      * @throws PIECE_ORM_ERROR_NOT_FOUND
      * @throws PIECE_ORM_ERROR_NOT_READABLE
@@ -186,7 +186,7 @@ class Piece_ORM_Mapper_ObjectPersister
      * @param string $methodName
      * @return integer
      * @throws PIECE_ORM_ERROR_UNEXPECTED_VALUE
-     * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
+     * @throws PIECE_ORM_ERROR_CANNOT_INVOKE
      * @throws PIECE_ORM_ERROR_INVALID_OPERATION
      * @throws PIECE_ORM_ERROR_NOT_FOUND
      * @throws PIECE_ORM_ERROR_NOT_READABLE
@@ -235,7 +235,7 @@ class Piece_ORM_Mapper_ObjectPersister
      * @param string $methodName
      * @return integer
      * @throws PIECE_ORM_ERROR_UNEXPECTED_VALUE
-     * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
+     * @throws PIECE_ORM_ERROR_CANNOT_INVOKE
      * @throws PIECE_ORM_ERROR_INVALID_OPERATION
      * @throws PIECE_ORM_ERROR_NOT_FOUND
      * @throws PIECE_ORM_ERROR_NOT_READABLE
@@ -311,7 +311,7 @@ class Piece_ORM_Mapper_ObjectPersister
      * Returns the value of an ID field if a table has an ID field.
      *
      * @return integer
-     * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
+     * @throws PIECE_ORM_ERROR_CANNOT_INVOKE
      * @since Method available since Release 1.1.0
      */
     function _getLastInsertID()
@@ -325,7 +325,7 @@ class Piece_ORM_Mapper_ObjectPersister
             PEAR::staticPopErrorHandling();
             if (MDB2::isError($id)) {
                 Piece_ORM_Error::pushPEARError($id,
-                                               PIECE_ORM_ERROR_INVOCATION_FAILED,
+                                               PIECE_ORM_ERROR_CANNOT_INVOKE,
                                                "Failed to invoke MDB2_Driver_{$this->_dbh->phptype}::lastInsertID() for any reasons."
                                                );
                 return;

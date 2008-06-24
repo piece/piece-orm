@@ -90,7 +90,7 @@ class Piece_ORM_Metadata_Factory
      *
      * @param string $tableName
      * @return Piece_ORM_Metadata
-     * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
+     * @throws PIECE_ORM_ERROR_CANNOT_INVOKE
      * @static
      */
     function &factory($tableName)
@@ -154,7 +154,7 @@ class Piece_ORM_Metadata_Factory
      * @param string $tableName
      * @param string $tableID
      * @return Piece_ORM_Metadata
-     * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
+     * @throws PIECE_ORM_ERROR_CANNOT_INVOKE
      */
     function &_getMetadata($tableName, $tableID)
     {
@@ -217,7 +217,7 @@ class Piece_ORM_Metadata_Factory
      *
      * @param string $tableName
      * @return Piece_ORM_Metadata
-     * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
+     * @throws PIECE_ORM_ERROR_CANNOT_INVOKE
      */
     function &_createMetadataFromDatabase($tableName)
     {
@@ -233,7 +233,7 @@ class Piece_ORM_Metadata_Factory
         PEAR::staticPopErrorHandling();
         if (MDB2::isError($reverse)) {
             Piece_ORM_Error::pushPEARError($reverse,
-                                           PIECE_ORM_ERROR_INVOCATION_FAILED,
+                                           PIECE_ORM_ERROR_CANNOT_INVOKE,
                                            'Failed to invoke $dbh->loadModule() for any reasons.'
                                            );
             $return = null;
@@ -250,7 +250,7 @@ class Piece_ORM_Metadata_Factory
         PEAR::staticPopErrorHandling();
         if (MDB2::isError($tableInfo)) {
             Piece_ORM_Error::pushPEARError($tableInfo,
-                                           PIECE_ORM_ERROR_INVOCATION_FAILED,
+                                           PIECE_ORM_ERROR_CANNOT_INVOKE,
                                            'Failed to invoke $reverse->tableInfo() for any reasons.'
                                            );
             $return = null;
@@ -286,7 +286,7 @@ class Piece_ORM_Metadata_Factory
      * @param string $tableName
      * @param string $tableID
      * @return Piece_ORM_Metadata
-     * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
+     * @throws PIECE_ORM_ERROR_CANNOT_INVOKE
      */
     function &_createMetadata($tableName, $tableID)
     {

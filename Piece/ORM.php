@@ -133,7 +133,7 @@ class Piece_ORM
      * @throws PIECE_ORM_ERROR_CANNOT_READ
      * @throws PIECE_ORM_ERROR_CANNOT_WRITE
      * @throws PIECE_ORM_ERROR_INVALID_MAPPER
-     * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
+     * @throws PIECE_ORM_ERROR_CANNOT_INVOKE
      */
     function &getMapper($mapperName)
     {
@@ -208,7 +208,7 @@ class Piece_ORM
      * @throws PIECE_ORM_ERROR_CANNOT_READ
      * @throws PIECE_ORM_ERROR_CANNOT_WRITE
      * @throws PIECE_ORM_ERROR_INVALID_MAPPER
-     * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
+     * @throws PIECE_ORM_ERROR_CANNOT_INVOKE
      */
     function &createObject($mapperName)
     {

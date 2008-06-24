@@ -142,7 +142,7 @@ class Piece_ORM_Mapper_MysqlTestCase extends Piece_ORM_Mapper_CompatibilityTest
 
         $error = Piece_ORM_Error::pop();
 
-        $this->assertEquals(PIECE_ORM_ERROR_INVOCATION_FAILED, $error['code']);
+        $this->assertEquals(PIECE_ORM_ERROR_CANNOT_INVOKE, $error['code']);
         $this->assertEquals(MDB2_ERROR_NOSUCHTABLE, $error['repackage']['code']);
         $this->assertTrue(preg_match('/\[Last executed query: SHOW COLUMNS FROM Case_Sensitive\]/', $error['repackage']['params']['userinfo']));
 

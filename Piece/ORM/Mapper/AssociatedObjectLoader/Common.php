@@ -137,7 +137,7 @@ class Piece_ORM_Mapper_AssociatedObjectLoader_Common
      * @throws PIECE_ORM_ERROR_CANNOT_READ
      * @throws PIECE_ORM_ERROR_CANNOT_WRITE
      * @throws PIECE_ORM_ERROR_INVALID_MAPPER
-     * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
+     * @throws PIECE_ORM_ERROR_CANNOT_INVOKE
      */
     function loadAll(&$mapper, $relationshipIndex)
     {

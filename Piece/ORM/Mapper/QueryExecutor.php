@@ -99,7 +99,7 @@ class Piece_ORM_Mapper_QueryExecutor
      * @param string                $query
      * @param MDB2_Statement_Common $sth
      * @return MDB2_Result_Common|integer
-     * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
+     * @throws PIECE_ORM_ERROR_CANNOT_INVOKE
      * @throws PIECE_ORM_ERROR_UNEXPECTED_VALUE
      */
     function &execute($query, $sth)
@@ -132,7 +132,7 @@ class Piece_ORM_Mapper_QueryExecutor
             if ($result->getCode() == MDB2_ERROR_CONSTRAINT) {
                 $code = PIECE_ORM_ERROR_CONSTRAINT;
             } else {
-                $code = PIECE_ORM_ERROR_INVOCATION_FAILED;
+                $code = PIECE_ORM_ERROR_CANNOT_INVOKE;
             }
             Piece_ORM_Error::pushPEARError($result,
                                            $code,
@@ -154,7 +154,7 @@ class Piece_ORM_Mapper_QueryExecutor
      * @param string   $methodName
      * @param stdClass $criteria
      * @return MDB2_Result_Common|integer
-     * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
+     * @throws PIECE_ORM_ERROR_CANNOT_INVOKE
      */
     function &executeWithCriteria($methodName, $criteria)
     {

@@ -106,7 +106,7 @@ class Piece_ORM_Mapper_Factory
      * @throws PIECE_ORM_ERROR_CANNOT_READ
      * @throws PIECE_ORM_ERROR_CANNOT_WRITE
      * @throws PIECE_ORM_ERROR_INVALID_MAPPER
-     * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
+     * @throws PIECE_ORM_ERROR_CANNOT_INVOKE
      */
     function &factory($mapperName)
     {
@@ -210,7 +210,7 @@ class Piece_ORM_Mapper_Factory
      * @return string
      * @throws PIECE_ORM_ERROR_CANNOT_READ
      * @throws PIECE_ORM_ERROR_CANNOT_WRITE
-     * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
+     * @throws PIECE_ORM_ERROR_CANNOT_INVOKE
      * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
      * @throws PIECE_ORM_ERROR_NOT_FOUND
      */
@@ -266,7 +266,7 @@ class Piece_ORM_Mapper_Factory
      * @param string $mapperName
      * @param string $configFile
      * @return string
-     * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
+     * @throws PIECE_ORM_ERROR_CANNOT_INVOKE
      * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
      * @throws PIECE_ORM_ERROR_NOT_FOUND
      */
@@ -314,7 +314,7 @@ class Piece_ORM_Mapper_Factory
      * @throws PIECE_ORM_ERROR_NOT_READABLE
      * @throws PIECE_ORM_ERROR_CANNOT_READ
      * @throws PIECE_ORM_ERROR_CANNOT_WRITE
-     * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
+     * @throws PIECE_ORM_ERROR_CANNOT_INVOKE
      * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
      */
     function _load($mapperID, $mapperName)

@@ -123,7 +123,7 @@ class Piece_ORM_Mapper_ObjectLoader
      * @throws PIECE_ORM_ERROR_CANNOT_READ
      * @throws PIECE_ORM_ERROR_CANNOT_WRITE
      * @throws PIECE_ORM_ERROR_INVALID_MAPPER
-     * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
+     * @throws PIECE_ORM_ERROR_CANNOT_INVOKE
      */
     function loadAll()
     {
@@ -186,7 +186,7 @@ class Piece_ORM_Mapper_ObjectLoader
     /**
      * Loads all objects with a result object for the primary query.
      *
-     * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
+     * @throws PIECE_ORM_ERROR_CANNOT_INVOKE
      */
     function _loadPrimaryObjects()
     {
@@ -197,7 +197,7 @@ class Piece_ORM_Mapper_ObjectLoader
             if (MDB2::isError($row)) {
                 PEAR::staticPopErrorHandling();
                 Piece_ORM_Error::pushPEARError($row,
-                                               PIECE_ORM_ERROR_INVOCATION_FAILED,
+                                               PIECE_ORM_ERROR_CANNOT_INVOKE,
                                                "Failed to invoke MDB2_Driver_{$this->_result->db->phptype}::fetchRow() for any reasons."
                                                );
                 return;
@@ -232,7 +232,7 @@ class Piece_ORM_Mapper_ObjectLoader
      * @throws PIECE_ORM_ERROR_CANNOT_READ
      * @throws PIECE_ORM_ERROR_CANNOT_WRITE
      * @throws PIECE_ORM_ERROR_INVALID_MAPPER
-     * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
+     * @throws PIECE_ORM_ERROR_CANNOT_INVOKE
      */
     function _loadAssociatedObjects()
     {

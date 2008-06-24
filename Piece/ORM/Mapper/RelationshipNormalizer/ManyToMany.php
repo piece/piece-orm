@@ -86,7 +86,7 @@ class Piece_ORM_Mapper_RelationshipNormalizer_ManyToMany extends Piece_ORM_Mappe
      * Normalizes "through" definition.
      *
      * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
-     * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
+     * @throws PIECE_ORM_ERROR_CANNOT_INVOKE
      */
     function _normalizeThrough()
     {

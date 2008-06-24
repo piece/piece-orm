@@ -165,7 +165,7 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
 
         $error = Piece_ORM_Error::pop();
 
-        $this->assertEquals(PIECE_ORM_ERROR_INVOCATION_FAILED, $error['code']);
+        $this->assertEquals(PIECE_ORM_ERROR_CANNOT_INVOKE, $error['code']);
 
         Piece_ORM_Error::popCallback();
     }
@@ -333,7 +333,7 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
 
         $error = Piece_ORM_Error::pop();
 
-        $this->assertEquals(PIECE_ORM_ERROR_INVOCATION_FAILED, $error['code']);
+        $this->assertEquals(PIECE_ORM_ERROR_CANNOT_INVOKE, $error['code']);
 
         Piece_ORM_Error::popCallback();
     }
@@ -500,7 +500,7 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
 
         $error = Piece_ORM_Error::pop();
 
-        $this->assertEquals(PIECE_ORM_ERROR_INVOCATION_FAILED, $error['code']);
+        $this->assertEquals(PIECE_ORM_ERROR_CANNOT_INVOKE, $error['code']);
 
         Piece_ORM_Error::popCallback();
     }
@@ -820,7 +820,7 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
 
             $error = Piece_ORM_Error::pop();
 
-            $this->assertEquals(PIECE_ORM_ERROR_INVOCATION_FAILED, $error['code']);
+            $this->assertEquals(PIECE_ORM_ERROR_CANNOT_INVOKE, $error['code']);
 
             $this->_clearTableRecords();
             if ($useMapperNameAsTableName) {
@@ -849,7 +849,7 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
 
             $error = Piece_ORM_Error::pop();
 
-            $this->assertEquals(PIECE_ORM_ERROR_INVOCATION_FAILED, $error['code']);
+            $this->assertEquals(PIECE_ORM_ERROR_CANNOT_INVOKE, $error['code']);
 
             $this->_clearTableRecords();
             if ($useMapperNameAsTableName) {

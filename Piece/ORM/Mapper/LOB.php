@@ -139,7 +139,7 @@ class Piece_ORM_Mapper_LOB
      * Loads the LOB data of this field.
      *
      * @return string
-     * @throws PIECE_ORM_ERROR_INVOCATION_FAILED
+     * @throws PIECE_ORM_ERROR_CANNOT_INVOKE
      * @throws PIECE_ORM_ERROR_UNEXPECTED_VALUE
      */
     function load()
@@ -149,7 +149,7 @@ class Piece_ORM_Mapper_LOB
         PEAR::staticPopErrorHandling();
         if (MDB2::isError($datatype)) {
             Piece_ORM_Error::pushPEARError($datatype,
-                                           PIECE_ORM_ERROR_INVOCATION_FAILED,
+                                           PIECE_ORM_ERROR_CANNOT_INVOKE,
                                            'Failed to invoke $dbh->loadModule() for any reasons.'
                                            );
             return;
@@ -162,7 +162,7 @@ class Piece_ORM_Mapper_LOB
         PEAR::staticPopErrorHandling();
         if (MDB2::isError($lob)) {
             Piece_ORM_Error::pushPEARError($lob,
-                                           PIECE_ORM_ERROR_INVOCATION_FAILED,
+                                           PIECE_ORM_ERROR_CANNOT_INVOKE,
                                            'Failed to invoke $datatype->convertResult() for any reasons.'
                                            );
             return;
