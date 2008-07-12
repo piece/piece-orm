@@ -208,7 +208,7 @@ class Piece_ORM
         }
 
         $mapper = &Piece_ORM_Mapper_Factory::factory($mapperName);
-        if (Piece_ORM_Error::hasErrors('exception')) {
+        if (Piece_ORM_Error::hasErrors()) {
             $return = null;
             return $return;
         }

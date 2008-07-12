@@ -112,13 +112,13 @@ class Piece_ORM_Mapper_Factory
         $mapperID = sha1($context->getDSN() . ".$mapperName." . realpath($GLOBALS['PIECE_ORM_Mapper_ConfigDirectory']));
         if (!array_key_exists($mapperID, $GLOBALS['PIECE_ORM_Mapper_Instances'])) {
             Piece_ORM_Mapper_Factory::_load($mapperID, $mapperName);
-            if (Piece_ORM_Error::hasErrors('exception')) {
+            if (Piece_ORM_Error::hasErrors()) {
                 $return = null;
                 return $return;
             }
 
             $metadata = &Piece_ORM_Metadata_Factory::factory($mapperName);
-            if (Piece_ORM_Error::hasErrors('exception')) {
+            if (Piece_ORM_Error::hasErrors()) {
                 $return = null;
                 return $return;
             }
@@ -137,7 +137,7 @@ class Piece_ORM_Mapper_Factory
         }
 
         $dbh = &$context->getConnection();
-        if (Piece_ORM_Error::hasErrors('exception')) {
+        if (Piece_ORM_Error::hasErrors()) {
             $return = null;
             return $return;
         }
@@ -231,7 +231,7 @@ class Piece_ORM_Mapper_Factory
 
         if (!$mapperSource) {
             $mapperSource = Piece_ORM_Mapper_Factory::_generateMapperSource($mapperID, $mapperName, $configFile);
-            if (Piece_ORM_Error::hasErrors('exception')) {
+            if (Piece_ORM_Error::hasErrors()) {
                 return;
             }
 
@@ -261,7 +261,7 @@ class Piece_ORM_Mapper_Factory
     function _generateMapperSource($mapperID, $mapperName, $configFile)
     {
         $metadata = &Piece_ORM_Metadata_Factory::factory($mapperName);
-        if (Piece_ORM_Error::hasErrors('exception')) {
+        if (Piece_ORM_Error::hasErrors()) {
             return;
         }
 
@@ -358,7 +358,7 @@ class Piece_ORM_Mapper_Factory
         }
 
         $mapperSource = Piece_ORM_Mapper_Factory::_getMapperSource($mapperID, $mapperName, $configFile);
-        if (Piece_ORM_Error::hasErrors('exception')) {
+        if (Piece_ORM_Error::hasErrors()) {
             return;
         }
 

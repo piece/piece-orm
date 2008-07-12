@@ -120,27 +120,27 @@ class Piece_ORM_Mapper_Generator
     function generate()
     {
         $this->_generateFind();
-        if (Piece_ORM_Error::hasErrors('exception')) {
+        if (Piece_ORM_Error::hasErrors()) {
             return;
         }
 
         $this->_generateInsert();
-        if (Piece_ORM_Error::hasErrors('exception')) {
+        if (Piece_ORM_Error::hasErrors()) {
             return;
         }
 
         $this->_generateDelete();
-        if (Piece_ORM_Error::hasErrors('exception')) {
+        if (Piece_ORM_Error::hasErrors()) {
             return;
         }
 
         $this->_generateUpdate();
-        if (Piece_ORM_Error::hasErrors('exception')) {
+        if (Piece_ORM_Error::hasErrors()) {
             return;
         }
 
         $this->_generateFromConfiguration();
-        if (Piece_ORM_Error::hasErrors('exception')) {
+        if (Piece_ORM_Error::hasErrors()) {
             return;
         }
 
@@ -263,7 +263,7 @@ class Piece_ORM_Mapper_Generator
         }
 
         $this->_addPropertyDefinitions($methodName, $query, $relationships, $orderBy);
-        if (Piece_ORM_Error::hasErrors('exception')) {
+        if (Piece_ORM_Error::hasErrors()) {
             return;
         }
 
@@ -295,7 +295,7 @@ class Piece_ORM_Mapper_Generator
         }
 
         $this->_addPropertyDefinitions($methodName, $query, $relationships);
-        if (Piece_ORM_Error::hasErrors('exception')) {
+        if (Piece_ORM_Error::hasErrors()) {
             return;
         }
 
@@ -328,7 +328,7 @@ class Piece_ORM_Mapper_Generator
         }
 
         $this->_addPropertyDefinitions($methodName, $query, $relationships, $orderBy);
-        if (Piece_ORM_Error::hasErrors('exception')) {
+        if (Piece_ORM_Error::hasErrors()) {
             return;
         }
 
@@ -390,7 +390,7 @@ class Piece_ORM_Mapper_Generator
                                       );
             } while (false);
 
-            if (Piece_ORM_Error::hasErrors('exception')) {
+            if (Piece_ORM_Error::hasErrors()) {
                 return;
             }
         }
@@ -410,12 +410,12 @@ class Piece_ORM_Mapper_Generator
                 
                 $camelizedFieldName = Piece_ORM_Inflector::camelize($fieldName);
                 $this->_addFind("findBy$camelizedFieldName", 'SELECT * FROM ' . addslashes($this->_metadata->getTableName()) . " WHERE $fieldName = \$" . Piece_ORM_Inflector::lowerCaseFirstLetter($camelizedFieldName));
-                if (Piece_ORM_Error::hasErrors('exception')) {
+                if (Piece_ORM_Error::hasErrors()) {
                     return;
                 }
 
                 $this->_addFindAll("findAllBy$camelizedFieldName", 'SELECT * FROM ' . addslashes($this->_metadata->getTableName()) . " WHERE $fieldName = \$" . Piece_ORM_Inflector::lowerCaseFirstLetter($camelizedFieldName));
-                if (Piece_ORM_Error::hasErrors('exception')) {
+                if (Piece_ORM_Error::hasErrors()) {
                     return;
                 }
             }
@@ -470,7 +470,7 @@ class Piece_ORM_Mapper_Generator
         }
 
         $this->_addPropertyDefinitions($methodName, $query, $relationships);
-        if (Piece_ORM_Error::hasErrors('exception')) {
+        if (Piece_ORM_Error::hasErrors()) {
             return;
         }
 
@@ -516,7 +516,7 @@ class Piece_ORM_Mapper_Generator
         }
 
         $this->_addPropertyDefinitions($methodName, $query, $relationships);
-        if (Piece_ORM_Error::hasErrors('exception')) {
+        if (Piece_ORM_Error::hasErrors()) {
             return;
         }
 
@@ -560,7 +560,7 @@ class Piece_ORM_Mapper_Generator
     {
         if (is_array($relationships)) {
             $relationships = array_map(array(&$this, 'normalizeRelationshipDefinition'), $relationships);
-            if (Piece_ORM_Error::hasErrors('exception')) {
+            if (Piece_ORM_Error::hasErrors()) {
                 return;
             }
 
@@ -628,7 +628,7 @@ class Piece_ORM_Mapper_Generator
                                           );
                 } while (false);
 
-                if (Piece_ORM_Error::hasErrors('exception')) {
+                if (Piece_ORM_Error::hasErrors()) {
                     return;
                 }
             }

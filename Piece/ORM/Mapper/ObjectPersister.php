@@ -139,7 +139,7 @@ class Piece_ORM_Mapper_ObjectPersister
         }
 
         $this->_mapper->executeQueryWithCriteria($methodName, $this->_subject, true);
-        if (Piece_ORM_Error::hasErrors('exception')) {
+        if (Piece_ORM_Error::hasErrors()) {
             return;
         }
 
@@ -150,7 +150,7 @@ class Piece_ORM_Mapper_ObjectPersister
 
         if ($this->_metadata->hasID()) {
             $id = $this->_getLastInsertID();
-            if (Piece_ORM_Error::hasErrors('exception')) {
+            if (Piece_ORM_Error::hasErrors()) {
                 return;
             }
 
@@ -160,7 +160,7 @@ class Piece_ORM_Mapper_ObjectPersister
         if ($primaryKey) {
             foreach ($this->_relationships as $relationship) {
                 $this->_associatedObjectPersisters[ $relationship['type'] ]->insert($relationship);
-                if (Piece_ORM_Error::hasErrors('exception')) {
+                if (Piece_ORM_Error::hasErrors()) {
                     return;
                 }
             }
@@ -196,13 +196,13 @@ class Piece_ORM_Mapper_ObjectPersister
         }
 
         $affectedRows = $this->_mapper->executeQueryWithCriteria($methodName, $this->_subject, true);
-        if (Piece_ORM_Error::hasErrors('exception')) {
+        if (Piece_ORM_Error::hasErrors()) {
             return;
         }
 
         foreach ($this->_relationships as $relationship) {
             $this->_associatedObjectPersisters[ $relationship['type'] ]->update($relationship);
-            if (Piece_ORM_Error::hasErrors('exception')) {
+            if (Piece_ORM_Error::hasErrors()) {
                 return;
             }
         }
@@ -238,7 +238,7 @@ class Piece_ORM_Mapper_ObjectPersister
 
         foreach ($this->_relationships as $relationship) {
             $this->_associatedObjectPersisters[ $relationship['type'] ]->delete($relationship);
-            if (Piece_ORM_Error::hasErrors('exception')) {
+            if (Piece_ORM_Error::hasErrors()) {
                 return;
             }
         }

@@ -189,7 +189,7 @@ class Piece_ORMTestCase extends PHPUnit_TestCase
         Piece_ORM_Error::enableCallback();
 
         $this->assertNull($mapper);
-        $this->assertTrue(Piece_ORM_Error::hasErrors('exception'));
+        $this->assertTrue(Piece_ORM_Error::hasErrors());
 
         $error = Piece_ORM_Error::pop();
 
@@ -203,7 +203,7 @@ class Piece_ORMTestCase extends PHPUnit_TestCase
         Piece_ORM_Error::enableCallback();
 
         $this->assertNull($config);
-        $this->assertTrue(Piece_ORM_Error::hasErrors('exception'));
+        $this->assertTrue(Piece_ORM_Error::hasErrors());
 
         $error = Piece_ORM_Error::pop();
 
@@ -275,7 +275,7 @@ class Piece_ORMTestCase extends PHPUnit_TestCase
         Piece_ORM::setDatabase('database2');
         Piece_ORM_Error::enableCallback();
 
-        $this->assertTrue(Piece_ORM_Error::hasErrors('exception'));
+        $this->assertTrue(Piece_ORM_Error::hasErrors());
 
         $error = Piece_ORM_Error::pop();
 
@@ -292,7 +292,7 @@ class Piece_ORMTestCase extends PHPUnit_TestCase
         Piece_ORM_Error::enableCallback();
 
         $this->assertNull($employee);
-        $this->assertTrue(Piece_ORM_Error::hasErrors('exception'));
+        $this->assertTrue(Piece_ORM_Error::hasErrors());
 
         $error = Piece_ORM_Error::pop();
 
@@ -329,7 +329,7 @@ class Piece_ORMTestCase extends PHPUnit_TestCase
         Piece_ORM::setDatabase('foo');
         Piece_ORM_Error::enableCallback();
 
-        $this->assertTrue(Piece_ORM_Error::hasErrors('exception'));
+        $this->assertTrue(Piece_ORM_Error::hasErrors());
 
         $error = Piece_ORM_Error::pop();
 

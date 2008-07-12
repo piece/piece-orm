@@ -121,13 +121,13 @@ class Piece_ORM_Mapper_ObjectLoader
     function loadAll()
     {
         $this->_loadPrimaryObjects();
-        if (Piece_ORM_Error::hasErrors('exception')) {
+        if (Piece_ORM_Error::hasErrors()) {
             return;
         }
 
         if (count($this->_objects)) {
             $this->_loadAssociatedObjects();
-            if (Piece_ORM_Error::hasErrors('exception')) {
+            if (Piece_ORM_Error::hasErrors()) {
                 return;
             }
         }
@@ -223,12 +223,12 @@ class Piece_ORM_Mapper_ObjectLoader
     {
         for ($i = 0, $count = count($this->_relationships); $i < $count; ++$i) {
             $mapper = &Piece_ORM_Mapper_Factory::factory($this->_relationships[$i]['table']);
-            if (Piece_ORM_Error::hasErrors('exception')) {
+            if (Piece_ORM_Error::hasErrors()) {
                 return;
             }
 
             $this->_associatedObjectLoaders[ $this->_relationships[$i]['type'] ]->loadAll($mapper, $i);
-            if (Piece_ORM_Error::hasErrors('exception')) {
+            if (Piece_ORM_Error::hasErrors()) {
                 return;
             }
         }

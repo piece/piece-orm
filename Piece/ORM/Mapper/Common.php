@@ -124,12 +124,12 @@ class Piece_ORM_Mapper_Common
     function findAllWithQuery($query)
     {
         $result = &$this->executeQuery($query);
-        if (Piece_ORM_Error::hasErrors('exception')) {
+        if (Piece_ORM_Error::hasErrors()) {
             return;
         }
 
         $objects = $this->_loadAllObjects($result);
-        if (Piece_ORM_Error::hasErrors('exception')) {
+        if (Piece_ORM_Error::hasErrors()) {
             return;
         }
 
@@ -305,7 +305,7 @@ class Piece_ORM_Mapper_Common
     function &findWithQuery($query)
     {
         $objects = $this->findAllWithQuery($query);
-        if (Piece_ORM_Error::hasErrors('exception')) {
+        if (Piece_ORM_Error::hasErrors()) {
             return;
         }
 
@@ -381,7 +381,7 @@ class Piece_ORM_Mapper_Common
     function findOneWithQuery($query)
     {
         $result = &$this->executeQuery($query);
-        if (Piece_ORM_Error::hasErrors('exception')) {
+        if (Piece_ORM_Error::hasErrors()) {
             return;
         }
 
@@ -513,7 +513,7 @@ class Piece_ORM_Mapper_Common
     function &_find($methodName, $criteria)
     {
         $objects = $this->_findAll($methodName, $criteria);
-        if (Piece_ORM_Error::hasErrors('exception')) {
+        if (Piece_ORM_Error::hasErrors()) {
             $return = null;
             return $return;
         }
@@ -571,18 +571,18 @@ class Piece_ORM_Mapper_Common
             }
 
             $criteria = &$this->_createCriteria($methodName, $criteria);
-            if (Piece_ORM_Error::hasErrors('exception')) {
+            if (Piece_ORM_Error::hasErrors()) {
                 return;
             }
         }
 
         $result = &$this->executeQueryWithCriteria($methodName, $criteria);
-        if (Piece_ORM_Error::hasErrors('exception')) {
+        if (Piece_ORM_Error::hasErrors()) {
             return;
         }
 
         $objects = $this->_loadAllObjects($result, $this->{ '__relationship__' . strtolower($methodName) });
-        if (Piece_ORM_Error::hasErrors('exception')) {
+        if (Piece_ORM_Error::hasErrors()) {
             return;
         }
 
@@ -636,13 +636,13 @@ class Piece_ORM_Mapper_Common
 
         if (!is_object($criteria)) {
             $criteria = &$this->_createCriteria($methodName, $criteria);
-            if (Piece_ORM_Error::hasErrors('exception')) {
+            if (Piece_ORM_Error::hasErrors()) {
                 return;
             }
         }
 
         $result = &$this->executeQueryWithCriteria($methodName, $criteria);
-        if (Piece_ORM_Error::hasErrors('exception')) {
+        if (Piece_ORM_Error::hasErrors()) {
             return;
         }
 

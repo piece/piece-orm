@@ -91,7 +91,7 @@ class Piece_ORM_Mapper_AssociatedObjectPersister_OneToMany extends Piece_ORM_Map
         }
 
         $mapper = &Piece_ORM_Mapper_Factory::factory($relationship['table']);
-        if (Piece_ORM_Error::hasErrors('exception')) {
+        if (Piece_ORM_Error::hasErrors()) {
             return;
         }
 
@@ -99,7 +99,7 @@ class Piece_ORM_Mapper_AssociatedObjectPersister_OneToMany extends Piece_ORM_Map
         for ($i = 0, $count = count($this->_subject->$relationship['mappedAs']); $i < $count; ++$i) {
             $this->_subject->{ $relationship['mappedAs'] }[$i]->{ Piece_ORM_Inflector::camelize($relationship['column'], true) } = $referencedColumnValue;
             $mapper->insert($this->_subject->{ $relationship['mappedAs'] }[$i]);
-            if (Piece_ORM_Error::hasErrors('exception')) {
+            if (Piece_ORM_Error::hasErrors()) {
                 return;
             }
         }
@@ -124,13 +124,13 @@ class Piece_ORM_Mapper_AssociatedObjectPersister_OneToMany extends Piece_ORM_Map
         }
 
         $mapper = &Piece_ORM_Mapper_Factory::factory($relationship['table']);
-        if (Piece_ORM_Error::hasErrors('exception')) {
+        if (Piece_ORM_Error::hasErrors()) {
             return;
         }
 
         $referencedColumnValue = $this->_subject->{ Piece_ORM_Inflector::camelize($relationship['referencedColumn'], true) };
         $oldObjects = $mapper->findAllWithQuery("SELECT * FROM {$relationship['table']} WHERE {$relationship['column']} = " . $mapper->quote($referencedColumnValue, $relationship['column']));
-        if (Piece_ORM_Error::hasErrors('exception')) {
+        if (Piece_ORM_Error::hasErrors()) {
             return;
         }
 
@@ -177,7 +177,7 @@ return \$a->$primaryKeyProperty < \$b->$primaryKeyProperty ? -1 : 1;
 
         foreach (array_keys($targetsForDelete) as $i) {
             $mapper->delete($targetsForDelete[$i]);
-            if (Piece_ORM_Error::hasErrors('exception')) {
+            if (Piece_ORM_Error::hasErrors()) {
                 return;
             }
         }
@@ -185,7 +185,7 @@ return \$a->$primaryKeyProperty < \$b->$primaryKeyProperty ? -1 : 1;
         foreach (array_keys($targetsForInsert) as $i) {
             $targetsForInsert[$i]->{ Piece_ORM_Inflector::camelize($relationship['column'], true) } = $referencedColumnValue;
             $mapper->insert($targetsForInsert[$i]);
-            if (Piece_ORM_Error::hasErrors('exception')) {
+            if (Piece_ORM_Error::hasErrors()) {
                 return;
             }
         }
@@ -193,7 +193,7 @@ return \$a->$primaryKeyProperty < \$b->$primaryKeyProperty ? -1 : 1;
         foreach (array_keys($targetsForUpdate) as $i) {
             $targetsForUpdate[$i]->{ Piece_ORM_Inflector::camelize($relationship['column'], true) } = $referencedColumnValue;
             $mapper->update($targetsForUpdate[$i]);
-            if (Piece_ORM_Error::hasErrors('exception')) {
+            if (Piece_ORM_Error::hasErrors()) {
                 return;
             }
         }
@@ -218,7 +218,7 @@ return \$a->$primaryKeyProperty < \$b->$primaryKeyProperty ? -1 : 1;
         }
 
         $mapper = &Piece_ORM_Mapper_Factory::factory($relationship['table']);
-        if (Piece_ORM_Error::hasErrors('exception')) {
+        if (Piece_ORM_Error::hasErrors()) {
             return;
         }
 

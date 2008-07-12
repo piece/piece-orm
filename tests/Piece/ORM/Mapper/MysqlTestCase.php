@@ -139,7 +139,7 @@ class Piece_ORM_Mapper_MysqlTestCase extends Piece_ORM_Mapper_CompatibilityTest
         $mapper = &Piece_ORM_Mapper_Factory::factory('Case_Sensitive');
         Piece_ORM_Error::enableCallback();
 
-        $this->assertTrue(Piece_ORM_Error::hasErrors('exception'));
+        $this->assertTrue(Piece_ORM_Error::hasErrors());
 
         $error = Piece_ORM_Error::pop();
 

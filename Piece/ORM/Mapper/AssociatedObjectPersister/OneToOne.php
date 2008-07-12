@@ -91,7 +91,7 @@ class Piece_ORM_Mapper_AssociatedObjectPersister_OneToOne extends Piece_ORM_Mapp
         }
 
         $mapper = &Piece_ORM_Mapper_Factory::factory($relationship['table']);
-        if (Piece_ORM_Error::hasErrors('exception')) {
+        if (Piece_ORM_Error::hasErrors()) {
             return;
         }
 
@@ -118,13 +118,13 @@ class Piece_ORM_Mapper_AssociatedObjectPersister_OneToOne extends Piece_ORM_Mapp
         }
 
         $mapper = &Piece_ORM_Mapper_Factory::factory($relationship['table']);
-        if (Piece_ORM_Error::hasErrors('exception')) {
+        if (Piece_ORM_Error::hasErrors()) {
             return;
         }
 
         $referencedColumnValue = $this->_subject->{ Piece_ORM_Inflector::camelize($relationship['referencedColumn'], true) };
         $oldObject = $mapper->findWithQuery("SELECT * FROM {$relationship['table']} WHERE {$relationship['column']} = " . $mapper->quote($referencedColumnValue, $relationship['column']));
-        if (Piece_ORM_Error::hasErrors('exception')) {
+        if (Piece_ORM_Error::hasErrors()) {
             return;
         }
 
@@ -161,7 +161,7 @@ class Piece_ORM_Mapper_AssociatedObjectPersister_OneToOne extends Piece_ORM_Mapp
         }
 
         $mapper = &Piece_ORM_Mapper_Factory::factory($relationship['table']);
-        if (Piece_ORM_Error::hasErrors('exception')) {
+        if (Piece_ORM_Error::hasErrors()) {
             return;
         }
 

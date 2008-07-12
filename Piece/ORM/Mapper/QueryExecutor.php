@@ -164,13 +164,13 @@ class Piece_ORM_Mapper_QueryExecutor
                                                            $this->_isManip
                                                            );
         list($query, $sth) = $queryBuilder->build();
-        if (Piece_ORM_Error::hasErrors('exception')) {
+        if (Piece_ORM_Error::hasErrors()) {
             $return = null;
             return $return;
         }
 
         $result = &$this->execute($query, $sth);
-        if (Piece_ORM_Error::hasErrors('exception')) {
+        if (Piece_ORM_Error::hasErrors()) {
             $return = null;
             return $return;
         }

@@ -102,7 +102,7 @@ class Piece_ORM_Metadata_Factory
         $tableID = sha1($context->getDSN() . ".$tableName");
         if (!array_key_exists($tableID, $GLOBALS['PIECE_ORM_Metadata_Instances'])) {
             $metadata = &Piece_ORM_Metadata_Factory::_createMetadata($tableName, $tableID);
-            if (Piece_ORM_Error::hasErrors('exception')) {
+            if (Piece_ORM_Error::hasErrors()) {
                 $return = null;
                 return $return;
             }
@@ -176,7 +176,7 @@ class Piece_ORM_Metadata_Factory
                           );
 
             $metadata = &Piece_ORM_Metadata_Factory::_createMetadataFromDatabase($tableName);
-            if (Piece_ORM_Error::hasErrors('exception')) {
+            if (Piece_ORM_Error::hasErrors()) {
                 $return = null;
                 return $return;
             }
@@ -186,7 +186,7 @@ class Piece_ORM_Metadata_Factory
 
         if (!$metadata) {
             $metadata = &Piece_ORM_Metadata_Factory::_createMetadataFromDatabase($tableName);
-            if (Piece_ORM_Error::hasErrors('exception')) {
+            if (Piece_ORM_Error::hasErrors()) {
                 $return = null;
                 return $return;
             }
@@ -216,7 +216,7 @@ class Piece_ORM_Metadata_Factory
     {
         $context = &Piece_ORM_Context::singleton();
         $dbh = &$context->getConnection();
-        if (Piece_ORM_Error::hasErrors('exception')) {
+        if (Piece_ORM_Error::hasErrors()) {
             $return = null;
             return $return;
         }

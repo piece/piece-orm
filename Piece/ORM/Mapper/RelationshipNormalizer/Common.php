@@ -117,7 +117,7 @@ class Piece_ORM_Mapper_RelationshipNormalizer_Common
         }
 
         $this->_relationshipMetadata = &Piece_ORM_Metadata_Factory::factory($this->_relationship['table']);
-        if (Piece_ORM_Error::hasErrors('exception')) {
+        if (Piece_ORM_Error::hasErrors()) {
             return;
         }
 
@@ -169,7 +169,7 @@ class Piece_ORM_Mapper_RelationshipNormalizer_Common
         $this->_normalizeOrderBy();
 
         $this->_normalizeThrough();
-        if (Piece_ORM_Error::hasErrors('exception')) {
+        if (Piece_ORM_Error::hasErrors()) {
             return;
         }
 
