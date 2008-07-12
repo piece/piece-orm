@@ -35,7 +35,7 @@
  * @since      File available since Release 0.1.0
  */
 
-require_once dirname(__FILE__) . '/CompatibilityTest.php';
+require_once dirname(__FILE__) . '/CompatibilityTests.php';
 
 // {{{ Piece_ORM_Mapper_PgsqlTestCase
 
@@ -48,7 +48,7 @@ require_once dirname(__FILE__) . '/CompatibilityTest.php';
  * @version    Release: @package_version@
  * @since      Class available since Release 0.1.0
  */
-class Piece_ORM_Mapper_PgsqlTestCase extends Piece_ORM_Mapper_CompatibilityTest
+class Piece_ORM_Mapper_PgsqlTestCase extends Piece_ORM_Mapper_CompatibilityTests
 {
 
     // {{{ properties

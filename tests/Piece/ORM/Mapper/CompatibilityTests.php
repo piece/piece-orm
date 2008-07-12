@@ -44,7 +44,7 @@ require_once 'Piece/ORM/Context.php';
 require_once 'Piece/ORM/Config.php';
 require_once 'Piece/ORM/Metadata/Factory.php';
 
-// {{{ Piece_ORM_Mapper_APITestCase
+// {{{ Piece_ORM_Mapper_CompatibilityTests
 
 /**
  * The base class for compatibility test. This class provides test cases to
@@ -56,7 +56,7 @@ require_once 'Piece/ORM/Metadata/Factory.php';
  * @version    Release: @package_version@
  * @since      Class available since Release 0.1.0
  */
-class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
+class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
 {
 
     // {{{ properties

@@ -35,7 +35,7 @@
  * @since      File available since Release 0.1.0
  */
 
-require_once dirname(__FILE__) . '/CompatibilityTest.php';
+require_once dirname(__FILE__) . '/CompatibilityTests.php';
 require_once 'MDB2.php';
 require_once 'Piece/ORM/Mapper/Factory.php';
 require_once 'Piece/ORM/Error.php';
@@ -54,7 +54,7 @@ require_once 'Piece/ORM/Metadata/Factory.php';
  * @version    Release: @package_version@
  * @since      Class available since Release 0.1.0
  */
-class Piece_ORM_Mapper_MysqlTestCase extends Piece_ORM_Mapper_CompatibilityTest
+class Piece_ORM_Mapper_MysqlTestCase extends Piece_ORM_Mapper_CompatibilityTests
 {
 
     // {{{ properties
