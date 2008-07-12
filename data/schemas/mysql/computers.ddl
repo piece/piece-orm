@@ -6,7 +6,7 @@ CREATE TABLE computers (
   employees_id int (11),
   created_at datetime NOT NULL,
   updated_at timestamp,
-  PRIMARY KEY(id)
+  PRIMARY KEY (id)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 /*
