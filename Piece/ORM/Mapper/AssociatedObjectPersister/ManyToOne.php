@@ -140,4 +140,3 @@ class Piece_ORM_Mapper_AssociatedObjectPersister_ManyToOne extends Piece_ORM_Map
  * indent-tabs-mode: nil
  * End:
  */
-?>

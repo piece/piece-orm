@@ -310,4 +310,3 @@ class Piece_ORM_Mapper_FactoryTestCase extends PHPUnit_TestCase
  * indent-tabs-mode: nil
  * End:
  */
-?>

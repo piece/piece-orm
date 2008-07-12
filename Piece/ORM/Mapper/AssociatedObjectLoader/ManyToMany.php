@@ -201,4 +201,3 @@ class Piece_ORM_Mapper_AssociatedObjectLoader_ManyToMany extends Piece_ORM_Mappe
  * indent-tabs-mode: nil
  * End:
  */
-?>

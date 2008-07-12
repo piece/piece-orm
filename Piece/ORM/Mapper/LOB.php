@@ -221,4 +221,3 @@ class Piece_ORM_Mapper_LOB
  * indent-tabs-mode: nil
  * End:
  */
-?>

@@ -154,4 +154,3 @@ class Piece_ORM_Mapper_RelationshipNormalizer_OneToOne extends Piece_ORM_Mapper_
  * indent-tabs-mode: nil
  * End:
  */
-?>

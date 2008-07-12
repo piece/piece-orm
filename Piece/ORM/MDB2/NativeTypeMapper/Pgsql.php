@@ -120,4 +120,3 @@ class Piece_ORM_MDB2_NativeTypeMapper_Pgsql extends Piece_ORM_MDB2_NativeTypeMap
  * indent-tabs-mode: nil
  * End:
  */
-?>

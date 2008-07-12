@@ -857,4 +857,3 @@ class Piece_ORM_Mapper_Generator
  * indent-tabs-mode: nil
  * End:
  */
-?>

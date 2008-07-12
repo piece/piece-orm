@@ -242,4 +242,3 @@ class Piece_ORM_Mapper_AssociatedObjectLoader_Common
  * indent-tabs-mode: nil
  * End:
  */
-?>

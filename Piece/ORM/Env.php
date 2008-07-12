@@ -122,4 +122,3 @@ class Piece_ORM_Env
  * indent-tabs-mode: nil
  * End:
  */
-?>

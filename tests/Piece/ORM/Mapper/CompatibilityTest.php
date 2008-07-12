@@ -2255,4 +2255,3 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
  * indent-tabs-mode: nil
  * End:
  */
-?>

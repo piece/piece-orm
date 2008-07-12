@@ -127,4 +127,3 @@ class Piece_ORM_Mapper_RelationshipType
  * indent-tabs-mode: nil
  * End:
  */
-?>

@@ -254,4 +254,3 @@ class Piece_ORM_Mapper_RelationshipNormalizer_Common
  * indent-tabs-mode: nil
  * End:
  */
-?>

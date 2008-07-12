@@ -51,4 +51,3 @@ if (file_exists(dirname(__FILE__) . '/../Piece/ORM.php')) {
  * indent-tabs-mode: nil
  * End:
  */
-?>

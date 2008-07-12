@@ -222,4 +222,3 @@ class Piece_ORM_Mapper_AssociatedObjectPersister_ManyToMany extends Piece_ORM_Ma
  * indent-tabs-mode: nil
  * End:
  */
-?>

@@ -201,4 +201,3 @@ class Piece_ORM_Mapper_QueryExecutor
  * indent-tabs-mode: nil
  * End:
  */
-?>

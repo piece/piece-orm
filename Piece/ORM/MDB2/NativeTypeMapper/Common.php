@@ -166,4 +166,3 @@ class Piece_ORM_MDB2_NativeTypeMapper_Common
  * indent-tabs-mode: nil
  * End:
  */
-?>

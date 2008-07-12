@@ -255,4 +255,3 @@ class Piece_ORM_Config_Factory
  * indent-tabs-mode: nil
  * End:
  */
-?>

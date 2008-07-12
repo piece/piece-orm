@@ -226,4 +226,3 @@ class Piece_ORM_Config_FactoryTestCase extends PHPUnit_TestCase
  * indent-tabs-mode: nil
  * End:
  */
-?>

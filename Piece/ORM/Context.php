@@ -289,4 +289,3 @@ class Piece_ORM_Context
  * indent-tabs-mode: nil
  * End:
  */
-?>

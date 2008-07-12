@@ -155,4 +155,3 @@ class Piece_ORM_Mapper_PgsqlTestCase extends Piece_ORM_Mapper_CompatibilityTest
  * indent-tabs-mode: nil
  * End:
  */
-?>

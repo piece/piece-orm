@@ -172,4 +172,3 @@ class Piece_ORM_Mapper_MysqlTestCase extends Piece_ORM_Mapper_CompatibilityTest
  * indent-tabs-mode: nil
  * End:
  */
-?>

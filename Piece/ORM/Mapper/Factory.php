@@ -418,4 +418,3 @@ class Piece_ORM_Mapper_Factory
  * indent-tabs-mode: nil
  * End:
  */
-?>

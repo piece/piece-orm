@@ -415,4 +415,3 @@ class Piece_ORMTestCase_Employee
  * indent-tabs-mode: nil
  * End:
  */
-?>

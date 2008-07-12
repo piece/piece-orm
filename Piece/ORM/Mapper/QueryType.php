@@ -175,4 +175,3 @@ class Piece_ORM_Mapper_QueryType
  * indent-tabs-mode: nil
  * End:
  */
-?>

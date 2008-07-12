@@ -808,4 +808,3 @@ class Piece_ORM_Mapper_Common
  * indent-tabs-mode: nil
  * End:
  */
-?>

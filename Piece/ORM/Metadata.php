@@ -359,4 +359,3 @@ class Piece_ORM_Metadata
  * indent-tabs-mode: nil
  * End:
  */
-?>

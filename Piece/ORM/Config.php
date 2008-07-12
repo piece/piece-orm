@@ -323,4 +323,3 @@ class Piece_ORM_Config
  * indent-tabs-mode: nil
  * End:
  */
-?>

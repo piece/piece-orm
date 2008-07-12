@@ -151,4 +151,3 @@ class Piece_ORM_Mapper_AssociatedObjectLoader_OneToOne extends Piece_ORM_Mapper_
  * indent-tabs-mode: nil
  * End:
  */
-?>

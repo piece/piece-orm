@@ -250,4 +250,3 @@ class Piece_ORM_Error
  * indent-tabs-mode: nil
  * End:
  */
-?>

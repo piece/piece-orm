@@ -266,4 +266,3 @@ class Piece_ORM_Mapper_ObjectLoader
  * indent-tabs-mode: nil
  * End:
  */
-?>

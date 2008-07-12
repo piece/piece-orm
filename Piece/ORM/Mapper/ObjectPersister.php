@@ -352,4 +352,3 @@ class Piece_ORM_Mapper_ObjectPersister
  * indent-tabs-mode: nil
  * End:
  */
-?>

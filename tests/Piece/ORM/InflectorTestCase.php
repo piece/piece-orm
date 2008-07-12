@@ -122,4 +122,3 @@ class Piece_ORM_InflectorTestCase extends PHPUnit_TestCase
  * indent-tabs-mode: nil
  * End:
  */
-?>

@@ -147,4 +147,3 @@ class Piece_ORM_Metadata_FactoryTestCase extends PHPUnit_TestCase
  * indent-tabs-mode: nil
  * End:
  */
-?>

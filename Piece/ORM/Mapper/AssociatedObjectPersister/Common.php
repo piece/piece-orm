@@ -166,4 +166,3 @@ class Piece_ORM_Mapper_AssociatedObjectPersister_Common
  * indent-tabs-mode: nil
  * End:
  */
-?>

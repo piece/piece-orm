@@ -109,4 +109,3 @@ class Piece_ORM_ConfigTestCase extends PHPUnit_TestCase
  * indent-tabs-mode: nil
  * End:
  */
-?>

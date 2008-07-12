@@ -143,4 +143,3 @@ class Piece_ORM_Inflector
  * indent-tabs-mode: nil
  * End:
  */
-?>

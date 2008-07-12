@@ -217,4 +217,3 @@ class Piece_ORM_Mapper_AssociatedObjectPersister_OneToOne extends Piece_ORM_Mapp
  * indent-tabs-mode: nil
  * End:
  */
-?>

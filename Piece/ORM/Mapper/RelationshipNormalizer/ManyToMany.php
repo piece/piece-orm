@@ -240,4 +240,3 @@ class Piece_ORM_Mapper_RelationshipNormalizer_ManyToMany extends Piece_ORM_Mappe
  * indent-tabs-mode: nil
  * End:
  */
-?>

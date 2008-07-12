@@ -362,4 +362,3 @@ class Piece_ORM_Mapper_QueryBuilder
  * indent-tabs-mode: nil
  * End:
  */
-?>

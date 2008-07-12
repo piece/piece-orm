@@ -274,4 +274,3 @@ return \$a->$primaryKeyProperty < \$b->$primaryKeyProperty ? -1 : 1;
  * indent-tabs-mode: nil
  * End:
  */
-?>

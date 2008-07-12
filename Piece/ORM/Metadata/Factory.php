@@ -332,4 +332,3 @@ class Piece_ORM_Metadata_Factory
  * indent-tabs-mode: nil
  * End:
  */
-?>

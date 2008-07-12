@@ -417,4 +417,3 @@ ORDER BY
  * indent-tabs-mode: nil
  * End:
  */
-?>
