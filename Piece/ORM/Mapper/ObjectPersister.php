@@ -97,11 +97,11 @@ class Piece_ORM_Mapper_ObjectPersister
             $subject = &new stdClass();
 
             if ($metadata->getDatatype('created_at') == 'timestamp') {
-                $subject->{ Piece_ORM_Inflector::camelize('created_at', true) } = null;
+                $subject->createdAt = null;
             }
 
             if ($metadata->getDatatype('updated_at') == 'timestamp') {
-                $subject->{ Piece_ORM_Inflector::camelize('updated_at', true) } = null;
+                $subject->updatedAt = null;
             }
         }
 
