@@ -1938,10 +1938,21 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
         Piece_ORM_Mapper_Factory::setConfigDirectory($this->_cacheDirectory);
         Piece_ORM_Mapper_Factory::setCacheDirectory($this->_cacheDirectory);
         Piece_ORM_Metadata_Factory::setCacheDirectory($this->_cacheDirectory);
+        Piece_ORM_Error::disableCallback();
         $mapper = &Piece_ORM_Mapper_Factory::factory('Case_Sensitive');
-        $mapper->findAll();
+        Piece_ORM_Error::enableCallback();
 
-        $this->assertTrue(preg_match('/FROM ["\[]?Case_Sensitive["\[]?/', $mapper->getLastQuery()));
+        $this->assertFalse(Piece_ORM_Error::hasErrors());
+
+        Piece_ORM_Error::disableCallback();
+        $mapper->findAllByFirstName((object)array('firstName' => 'foo'));
+        Piece_ORM_Error::enableCallback();
+
+        $this->assertFalse(Piece_ORM_Error::hasErrors());
+
+        $dbh = &$mapper->getConnection();
+
+        $this->assertTrue(preg_match('/FROM ' . preg_quote($dbh->quoteIdentifier('Case_Sensitive'), '/') . '/', $mapper->getLastQuery()));
     }
 
     /**

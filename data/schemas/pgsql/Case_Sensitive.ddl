@@ -2,7 +2,13 @@
 
 CREATE TABLE "Case_Sensitive" (
   id serial,
-  name varchar (255) NOT NULL,
+  first_name varchar (255) NOT NULL,
+  last_name varchar (255) NOT NULL,
+  note varchar (255),
+  departments_id int4,
+  created_at timestamp with time zone NOT NULL DEFAULT current_timestamp,
+  updated_at timestamp with time zone NOT NULL DEFAULT current_timestamp,
+  lock_version int4 NOT NULL DEFAULT '0', 
   PRIMARY KEY (id)
 );
 

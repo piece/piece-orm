@@ -231,9 +231,14 @@ class Piece_ORM_Context
         if ($this->getUseMapperNameAsTableName()) {
             if ($dbh->phptype == 'pgsql') {
                 $dbh->options['quote_identifier'] = true;
+                $dbh->options['portability'] &= ~MDB2_PORTABILITY_FIX_CASE;
+            } elseif ($dbh->phptype == 'mysql') {
+                $dbh->options['portability'] |= MDB2_PORTABILITY_FIX_CASE;
+                $dbh->options['field_case'] = CASE_LOWER;
+            } elseif ($dbh->phptype == 'mssql') {
+                $dbh->options['portability'] |= MDB2_PORTABILITY_FIX_CASE;
+                $dbh->options['field_case'] = CASE_LOWER;
             }
-
-            $dbh->options['portability'] &= ~MDB2_PORTABILITY_FIX_CASE;
         }
 
         return $dbh;
