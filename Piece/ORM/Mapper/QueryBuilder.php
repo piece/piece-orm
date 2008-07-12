@@ -225,7 +225,8 @@ class Piece_ORM_Mapper_QueryBuilder
             }
         }
 
-        if (Piece_ORM_Mapper_QueryType::isUpdate($this->_methodName)
+        if ((Piece_ORM_Mapper_QueryType::isInsert($this->_methodName)
+             || Piece_ORM_Mapper_QueryType::isUpdate($this->_methodName))
             && $this->_metadata->getDatatype('updated_at') == 'timestamp'
             ) {
             $updatedAtProperty = Piece_ORM_Inflector::camelize('updated_at', true);
