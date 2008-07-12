@@ -66,6 +66,8 @@ class Piece_ORM_Mapper_AssociatedObjectPersister_OneToMany extends Piece_ORM_Map
      * @access private
      */
 
+    var $_primaryKeyProperty;
+
     /**#@-*/
 
     /**#@+
@@ -135,17 +137,17 @@ class Piece_ORM_Mapper_AssociatedObjectPersister_OneToMany extends Piece_ORM_Map
         }
 
         $metadata = &$mapper->getMetadata();
-        $primaryKeyProperty = Piece_ORM_Inflector::camelize($metadata->getPrimaryKey(), true);
+        $this->_primaryKeyProperty = Piece_ORM_Inflector::camelize($metadata->getPrimaryKey(), true);
         $targetsForInsert = array();
         $targetsForUpdate = array();
         $targetsForDelete = array();
         for ($i = 0, $count = count($this->_subject->$relationship['mappedAs']); $i < $count; ++$i) {
-            if (!array_key_exists($primaryKeyProperty, $this->_subject->{ $relationship['mappedAs'] }[$i])) {
+            if (!array_key_exists($this->_primaryKeyProperty, $this->_subject->{ $relationship['mappedAs'] }[$i])) {
                 $targetsForInsert[] = &$this->_subject->{ $relationship['mappedAs'] }[$i];
                 continue;
             }
 
-            if (is_null($this->_subject->{ $relationship['mappedAs'] }[$i]->$primaryKeyProperty)) {
+            if (is_null($this->_subject->{ $relationship['mappedAs'] }[$i]->{ $this->_primaryKeyProperty })) {
                 $targetsForInsert[] = &$this->_subject->{ $relationship['mappedAs'] }[$i];
                 continue;
             }
@@ -153,19 +155,11 @@ class Piece_ORM_Mapper_AssociatedObjectPersister_OneToMany extends Piece_ORM_Map
             $targetsForUpdate[] = &$this->_subject->{ $relationship['mappedAs']}[$i];
         }
 
-        $sorter = create_function('$a,$b', "
-if (\$a->$primaryKeyProperty == \$b->$primaryKeyProperty) {
-    return 0;
-}
+        usort($oldObjects, array(&$this, 'sortByPrimaryKey'));
+        usort($targetsForUpdate, array(&$this, 'sortByPrimaryKey'));
 
-return \$a->$primaryKeyProperty < \$b->$primaryKeyProperty ? -1 : 1;
-");
-
-        usort($oldObjects, $sorter);
-        usort($targetsForUpdate, $sorter);
-
-        $oldPrimaryKeyValues = array_map(create_function('$o', "return \$o->$primaryKeyProperty;"), $oldObjects);
-        $newPrimaryKeyValues = array_map(create_function('$o', "return \$o->$primaryKeyProperty;"), $targetsForUpdate);
+        $oldPrimaryKeyValues = array_map(array(&$this, 'getPrimaryKey'), $oldObjects);
+        $newPrimaryKeyValues = array_map(array(&$this, 'getPrimaryKey'), $targetsForUpdate);
         foreach (array_keys(array_diff($oldPrimaryKeyValues, $newPrimaryKeyValues)) as $indexForDelete) {
             $targetsForDelete[] = $oldObjects[$indexForDelete];
         }
@@ -223,6 +217,37 @@ return \$a->$primaryKeyProperty < \$b->$primaryKeyProperty ? -1 : 1;
         }
 
         $mapper->executeQuery("DELETE FROM {$relationship['table']} WHERE {$relationship['column']} = " . $mapper->quote($this->_subject->{ Piece_ORM_Inflector::camelize($relationship['referencedColumn'], true) }, $relationship['column']), true);
+    }
+
+    // }}}
+    // {{{ sortByPrimaryKey()
+
+    /**
+     * Sorts two objects by the primary key.
+     *
+     * @param mixed &$a
+     * @param mixed &$b
+     */
+    function sortByPrimaryKey(&$a, &$b)
+    {
+        if ($a->{ $this->_primaryKeyProperty } == $b->{ $this->_primaryKeyProperty }) {
+            return 0;
+        }
+
+        return $a->{ $this->_primaryKeyProperty } < $b->{ $this->_primaryKeyProperty } ? -1 : 1;
+    }
+
+    // }}}
+    // {{{ getPrimaryKey()
+
+    /**
+     * Gets the primary key of a given object.
+     *
+     * @param mixed &$o
+     */
+    function getPrimaryKey(&$o)
+    {
+        return $o->{ $this->_primaryKeyProperty };
     }
 
     /**#@-*/
