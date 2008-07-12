@@ -90,7 +90,6 @@ class Piece_ORM_Metadata_Factory
      *
      * @param string $tableName
      * @return Piece_ORM_Metadata
-     * @throws PIECE_ORM_ERROR_CANNOT_INVOKE
      * @static
      */
     function &factory($tableName)
@@ -154,7 +153,6 @@ class Piece_ORM_Metadata_Factory
      * @param string $tableName
      * @param string $tableID
      * @return Piece_ORM_Metadata
-     * @throws PIECE_ORM_ERROR_CANNOT_INVOKE
      */
     function &_getMetadata($tableName, $tableID)
     {
@@ -281,7 +279,6 @@ class Piece_ORM_Metadata_Factory
      * @param string $tableName
      * @param string $tableID
      * @return Piece_ORM_Metadata
-     * @throws PIECE_ORM_ERROR_CANNOT_INVOKE
      */
     function &_createMetadata($tableName, $tableID)
     {

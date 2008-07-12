@@ -86,7 +86,6 @@ class Piece_ORM_Mapper_RelationshipNormalizer_ManyToMany extends Piece_ORM_Mappe
      * Normalizes "through" definition.
      *
      * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
-     * @throws PIECE_ORM_ERROR_CANNOT_INVOKE
      */
     function _normalizeThrough()
     {
@@ -178,8 +177,6 @@ class Piece_ORM_Mapper_RelationshipNormalizer_ManyToMany extends Piece_ORM_Mappe
 
     /**
      * Normalizes "column" definition.
-     *
-     * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
      */
     function _normalizeColumn()
     {
@@ -196,8 +193,6 @@ class Piece_ORM_Mapper_RelationshipNormalizer_ManyToMany extends Piece_ORM_Mappe
 
     /**
      * Normalizes "referencedColumn" definition.
-     *
-     * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
      */
     function _normalizeReferencedColumn()
     {

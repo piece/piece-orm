@@ -98,7 +98,6 @@ class Piece_ORM_Mapper_RelationshipNormalizer_Common
      *
      * @return array
      * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
-     * @throws PIECE_ORM_ERROR_CANNOT_INVOKE
      * @throws PIECE_ORM_ERROR_NOT_FOUND
      */
     function normalize()
@@ -189,8 +188,6 @@ class Piece_ORM_Mapper_RelationshipNormalizer_Common
     /**
      * Normalizes "through" definition.
      *
-     * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
-     * @throws PIECE_ORM_ERROR_CANNOT_INVOKE
      * @abstract
      */
     function _normalizeThrough() {}
@@ -201,7 +198,6 @@ class Piece_ORM_Mapper_RelationshipNormalizer_Common
     /**
      * Normalizes "column" definition.
      *
-     * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
      * @abstract
      */
     function _normalizeColumn() {}
@@ -212,7 +208,6 @@ class Piece_ORM_Mapper_RelationshipNormalizer_Common
     /**
      * Normalizes "referencedColumn" definition.
      *
-     * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
      * @abstract
      */
     function _normalizeReferencedColumn() {}

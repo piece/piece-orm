@@ -89,15 +89,6 @@ class Piece_ORM_Mapper_AssociatedObjectPersister_Common
      * Inserts associated objects to a table.
      *
      * @param array $relationship
-     * @throws PIECE_ORM_ERROR_UNEXPECTED_VALUE
-     * @throws PIECE_ORM_ERROR_CANNOT_INVOKE
-     * @throws PIECE_ORM_ERROR_INVALID_OPERATION
-     * @throws PIECE_ORM_ERROR_NOT_FOUND
-     * @throws PIECE_ORM_ERROR_NOT_READABLE
-     * @throws PIECE_ORM_ERROR_CANNOT_READ
-     * @throws PIECE_ORM_ERROR_CANNOT_WRITE
-     * @throws PIECE_ORM_ERROR_INVALID_MAPPER
-     * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
      * @abstract
      */
     function insert($relationship) {}
@@ -109,15 +100,6 @@ class Piece_ORM_Mapper_AssociatedObjectPersister_Common
      * Updates associated objects in a table.
      *
      * @param array $relationship
-     * @throws PIECE_ORM_ERROR_UNEXPECTED_VALUE
-     * @throws PIECE_ORM_ERROR_CANNOT_INVOKE
-     * @throws PIECE_ORM_ERROR_INVALID_OPERATION
-     * @throws PIECE_ORM_ERROR_NOT_FOUND
-     * @throws PIECE_ORM_ERROR_NOT_READABLE
-     * @throws PIECE_ORM_ERROR_CANNOT_READ
-     * @throws PIECE_ORM_ERROR_CANNOT_WRITE
-     * @throws PIECE_ORM_ERROR_INVALID_MAPPER
-     * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
      * @abstract
      */
     function update($relationship) {}
@@ -130,15 +112,6 @@ class Piece_ORM_Mapper_AssociatedObjectPersister_Common
      *
      * @param array $relationship
      * @return integer
-     * @throws PIECE_ORM_ERROR_UNEXPECTED_VALUE
-     * @throws PIECE_ORM_ERROR_CANNOT_INVOKE
-     * @throws PIECE_ORM_ERROR_INVALID_OPERATION
-     * @throws PIECE_ORM_ERROR_NOT_FOUND
-     * @throws PIECE_ORM_ERROR_NOT_READABLE
-     * @throws PIECE_ORM_ERROR_CANNOT_READ
-     * @throws PIECE_ORM_ERROR_CANNOT_WRITE
-     * @throws PIECE_ORM_ERROR_INVALID_MAPPER
-     * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
      * @abstract
      */
     function delete($relationship) {}

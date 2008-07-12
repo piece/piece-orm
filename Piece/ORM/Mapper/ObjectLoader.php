@@ -117,13 +117,6 @@ class Piece_ORM_Mapper_ObjectLoader
      * Loads all objects with a result object.
      *
      * @return array
-     * @throws PIECE_ORM_ERROR_INVALID_OPERATION
-     * @throws PIECE_ORM_ERROR_NOT_FOUND
-     * @throws PIECE_ORM_ERROR_NOT_READABLE
-     * @throws PIECE_ORM_ERROR_CANNOT_READ
-     * @throws PIECE_ORM_ERROR_CANNOT_WRITE
-     * @throws PIECE_ORM_ERROR_INVALID_MAPPER
-     * @throws PIECE_ORM_ERROR_CANNOT_INVOKE
      */
     function loadAll()
     {
@@ -225,14 +218,6 @@ class Piece_ORM_Mapper_ObjectLoader
 
     /**
      * Loads associated objects into appropriate objects.
-     *
-     * @throws PIECE_ORM_ERROR_INVALID_OPERATION
-     * @throws PIECE_ORM_ERROR_NOT_FOUND
-     * @throws PIECE_ORM_ERROR_NOT_READABLE
-     * @throws PIECE_ORM_ERROR_CANNOT_READ
-     * @throws PIECE_ORM_ERROR_CANNOT_WRITE
-     * @throws PIECE_ORM_ERROR_INVALID_MAPPER
-     * @throws PIECE_ORM_ERROR_CANNOT_INVOKE
      */
     function _loadAssociatedObjects()
     {

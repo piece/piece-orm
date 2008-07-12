@@ -101,6 +101,7 @@ class Piece_ORM_Mapper_QueryExecutor
      * @return MDB2_Result_Common|integer
      * @throws PIECE_ORM_ERROR_CANNOT_INVOKE
      * @throws PIECE_ORM_ERROR_UNEXPECTED_VALUE
+     * @throws PIECE_ORM_ERROR_CONSTRAINT
      */
     function &execute($query, $sth)
     {
@@ -154,7 +155,6 @@ class Piece_ORM_Mapper_QueryExecutor
      * @param string   $methodName
      * @param stdClass $criteria
      * @return MDB2_Result_Common|integer
-     * @throws PIECE_ORM_ERROR_CANNOT_INVOKE
      */
     function &executeWithCriteria($methodName, $criteria)
     {

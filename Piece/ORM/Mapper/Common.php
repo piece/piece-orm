@@ -120,13 +120,6 @@ class Piece_ORM_Mapper_Common
      *
      * @param string $query
      * @return array
-     * @throws PIECE_ORM_ERROR_INVALID_OPERATION
-     * @throws PIECE_ORM_ERROR_NOT_FOUND
-     * @throws PIECE_ORM_ERROR_NOT_READABLE
-     * @throws PIECE_ORM_ERROR_CANNOT_READ
-     * @throws PIECE_ORM_ERROR_CANNOT_WRITE
-     * @throws PIECE_ORM_ERROR_INVALID_MAPPER
-     * @throws PIECE_ORM_ERROR_CANNOT_INVOKE
      */
     function findAllWithQuery($query)
     {
@@ -293,8 +286,6 @@ class Piece_ORM_Mapper_Common
      * @param boolean               $isManip
      * @param MDB2_Statement_Common $sth
      * @return MDB2_Result_Common|integer
-     * @throws PIECE_ORM_ERROR_CANNOT_INVOKE
-     * @throws PIECE_ORM_ERROR_UNEXPECTED_VALUE
      */
     function &executeQuery($query, $isManip = false, $sth = null)
     {
@@ -310,13 +301,6 @@ class Piece_ORM_Mapper_Common
      *
      * @param string $query
      * @return stdClass
-     * @throws PIECE_ORM_ERROR_INVALID_OPERATION
-     * @throws PIECE_ORM_ERROR_NOT_FOUND
-     * @throws PIECE_ORM_ERROR_NOT_READABLE
-     * @throws PIECE_ORM_ERROR_CANNOT_READ
-     * @throws PIECE_ORM_ERROR_CANNOT_WRITE
-     * @throws PIECE_ORM_ERROR_INVALID_MAPPER
-     * @throws PIECE_ORM_ERROR_CANNOT_INVOKE
      */
     function &findWithQuery($query)
     {
@@ -343,7 +327,6 @@ class Piece_ORM_Mapper_Common
      * @param stdClass $criteria
      * @param boolean  $isManip
      * @return MDB2_Result_Common|integer
-     * @throws PIECE_ORM_ERROR_CANNOT_INVOKE
      */
     function &executeQueryWithCriteria($methodName, $criteria, $isManip = false)
     {
@@ -372,7 +355,6 @@ class Piece_ORM_Mapper_Common
      * clause in the latest findAll method execution.
      *
      * @return integer
-     * @throws PIECE_ORM_ERROR_CANNOT_INVOKE
      * @since Method available since Release 0.3.0
      */
     function getCount()
@@ -394,7 +376,6 @@ class Piece_ORM_Mapper_Common
      *
      * @param string $query
      * @return array
-     * @throws PIECE_ORM_ERROR_CANNOT_INVOKE
      * @since Method available since Release 0.3.0
      */
     function findOneWithQuery($query)
@@ -528,14 +509,6 @@ class Piece_ORM_Mapper_Common
      * @param string $methodName
      * @param mixed  $criteria
      * @return stdClass
-     * @throws PIECE_ORM_ERROR_UNEXPECTED_VALUE
-     * @throws PIECE_ORM_ERROR_INVALID_OPERATION
-     * @throws PIECE_ORM_ERROR_NOT_FOUND
-     * @throws PIECE_ORM_ERROR_NOT_READABLE
-     * @throws PIECE_ORM_ERROR_CANNOT_READ
-     * @throws PIECE_ORM_ERROR_CANNOT_WRITE
-     * @throws PIECE_ORM_ERROR_INVALID_MAPPER
-     * @throws PIECE_ORM_ERROR_CANNOT_INVOKE
      */
     function &_find($methodName, $criteria)
     {
@@ -562,13 +535,6 @@ class Piece_ORM_Mapper_Common
      * @param MDB2_Result &$result
      * @param array       $relationships
      * @return array
-     * @throws PIECE_ORM_ERROR_INVALID_OPERATION
-     * @throws PIECE_ORM_ERROR_NOT_FOUND
-     * @throws PIECE_ORM_ERROR_NOT_READABLE
-     * @throws PIECE_ORM_ERROR_CANNOT_READ
-     * @throws PIECE_ORM_ERROR_CANNOT_WRITE
-     * @throws PIECE_ORM_ERROR_INVALID_MAPPER
-     * @throws PIECE_ORM_ERROR_CANNOT_INVOKE
      */
     function _loadAllObjects(&$result, $relationships = array())
     {
@@ -589,13 +555,6 @@ class Piece_ORM_Mapper_Common
      * @param stdClass $criteria
      * @return array
      * @throws PIECE_ORM_ERROR_UNEXPECTED_VALUE
-     * @throws PIECE_ORM_ERROR_INVALID_OPERATION
-     * @throws PIECE_ORM_ERROR_NOT_FOUND
-     * @throws PIECE_ORM_ERROR_NOT_READABLE
-     * @throws PIECE_ORM_ERROR_CANNOT_READ
-     * @throws PIECE_ORM_ERROR_CANNOT_WRITE
-     * @throws PIECE_ORM_ERROR_INVALID_MAPPER
-     * @throws PIECE_ORM_ERROR_CANNOT_INVOKE
      */
     function _findAll($methodName, $criteria)
     {
@@ -667,8 +626,6 @@ class Piece_ORM_Mapper_Common
      * @param string   $methodName
      * @param stdClass $criteria
      * @return array
-     * @throws PIECE_ORM_ERROR_UNEXPECTED_VALUE
-     * @throws PIECE_ORM_ERROR_CANNOT_INVOKE
      * @since Method available since Release 0.3.0
      */
     function _findOne($methodName, $criteria)
@@ -725,15 +682,6 @@ class Piece_ORM_Mapper_Common
      * @param string $methodName
      * @param mixed &$subject
      * @return integer
-     * @throws PIECE_ORM_ERROR_UNEXPECTED_VALUE
-     * @throws PIECE_ORM_ERROR_CANNOT_INVOKE
-     * @throws PIECE_ORM_ERROR_INVALID_OPERATION
-     * @throws PIECE_ORM_ERROR_NOT_FOUND
-     * @throws PIECE_ORM_ERROR_NOT_READABLE
-     * @throws PIECE_ORM_ERROR_CANNOT_READ
-     * @throws PIECE_ORM_ERROR_CANNOT_WRITE
-     * @throws PIECE_ORM_ERROR_INVALID_MAPPER
-     * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
      */
     function _insert($methodName, &$subject)
     {
@@ -750,15 +698,6 @@ class Piece_ORM_Mapper_Common
      * @param string $methodName
      * @param mixed &$subject
      * @return integer
-     * @throws PIECE_ORM_ERROR_UNEXPECTED_VALUE
-     * @throws PIECE_ORM_ERROR_CANNOT_INVOKE
-     * @throws PIECE_ORM_ERROR_INVALID_OPERATION
-     * @throws PIECE_ORM_ERROR_NOT_FOUND
-     * @throws PIECE_ORM_ERROR_NOT_READABLE
-     * @throws PIECE_ORM_ERROR_CANNOT_READ
-     * @throws PIECE_ORM_ERROR_CANNOT_WRITE
-     * @throws PIECE_ORM_ERROR_INVALID_MAPPER
-     * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
      */
     function _delete($methodName, &$subject)
     {
@@ -775,15 +714,6 @@ class Piece_ORM_Mapper_Common
      * @param string $methodName
      * @param mixed &$subject
      * @return integer
-     * @throws PIECE_ORM_ERROR_UNEXPECTED_VALUE
-     * @throws PIECE_ORM_ERROR_CANNOT_INVOKE
-     * @throws PIECE_ORM_ERROR_INVALID_OPERATION
-     * @throws PIECE_ORM_ERROR_NOT_FOUND
-     * @throws PIECE_ORM_ERROR_NOT_READABLE
-     * @throws PIECE_ORM_ERROR_CANNOT_READ
-     * @throws PIECE_ORM_ERROR_CANNOT_WRITE
-     * @throws PIECE_ORM_ERROR_INVALID_MAPPER
-     * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
      */
     function _update($methodName, &$subject)
     {

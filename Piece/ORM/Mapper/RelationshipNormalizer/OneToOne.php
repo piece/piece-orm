@@ -81,8 +81,6 @@ class Piece_ORM_Mapper_RelationshipNormalizer_OneToOne extends Piece_ORM_Mapper_
 
     /**
      * Normalizes "column" definition.
-     *
-     * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
      */
     function _normalizeColumn()
     {
@@ -99,8 +97,6 @@ class Piece_ORM_Mapper_RelationshipNormalizer_OneToOne extends Piece_ORM_Mapper_
 
     /**
      * Normalizes "referencedColumn" definition.
-     *
-     * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
      */
     function _normalizeReferencedColumn()
     {

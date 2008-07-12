@@ -128,12 +128,6 @@ class Piece_ORM
      * @param string $mapperName
      * @return Piece_ORM_Mapper_Common
      * @throws PIECE_ORM_ERROR_INVALID_OPERATION
-     * @throws PIECE_ORM_ERROR_NOT_FOUND
-     * @throws PIECE_ORM_ERROR_NOT_READABLE
-     * @throws PIECE_ORM_ERROR_CANNOT_READ
-     * @throws PIECE_ORM_ERROR_CANNOT_WRITE
-     * @throws PIECE_ORM_ERROR_INVALID_MAPPER
-     * @throws PIECE_ORM_ERROR_CANNOT_INVOKE
      */
     function &getMapper($mapperName)
     {
@@ -179,7 +173,6 @@ class Piece_ORM
      *
      * @param string $database
      * @throws PIECE_ORM_ERROR_INVALID_OPERATION
-     * @throws PIECE_ORM_ERROR_NOT_FOUND
      */
     function setDatabase($database)
     {
@@ -203,12 +196,6 @@ class Piece_ORM
      * @param string $mapperName
      * @return stdClass
      * @throws PIECE_ORM_ERROR_INVALID_OPERATION
-     * @throws PIECE_ORM_ERROR_NOT_FOUND
-     * @throws PIECE_ORM_ERROR_NOT_READABLE
-     * @throws PIECE_ORM_ERROR_CANNOT_READ
-     * @throws PIECE_ORM_ERROR_CANNOT_WRITE
-     * @throws PIECE_ORM_ERROR_INVALID_MAPPER
-     * @throws PIECE_ORM_ERROR_CANNOT_INVOKE
      */
     function &createObject($mapperName)
     {
