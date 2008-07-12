@@ -173,11 +173,9 @@ class Piece_ORM_Metadata_Factory
          */
         $metadata = $cache->get($tableID);
         if (PEAR::isError($metadata)) {
-            Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
-            Piece_ORM_Error::push(PIECE_ORM_ERROR_CANNOT_READ,
-                                  "Cannot read the cache file in the directory [ {$GLOBALS['PIECE_ORM_Metadata_CacheDirectory']} ]."
-                                  );
-            Piece_ORM_Error::popCallback();
+            trigger_error("Cannot read the cache file in the directory [ {$GLOBALS['PIECE_ORM_Metadata_CacheDirectory']} ].",
+                          E_USER_WARNING
+                          );
 
             $metadata = &Piece_ORM_Metadata_Factory::_createMetadataFromDatabase($tableName);
             if (Piece_ORM_Error::hasErrors('exception')) {
@@ -197,12 +195,9 @@ class Piece_ORM_Metadata_Factory
 
             $result = $cache->save($metadata);
             if (PEAR::isError($result)) {
-                Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
-                Piece_ORM_Error::push(PIECE_ORM_ERROR_CANNOT_WRITE,
-                                      "Cannot write the Piece_ORM_Metadata object to the cache file in the directory [ {$GLOBALS['PIECE_ORM_Metadata_CacheDirectory']} ].",
-                                      'warning'
-                                      );
-                Piece_ORM_Error::popCallback();
+                trigger_error("Cannot write the Piece_ORM_Metadata object to the cache file in the directory [ {$GLOBALS['PIECE_ORM_Metadata_CacheDirectory']} ].",
+                              E_USER_WARNING
+                              );
             }
         }
 
@@ -291,24 +286,16 @@ class Piece_ORM_Metadata_Factory
     function &_createMetadata($tableName, $tableID)
     {
         if (!file_exists($GLOBALS['PIECE_ORM_Metadata_CacheDirectory'])) {
-            Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
-            Piece_ORM_Error::push(PIECE_ORM_ERROR_NOT_FOUND,
-                                  "The cache directory [ {$GLOBALS['PIECE_ORM_Metadata_CacheDirectory']} ] not found.",
-                                  'warning'
-                                  );
-            Piece_ORM_Error::popCallback();
-
+            trigger_error("The cache directory [ {$GLOBALS['PIECE_ORM_Metadata_CacheDirectory']} ] is not found.",
+                          E_USER_WARNING
+                          );
             return Piece_ORM_Metadata_Factory::_createMetadataFromDatabase($tableName);
         }
 
         if (!is_readable($GLOBALS['PIECE_ORM_Metadata_CacheDirectory']) || !is_writable($GLOBALS['PIECE_ORM_Metadata_CacheDirectory'])) {
-            Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
-            Piece_ORM_Error::push(PIECE_ORM_ERROR_NOT_READABLE,
-                                  "The cache directory [ {$GLOBALS['PIECE_ORM_Metadata_CacheDirectory']} ] is not readable or writable.",
-                                  'warning'
-                                  );
-            Piece_ORM_Error::popCallback();
-
+            trigger_error("The cache directory [ {$GLOBALS['PIECE_ORM_Metadata_CacheDirectory']} ] is not readable or writable.",
+                          E_USER_WARNING
+                          );
             return Piece_ORM_Metadata_Factory::_createMetadataFromDatabase($tableName);
         }
 

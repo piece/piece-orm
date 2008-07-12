@@ -125,7 +125,6 @@ class Piece_ORM_Mapper_MysqlTestCase extends Piece_ORM_Mapper_CompatibilityTest
      */
     function testShouldUseAMapperNameAsATableNameIfEnabled()
     {
-        Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
         $config = &new Piece_ORM_Config();
         $config->setDSN('caseSensitive', $this->_dsn);
         $config->setOptions('caseSensitive', array('debug' => 2, 'result_buffering' => false));
@@ -136,7 +135,9 @@ class Piece_ORM_Mapper_MysqlTestCase extends Piece_ORM_Mapper_CompatibilityTest
         Piece_ORM_Mapper_Factory::setConfigDirectory($this->_cacheDirectory);
         Piece_ORM_Mapper_Factory::setCacheDirectory($this->_cacheDirectory);
         Piece_ORM_Metadata_Factory::setCacheDirectory($this->_cacheDirectory);
+        Piece_ORM_Error::disableCallback();
         $mapper = &Piece_ORM_Mapper_Factory::factory('Case_Sensitive');
+        Piece_ORM_Error::enableCallback();
 
         $this->assertTrue(Piece_ORM_Error::hasErrors('exception'));
 
@@ -145,8 +146,6 @@ class Piece_ORM_Mapper_MysqlTestCase extends Piece_ORM_Mapper_CompatibilityTest
         $this->assertEquals(PIECE_ORM_ERROR_CANNOT_INVOKE, $error['code']);
         $this->assertEquals(MDB2_ERROR_NOSUCHTABLE, $error['repackage']['code']);
         $this->assertTrue(preg_match('/\[Last executed query: SHOW COLUMNS FROM Case_Sensitive\]/', $error['repackage']['params']['userinfo']));
-
-        Piece_ORM_Error::popCallback();
     }
 
     /**#@-*/

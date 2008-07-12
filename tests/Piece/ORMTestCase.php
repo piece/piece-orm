@@ -87,7 +87,6 @@ class Piece_ORMTestCase extends PHPUnit_TestCase
 
     function setUp()
     {
-        Piece_ORM_Error::pushCallback(create_function('$error', 'var_dump($error); return ' . PEAR_ERRORSTACK_DIE . ';'));
         $this->_cacheDirectory = dirname(__FILE__) . '/' . basename(__FILE__, '.php');
     }
 
@@ -103,7 +102,6 @@ class Piece_ORMTestCase extends PHPUnit_TestCase
                                  );
         $cache->clean();
         Piece_ORM_Error::clearErrors();
-        Piece_ORM_Error::popCallback();
     }
 
     function testConfigure()
@@ -186,8 +184,9 @@ class Piece_ORMTestCase extends PHPUnit_TestCase
 
     function testGetMapperBeforeCallingConfigure()
     {
-        Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
+        Piece_ORM_Error::disableCallback();
         $mapper = &Piece_ORM::getMapper('Employees');
+        Piece_ORM_Error::enableCallback();
 
         $this->assertNull($mapper);
         $this->assertTrue(Piece_ORM_Error::hasErrors('exception'));
@@ -195,14 +194,13 @@ class Piece_ORMTestCase extends PHPUnit_TestCase
         $error = Piece_ORM_Error::pop();
 
         $this->assertEquals(PIECE_ORM_ERROR_INVALID_OPERATION, $error['code']);
-
-        Piece_ORM_Error::popCallback();
     }
 
     function testGetConfigurationBeforeCallingConfigure()
     {
-        Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
+        Piece_ORM_Error::disableCallback();
         $config = &Piece_ORM::getConfiguration();
+        Piece_ORM_Error::enableCallback();
 
         $this->assertNull($config);
         $this->assertTrue(Piece_ORM_Error::hasErrors('exception'));
@@ -210,8 +208,6 @@ class Piece_ORMTestCase extends PHPUnit_TestCase
         $error = Piece_ORM_Error::pop();
 
         $this->assertEquals(PIECE_ORM_ERROR_INVALID_OPERATION, $error['code']);
-
-        Piece_ORM_Error::popCallback();
     }
 
     function testSetDatabase()
@@ -275,16 +271,15 @@ class Piece_ORMTestCase extends PHPUnit_TestCase
      */
     function testSetDatabaseBeforeCallingConfigure()
     {
-        Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
+        Piece_ORM_Error::disableCallback();
         Piece_ORM::setDatabase('database2');
+        Piece_ORM_Error::enableCallback();
 
         $this->assertTrue(Piece_ORM_Error::hasErrors('exception'));
 
         $error = Piece_ORM_Error::pop();
 
         $this->assertEquals(PIECE_ORM_ERROR_INVALID_OPERATION, $error['code']);
-
-        Piece_ORM_Error::popCallback();
     }
 
     /**
@@ -292,8 +287,9 @@ class Piece_ORMTestCase extends PHPUnit_TestCase
      */
     function testCreateObjectBeforeCallingConfigure()
     {
-        Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
+        Piece_ORM_Error::disableCallback();
         $employee = &Piece_ORM::createObject('Employees');
+        Piece_ORM_Error::enableCallback();
 
         $this->assertNull($employee);
         $this->assertTrue(Piece_ORM_Error::hasErrors('exception'));
@@ -301,8 +297,6 @@ class Piece_ORMTestCase extends PHPUnit_TestCase
         $error = Piece_ORM_Error::pop();
 
         $this->assertEquals(PIECE_ORM_ERROR_INVALID_OPERATION, $error['code']);
-
-        Piece_ORM_Error::popCallback();
     }
 
     /**
@@ -327,20 +321,19 @@ class Piece_ORMTestCase extends PHPUnit_TestCase
      */
     function testNotFoundExceptionShouldBeRaisedWhenUndefinedDatabaseIsGiven()
     {
-        Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
         Piece_ORM::configure($this->_cacheDirectory,
                              $this->_cacheDirectory,
                              $this->_cacheDirectory
                              );
+        Piece_ORM_Error::disableCallback();
         Piece_ORM::setDatabase('foo');
+        Piece_ORM_Error::enableCallback();
 
         $this->assertTrue(Piece_ORM_Error::hasErrors('exception'));
 
         $error = Piece_ORM_Error::pop();
 
         $this->assertEquals(PIECE_ORM_ERROR_NOT_FOUND, $error['code']);
-
-        Piece_ORM_Error::popCallback();
     }
 
     /**

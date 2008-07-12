@@ -81,7 +81,6 @@ class Piece_ORM_Mapper_FactoryTestCase extends PHPUnit_TestCase
 
     function setUp()
     {
-        Piece_ORM_Error::pushCallback(create_function('$error', 'var_dump($error); return ' . PEAR_ERRORSTACK_DIE . ';'));
         $this->_cacheDirectory = dirname(__FILE__) . '/' . basename(__FILE__, '.php');
         $config = &new Piece_ORM_Config();
         $config->setDSN('piece', 'pgsql://piece:piece@pieceorm/piece');
@@ -111,94 +110,87 @@ class Piece_ORM_Mapper_FactoryTestCase extends PHPUnit_TestCase
                                  );
         $cache->clean();
         Piece_ORM_Error::clearErrors();
-        Piece_ORM_Error::popCallback();
     }
 
     function testConfigurationDirectoryNotSpecified()
     {
-        Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
         $oldConfigDirectory = $GLOBALS['PIECE_ORM_Mapper_ConfigDirectory'];
         Piece_ORM_Mapper_Factory::setConfigDirectory(null);
-
+        Piece_ORM_Error::disableCallback();
         Piece_ORM_Mapper_Factory::factory('Employees');
+        Piece_ORM_Error::enableCallback();
 
-        $this->assertTrue(Piece_ORM_Error::hasErrors('exception'));
+        $this->assertTrue(Piece_ORM_Error::hasErrors());
 
         $error = Piece_ORM_Error::pop();
 
         $this->assertEquals(PIECE_ORM_ERROR_INVALID_OPERATION, $error['code']);
 
         Piece_ORM_Mapper_Factory::setConfigDirectory($oldConfigDirectory);
-        Piece_ORM_Error::popCallback();
     }
 
     function testConfigurationDirectoryNotFound()
     {
-        Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
         $oldConfigDirectory = $GLOBALS['PIECE_ORM_Mapper_ConfigDirectory'];
         Piece_ORM_Mapper_Factory::setConfigDirectory(dirname(__FILE__) . '/foo');
-
+        Piece_ORM_Error::disableCallback();
         Piece_ORM_Mapper_Factory::factory('Employees');
+        Piece_ORM_Error::enableCallback();
 
-        $this->assertTrue(Piece_ORM_Error::hasErrors('exception'));
+        $this->assertTrue(Piece_ORM_Error::hasErrors());
 
         $error = Piece_ORM_Error::pop();
 
         $this->assertEquals(PIECE_ORM_ERROR_NOT_FOUND, $error['code']);
 
         Piece_ORM_Mapper_Factory::setConfigDirectory($oldConfigDirectory);
-        Piece_ORM_Error::popCallback();
     }
 
     function testCacheDirectoryNotSpecified()
     {
-        Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
         $oldCacheDirectory = $GLOBALS['PIECE_ORM_Metadata_CacheDirectory'];
         Piece_ORM_Mapper_Factory::setCacheDirectory(null);
-
+        Piece_ORM_Error::disableCallback();
         Piece_ORM_Mapper_Factory::factory('Employees');
+        Piece_ORM_Error::enableCallback();
 
-        $this->assertTrue(Piece_ORM_Error::hasErrors('exception'));
+        $this->assertTrue(Piece_ORM_Error::hasErrors());
 
         $error = Piece_ORM_Error::pop();
 
         $this->assertEquals(PIECE_ORM_ERROR_INVALID_OPERATION, $error['code']);
 
         Piece_ORM_Mapper_Factory::setCacheDirectory($oldCacheDirectory);
-        Piece_ORM_Error::popCallback();
     }
 
     function testCacheDirectoryNotFound()
     {
-        Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
         $oldCacheDirectory = $GLOBALS['PIECE_ORM_Metadata_CacheDirectory'];
         Piece_ORM_Mapper_Factory::setCacheDirectory(dirname(__FILE__) . '/foo');
-
+        Piece_ORM_Error::disableCallback();
         Piece_ORM_Mapper_Factory::factory('Employees');
+        Piece_ORM_Error::enableCallback();
 
-        $this->assertTrue(Piece_ORM_Error::hasErrors('exception'));
+        $this->assertTrue(Piece_ORM_Error::hasErrors());
 
         $error = Piece_ORM_Error::pop();
 
         $this->assertEquals(PIECE_ORM_ERROR_NOT_FOUND, $error['code']);
 
         Piece_ORM_Mapper_Factory::setCacheDirectory($oldCacheDirectory);
-        Piece_ORM_Error::popCallback();
     }
 
     function testConfigurationFileNotFound()
     {
-        Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
-
+        Piece_ORM_Error::disableCallback();
         Piece_ORM_Mapper_Factory::factory('Foo');
+        Piece_ORM_Error::enableCallback();
 
-        $this->assertTrue(Piece_ORM_Error::hasErrors('exception'));
+        $this->assertTrue(Piece_ORM_Error::hasErrors());
 
         $error = Piece_ORM_Error::pop();
 
         $this->assertEquals(PIECE_ORM_ERROR_NOT_FOUND, $error['code']);
-
-        Piece_ORM_Error::popCallback();
     }
 
     function testFactory()

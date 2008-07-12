@@ -98,15 +98,11 @@ class Piece_ORM_Mapper_RelationshipNormalizer_ManyToMany extends Piece_ORM_Mappe
             $throughTableName1 = $this->_metadata->getTableName(true) . "_{$this->_relationship['table']}";
             $throughTableName2 = "{$this->_relationship['table']}_" . $this->_metadata->getTableName(true);
             foreach (array($throughTableName1, $throughTableName2) as $throughTableName) {
-                Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
                 $throughMetadata = &Piece_ORM_Metadata_Factory::factory($throughTableName);
-                Piece_ORM_Error::popCallback();
                 if (!Piece_ORM_Error::hasErrors('exception')) {
                     $this->_relationship['through']['table'] = $throughTableName;
                     break;
                 }
-
-                Piece_ORM_Error::pop();
             }
 
             if (!$throughMetadata) {

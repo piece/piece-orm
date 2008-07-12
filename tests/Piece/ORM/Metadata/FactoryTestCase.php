@@ -80,7 +80,6 @@ class Piece_ORM_Metadata_FactoryTestCase extends PHPUnit_TestCase
 
     function setUp()
     {
-        Piece_ORM_Error::pushCallback(create_function('$error', 'var_dump($error); return ' . PEAR_ERRORSTACK_DIE . ';'));
         $this->_cacheDirectory = dirname(__FILE__) . '/' . basename(__FILE__, '.php');
         $config = &new Piece_ORM_Config();
         $config->setDSN('piece', 'pgsql://piece:piece@pieceorm/piece');
@@ -103,7 +102,6 @@ class Piece_ORM_Metadata_FactoryTestCase extends PHPUnit_TestCase
                                  );
         $cache->clean();
         Piece_ORM_Error::clearErrors();
-        Piece_ORM_Error::popCallback();
     }
 
     function testFactory()

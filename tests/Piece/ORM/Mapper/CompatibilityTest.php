@@ -100,7 +100,6 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
 
     function setUp()
     {
-        Piece_ORM_Error::pushCallback(create_function('$error', 'var_dump($error); return ' . PEAR_ERRORSTACK_DIE . ';'));
         $this->_cacheDirectory = dirname(__FILE__) . '/' . basename(__FILE__, '.php');
 
         $config = &new Piece_ORM_Config();
@@ -135,7 +134,6 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         Piece_ORM_Mapper_Factory::clearInstances();
         Piece_ORM_Context::clear();
         Piece_ORM_Error::clearErrors();
-        Piece_ORM_Error::popCallback();
     }
 
     function testFind()
@@ -157,17 +155,16 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
 
     function testFindWithNull()
     {
-        Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
         $mapper = &Piece_ORM_Mapper_Factory::factory('Employees');
+        Piece_ORM_Error::disableCallback();
         $employee = &$mapper->findById(null);
+        Piece_ORM_Error::enableCallback();
 
-        $this->assertTrue(Piece_ORM_Error::hasErrors('exception'));
+        $this->assertTrue(Piece_ORM_Error::hasErrors());
 
         $error = Piece_ORM_Error::pop();
 
         $this->assertEquals(PIECE_ORM_ERROR_CANNOT_INVOKE, $error['code']);
-
-        Piece_ORM_Error::popCallback();
     }
 
     function testBuiltinMethods()
@@ -323,64 +320,58 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
 
     function testDeleteByNull()
     {
-        Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
-
         $mapper = &Piece_ORM_Mapper_Factory::factory('Employees');
         $subject = null;
+        Piece_ORM_Error::disableCallback();
         $mapper->delete($subject);
+        Piece_ORM_Error::enableCallback();
 
-        $this->assertTrue(Piece_ORM_Error::hasErrors('exception'));
+        $this->assertTrue(Piece_ORM_Error::hasErrors());
 
         $error = Piece_ORM_Error::pop();
 
         $this->assertEquals(PIECE_ORM_ERROR_CANNOT_INVOKE, $error['code']);
-
-        Piece_ORM_Error::popCallback();
     }
 
     function testDeleteByEmptyString()
     {
-        Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
-
         $mapper = &Piece_ORM_Mapper_Factory::factory('Employees');
         $subject = '';
+        Piece_ORM_Error::disableCallback();
         $mapper->delete($subject);
+        Piece_ORM_Error::enableCallback();
 
-        $this->assertTrue(Piece_ORM_Error::hasErrors('exception'));
+        $this->assertTrue(Piece_ORM_Error::hasErrors());
 
         $error = Piece_ORM_Error::pop();
 
         $this->assertEquals(PIECE_ORM_ERROR_UNEXPECTED_VALUE, $error['code']);
-
-        Piece_ORM_Error::popCallback();
     }
 
     function testDeleteByResource()
     {
-        Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
-
         $mapper = &Piece_ORM_Mapper_Factory::factory('Employees');
         $subject = fopen(__FILE__, 'r');
+        Piece_ORM_Error::disableCallback();
         $mapper->delete($subject);
+        Piece_ORM_Error::enableCallback();
 
-        $this->assertTrue(Piece_ORM_Error::hasErrors('exception'));
+        $this->assertTrue(Piece_ORM_Error::hasErrors());
 
         $error = Piece_ORM_Error::pop();
 
         $this->assertEquals(PIECE_ORM_ERROR_UNEXPECTED_VALUE, $error['code']);
-
-        Piece_ORM_Error::popCallback();
     }
 
     function testDeleteByInappropriatePrimaryKey()
     {
-        Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
-
         $mapper = &Piece_ORM_Mapper_Factory::factory('Employees');
         $subject = &$mapper->createObject();
+        Piece_ORM_Error::disableCallback();
         $mapper->delete($subject);
+        Piece_ORM_Error::enableCallback();
 
-        $this->assertTrue(Piece_ORM_Error::hasErrors('exception'));
+        $this->assertTrue(Piece_ORM_Error::hasErrors());
 
         $error = Piece_ORM_Error::pop();
 
@@ -389,26 +380,26 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         $subject = &$mapper->createObject();
         $subject->id = null;
         $mapper = &Piece_ORM_Mapper_Factory::factory('Employees');
+        Piece_ORM_Error::disableCallback();
         $mapper->delete($subject);
+        Piece_ORM_Error::enableCallback();
 
-        $this->assertTrue(Piece_ORM_Error::hasErrors('exception'));
+        $this->assertTrue(Piece_ORM_Error::hasErrors());
 
         $error = Piece_ORM_Error::pop();
 
         $this->assertEquals(PIECE_ORM_ERROR_UNEXPECTED_VALUE, $error['code']);
-
-        Piece_ORM_Error::popCallback();
     }
 
     function testUpdateByInappropriatePrimaryKey()
     {
-        Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
-
         $mapper = &Piece_ORM_Mapper_Factory::factory('Employees');
         $subject = &$mapper->createObject();
+        Piece_ORM_Error::disableCallback();
         $mapper->update($subject);
+        Piece_ORM_Error::enableCallback();
 
-        $this->assertTrue(Piece_ORM_Error::hasErrors('exception'));
+        $this->assertTrue(Piece_ORM_Error::hasErrors());
 
         $error = Piece_ORM_Error::pop();
 
@@ -417,15 +408,15 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         $subject = &$mapper->createObject();
         $subject->id = null;
         $mapper = &Piece_ORM_Mapper_Factory::factory('Employees');
+        Piece_ORM_Error::disableCallback();
         $mapper->update($subject);
+        Piece_ORM_Error::enableCallback();
 
-        $this->assertTrue(Piece_ORM_Error::hasErrors('exception'));
+        $this->assertTrue(Piece_ORM_Error::hasErrors());
 
         $error = Piece_ORM_Error::pop();
 
         $this->assertEquals(PIECE_ORM_ERROR_UNEXPECTED_VALUE, $error['code']);
-
-        Piece_ORM_Error::popCallback();
     }
 
     function testOverwriteInsertQuery()
@@ -492,17 +483,15 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         $employee->firstName = 'Seven';
         unset($employee->lastName);
 
-        Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
+        Piece_ORM_Error::disableCallback();
+        $mapper->update($employee);
+        Piece_ORM_Error::enableCallback();
 
-        $affectedRows = $mapper->update($employee);
-
-        $this->assertTrue(Piece_ORM_Error::hasErrors('exception'));
+        $this->assertTrue(Piece_ORM_Error::hasErrors());
 
         $error = Piece_ORM_Error::pop();
 
         $this->assertEquals(PIECE_ORM_ERROR_CANNOT_INVOKE, $error['code']);
-
-        Piece_ORM_Error::popCallback();
     }
 
     function testManyToManyRelationships()
@@ -804,8 +793,6 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
 
     function testLimitFailure()
     {
-        Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
-
         foreach (array(false, true) as $useMapperNameAsTableName) {
             if ($useMapperNameAsTableName) {
                 $this->_prepareCaseSensitiveContext();
@@ -814,9 +801,11 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
             $this->_prepareTableRecords($useMapperNameAsTableName);
             $mapperName = !$useMapperNameAsTableName ? 'Employees' : 'employees';
             $mapper = &Piece_ORM_Mapper_Factory::factory($mapperName);
+            Piece_ORM_Error::disableCallback();
             $mapper->setLimit(-1);
+            Piece_ORM_Error::enableCallback();
 
-            $this->assertTrue(Piece_ORM_Error::hasErrors('exception'));
+            $this->assertTrue(Piece_ORM_Error::hasErrors());
 
             $error = Piece_ORM_Error::pop();
 
@@ -827,14 +816,10 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
                 $this->_clearCaseSensitiveContext();
             }
         }
-
-        Piece_ORM_Error::popCallback();
     }
 
     function testOffsetFailure()
     {
-        Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
-
         foreach (array(false, true) as $useMapperNameAsTableName) {
             if ($useMapperNameAsTableName) {
                 $this->_prepareCaseSensitiveContext();
@@ -843,9 +828,11 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
             $this->_prepareTableRecords($useMapperNameAsTableName);
             $mapperName = !$useMapperNameAsTableName ? 'Employees' : 'employees';
             $mapper = &Piece_ORM_Mapper_Factory::factory($mapperName);
+            Piece_ORM_Error::disableCallback();
             $mapper->setLimit(2, -1);
+            Piece_ORM_Error::enableCallback();
 
-            $this->assertTrue(Piece_ORM_Error::hasErrors('exception'));
+            $this->assertTrue(Piece_ORM_Error::hasErrors());
 
             $error = Piece_ORM_Error::pop();
 
@@ -856,8 +843,6 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
                 $this->_clearCaseSensitiveContext();
             }
         }
-
-        Piece_ORM_Error::popCallback();
     }
 
     function testOrder()
@@ -1593,20 +1578,19 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
      */
     function testConstraintExceptionShouldBeRaisedWhenUniqueConstraintErrorIsOccurred()
     {
-        Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
         $mapper = &Piece_ORM_Mapper_Factory::factory('Emails');
         $subject = &$mapper->createObject();
         $subject->email = 'foo@example.org';
         $mapper->insert($subject);
+        Piece_ORM_Error::disableCallback();
         $mapper->insert($subject);
+        Piece_ORM_Error::enableCallback();
 
-        $this->assertTrue(Piece_ORM_Error::hasErrors('exception'));
+        $this->assertTrue(Piece_ORM_Error::hasErrors());
 
         $error = Piece_ORM_Error::pop();
 
         $this->assertEquals(PIECE_ORM_ERROR_CONSTRAINT, $error['code']);
-
-        Piece_ORM_Error::popCallback();
     }
 
     /**
@@ -1751,7 +1735,6 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
      */
     function testUpdateShouldWorkWithTableWhichHasNoPrimaryKeys()
     {
-        Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
         $mapper = &Piece_ORM_Mapper_Factory::factory('Nonprimarykeys');
         $subject1 = &$mapper->createObject();
         $subject1->memberId = 1;
@@ -1759,12 +1742,12 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
         $mapper->insert($subject1);
         $subject2 = &$mapper->findByMemberIdAndServiceId($subject1);
         $subject2->point += 50;
+        Piece_ORM_Error::disableCallback();
         $affectedRows = $mapper->updateByMemberIdAndServiceId($subject2);
+        Piece_ORM_Error::enableCallback();
 
-        $this->assertFalse(Piece_ORM_Error::hasErrors('exception'));
+        $this->assertFalse(Piece_ORM_Error::hasErrors());
         $this->assertEquals(1, $affectedRows);
-
-        Piece_ORM_Error::popCallback();
     }
 
     /**
@@ -1772,19 +1755,18 @@ class Piece_ORM_Mapper_CompatibilityTest extends PHPUnit_TestCase
      */
     function testDeleteShouldWorkWithTableWhichHasNoPrimaryKeys()
     {
-        Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
         $mapper = &Piece_ORM_Mapper_Factory::factory('Nonprimarykeys');
         $subject1 = &$mapper->createObject();
         $subject1->memberId = 1;
         $subject1->serviceId = 1;
         $mapper->insert($subject1);
         $subject2 = &$mapper->findByMemberIdAndServiceId($subject1);
+        Piece_ORM_Error::disableCallback();
         $affectedRows = $mapper->deleteByMemberIdAndServiceId($subject2);
+        Piece_ORM_Error::enableCallback();
 
-        $this->assertFalse(Piece_ORM_Error::hasErrors('exception'));
+        $this->assertFalse(Piece_ORM_Error::hasErrors());
         $this->assertEquals(1, $affectedRows);
-
-        Piece_ORM_Error::popCallback();
     }
 
     /**

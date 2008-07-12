@@ -4,7 +4,7 @@
 /**
  * PHP versions 4 and 5
  *
- * Copyright (c) 2007 KUBO Atsuhiro <iteman@users.sourceforge.net>,
+ * Copyright (c) 2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>,
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,7 +29,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  * @package    Piece_ORM
- * @copyright  2007 KUBO Atsuhiro <iteman@users.sourceforge.net>
+ * @copyright  2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License (revised)
  * @version    SVN: $Id$
  * @since      File available since Release 0.1.0
@@ -47,13 +47,18 @@ if (version_compare(phpversion(), '5.0.0', '<')) {
     require_once 'spyc.php5';
 }
 
+// {{{ GLOBALS
+
+$GLOBALS['PIECE_ORM_Config_FactoryTestCase_hasWarnings'] = false;
+
+// }}}
 // {{{ Piece_ORM_Config_FactoryTestCase
 
 /**
  * TestCase for Piece_ORM_Config_Factory
  *
  * @package    Piece_ORM
- * @copyright  2007 KUBO Atsuhiro <iteman@users.sourceforge.net>
+ * @copyright  2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License (revised)
  * @version    Release: @package_version@
  * @since      Class available since Release 0.1.0
@@ -83,7 +88,6 @@ class Piece_ORM_Config_FactoryTestCase extends PHPUnit_TestCase
 
     function setUp()
     {
-        Piece_ORM_Error::pushCallback(create_function('$error', 'var_dump($error); return ' . PEAR_ERRORSTACK_DIE . ';'));
         $this->_cacheDirectory = dirname(__FILE__) . '/' . basename(__FILE__, '.php');
     }
 
@@ -95,7 +99,6 @@ class Piece_ORM_Config_FactoryTestCase extends PHPUnit_TestCase
                                  );
         $cache->clean();
         Piece_ORM_Error::clearErrors();
-        Piece_ORM_Error::popCallback();
     }
 
     function testFactoryWithoutConfigurationFile()
@@ -105,44 +108,46 @@ class Piece_ORM_Config_FactoryTestCase extends PHPUnit_TestCase
 
     function testConfigurationDirectoryNotFound()
     {
-        Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
+        Piece_ORM_Error::disableCallback();
         $config = &Piece_ORM_Config_Factory::factory(dirname(__FILE__) . '/foo', $this->_cacheDirectory);
+        Piece_ORM_Error::enableCallback();
 
         $this->assertNull($config);
-        $this->assertTrue(Piece_ORM_Error::hasErrors('exception'));
+        $this->assertTrue(Piece_ORM_Error::hasErrors());
 
         $error = Piece_ORM_Error::pop();
 
         $this->assertEquals(PIECE_ORM_ERROR_NOT_FOUND, $error['code']);
-
-        Piece_ORM_Error::popCallback();
     }
 
     function testConfigurationFileNotFound()
     {
-        Piece_ORM_Error::pushCallback(create_function('$error', 'return ' . PEAR_ERRORSTACK_PUSHANDLOG . ';'));
+        Piece_ORM_Error::disableCallback();
         $config = &Piece_ORM_Config_Factory::factory(dirname(__FILE__), $this->_cacheDirectory);
+        Piece_ORM_Error::enableCallback();
 
         $this->assertNull($config);
-        $this->assertTrue(Piece_ORM_Error::hasErrors('exception'));
+        $this->assertTrue(Piece_ORM_Error::hasErrors());
 
         $error = Piece_ORM_Error::pop();
 
         $this->assertEquals(PIECE_ORM_ERROR_NOT_FOUND, $error['code']);
-
-        Piece_ORM_Error::popCallback();
     }
 
     function testNoCachingIfCacheDirectoryNotFound()
     {
+        set_error_handler(create_function('$code, $message, $file, $line', "
+if (\$code == E_USER_WARNING) {
+    \$GLOBALS['PIECE_ORM_Config_FactoryTestCase_hasWarnings'] = true;
+}
+"));
         $config = &Piece_ORM_Config_Factory::factory($this->_cacheDirectory, dirname(__FILE__) . '/foo');
+        restore_error_handler();
 
+        $this->assertTrue($GLOBALS['PIECE_ORM_Config_FactoryTestCase_hasWarnings']);
         $this->assertEquals(strtolower('Piece_ORM_Config'), strtolower(get_class($config)));
-        $this->assertTrue(Piece_ORM_Error::hasErrors('warning'));
 
-        $error = Piece_ORM_Error::pop();
-
-        $this->assertEquals(PIECE_ORM_ERROR_NOT_FOUND, $error['code']);
+        $GLOBALS['PIECE_ORM_Config_FactoryTestCase_hasWarnings'] = false;
     }
 
     function testFactoryWithConfigurationFile()
