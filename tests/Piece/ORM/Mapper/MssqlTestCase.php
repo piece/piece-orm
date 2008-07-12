@@ -35,6 +35,10 @@
  * @since      File available since Release 0.4.0
  */
 
+if (substr(PHP_OS, 0, 3) != 'WIN') {
+    return;
+}
+
 require_once dirname(__FILE__) . '/CompatibilityTests.php';
 
 // {{{ Piece_ORM_Mapper_MssqlTestCase
