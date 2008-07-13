@@ -5,8 +5,8 @@
     http://pear.php.net/dtd/package-2.0.xsd">
  <name>Piece_ORM</name>
  <channel>pear.piece-framework.com</channel>
- <summary>An object-relational mapping framework for PHP</summary>
- <description>Piece_ORM is an object-relational mapping framework for PHP.
+ <summary>An object-relational mapping framework</summary>
+ <description>Piece_ORM is an object-relational mapping framework.
 
 Piece_ORM is a simple framework based on the DataMapper pattern, and features stdClass centered approach.</description>
  <lead>
@@ -15,8 +15,8 @@ Piece_ORM is a simple framework based on the DataMapper pattern, and features st
   <email>iteman@users.sourceforge.net</email>
   <active>yes</active>
  </lead>
- <date>2008-06-05</date>
- <time>16:27:50</time>
+ <date>2008-07-13</date>
+ <time>19:20:28</time>
  <version>
   <release>1.1.0</release>
   <api>0.3.0</api>
@@ -28,7 +28,33 @@ Piece_ORM is a simple framework based on the DataMapper pattern, and features st
  <license uri="http://www.opensource.org/licenses/bsd-license.php">BSD License (revised)</license>
  <notes>A new release of Piece_ORM is now available.
 
-What&apos;s New in Piece_ORM 1.1.0</notes>
+What&apos;s New in Piece_ORM 1.1.0
+
+ * Improved error handling: The behavior of internal error handling has been changed so as to handle only own and &quot;exception&quot; level errors.
+ * Improved Automatic Timestamp: The behavior of insert() has been changed so that the current timestamp to be set to the updated_at field.
+ * Many defect fixes: Many defects related to LOB support and the useMapperNameAsTableName option and a few other defects have been fixed.
+
+See the following release notes for details.
+
+Enhancements
+============ 
+
+- Changed the behavior of object loading so that a field value of an object is always set null if the field value of the database is NULL.
+- Renamed from PIECE_ORM_ERROR_INVOCATION_FAILED to PIECE_ORM_ERROR_CANNOT_INVOKE.
+- Changed the behavior of internal error handling so as to handle only own and &quot;exception&quot; level errors.
+- Changed the behavior of insert() so that the current timestamp to be set to the updated_at field. (Ticket #99)
+
+Defect Fixes
+============
+
+- Fixed a defect that caused an fatal error &quot;PHP Fatal error:  Call to a member function getSource() on a non-object&quot; to be raised when insert()/update() call on an object which contains one or more LOB fields setting null. (Ticket #96) (Piece_ORM_Mapper_Common)
+- Fixed a defect that a LOB field value to be null after invoking update() even if the value is not changed. (Ticket #95) (Piece_ORM_Mapper_Common, Piece_ORM_Mapper_LOB)
+- Fixed the definition of &quot;options&quot;. (Ticket #88) (data/piece-orm.yaml)
+- Fixed a defect that caused a LOB value to be damaged after invoking update if the value is not changed on PostgreSQL. (Ticket #97) (Piece_ORM_Mapper_Common)
+- Fixed a defect so that all blob values are set to the same value as the value of the last placeholder in a query if multiple blobs are included in the query. (Piece_ORM_Mapper_Common)
+- Fixed a defect so that any queries with relationships do not work if the useMapperNameAsTableName option is enabled.
+- Fixed a defect that caused an exception to be raised when inserting a record to a table including one or more datetime field which is NOT NULL and *not* has default value if Piece_ORM was used with MDB2_Driver_mysql 1.5.0b1. (Ticket #100) (Piece_ORM_Metadata_Factory)
+- Fixed a defect that caused variable names in a default query to be broken if the useMapperNameAsTableName option was enabled. (Ticket #87) (Piece_ORM_Context)</notes>
  <contents>
   <dir baseinstalldir="/" name="/">
    <dir name="data">
@@ -81,6 +107,9 @@ What&apos;s New in Piece_ORM 1.1.0</notes>
       </file>
      </dir> <!-- /data/schemas/mssql -->
      <dir name="mysql">
+      <file name="Case_Sensitive.ddl" role="data">
+       <tasks:replace from="@package_version@" to="version" type="package-info" />
+      </file>
       <file name="compositeprimarykey.ddl" role="data">
        <tasks:replace from="@package_version@" to="version" type="package-info" />
       </file>
@@ -352,7 +381,7 @@ What&apos;s New in Piece_ORM 1.1.0</notes>
        </file>
       </dir> <!-- /tests/Piece/ORM/Config -->
       <dir name="Mapper">
-       <dir name="CompatibilityTest">
+       <dir name="CompatibilityTests">
         <dir name="CaseSensitive">
          <file name="computers.yaml" role="test">
           <tasks:replace from="@package_version@" to="version" type="package-info" />
@@ -384,12 +413,12 @@ What&apos;s New in Piece_ORM 1.1.0</notes>
          <file name="unusualname_12.yaml" role="test">
           <tasks:replace from="@package_version@" to="version" type="package-info" />
          </file>
-        </dir> <!-- /tests/Piece/ORM/Mapper/CompatibilityTest/CaseSensitive -->
+        </dir> <!-- /tests/Piece/ORM/Mapper/CompatibilityTests/CaseSensitive -->
         <dir name="Overwrite">
          <file name="Employees.yaml" role="test">
           <tasks:replace from="@package_version@" to="version" type="package-info" />
          </file>
-        </dir> <!-- /tests/Piece/ORM/Mapper/CompatibilityTest/Overwrite -->
+        </dir> <!-- /tests/Piece/ORM/Mapper/CompatibilityTests/Overwrite -->
         <file name="Case_Sensitive.yaml" role="test">
          <tasks:replace from="@package_version@" to="version" type="package-info" />
         </file>
@@ -441,7 +470,7 @@ What&apos;s New in Piece_ORM 1.1.0</notes>
         <file name="Unusualname_12.yaml" role="test">
          <tasks:replace from="@package_version@" to="version" type="package-info" />
         </file>
-       </dir> <!-- /tests/Piece/ORM/Mapper/CompatibilityTest -->
+       </dir> <!-- /tests/Piece/ORM/Mapper/CompatibilityTests -->
        <dir name="FactoryTestCase">
         <dir name="CacheIDsShouldUniqueInOneCacheDirectory1">
          <file name="Employees.yaml" role="test">
@@ -462,7 +491,7 @@ What&apos;s New in Piece_ORM 1.1.0</notes>
          <tasks:replace from="@package_version@" to="version" type="package-info" />
         </file>
        </dir> <!-- /tests/Piece/ORM/Mapper/PgsqlTestCase -->
-       <file name="CompatibilityTest.php" role="test">
+       <file name="CompatibilityTests.php" role="test">
         <tasks:replace from="@package_version@" to="version" type="package-info" />
        </file>
        <file name="FactoryTestCase.php" role="test">
@@ -552,11 +581,37 @@ What&apos;s New in Piece_ORM 1.1.0</notes>
     <release>stable</release>
     <api>stable</api>
    </stability>
-   <date>2008-06-05</date>
+   <date>2008-07-13</date>
    <license uri="http://www.opensource.org/licenses/bsd-license.php">BSD License (revised)</license>
    <notes>A new release of Piece_ORM is now available.
 
-What&apos;s New in Piece_ORM 1.1.0</notes>
+What&apos;s New in Piece_ORM 1.1.0
+
+ * Improved error handling: The behavior of internal error handling has been changed so as to handle only own and &quot;exception&quot; level errors.
+ * Improved Automatic Timestamp: The behavior of insert() has been changed so that the current timestamp to be set to the updated_at field.
+ * Many defect fixes: Many defects related to LOB support and the useMapperNameAsTableName option and a few other defects have been fixed.
+
+See the following release notes for details.
+
+Enhancements
+============ 
+
+- Changed the behavior of object loading so that a field value of an object is always set null if the field value of the database is NULL.
+- Renamed from PIECE_ORM_ERROR_INVOCATION_FAILED to PIECE_ORM_ERROR_CANNOT_INVOKE.
+- Changed the behavior of internal error handling so as to handle only own and &quot;exception&quot; level errors.
+- Changed the behavior of insert() so that the current timestamp to be set to the updated_at field. (Ticket #99)
+
+Defect Fixes
+============
+
+- Fixed a defect that caused an fatal error &quot;PHP Fatal error:  Call to a member function getSource() on a non-object&quot; to be raised when insert()/update() call on an object which contains one or more LOB fields setting null. (Ticket #96) (Piece_ORM_Mapper_Common)
+- Fixed a defect that a LOB field value to be null after invoking update() even if the value is not changed. (Ticket #95) (Piece_ORM_Mapper_Common, Piece_ORM_Mapper_LOB)
+- Fixed the definition of &quot;options&quot;. (Ticket #88) (data/piece-orm.yaml)
+- Fixed a defect that caused a LOB value to be damaged after invoking update if the value is not changed on PostgreSQL. (Ticket #97) (Piece_ORM_Mapper_Common)
+- Fixed a defect so that all blob values are set to the same value as the value of the last placeholder in a query if multiple blobs are included in the query. (Piece_ORM_Mapper_Common)
+- Fixed a defect so that any queries with relationships do not work if the useMapperNameAsTableName option is enabled.
+- Fixed a defect that caused an exception to be raised when inserting a record to a table including one or more datetime field which is NOT NULL and *not* has default value if Piece_ORM was used with MDB2_Driver_mysql 1.5.0b1. (Ticket #100) (Piece_ORM_Metadata_Factory)
+- Fixed a defect that caused variable names in a default query to be broken if the useMapperNameAsTableName option was enabled. (Ticket #87) (Piece_ORM_Context)</notes>
   </release>
   <release>
    <version>
