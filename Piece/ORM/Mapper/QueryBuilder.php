@@ -300,7 +300,7 @@ class Piece_ORM_Mapper_QueryBuilder
         if (MDB2::isError($sth)) {
             Piece_ORM_Error::pushPEARError($sth,
                                            PIECE_ORM_ERROR_CANNOT_INVOKE,
-                                           "Failed to invoke MDB2_Driver_{$this->_dbh->phptype}::prepare() for any reasons."
+                                           "Failed to invoke MDB2_Driver_{$dbh->phptype}::prepare() for any reasons."
                                            );
             return;
         }
