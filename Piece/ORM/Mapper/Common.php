@@ -493,6 +493,21 @@ class Piece_ORM_Mapper_Common
         $this->_lastQuery = $lastQuery;
     }
 
+    // }}}
+    // {{{ getDefault()
+
+    /**
+     * Gets the default value of a given field.
+     *
+     * @param string $fieldName
+     * @return mixed
+     * @since Method available since Release 1.2.0
+     */
+    function getDefault($fieldName)
+    {
+        return $this->_metadata->getDefault($this->_metadata->getFieldNameWithAlias(strtolower($fieldName)));
+    }
+
     /**#@-*/
 
     /**#@+

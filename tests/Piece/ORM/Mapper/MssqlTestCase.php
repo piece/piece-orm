@@ -80,6 +80,23 @@ class Piece_ORM_Mapper_MssqlTestCase extends Piece_ORM_Mapper_CompatibilityTests
      */
     function testShouldSetAFunctionToGetTheCurrentTimestampToTheCreatedatFieldWhenExecutingInsert() {}
 
+    /**
+     * @since Method available since Release 1.2.0
+     */
+    function testShouldProvideTheDefaultValueOfAGivenField()
+    {
+        $mapper = &Piece_ORM_Mapper_Factory::factory('Employees');
+
+        $this->assertNull($mapper->getDefault('id'));
+        $this->assertNull($mapper->getDefault('firstName'));
+        $this->assertNull($mapper->getDefault('lastName'));
+        $this->assertNull($mapper->getDefault('note'));
+        $this->assertNull($mapper->getDefault('departmentsId'));
+        $this->assertEquals('getdate', $mapper->getDefault('createdAt'));
+        $this->assertEquals('getdate', $mapper->getDefault('updatedAt'));
+        $this->assertEquals('0', $mapper->getDefault('lockVersion'));
+    }
+
     /**#@-*/
 
     /**#@+

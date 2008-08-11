@@ -2103,6 +2103,12 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
         $this->assertEquals(file_get_contents($pngPath), $file->largePicture->load());
     }
 
+    /**
+     * @abstract
+     * @since Method available since Release 1.2.0
+     */
+    function testShouldProvideTheDefaultValueOfAGivenField() {}
+
     /**#@-*/
 
     /**#@+

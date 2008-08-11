@@ -319,6 +319,25 @@ class Piece_ORM_Metadata
         return $datatype == 'blob' || $datatype == 'clob';
     }
 
+    // }}}
+    // {{{ getDefault()
+
+    /**
+     * Gets the default value of a given field.
+     *
+     * @param string $fieldName
+     * @return mixed
+     * @since Method available since Release 1.2.0
+     */
+    function getDefault($fieldName)
+    {
+        if (!$this->hasDefault($fieldName)) {
+            return;
+        }
+
+        return $this->_tableInfo[$fieldName]['default'];
+    }
+
     /**#@-*/
 
     /**#@+
