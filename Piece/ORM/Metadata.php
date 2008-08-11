@@ -252,7 +252,7 @@ class Piece_ORM_Metadata
     // {{{ hasField()
 
     /**
-     * Returns whether a table has the given field.
+     * Returns whether a table has a given field.
      *
      * @param string $fieldName
      * @return boolean
@@ -283,7 +283,7 @@ class Piece_ORM_Metadata
     // {{{ hasDefault()
 
     /**
-     * Returns whether the given field has the default value or not.
+     * Returns whether a given field has the default value or not.
      *
      * @param string $fieldName
      * @return boolean
