@@ -158,13 +158,14 @@ class Piece_ORM_Metadata
     // {{{ getFieldNameWithAlias()
 
     /**
-     * Gets the field name of a table with a given alias.
+     * Gets the field name of a table by a given alias.
      *
      * @return string
+     * @deprecated Method deprecated in Release 1.2.0
      */
     function getFieldNameWithAlias($alias)
     {
-        return $this->_aliases[$alias];
+        return $this->getFieldNameByAlias($alias);
     }
 
     // }}}
@@ -336,6 +337,20 @@ class Piece_ORM_Metadata
         }
 
         return $this->_tableInfo[$fieldName]['default'];
+    }
+
+    // }}}
+    // {{{ getFieldNameByAlias()
+
+    /**
+     * Gets the field name of a table by a given alias.
+     *
+     * @return string
+     * @since Method available since Release 1.2.0
+     */
+    function getFieldNameByAlias($alias)
+    {
+        return $this->_aliases[$alias];
     }
 
     /**#@-*/

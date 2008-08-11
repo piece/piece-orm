@@ -505,7 +505,7 @@ class Piece_ORM_Mapper_Common
      */
     function getDefault($fieldName)
     {
-        return $this->_metadata->getDefault($this->_metadata->getFieldNameWithAlias(strtolower($fieldName)));
+        return $this->_metadata->getDefault($this->_metadata->getFieldNameByAlias(strtolower($fieldName)));
     }
 
     /**#@-*/
