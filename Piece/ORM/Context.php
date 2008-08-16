@@ -138,6 +138,7 @@ class Piece_ORM_Context
      */
     function clear()
     {
+        unset($GLOBALS['PIECE_ORM_Context_Instance']);
         $GLOBALS['PIECE_ORM_Context_Instance'] = null;
         foreach (array_keys($GLOBALS['_MDB2_databases']) as $dbIndex) {
             unset($GLOBALS['_MDB2_databases'][$dbIndex]);
