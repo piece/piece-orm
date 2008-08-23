@@ -2109,6 +2109,58 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
      */
     function testShouldProvideTheDefaultValueOfAGivenField() {}
 
+    /**
+     * @since Method available since Release 1.2.0
+     */
+    function testShouldTreatInverseThroughTablesOnManyToManyRelationships()
+    {
+        foreach (array(false, true) as $useMapperNameAsTableName) {
+            if ($useMapperNameAsTableName) {
+                $this->_prepareCaseSensitiveContext();
+            }
+
+            $this->_prepareTableRecords($useMapperNameAsTableName);
+            $mapperName = !$useMapperNameAsTableName ? 'Skills' : 'skills';
+            $mapper = &Piece_ORM_Mapper_Factory::factory($mapperName);
+            $skills = $mapper->findAllWithEmployees();
+
+            $this->assertTrue(is_array($skills));
+            $this->assertEquals(2, count($skills));
+
+            foreach ($skills as $skill) {
+                $this->assertTrue(is_array($skill->employees));
+
+                switch ($skill->name) {
+                case 'Foo':
+                    $this->assertEquals(2, count($skill->employees));
+                    if (count($skill->employees) == 2) {
+                        $this->assertEquals('Bar', $skill->employees[0]->firstName);
+                        $this->assertEquals('Qux', $skill->employees[1]->firstName);
+                    } else {
+                        $this->fail('Invalid skills count.');
+                    }
+                    break;
+                case 'Bar':
+                    $this->assertEquals(2, count($skill->employees));
+                    if (count($skill->employees) == 2) {
+                        $this->assertEquals('Baz', $skill->employees[0]->firstName);
+                        $this->assertEquals('Qux', $skill->employees[1]->firstName);
+                    } else {
+                        $this->fail('Invalid skills count.');
+                    }
+                    break;
+                default:
+                    $this->fail('Unknown skill name.');
+                }
+            }
+
+            $this->_clearTableRecords();
+            if ($useMapperNameAsTableName) {
+                $this->_clearCaseSensitiveContext();
+            }
+        }
+    }
+
     /**#@-*/
 
     /**#@+
