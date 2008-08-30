@@ -84,7 +84,7 @@ class Piece_ORM_Mapper_MysqlTestCase extends Piece_ORM_Mapper_CompatibilityTests
     {
         $mapper = &Piece_ORM_Mapper_Factory::factory('Employees');
 
-        $this->assertEquals('INSERT INTO employees (first_name, last_name, note, departments_id, created_at) VALUES ($firstName, $lastName, $note, $departmentsId, $createdAt)', $mapper->__query__insertwithnoquery);
+        $this->assertEquals('INSERT INTO $__table (first_name, last_name, note, departments_id, created_at) VALUES ($firstName, $lastName, $note, $departmentsId, $createdAt)', $mapper->__query__insertwithnoquery);
     }
 
     /**
