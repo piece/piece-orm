@@ -48,7 +48,7 @@ require_once 'Piece/ORM/Inflector.php';
  * @package    Piece_ORM
  * @copyright  2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License (revised)
- * @version    Release: @package_version@
+ * @version    Release: 1.2.0
  * @since      Class available since Release 0.2.0
  */
 class Piece_ORM_Mapper_AssociatedObjectPersister_ManyToMany extends Piece_ORM_Mapper_AssociatedObjectPersister_Common
@@ -157,11 +157,8 @@ class Piece_ORM_Mapper_AssociatedObjectPersister_ManyToMany extends Piece_ORM_Ma
      */
     function delete($relationship)
     {
-        if (!array_key_exists($relationship['mappedAs'], $this->_subject)) {
-            return;
-        }
-
-        if (!is_array($this->_subject->$relationship['mappedAs'])) {
+        $property = Piece_ORM_Inflector::camelize($relationship['through']['referencedColumn'], true);
+        if (!array_key_exists($property, $this->_subject)) {
             return;
         }
 
@@ -170,7 +167,10 @@ class Piece_ORM_Mapper_AssociatedObjectPersister_ManyToMany extends Piece_ORM_Ma
             return;
         }
 
-        $mapper->executeQuery("DELETE FROM {$relationship['through']['table']} WHERE {$relationship['through']['column']} = " . $mapper->quote($this->_subject->{ Piece_ORM_Inflector::camelize($relationship['through']['referencedColumn'], true) }, $relationship['through']['column']), true);
+        $mapper->executeQuery("DELETE FROM {$relationship['through']['table']} WHERE {$relationship['through']['column']} = " .
+                              $mapper->quote($this->_subject->$property, $relationship['through']['column']),
+                              true
+                              );
     }
 
     /**#@-*/

@@ -203,11 +203,8 @@ class Piece_ORM_Mapper_AssociatedObjectPersister_OneToMany extends Piece_ORM_Map
      */
     function delete($relationship)
     {
-        if (!array_key_exists($relationship['mappedAs'], $this->_subject)) {
-            return;
-        }
-
-        if (!is_array($this->_subject->$relationship['mappedAs'])) {
+        $property = Piece_ORM_Inflector::camelize($relationship['referencedColumn'], true);
+        if (!array_key_exists($property, $this->_subject)) {
             return;
         }
 
@@ -216,7 +213,10 @@ class Piece_ORM_Mapper_AssociatedObjectPersister_OneToMany extends Piece_ORM_Map
             return;
         }
 
-        $mapper->executeQuery("DELETE FROM {$relationship['table']} WHERE {$relationship['column']} = " . $mapper->quote($this->_subject->{ Piece_ORM_Inflector::camelize($relationship['referencedColumn'], true) }, $relationship['column']), true);
+        $mapper->executeQuery("DELETE FROM {$relationship['table']} WHERE {$relationship['column']} = " .
+                              $mapper->quote($this->_subject->$property, $relationship['column']),
+                              true
+                              );
     }
 
     // }}}
