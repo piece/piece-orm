@@ -15,8 +15,8 @@ Piece_ORM is a simple framework based on the DataMapper pattern, and features st
   <email>iteman@users.sourceforge.net</email>
   <active>yes</active>
  </lead>
- <date>2008-08-23</date>
- <time>16:13:30</time>
+ <date>2008-08-31</date>
+ <time>02:01:59</time>
  <version>
   <release>1.2.0</release>
   <api>0.3.0</api>
@@ -555,7 +555,7 @@ What&apos;s New in Piece_ORM 1.2.0</notes>
     <release>stable</release>
     <api>stable</api>
    </stability>
-   <date>2008-08-23</date>
+   <date>2008-08-31</date>
    <license uri="http://www.opensource.org/licenses/bsd-license.php">BSD License (revised)</license>
    <notes>A new release of Piece_ORM is now available.
 
