@@ -48,7 +48,7 @@ require_once 'Piece/ORM/Mapper/QueryType.php';
  * @package    Piece_ORM
  * @copyright  2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License (revised)
- * @version    Release: @package_version@
+ * @version    Release: 1.2.0
  * @since      Class available since Release 0.1.0
  */
 class Piece_ORM_Mapper_Generator
@@ -409,12 +409,12 @@ class Piece_ORM_Mapper_Generator
             if ($datatype == 'integer' || $datatype == 'text') {
                 
                 $camelizedFieldName = Piece_ORM_Inflector::camelize($fieldName);
-                $this->_addFind("findBy$camelizedFieldName", 'SELECT * FROM ' . addslashes($this->_metadata->getTableName()) . " WHERE $fieldName = \$" . Piece_ORM_Inflector::lowerCaseFirstLetter($camelizedFieldName));
+                $this->_addFind("findBy$camelizedFieldName", "SELECT * FROM \$__table WHERE $fieldName = \$" . Piece_ORM_Inflector::lowerCaseFirstLetter($camelizedFieldName));
                 if (Piece_ORM_Error::hasErrors()) {
                     return;
                 }
 
-                $this->_addFindAll("findAllBy$camelizedFieldName", 'SELECT * FROM ' . addslashes($this->_metadata->getTableName()) . " WHERE $fieldName = \$" . Piece_ORM_Inflector::lowerCaseFirstLetter($camelizedFieldName));
+                $this->_addFindAll("findAllBy$camelizedFieldName", "SELECT * FROM \$__table WHERE $fieldName = \$" . Piece_ORM_Inflector::lowerCaseFirstLetter($camelizedFieldName));
                 if (Piece_ORM_Error::hasErrors()) {
                     return;
                 }
@@ -592,7 +592,7 @@ class Piece_ORM_Mapper_Generator
                     if (Piece_ORM_Mapper_QueryType::isFindAll($methodName)
                         || Piece_ORM_Mapper_QueryType::isFind($methodName)
                         ) {
-                        $query = 'SELECT * FROM ' . addslashes($this->_metadata->getTableName());
+                        $query = 'SELECT * FROM $__table';
                         break;
                     }
 
@@ -709,7 +709,7 @@ class Piece_ORM_Mapper_Generator
             }
         }
 
-        return 'INSERT INTO ' . addslashes($this->_metadata->getTableName()) . ' (' . implode(", ", $fields) . ') VALUES (' . implode(', ', array_map(array(&$this, 'generateExpression'), $fields)) . ')';
+        return 'INSERT INTO $__table (' . implode(", ", $fields) . ') VALUES (' . implode(', ', array_map(array(&$this, 'generateExpression'), $fields)) . ')';
     }
 
     // }}}
@@ -731,7 +731,7 @@ class Piece_ORM_Mapper_Generator
                 $whereClause .= " AND $partOfPrimeryKey = \$" . Piece_ORM_Inflector::camelize($partOfPrimeryKey, true);
             }
 
-            return 'DELETE FROM ' . addslashes($this->_metadata->getTableName()) . " WHERE $whereClause";
+            return "DELETE FROM \$__table WHERE $whereClause";
         } else {
             return null;
         }
@@ -775,7 +775,7 @@ class Piece_ORM_Mapper_Generator
                 }
             }
 
-            return 'UPDATE ' . addslashes($this->_metadata->getTableName()) . ' SET ' . implode(", ", $fields) . " WHERE $whereClause";
+            return 'UPDATE $__table SET ' . implode(", ", $fields) . " WHERE $whereClause";
         } else {
             return null;
         }

@@ -1600,7 +1600,7 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
     {
         $mapper = &Piece_ORM_Mapper_Factory::factory('Employees');
 
-        $this->assertEquals('INSERT INTO employees (first_name, last_name, note, departments_id) VALUES ($firstName, $lastName, $note, $departmentsId)', $mapper->__query__insertwithnoquery);
+        $this->assertEquals('INSERT INTO $__table (first_name, last_name, note, departments_id) VALUES ($firstName, $lastName, $note, $departmentsId)', $mapper->__query__insertwithnoquery);
     }
 
     /**
@@ -1610,7 +1610,7 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
     {
         $mapper = &Piece_ORM_Mapper_Factory::factory('Employees');
 
-        $this->assertEquals('UPDATE employees SET first_name = $firstName, last_name = $lastName, note = $note, departments_id = $departmentsId, created_at = $createdAt, updated_at = $updatedAt, lock_version = lock_version + 1 WHERE id = $id AND lock_version = $lockVersion', $mapper->__query__updatewithnoquery);
+        $this->assertEquals('UPDATE $__table SET first_name = $firstName, last_name = $lastName, note = $note, departments_id = $departmentsId, created_at = $createdAt, updated_at = $updatedAt, lock_version = lock_version + 1 WHERE id = $id AND lock_version = $lockVersion', $mapper->__query__updatewithnoquery);
     }
 
     /**
@@ -1620,7 +1620,7 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
     {
         $mapper = &Piece_ORM_Mapper_Factory::factory('Employees');
 
-        $this->assertEquals('DELETE FROM employees WHERE id = $id', $mapper->__query__deletewithnoquery);
+        $this->assertEquals('DELETE FROM $__table WHERE id = $id', $mapper->__query__deletewithnoquery);
     }
 
     /**
