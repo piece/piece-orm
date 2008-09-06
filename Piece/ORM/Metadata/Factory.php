@@ -211,12 +211,46 @@ class Piece_ORM_Metadata_Factory
      * @param string $tableName
      * @return Piece_ORM_Metadata
      * @throws PIECE_ORM_ERROR_CANNOT_INVOKE
+     * @throws PIECE_ORM_ERROR_NOT_FOUND
      */
     function &_createMetadataFromDatabase($tableName)
     {
         $context = &Piece_ORM_Context::singleton();
         $dbh = &$context->getConnection();
         if (Piece_ORM_Error::hasErrors()) {
+            $return = null;
+            return $return;
+        }
+
+        PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
+        $result = $dbh->setLimit(1);
+        PEAR::staticPopErrorHandling();
+        if (MDB2::isError($result)) {
+            Piece_ORM_Error::pushPEARError($result,
+                                           PIECE_ORM_ERROR_CANNOT_INVOKE,
+                                           "Failed to invoke MDB2_Driver_{$dbh->phptype}::setLimit() for any reasons."
+                                           );
+            $return = null;
+            return $return;
+        }
+
+        PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
+        $result = $dbh->query('SELECT 1 FROM ' . $dbh->quoteIdentifier($tableName));
+        PEAR::staticPopErrorHandling();
+        if (MDB2::isError($result)) {
+            if ($result->getCode() != MDB2_ERROR_NOSUCHTABLE) {
+                Piece_ORM_Error::pushPEARError($result,
+                                               PIECE_ORM_ERROR_CANNOT_INVOKE,
+                                               "Failed to invoke MDB2_Driver_{$dbh->phptype}::query() for any reasons."
+                                               );
+                $return = null;
+                return $return;
+            }
+
+            Piece_ORM_Error::pushPEARError($result,
+                                           PIECE_ORM_ERROR_NOT_FOUND,
+                                           "Failed to invoke MDB2_Driver_{$dbh->phptype}::query() for any reasons."
+                                           );
             $return = null;
             return $return;
         }
