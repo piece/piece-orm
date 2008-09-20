@@ -388,7 +388,7 @@ class Piece_ORMTestCase extends PHPUnit_Framework_TestCase
 
 class Piece_ORMTestCase_Employee
 {
-    function generatePassword() {}
+    public function generatePassword() {}
 }
 
 // }}}
