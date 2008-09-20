@@ -2,7 +2,7 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 
 /**
- * PHP versions 4 and 5
+ * PHP version 5
  *
  * Copyright (c) 2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>,
  * All rights reserved.
@@ -35,11 +35,6 @@
  * @since      File available since Release 0.7.0
  */
 
-// {{{ GLOBALS
-
-$GLOBALS['PIECE_ORM_MDB2_NativeTypeMap'] = array();
-
-// }}}
 // {{{ Piece_ORM_MDB2_NativeTypeMapper_Common
 
 /**
@@ -63,10 +58,17 @@ class Piece_ORM_MDB2_NativeTypeMapper_Common
     /**#@-*/
 
     /**#@+
+     * @access protected
+     */
+
+    /**#@-*/
+
+    /**#@+
      * @access private
      */
 
-    var $_driverName;
+    private $_driverName;
+    private static $_nativeTypeMap = array();
 
     /**#@-*/
 
@@ -75,12 +77,12 @@ class Piece_ORM_MDB2_NativeTypeMapper_Common
      */
 
     // }}}
-    // {{{ constructor
+    // {{{ __construct()
 
     /**
      * Sets the driver name to the property.
      */
-    function Piece_ORM_MDB2_NativeTypeMapper_Common()
+    public function __construct()
     {
         $this->_driverName = strtolower(substr(strrchr(get_class($this), '_'), 1));
     }
@@ -91,17 +93,17 @@ class Piece_ORM_MDB2_NativeTypeMapper_Common
     /**
      * Maps a native datatype of the DBMS to a MDB2 datatype.
      *
-     * @param MDB2_Driver_Common &$dbh
+     * @param MDB2_Driver_Common $dbh
      */
-    function mapNativeType(&$dbh)
+    public function mapNativeType(MDB2_Driver_Common $dbh)
     {
-        if (!array_key_exists($this->_driverName, $GLOBALS['PIECE_ORM_MDB2_NativeTypeMap'])) {
+        if (!array_key_exists($this->_driverName, self::$_nativeTypeMap)) {
             return;
         }
 
         $callbacks = array();
-        foreach (array_keys($GLOBALS['PIECE_ORM_MDB2_NativeTypeMap'][ $this->_driverName ]) as $type) {
-            $callbacks[$type] = array(&$this, 'getMDB2TypeInfo');
+        foreach (array_keys(self::$_nativeTypeMap[ $this->_driverName ]) as $type) {
+            $callbacks[$type] = array($this, 'getMDB2TypeInfo');
         }
 
         $dbh->setOption('nativetype_map_callback', $callbacks);
@@ -111,36 +113,40 @@ class Piece_ORM_MDB2_NativeTypeMapper_Common
     // {{{ getMDB2TypeInfo()
 
     /**
-     * Gets the MDB2 datatype information of a native array description of
-     * a field.
+     * Gets the MDB2 datatype information of a native array description of a field.
      *
-     * @param MDB2_Driver_Common &$dbh
+     * @param MDB2_Driver_Common $dbh
      * @param array              $field
      * @return array
      */
-    function getMDB2TypeInfo(&$dbh, $field)
+    public function getMDB2TypeInfo(MDB2_Driver_Common $dbh, array $field)
     {
-        return array(array($GLOBALS['PIECE_ORM_MDB2_NativeTypeMap'][ $this->_driverName ][ $field['type'] ]),
+        return array(array(self::$_nativeTypeMap[ $this->_driverName ][ $field['type'] ]),
                      null,
                      null,
                      null
                      );
     }
 
+    /**#@-*/
+
+    /**#@+
+     * @access protected
+     */
+
     // }}}
-    // {{{ addMap()
+    // {{{ addMapForDriver()
 
     /**
-     * Adds an element to the map.
+     * Adds an element to the map for a given driver.
      *
-     * @param string $driverName
      * @param string $nativeType
      * @param string $mdb2Type
-     * @static
+     * @param string $driverName
      */
-    function addMap($driverName, $nativeType, $mdb2Type)
+    protected static function addMapForDriver($nativeType, $mdb2Type, $driverName)
     {
-        $GLOBALS['PIECE_ORM_MDB2_NativeTypeMap'][$driverName][$nativeType] = $mdb2Type;
+        self::$_nativeTypeMap[$driverName][$nativeType] = $mdb2Type;
     }
 
     /**#@-*/

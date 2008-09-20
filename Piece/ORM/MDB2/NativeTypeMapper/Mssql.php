@@ -2,9 +2,9 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 
 /**
- * PHP versions 4 and 5
+ * PHP version 5
  *
- * Copyright (c) 2007 KUBO Atsuhiro <iteman@users.sourceforge.net>,
+ * Copyright (c) 2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>,
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,27 +29,19 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  * @package    Piece_ORM
- * @copyright  2007 KUBO Atsuhiro <iteman@users.sourceforge.net>
+ * @copyright  2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License (revised)
  * @version    SVN: $Id$
  * @since      File available since Release 0.7.0
  */
 
-require_once 'Piece/ORM/MDB2/NativeTypeMapper/Common.php';
-
-// {{{ GLOBALS
-
-$GLOBALS['PIECE_ORM_MDB2_NativeTypeMap']['mssql'] = array();
-
-// }}}
 // {{{ Piece_ORM_MDB2_NativeTypeMapper_Mssql
 
 /**
- * A helper class to map native datatypes of Microsoft SQL Server to MDB2
- * datatypes.
+ * A helper class to map native datatypes of Microsoft SQL Server to MDB2 datatypes.
  *
  * @package    Piece_ORM
- * @copyright  2007 KUBO Atsuhiro <iteman@users.sourceforge.net>
+ * @copyright  2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License (revised)
  * @version    Release: @package_version@
  * @since      Class available since Release 0.7.0
@@ -61,6 +53,12 @@ class Piece_ORM_MDB2_NativeTypeMapper_Mssql extends Piece_ORM_MDB2_NativeTypeMap
 
     /**#@+
      * @access public
+     */
+
+    /**#@-*/
+
+    /**#@+
+     * @access protected
      */
 
     /**#@-*/
@@ -83,13 +81,18 @@ class Piece_ORM_MDB2_NativeTypeMapper_Mssql extends Piece_ORM_MDB2_NativeTypeMap
      *
      * @param string $nativeType
      * @param string $mdb2Type
-     * @static
      */
-    function addMap($nativeType, $mdb2Type)
+    public static function addMap($nativeType, $mdb2Type)
     {
         $driverName = strtolower(substr(strrchr(__CLASS__, '_'), 1));
-        parent::addMap($driverName, $nativeType, $mdb2Type);
+        parent::addMapForDriver($nativeType, $mdb2Type, $driverName);
     }
+
+    /**#@-*/
+
+    /**#@+
+     * @access protected
+     */
 
     /**#@-*/
 
