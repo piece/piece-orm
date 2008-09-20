@@ -35,7 +35,7 @@
  * @since      File available since Release 0.1.0
  */
 
-// {{{ Piece_ORM_Mapper_FactoryTestCase
+// {{{  Piece_ORM_Mapper_FactoryTest
 
 /**
  * Some tests for Piece_ORM_Mapper_Factory.
@@ -46,7 +46,7 @@
  * @version    Release: @package_version@
  * @since      Class available since Release 0.1.0
  */
-class Piece_ORM_Mapper_FactoryTestCase extends PHPUnit_Framework_TestCase
+class Piece_ORM_Mapper_FactoryTest extends PHPUnit_Framework_TestCase
 {
 
     // {{{ properties
