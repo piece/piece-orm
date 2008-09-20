@@ -2,7 +2,7 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 
 /**
- * PHP versions 4 and 5
+ * PHP version 5
  *
  * Copyright (c) 2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>,
  * All rights reserved.
@@ -35,13 +35,15 @@
  * @since      File available since Release 0.5.0
  */
 
-error_reporting(E_ALL);
+error_reporting(E_ALL & ~E_DEPRECATED);
 
 if (file_exists(dirname(__FILE__) . '/../Piece/ORM.php')) {
     set_include_path(realpath(dirname(__FILE__) . '/..') . PATH_SEPARATOR . get_include_path());
 }
 
-require_once 'PEAR/ErrorStack.php';
+require_once 'PHPUnit/Framework.php';
+require_once 'Stagehand/Autoload.php';
+require_once 'Stagehand/Autoload/PEAR.php';
 
 PEAR_ErrorStack::setDefaultCallback(create_function('$error', 'var_dump($error); return ' . PEAR_ERRORSTACK_DIE . ';'));
 
