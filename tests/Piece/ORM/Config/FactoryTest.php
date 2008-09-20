@@ -94,7 +94,7 @@ class Piece_ORM_Config_FactoryTest extends PHPUnit_Framework_TestCase
         Piece_ORM_Error::clearErrors();
     }
 
-    public function testShouldCreateAConfigObjectWithoutConfigurationFile()
+    public function testShouldCreateAnObjectWithoutConfigurationFile()
     {
         $this->assertType('Piece_ORM_Config', Piece_ORM_Config_Factory::factory());
     }
@@ -131,7 +131,7 @@ class Piece_ORM_Config_FactoryTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(PIECE_ORM_ERROR_NOT_FOUND, $error['code']);
     }
 
-    public function testShouldCreateAConfigObjectEvenThoughAGivenCacheDirectoryIsNotFound()
+    public function testShouldCreateAnObjectEvenThoughAGivenCacheDirectoryIsNotFound()
     {
         $this->assertType('Piece_ORM_Config',
                           @Piece_ORM_Config_Factory::factory($this->_cacheDirectory,
@@ -139,7 +139,7 @@ class Piece_ORM_Config_FactoryTest extends PHPUnit_Framework_TestCase
                           );
     }
 
-    public function testShouldCreateAConfigObjectWithConfigurationFile()
+    public function testShouldCreateAnObjectByAGivenConfigurationFile()
     {
         $yaml = Spyc::YAMLLoad("{$this->_cacheDirectory}/piece-orm-config.yaml");
         $config = Piece_ORM_Config_Factory::factory($this->_cacheDirectory,

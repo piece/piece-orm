@@ -227,7 +227,7 @@ class Piece_ORMTest extends PHPUnit_Framework_TestCase
         $cache->clean();
     }
 
-    public function testShouldCreateAnObject()
+    public function testShouldCreateAnObjectByAGivenMapper()
     {
         Piece_ORM::configure($this->_cacheDirectory,
                              $this->_cacheDirectory,
