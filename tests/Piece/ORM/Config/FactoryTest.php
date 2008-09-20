@@ -37,7 +37,7 @@
 
 require_once 'spyc.php5';
 
-// {{{ Piece_ORM_Config_FactoryTestCase
+// {{{ Piece_ORM_Config_FactoryTest
 
 /**
  * Some tests for Piece_ORM_Config_Factory.
@@ -48,7 +48,7 @@ require_once 'spyc.php5';
  * @version    Release: @package_version@
  * @since      Class available since Release 0.1.0
  */
-class Piece_ORM_Config_FactoryTestCase extends PHPUnit_Framework_TestCase
+class Piece_ORM_Config_FactoryTest extends PHPUnit_Framework_TestCase
 {
 
     // {{{ properties
