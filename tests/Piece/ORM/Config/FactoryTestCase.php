@@ -2,7 +2,7 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 
 /**
- * PHP versions 4 and 5
+ * PHP version 5
  *
  * Copyright (c) 2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>,
  * All rights reserved.
@@ -35,17 +35,7 @@
  * @since      File available since Release 0.1.0
  */
 
-require_once realpath(dirname(__FILE__) . '/../../../prepare.php');
-require_once 'PHPUnit.php';
-require_once 'Piece/ORM/Config/Factory.php';
-require_once 'Cache/Lite.php';
-require_once 'Piece/ORM/Error.php';
-
-if (version_compare(phpversion(), '5.0.0', '<')) {
-    require_once 'spyc.php';
-} else {
-    require_once 'spyc.php5';
-}
+require_once 'spyc.php5';
 
 // {{{ GLOBALS
 
@@ -63,7 +53,7 @@ $GLOBALS['PIECE_ORM_Config_FactoryTestCase_hasWarnings'] = false;
  * @version    Release: @package_version@
  * @since      Class available since Release 0.1.0
  */
-class Piece_ORM_Config_FactoryTestCase extends PHPUnit_TestCase
+class Piece_ORM_Config_FactoryTestCase extends PHPUnit_Framework_TestCase
 {
 
     // {{{ properties
@@ -75,10 +65,18 @@ class Piece_ORM_Config_FactoryTestCase extends PHPUnit_TestCase
     /**#@-*/
 
     /**#@+
+     * @access protected
+     */
+
+    protected $backupGlobals = false;
+
+    /**#@-*/
+
+    /**#@+
      * @access private
      */
 
-    var $_cacheDirectory;
+    private $_cacheDirectory;
 
     /**#@-*/
 
@@ -86,17 +84,17 @@ class Piece_ORM_Config_FactoryTestCase extends PHPUnit_TestCase
      * @access public
      */
 
-    function setUp()
+    public function setUp()
     {
         $this->_cacheDirectory = dirname(__FILE__) . '/' . basename(__FILE__, '.php');
     }
 
-    function tearDown()
+    public function tearDown()
     {
-        $cache = &new Cache_Lite(array('cacheDir' => "{$this->_cacheDirectory}/",
-                                       'automaticSerialization' => true,
-                                       'errorHandlingAPIBreak' => true)
-                                 );
+        $cache = new Cache_Lite(array('cacheDir' => "{$this->_cacheDirectory}/",
+                                      'automaticSerialization' => true,
+                                      'errorHandlingAPIBreak' => true)
+                                );
         $cache->clean();
         Piece_ORM_Error::clearErrors();
     }
@@ -106,81 +104,87 @@ class Piece_ORM_Config_FactoryTestCase extends PHPUnit_TestCase
         $this->assertEquals(strtolower('Piece_ORM_Config'), strtolower(get_class(Piece_ORM_Config_Factory::factory())));
     }
 
-    function testConfigurationDirectoryNotFound()
-    {
-        Piece_ORM_Error::disableCallback();
-        $config = &Piece_ORM_Config_Factory::factory(dirname(__FILE__) . '/foo', $this->_cacheDirectory);
-        Piece_ORM_Error::enableCallback();
+/*     function testConfigurationDirectoryNotFound() */
+/*     { */
+/*         Piece_ORM_Error::disableCallback(); */
+/*         $config = Piece_ORM_Config_Factory::factory(dirname(__FILE__) . '/foo', $this->_cacheDirectory); */
+/*         Piece_ORM_Error::enableCallback(); */
 
-        $this->assertNull($config);
-        $this->assertTrue(Piece_ORM_Error::hasErrors());
+/*         $this->assertNull($config); */
+/*         $this->assertTrue(Piece_ORM_Error::hasErrors()); */
 
-        $error = Piece_ORM_Error::pop();
+/*         $error = Piece_ORM_Error::pop(); */
 
-        $this->assertEquals(PIECE_ORM_ERROR_NOT_FOUND, $error['code']);
-    }
+/*         $this->assertEquals(PIECE_ORM_ERROR_NOT_FOUND, $error['code']); */
+/*     } */
 
-    function testConfigurationFileNotFound()
-    {
-        Piece_ORM_Error::disableCallback();
-        $config = &Piece_ORM_Config_Factory::factory(dirname(__FILE__), $this->_cacheDirectory);
-        Piece_ORM_Error::enableCallback();
+/*     function testConfigurationFileNotFound() */
+/*     { */
+/*         Piece_ORM_Error::disableCallback(); */
+/*         $config = Piece_ORM_Config_Factory::factory(dirname(__FILE__), $this->_cacheDirectory); */
+/*         Piece_ORM_Error::enableCallback(); */
 
-        $this->assertNull($config);
-        $this->assertTrue(Piece_ORM_Error::hasErrors());
+/*         $this->assertNull($config); */
+/*         $this->assertTrue(Piece_ORM_Error::hasErrors()); */
 
-        $error = Piece_ORM_Error::pop();
+/*         $error = Piece_ORM_Error::pop(); */
 
-        $this->assertEquals(PIECE_ORM_ERROR_NOT_FOUND, $error['code']);
-    }
+/*         $this->assertEquals(PIECE_ORM_ERROR_NOT_FOUND, $error['code']); */
+/*     } */
 
-    function testNoCachingIfCacheDirectoryNotFound()
-    {
-        set_error_handler(create_function('$code, $message, $file, $line', "
-if (\$code == E_USER_WARNING) {
-    \$GLOBALS['PIECE_ORM_Config_FactoryTestCase_hasWarnings'] = true;
-}
-"));
-        $config = &Piece_ORM_Config_Factory::factory($this->_cacheDirectory, dirname(__FILE__) . '/foo');
-        restore_error_handler();
+/*     function testNoCachingIfCacheDirectoryNotFound() */
+/*     { */
+/*         set_error_handler(create_function('$code, $message, $file, $line', " */
+/* if (\$code == E_USER_WARNING) { */
+/*     \$GLOBALS['PIECE_ORM_Config_FactoryTestCase_hasWarnings'] = true; */
+/* } */
+/* ")); */
+/*         $config = Piece_ORM_Config_Factory::factory($this->_cacheDirectory, dirname(__FILE__) . '/foo'); */
+/*         restore_error_handler(); */
 
-        $this->assertTrue($GLOBALS['PIECE_ORM_Config_FactoryTestCase_hasWarnings']);
-        $this->assertEquals(strtolower('Piece_ORM_Config'), strtolower(get_class($config)));
+/*         $this->assertTrue($GLOBALS['PIECE_ORM_Config_FactoryTestCase_hasWarnings']); */
+/*         $this->assertEquals(strtolower('Piece_ORM_Config'), strtolower(get_class($config))); */
 
-        $GLOBALS['PIECE_ORM_Config_FactoryTestCase_hasWarnings'] = false;
-    }
+/*         $GLOBALS['PIECE_ORM_Config_FactoryTestCase_hasWarnings'] = false; */
+/*     } */
 
-    function testFactoryWithConfigurationFile()
-    {
-        $yaml = Spyc::YAMLLoad("{$this->_cacheDirectory}/piece-orm-config.yaml");
-        $config = &Piece_ORM_Config_Factory::factory($this->_cacheDirectory, $this->_cacheDirectory);
+/*     function testFactoryWithConfigurationFile() */
+/*     { */
+/*         $yaml = Spyc::YAMLLoad("{$this->_cacheDirectory}/piece-orm-config.yaml"); */
+/*         $config = Piece_ORM_Config_Factory::factory($this->_cacheDirectory, $this->_cacheDirectory); */
 
-        $this->assertTrue(count($yaml));
+/*         $this->assertTrue(count($yaml)); */
 
-        foreach ($yaml as $configuration) {
-            $this->assertEquals($configuration['dsn'], $config->getDSN($configuration['name']));
-            $this->assertEquals($configuration['options'], $config->getOptions($configuration['name']));
-        }
-    }
+/*         foreach ($yaml as $configuration) { */
+/*             $this->assertEquals($configuration['dsn'], $config->getDSN($configuration['name'])); */
+/*             $this->assertEquals($configuration['options'], $config->getOptions($configuration['name'])); */
+/*         } */
+/*     } */
 
-    /**
-     * @since Method available since Release 0.8.0
+/*     /\** */
+/*      * @since Method available since Release 0.8.0 */
+/*      *\/ */
+/*     function testCacheIDsShouldUniqueInOneCacheDirectory() */
+/*     { */
+/*         $oldDirectory = getcwd(); */
+/*         chdir("{$this->_cacheDirectory}/CacheIDsShouldBeUniqueInOneCacheDirectory1"); */
+/*         Piece_ORM_Config_Factory::factory('.', $this->_cacheDirectory); */
+
+/*         $this->assertEquals(1, $this->_getCacheFileCount($this->_cacheDirectory)); */
+
+/*         chdir("{$this->_cacheDirectory}/CacheIDsShouldBeUniqueInOneCacheDirectory2"); */
+/*         Piece_ORM_Config_Factory::factory('.', $this->_cacheDirectory); */
+
+/*         $this->assertEquals(2, $this->_getCacheFileCount($this->_cacheDirectory)); */
+
+/*         chdir($oldDirectory); */
+/*     } */
+
+    /**#@-*/
+
+    /**#@+
+     * @access protected
      */
-    function testCacheIDsShouldUniqueInOneCacheDirectory()
-    {
-        $oldDirectory = getcwd();
-        chdir("{$this->_cacheDirectory}/CacheIDsShouldBeUniqueInOneCacheDirectory1");
-        Piece_ORM_Config_Factory::factory('.', $this->_cacheDirectory);
-
-        $this->assertEquals(1, $this->_getCacheFileCount($this->_cacheDirectory));
-
-        chdir("{$this->_cacheDirectory}/CacheIDsShouldBeUniqueInOneCacheDirectory2");
-        Piece_ORM_Config_Factory::factory('.', $this->_cacheDirectory);
-
-        $this->assertEquals(2, $this->_getCacheFileCount($this->_cacheDirectory));
-
-        chdir($oldDirectory);
-    }
 
     /**#@-*/
 
@@ -191,7 +195,7 @@ if (\$code == E_USER_WARNING) {
     /**
      * @since Method available since Release 0.8.0
      */
-    function _getCacheFileCount($directory)
+    private function _getCacheFileCount($directory)
     {
         $cacheFileCount = 0;
         if ($dh = opendir($directory)) {

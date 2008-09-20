@@ -37,7 +37,7 @@
 
 require_once 'spyc.php5';
 
-// {{{ Piece_ORMTestCase
+// {{{ Piece_ORMTest
 
 /**
  * Some tests for Piece_ORM.
@@ -48,7 +48,7 @@ require_once 'spyc.php5';
  * @version    Release: @package_version@
  * @since      Class available since Release 0.1.0
  */
-class Piece_ORMTestCase extends PHPUnit_Framework_TestCase
+class Piece_ORMTest extends PHPUnit_Framework_TestCase
 {
 
     // {{{ properties
@@ -248,9 +248,9 @@ class Piece_ORMTestCase extends PHPUnit_Framework_TestCase
         $employee->lastName = 'Bar';
         $employee->object = new stdClass();
         $realEmployee =
-            Piece_ORM::dressObject($employee, new Piece_ORMTestCase_Employee());
+            Piece_ORM::dressObject($employee, new Piece_ORMTest_Employee());
 
-        $this->assertType('Piece_ORMTestCase_Employee', $realEmployee);
+        $this->assertType('Piece_ORMTest_Employee', $realEmployee);
         $this->assertTrue(method_exists($realEmployee, 'generatePassword'));
         $this->assertEquals('Foo', $realEmployee->firstName);
         $this->assertObjectHasAttribute('object', $realEmployee);
@@ -384,9 +384,9 @@ class Piece_ORMTestCase extends PHPUnit_Framework_TestCase
 }
 
 // }}}
-// {{{ Piece_ORMTestCase_Employee
+// {{{ Piece_ORMTest_Employee
 
-class Piece_ORMTestCase_Employee
+class Piece_ORMTest_Employee
 {
     public function generatePassword() {}
 }
