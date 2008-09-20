@@ -2,7 +2,7 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 
 /**
- * PHP versions 4 and 5
+ * PHP version 5
  *
  * Copyright (c) 2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>,
  * All rights reserved.
@@ -35,14 +35,10 @@
  * @since      File available since Release 0.1.0
  */
 
-require_once realpath(dirname(__FILE__) . '/../../prepare.php');
-require_once 'PHPUnit.php';
-require_once 'Piece/ORM/Inflector.php';
-
 // {{{ Piece_ORM_InflectorTestCase
 
 /**
- * TestCase for Piece_ORM_Inflector
+ * Some tests for Piece_ORM_Inflector.
  *
  * @package    Piece_ORM
  * @copyright  2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
@@ -50,13 +46,19 @@ require_once 'Piece/ORM/Inflector.php';
  * @version    Release: @package_version@
  * @since      Class available since Release 0.1.0
  */
-class Piece_ORM_InflectorTestCase extends PHPUnit_TestCase
+class Piece_ORM_InflectorTestCase extends PHPUnit_Framework_TestCase
 {
 
     // {{{ properties
 
     /**#@+
      * @access public
+     */
+
+    /**#@-*/
+
+    /**#@+
+     * @access protected
      */
 
     /**#@-*/
@@ -71,7 +73,7 @@ class Piece_ORM_InflectorTestCase extends PHPUnit_TestCase
      * @access public
      */
 
-    function testWordShouldUnderscore()
+    public function testShouldUnderscoreWords()
     {
         $this->assertEquals('keyword_id', Piece_ORM_Inflector::underscore('keywordId'));
         $this->assertEquals('keyword1_id', Piece_ORM_Inflector::underscore('keyword1_id'));
@@ -86,7 +88,7 @@ class Piece_ORM_InflectorTestCase extends PHPUnit_TestCase
     /**
      * @since Method available since Release 0.8.1
      */
-    function testWordShouldCamelize()
+    public function testShouldCamelizeWords()
     {
         $this->assertEquals('keywordId', Piece_ORM_Inflector::camelize('keyword_id', true));
         $this->assertEquals('keyword1_id', Piece_ORM_Inflector::camelize('keyword1_id', true));
@@ -98,6 +100,12 @@ class Piece_ORM_InflectorTestCase extends PHPUnit_TestCase
         $this->assertEquals('foo123', Piece_ORM_Inflector::camelize('foo123', true));
         $this->assertEquals('Unusualname1_2_unusualname_12', Piece_ORM_Inflector::camelize('unusualname1_2_unusualname_12', false));
     }
+
+    /**#@-*/
+
+    /**#@+
+     * @access protected
+     */
 
     /**#@-*/
 
