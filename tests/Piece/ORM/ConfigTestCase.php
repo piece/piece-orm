@@ -2,9 +2,9 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 
 /**
- * PHP versions 4 and 5
+ * PHP version 5
  *
- * Copyright (c) 2007 KUBO Atsuhiro <iteman@users.sourceforge.net>,
+ * Copyright (c) 2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>,
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,28 +29,24 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  * @package    Piece_ORM
- * @copyright  2007 KUBO Atsuhiro <iteman@users.sourceforge.net>
+ * @copyright  2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License (revised)
  * @version    SVN: $Id$
  * @since      File available since Release 0.1.0
  */
 
-require_once realpath(dirname(__FILE__) . '/../../prepare.php');
-require_once 'PHPUnit.php';
-require_once 'Piece/ORM/Config.php';
-
 // {{{ Piece_ORM_ConfigTestCase
 
 /**
- * TestCase for Piece_ORM_Config
+ * Some tests for Piece_ORM_Config.
  *
  * @package    Piece_ORM
- * @copyright  2007 KUBO Atsuhiro <iteman@users.sourceforge.net>
+ * @copyright  2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License (revised)
  * @version    Release: @package_version@
  * @since      Class available since Release 0.1.0
  */
-class Piece_ORM_ConfigTestCase extends PHPUnit_TestCase
+class Piece_ORM_ConfigTestCase extends PHPUnit_Framework_TestCase
 {
 
     // {{{ properties
@@ -71,19 +67,16 @@ class Piece_ORM_ConfigTestCase extends PHPUnit_TestCase
      * @access public
      */
 
-    function testNoConfigurations()
+    public function testShouldReturnNullIfNoConfigurationsAreFound()
     {
-        $config = &new Piece_ORM_Config();
+        $config1 = new Piece_ORM_Config();
 
-        $this->assertNull($config->getDSN(null));
-    }
+        $this->assertNull($config1->getDSN(null));
 
-    function testConfigurationNotFound()
-    {
-        $config = &new Piece_ORM_Config();
-        $config->setDSN('foo', 'bar');
+        $config2 = new Piece_ORM_Config();
+        $config2->setDSN('foo', 'bar');
 
-        $this->assertNull($config->getDSN('baz'));
+        $this->assertNull($config2->getDSN('baz'));
     }
 
     /**#@-*/
