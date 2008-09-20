@@ -35,7 +35,7 @@
  * @since      File available since Release 0.1.0
  */
 
-// {{{ Piece_ORM_InflectorTestCase
+// {{{ Piece_ORM_InflectorTest
 
 /**
  * Some tests for Piece_ORM_Inflector.
@@ -46,7 +46,7 @@
  * @version    Release: @package_version@
  * @since      Class available since Release 0.1.0
  */
-class Piece_ORM_InflectorTestCase extends PHPUnit_Framework_TestCase
+class Piece_ORM_InflectorTest extends PHPUnit_Framework_TestCase
 {
 
     // {{{ properties
