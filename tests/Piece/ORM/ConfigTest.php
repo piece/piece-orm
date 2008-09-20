@@ -35,7 +35,7 @@
  * @since      File available since Release 0.1.0
  */
 
-// {{{ Piece_ORM_ConfigTestCase
+// {{{ Piece_ORM_ConfigTest
 
 /**
  * Some tests for Piece_ORM_Config.
@@ -46,13 +46,19 @@
  * @version    Release: @package_version@
  * @since      Class available since Release 0.1.0
  */
-class Piece_ORM_ConfigTestCase extends PHPUnit_Framework_TestCase
+class Piece_ORM_ConfigTest extends PHPUnit_Framework_TestCase
 {
 
     // {{{ properties
 
     /**#@+
      * @access public
+     */
+
+    /**#@-*/
+
+    /**#@+
+     * @access protected
      */
 
     /**#@-*/
@@ -78,6 +84,12 @@ class Piece_ORM_ConfigTestCase extends PHPUnit_Framework_TestCase
 
         $this->assertNull($config2->getDSN('baz'));
     }
+
+    /**#@-*/
+
+    /**#@+
+     * @access protected
+     */
 
     /**#@-*/
 
