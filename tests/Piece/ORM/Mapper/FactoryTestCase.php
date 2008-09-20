@@ -2,7 +2,7 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 
 /**
- * PHP versions 4 and 5
+ * PHP version 5
  *
  * Copyright (c) 2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>,
  * All rights reserved.
@@ -35,18 +35,10 @@
  * @since      File available since Release 0.1.0
  */
 
-require_once realpath(dirname(__FILE__) . '/../../../prepare.php');
-require_once 'PHPUnit.php';
-require_once 'Piece/ORM/Mapper/Factory.php';
-require_once 'Piece/ORM/Error.php';
-require_once 'Cache/Lite.php';
-require_once 'Piece/ORM/Context.php';
-require_once 'Piece/ORM/Config.php';
-
 // {{{ Piece_ORM_Mapper_FactoryTestCase
 
 /**
- * TestCase for Piece_ORM_Mapper_Factory
+ * Some tests for Piece_ORM_Mapper_Factory.
  *
  * @package    Piece_ORM
  * @copyright  2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
@@ -54,7 +46,7 @@ require_once 'Piece/ORM/Config.php';
  * @version    Release: @package_version@
  * @since      Class available since Release 0.1.0
  */
-class Piece_ORM_Mapper_FactoryTestCase extends PHPUnit_TestCase
+class Piece_ORM_Mapper_FactoryTestCase extends PHPUnit_Framework_TestCase
 {
 
     // {{{ properties
@@ -66,12 +58,20 @@ class Piece_ORM_Mapper_FactoryTestCase extends PHPUnit_TestCase
     /**#@-*/
 
     /**#@+
+     * @access protected
+     */
+
+    protected $backupGlobals = false;
+
+    /**#@-*/
+
+    /**#@+
      * @access private
      */
 
-    var $_cacheDirectory;
-    var $_oldCacheDirectory;
-    var $_oldMetadataCacheDirectory;
+    private $_cacheDirectory;
+    private $_oldCacheDirectory;
+    private $_oldMetadataCacheDirectory;
 
     /**#@-*/
 
@@ -79,13 +79,13 @@ class Piece_ORM_Mapper_FactoryTestCase extends PHPUnit_TestCase
      * @access public
      */
 
-    function setUp()
+    public function setUp()
     {
         $this->_cacheDirectory = dirname(__FILE__) . '/' . basename(__FILE__, '.php');
-        $config = &new Piece_ORM_Config();
+        $config = new Piece_ORM_Config();
         $config->setDSN('piece', 'pgsql://piece:piece@pieceorm/piece');
         $config->setOptions('piece', array('debug' => 2, 'result_buffering' => false));
-        $context = &Piece_ORM_Context::singleton();
+        $context = Piece_ORM_Context::singleton();
         $context->setConfiguration($config);
         $context->setMapperConfigDirectory($this->_cacheDirectory);
         $context->setDatabase('piece');
@@ -96,7 +96,7 @@ class Piece_ORM_Mapper_FactoryTestCase extends PHPUnit_TestCase
         Piece_ORM_Metadata_Factory::setCacheDirectory($this->_cacheDirectory);
     }
 
-    function tearDown()
+    public function tearDown()
     {
         Piece_ORM_Metadata_Factory::setCacheDirectory($this->_oldMetadataCacheDirectory);
         Piece_ORM_Metadata_Factory::clearInstances();
@@ -104,15 +104,15 @@ class Piece_ORM_Mapper_FactoryTestCase extends PHPUnit_TestCase
         Piece_ORM_Mapper_Factory::setConfigDirectory($this->_oldCacheDirectory);
         Piece_ORM_Mapper_Factory::clearInstances();
         Piece_ORM_Context::clear();
-        $cache = &new Cache_Lite(array('cacheDir' => "{$this->_cacheDirectory}/",
-                                       'automaticSerialization' => true,
-                                       'errorHandlingAPIBreak' => true)
-                                 );
+        $cache = new Cache_Lite(array('cacheDir' => "{$this->_cacheDirectory}/",
+                                      'automaticSerialization' => true,
+                                      'errorHandlingAPIBreak' => true)
+                                );
         $cache->clean();
         Piece_ORM_Error::clearErrors();
     }
 
-    function testConfigurationDirectoryNotSpecified()
+    public function testShouldRaiseAnExceptionIfTheConfigurationDirectoryIsNotSpecified()
     {
         $oldConfigDirectory = $GLOBALS['PIECE_ORM_Mapper_ConfigDirectory'];
         Piece_ORM_Mapper_Factory::setConfigDirectory(null);
@@ -129,7 +129,7 @@ class Piece_ORM_Mapper_FactoryTestCase extends PHPUnit_TestCase
         Piece_ORM_Mapper_Factory::setConfigDirectory($oldConfigDirectory);
     }
 
-    function testConfigurationDirectoryNotFound()
+    public function testShouldRaiseAnExceptionIfAGivenConfigurationDirectoryIsNotFound()
     {
         $oldConfigDirectory = $GLOBALS['PIECE_ORM_Mapper_ConfigDirectory'];
         Piece_ORM_Mapper_Factory::setConfigDirectory(dirname(__FILE__) . '/foo');
@@ -146,7 +146,7 @@ class Piece_ORM_Mapper_FactoryTestCase extends PHPUnit_TestCase
         Piece_ORM_Mapper_Factory::setConfigDirectory($oldConfigDirectory);
     }
 
-    function testCacheDirectoryNotSpecified()
+    public function testShouldRaiseAnExceptionIfTheCacheDirectoryIsNotSpecified()
     {
         $oldCacheDirectory = $GLOBALS['PIECE_ORM_Metadata_CacheDirectory'];
         Piece_ORM_Mapper_Factory::setCacheDirectory(null);
@@ -163,7 +163,7 @@ class Piece_ORM_Mapper_FactoryTestCase extends PHPUnit_TestCase
         Piece_ORM_Mapper_Factory::setCacheDirectory($oldCacheDirectory);
     }
 
-    function testCacheDirectoryNotFound()
+    public function testShouldRaiseAnExceptionIfAGivenCacheDirectoryIsNotFound()
     {
         $oldCacheDirectory = $GLOBALS['PIECE_ORM_Metadata_CacheDirectory'];
         Piece_ORM_Mapper_Factory::setCacheDirectory(dirname(__FILE__) . '/foo');
@@ -180,7 +180,7 @@ class Piece_ORM_Mapper_FactoryTestCase extends PHPUnit_TestCase
         Piece_ORM_Mapper_Factory::setCacheDirectory($oldCacheDirectory);
     }
 
-    function testConfigurationFileNotFound()
+    public function testShouldRaiseAnExceptionIfAGivenConfigurationFileIsNotFound()
     {
         Piece_ORM_Error::disableCallback();
         Piece_ORM_Mapper_Factory::factory('Foo');
@@ -193,49 +193,51 @@ class Piece_ORM_Mapper_FactoryTestCase extends PHPUnit_TestCase
         $this->assertEquals(PIECE_ORM_ERROR_NOT_FOUND, $error['code']);
     }
 
-    function testFactory()
+    public function testShouldCreateAnObjectByAGivenMapper()
     {
-        $mapper = &Piece_ORM_Mapper_Factory::factory('Employees');
+        $mapper = Piece_ORM_Mapper_Factory::factory('Employees');
 
-        $this->assertTrue(is_subclass_of($mapper, 'Piece_ORM_Mapper_Common'));
+        $this->assertType('Piece_ORM_Mapper_Common', $mapper);
     }
 
-    function testInstanceCache()
+    public function testShouldReturnTheExistingObjectIfItExists()
     {
-        $mapper1 = &Piece_ORM_Mapper_Factory::factory('Employees');
-        $mapper2 = &Piece_ORM_Mapper_Factory::factory('Employees');
+        $mapper1 = Piece_ORM_Mapper_Factory::factory('Employees');
+        $mapper2 = Piece_ORM_Mapper_Factory::factory('Employees');
 
         $mapper1->foo = 'bar';
 
-        $this->assertTrue(array_key_exists('foo', $mapper1));
+        $this->assertObjectHasAttribute('foo', $mapper1);;
         $this->assertEquals('bar', $mapper1->foo);
-        $this->assertTrue(array_key_exists('foo', $mapper2));
+        $this->assertObjectHasAttribute('foo', $mapper2);;
         $this->assertEquals('bar', $mapper2->foo);
     }
 
-    function testSwitchDatabase()
+    public function testShouldSwitchDatabase()
     {
-        $context = &Piece_ORM_Context::singleton();
-        $config = &$context->getConfiguration();
+        $context = Piece_ORM_Context::singleton();
+        $config = $context->getConfiguration();
         $config->setDSN('piece1', 'pgsql://piece:piece@pieceorm/piece');
-        $config->setOptions('piece1', array('debug' => 0, 'result_buffering' => false));
-        $mapper1 = &Piece_ORM_Mapper_Factory::factory('Employees');
+        $config->setOptions('piece1',
+                            array('debug' => 0, 'result_buffering' => false)
+                            );
+        $mapper1 = Piece_ORM_Mapper_Factory::factory('Employees');
 
         $this->assertEquals(2, $mapper1->_dbh->options['debug']);
 
         $mapper1->foo = 'bar';
         $context->setDatabase('piece1');
-        $mapper2 = &Piece_ORM_Mapper_Factory::factory('Employees');
+        $mapper2 = Piece_ORM_Mapper_Factory::factory('Employees');
 
         $this->assertEquals(0, $mapper2->_dbh->options['debug']);
-        $this->assertTrue(array_key_exists('foo', $mapper2));
+        $this->assertObjectHasAttribute('foo', $mapper2);;
         $this->assertEquals('bar', $mapper2->foo);
     }
 
     /**
      * @since Method available since Release 0.8.0
      */
-    function testCacheIDsShouldUniqueInOneCacheDirectory()
+    public function testShouldCreateUniqueCacheIdsInOneCacheDirectory()
     {
         $oldDirectory = getcwd();
         chdir("{$this->_cacheDirectory}/CacheIDsShouldUniqueInOneCacheDirectory1");
@@ -256,13 +258,19 @@ class Piece_ORM_Mapper_FactoryTestCase extends PHPUnit_TestCase
     /**#@-*/
 
     /**#@+
+     * @access protected
+     */
+
+    /**#@-*/
+
+    /**#@+
      * @access private
      */
 
     /**
      * @since Method available since Release 0.8.0
      */
-    function _getCacheFileCount($directory)
+    private function _getCacheFileCount($directory)
     {
         $cacheFileCount = 0;
         if ($dh = opendir($directory)) {
