@@ -2,7 +2,7 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 
 /**
- * PHP versions 4 and 5
+ * PHP version 5
  *
  * Copyright (c) 2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>,
  * All rights reserved.
@@ -35,18 +35,10 @@
  * @since      File available since Release 0.1.0
  */
 
-require_once realpath(dirname(__FILE__) . '/../../../prepare.php');
-require_once 'PHPUnit.php';
-require_once 'Piece/ORM/Metadata/Factory.php';
-require_once 'Cache/Lite.php';
-require_once 'Piece/ORM/Context.php';
-require_once 'Piece/ORM/Config.php';
-require_once 'Piece/ORM/Error.php';
-
 // {{{ Piece_ORM_Metadata_FactoryTestCase
 
 /**
- * TestCase for Piece_ORM_Metadata_Factory
+ * Some tests for Piece_ORM_Metadata_Factory.
  *
  * @package    Piece_ORM
  * @copyright  2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
@@ -54,7 +46,7 @@ require_once 'Piece/ORM/Error.php';
  * @version    Release: @package_version@
  * @since      Class available since Release 0.1.0
  */
-class Piece_ORM_Metadata_FactoryTestCase extends PHPUnit_TestCase
+class Piece_ORM_Metadata_FactoryTestCase extends PHPUnit_Framework_TestCase
 {
 
     // {{{ properties
@@ -66,11 +58,19 @@ class Piece_ORM_Metadata_FactoryTestCase extends PHPUnit_TestCase
     /**#@-*/
 
     /**#@+
+     * @access protected
+     */
+
+    protected $backupGlobals = false;
+
+    /**#@-*/
+
+    /**#@+
      * @access private
      */
 
-    var $_cacheDirectory;
-    var $_oldCacheDirectory;
+    private $_cacheDirectory;
+    private $_oldCacheDirectory;
 
     /**#@-*/
 
@@ -78,49 +78,55 @@ class Piece_ORM_Metadata_FactoryTestCase extends PHPUnit_TestCase
      * @access public
      */
 
-    function setUp()
+    public function setUp()
     {
         $this->_cacheDirectory = dirname(__FILE__) . '/' . basename(__FILE__, '.php');
-        $config = &new Piece_ORM_Config();
+        $config = new Piece_ORM_Config();
         $config->setDSN('piece', 'pgsql://piece:piece@pieceorm/piece');
         $config->setOptions('piece', array('debug' => 2, 'result_buffering' => false));
-        $context = &Piece_ORM_Context::singleton();
+        $context = Piece_ORM_Context::singleton();
         $context->setConfiguration($config);
         $context->setDatabase('piece');
         $this->_oldCacheDirectory = $GLOBALS['PIECE_ORM_Metadata_CacheDirectory'];
         Piece_ORM_Metadata_Factory::setCacheDirectory($this->_cacheDirectory);
     }
 
-    function tearDown()
+    public function tearDown()
     {
         Piece_ORM_Metadata_Factory::setCacheDirectory($this->_oldCacheDirectory);
         Piece_ORM_Metadata_Factory::clearInstances();
         Piece_ORM_Context::clear();
-        $cache = &new Cache_Lite(array('cacheDir' => "{$this->_cacheDirectory}/",
-                                       'automaticSerialization' => true,
-                                       'errorHandlingAPIBreak' => true)
-                                 );
+        $cache = new Cache_Lite(array('cacheDir' => "{$this->_cacheDirectory}/",
+                                      'automaticSerialization' => true,
+                                      'errorHandlingAPIBreak' => true)
+                                );
         $cache->clean();
         Piece_ORM_Error::clearErrors();
     }
 
-    function testFactory()
+    public function testShouldCreateAnObjectByAGivenMapper()
     {
-        $metadata = &Piece_ORM_Metadata_Factory::factory('Employees');
+        $metadata = Piece_ORM_Metadata_Factory::factory('Employees');
 
-        $this->assertEquals(strtolower('Piece_ORM_Metadata'), strtolower(get_class($metadata)));
+        $this->assertType('Piece_ORM_Metadata', $metadata);
         $this->assertEquals('employees', $metadata->getTableName());
     }
 
-    function testInstanceCache()
+    public function testShouldReturnTheExistingObjectIfItExists()
     {
-        $metadata1 = &Piece_ORM_Metadata_Factory::factory('Employees');
+        $metadata1 = Piece_ORM_Metadata_Factory::factory('Employees');
         $metadata1->foo = 'bar';
-        $metadata2 = &Piece_ORM_Metadata_Factory::factory('Employees');
+        $metadata2 = Piece_ORM_Metadata_Factory::factory('Employees');
 
-        $this->assertTrue(array_key_exists('foo', $metadata2));
+        $this->assertObjectHasAttribute('foo', $metadata2);
         $this->assertEquals('bar', $metadata2->foo);
     }
+
+    /**#@-*/
+
+    /**#@+
+     * @access protected
+     */
 
     /**#@-*/
 
