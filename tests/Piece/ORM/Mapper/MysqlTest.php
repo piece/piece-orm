@@ -37,7 +37,7 @@
 
 require_once dirname(__FILE__) . '/CompatibilityTests.php';
 
-// {{{ Piece_ORM_Mapper_MysqlTestCase
+// {{{ Piece_ORM_Mapper_MysqlTest
 
 /**
  * Some tests for MySQL.
@@ -48,7 +48,7 @@ require_once dirname(__FILE__) . '/CompatibilityTests.php';
  * @version    Release: @package_version@
  * @since      Class available since Release 0.1.0
  */
-class Piece_ORM_Mapper_MysqlTestCase extends Piece_ORM_Mapper_CompatibilityTests
+class Piece_ORM_Mapper_MysqlTest extends Piece_ORM_Mapper_CompatibilityTests
 {
 
     // {{{ properties

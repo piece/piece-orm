@@ -39,7 +39,7 @@ return;
 
 require_once dirname(__FILE__) . '/CompatibilityTests.php';
 
-// {{{ Piece_ORM_Mapper_MssqlTestCase
+// {{{ Piece_ORM_Mapper_MssqlTest
 
 /**
  * Some tests for Microsoft SQL Server.
@@ -50,7 +50,7 @@ require_once dirname(__FILE__) . '/CompatibilityTests.php';
  * @version    Release: @package_version@
  * @since      Class available since Release 0.4.0
  */
-class Piece_ORM_Mapper_MssqlTestCase extends Piece_ORM_Mapper_CompatibilityTests
+class Piece_ORM_Mapper_MssqlTest extends Piece_ORM_Mapper_CompatibilityTests
 {
 
     // {{{ properties
