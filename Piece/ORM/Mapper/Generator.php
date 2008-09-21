@@ -122,29 +122,10 @@ class Piece_ORM_Mapper_Generator
     public function generate()
     {
         $this->_generateFind();
-        if (Piece_ORM_Error::hasErrors()) {
-            return;
-        }
-
         $this->_generateInsert();
-        if (Piece_ORM_Error::hasErrors()) {
-            return;
-        }
-
         $this->_generateDelete();
-        if (Piece_ORM_Error::hasErrors()) {
-            return;
-        }
-
         $this->_generateUpdate();
-        if (Piece_ORM_Error::hasErrors()) {
-            return;
-        }
-
         $this->_generateFromConfiguration();
-        if (Piece_ORM_Error::hasErrors()) {
-            return;
-        }
 
         return "class {$this->_mapperClass} extends Piece_ORM_Mapper_Common
 {\n" .
@@ -162,22 +143,16 @@ class Piece_ORM_Mapper_Generator
      *
      * @param array $relationship
      * @return array
-     * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
+     * @throws Piece_ORM_Exception
      */
     public function normalizeRelationshipDefinition(array $relationship)
     {
         if (!array_key_exists('type', $relationship)) {
-            Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_CONFIGURATION,
-                                  'The element [ type ] is required to generate a relationship property declaration.'
-                                  );
-            return;
+            throw new Piece_ORM_Exception('The element [ type ] is required to generate a relationship property declaration.');
         }
 
         if (!Piece_ORM_Mapper_RelationshipType::isValid($relationship['type'])) {
-            Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_CONFIGURATION,
-                                  'The value of the element [ type ] must be one of ' . implode(', ', Piece_ORM_Mapper_RelationshipType::getRelationshipTypes())
-                                  );
-            return;
+            throw new Piece_ORM_Exception('The value of the element [ type ] must be one of ' . implode(', ', Piece_ORM_Mapper_RelationshipType::getRelationshipTypes()));
         }
 
         $relationshipNormalizerClass = 'Piece_ORM_Mapper_RelationshipNormalizer_' . ucwords($relationship['type']);
@@ -257,7 +232,7 @@ class Piece_ORM_Mapper_Generator
      * @param string $query
      * @param array  $relationships
      * @param string $orderBy
-     * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
+     * @throws Piece_ORM_Exception
      */
     private function _addFind($methodName,
                               $query,
@@ -266,16 +241,10 @@ class Piece_ORM_Mapper_Generator
                               )
     {
         if (!$this->_validateMethodName($methodName)) {
-            Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_CONFIGURATION,
-                                  "Cannot use the method name [ $methodName ] since it is a reserved for internal use only."
-                                  );
-            return;
+            throw new Piece_ORM_Exception("Cannot use the method name [ $methodName ] since it is a reserved for internal use only.");
         }
 
         $this->_addPropertyDefinitions($methodName, $query, $relationships, $orderBy);
-        if (Piece_ORM_Error::hasErrors()) {
-            return;
-        }
 
         $this->_methodDefinitions[ strtolower($methodName) ] = "
     public function $methodName(\$criteria = null)
@@ -293,21 +262,15 @@ class Piece_ORM_Mapper_Generator
      * @param string $methodName
      * @param string $query
      * @param array  $relationships
-     * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
+     * @throws Piece_ORM_Exception
      */
     private function _addInsert($methodName, $query, array $relationships = array())
     {
         if (!$this->_validateMethodName($methodName)) {
-            Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_CONFIGURATION,
-                                  "Cannot use the method name [ $methodName ] since it is a reserved for internal use only."
-                                  );
-            return;
+            throw new Piece_ORM_Exception("Cannot use the method name [ $methodName ] since it is a reserved for internal use only.");
         }
 
         $this->_addPropertyDefinitions($methodName, $query, $relationships);
-        if (Piece_ORM_Error::hasErrors()) {
-            return;
-        }
 
         $this->_methodDefinitions[ strtolower($methodName) ] = "
     public function $methodName(\$subject)
@@ -326,7 +289,7 @@ class Piece_ORM_Mapper_Generator
      * @param string $query
      * @param array  $relationships
      * @param string $orderBy
-     * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
+     * @throws Piece_ORM_Exception
      */
     private function _addFindAll($methodName,
                                  $query = null,
@@ -335,16 +298,10 @@ class Piece_ORM_Mapper_Generator
                                  )
     {
         if (!$this->_validateMethodName($methodName)) {
-            Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_CONFIGURATION,
-                                  "Cannot use the method name [ $methodName ] since it is a reserved for internal use only."
-                                  );
-            return;
+            throw new Piece_ORM_Exception("Cannot use the method name [ $methodName ] since it is a reserved for internal use only.");
         }
 
         $this->_addPropertyDefinitions($methodName, $query, $relationships, $orderBy);
-        if (Piece_ORM_Error::hasErrors()) {
-            return;
-        }
 
         $this->_methodDefinitions[ strtolower($methodName) ] = "
     public function $methodName(\$criteria = null)
@@ -359,7 +316,7 @@ class Piece_ORM_Mapper_Generator
     /**
      * Generates methods from configuration.
      *
-     * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
+     * @throws Piece_ORM_Exception
      */
     private function _generateFromConfiguration()
     {
@@ -368,65 +325,57 @@ class Piece_ORM_Mapper_Generator
         }
 
         foreach ($this->_config as $method) {
-            do {
-                if (Piece_ORM_Mapper_QueryType::isFindAll($method['name'])) {
-                    $this->_addFindAll($method['name'],
-                                       @$method['query'],
-                                       (array)@$method['relationship'],
-                                       @$method['orderBy']
-                                       );
-                    break;
-                }
-
-                if (Piece_ORM_Mapper_QueryType::isFindOne($method['name'])) {
-                    $this->_addFindOne($method['name'],
-                                       @$method['query'],
-                                       @$method['orderBy']
-                                       );
-                    break;
-                }
-
-                if (Piece_ORM_Mapper_QueryType::isFind($method['name'])) {
-                    $this->_addFind($method['name'],
-                                    @$method['query'],
-                                    (array)@$method['relationship'],
-                                    @$method['orderBy']
-                                    );
-                    break;
-                }
-
-                if (Piece_ORM_Mapper_QueryType::isInsert($method['name'])) {
-                    $this->_addInsert($method['name'],
-                                      @$method['query'],
-                                      (array)@$method['relationship']
-                                      );
-                    break;
-                }
-
-                if (Piece_ORM_Mapper_QueryType::isUpdate($method['name'])) {
-                    $this->_addUpdate($method['name'],
-                                      @$method['query'],
-                                      (array)@$method['relationship']
-                                      );
-                    break;
-                }
-
-                if (Piece_ORM_Mapper_QueryType::isDelete($method['name'])) {
-                    $this->_addDelete($method['name'],
-                                      @$method['query'],
-                                      (array)@$method['relationship']
-                                      );
-                    break;
-                }
-
-                Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_CONFIGURATION,
-                                      "Invalid method name [ {$method['name']} ] detected."
-                                      );
-            } while (false);
-
-            if (Piece_ORM_Error::hasErrors()) {
-                return;
+            if (Piece_ORM_Mapper_QueryType::isFindAll($method['name'])) {
+                $this->_addFindAll($method['name'],
+                                   @$method['query'],
+                                   (array)@$method['relationship'],
+                                   @$method['orderBy']
+                                   );
+                continue;
             }
+
+            if (Piece_ORM_Mapper_QueryType::isFindOne($method['name'])) {
+                $this->_addFindOne($method['name'],
+                                   @$method['query'],
+                                   @$method['orderBy']
+                                   );
+                continue;
+            }
+
+            if (Piece_ORM_Mapper_QueryType::isFind($method['name'])) {
+                $this->_addFind($method['name'],
+                                @$method['query'],
+                                (array)@$method['relationship'],
+                                @$method['orderBy']
+                                );
+                continue;
+            }
+
+            if (Piece_ORM_Mapper_QueryType::isInsert($method['name'])) {
+                $this->_addInsert($method['name'],
+                                  @$method['query'],
+                                  (array)@$method['relationship']
+                                  );
+                continue;
+            }
+
+            if (Piece_ORM_Mapper_QueryType::isUpdate($method['name'])) {
+                $this->_addUpdate($method['name'],
+                                  @$method['query'],
+                                  (array)@$method['relationship']
+                                  );
+                continue;
+            }
+
+            if (Piece_ORM_Mapper_QueryType::isDelete($method['name'])) {
+                $this->_addDelete($method['name'],
+                                  @$method['query'],
+                                  (array)@$method['relationship']
+                                  );
+                continue;
+            }
+
+            throw new Piece_ORM_Exception("Invalid method name [ {$method['name']} ] detected.");
         }
     }
 
@@ -444,14 +393,7 @@ class Piece_ORM_Mapper_Generator
                 
                 $camelizedFieldName = Piece_ORM_Inflector::camelize($fieldName);
                 $this->_addFind("findBy$camelizedFieldName", "SELECT * FROM \$__table WHERE $fieldName = \$" . Piece_ORM_Inflector::lowerCaseFirstLetter($camelizedFieldName));
-                if (Piece_ORM_Error::hasErrors()) {
-                    return;
-                }
-
                 $this->_addFindAll("findAllBy$camelizedFieldName", "SELECT * FROM \$__table WHERE $fieldName = \$" . Piece_ORM_Inflector::lowerCaseFirstLetter($camelizedFieldName));
-                if (Piece_ORM_Error::hasErrors()) {
-                    return;
-                }
             }
         }
 
@@ -492,21 +434,15 @@ class Piece_ORM_Mapper_Generator
      * @param string $methodName
      * @param string $query
      * @param array  $relationships
-     * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
+     * @throws Piece_ORM_Exception
      */
     private function _addDelete($methodName, $query, array $relationships = array())
     {
         if (!$this->_validateMethodName($methodName)) {
-            Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_CONFIGURATION,
-                                  "Cannot use the method name [ $methodName ] since it is a reserved for internal use only."
-                                  );
-            return;
+            throw new Piece_ORM_Exception("Cannot use the method name [ $methodName ] since it is a reserved for internal use only.");
         }
 
         $this->_addPropertyDefinitions($methodName, $query, $relationships);
-        if (Piece_ORM_Error::hasErrors()) {
-            return;
-        }
 
         $this->_methodDefinitions[ strtolower($methodName) ] = "
     public function $methodName(\$subject)
@@ -538,21 +474,15 @@ class Piece_ORM_Mapper_Generator
      * @param string $methodName
      * @param string $query
      * @param array  $relationships
-     * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
+     * @throws Piece_ORM_Exception
      */
     private function _addUpdate($methodName, $query, array $relationships = array())
     {
         if (!$this->_validateMethodName($methodName)) {
-            Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_CONFIGURATION,
-                                  "Cannot use the method name [ $methodName ] since it is a reserved for internal use only."
-                                  );
-            return;
+            throw new Piece_ORM_Exception("Cannot use the method name [ $methodName ] since it is a reserved for internal use only.");
         }
 
         $this->_addPropertyDefinitions($methodName, $query, $relationships);
-        if (Piece_ORM_Error::hasErrors()) {
-            return;
-        }
 
         $this->_methodDefinitions[ strtolower($methodName) ] = "
     public function $methodName(\$subject)
@@ -595,12 +525,9 @@ class Piece_ORM_Mapper_Generator
                                                               )
     {
         if (is_array($relationships)) {
-            $relationships = array_map(array($this, 'normalizeRelationshipDefinition'), $relationships);
-            if (Piece_ORM_Error::hasErrors()) {
-                return;
-            }
-
-            return "    public \$__relationship__{$propertyName} = " . var_export($relationships, true) . ';';
+            return "    public \$__relationship__{$propertyName} = " .
+                var_export(array_map(array($this, 'normalizeRelationshipDefinition'), $relationships), true) .
+                ';';
         } else {
             return "    public \$__relationship__{$propertyName} = array();";
         }
@@ -616,7 +543,7 @@ class Piece_ORM_Mapper_Generator
      * @param string $query
      * @param array  $relationships
      * @param string $orderBy
-     * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
+     * @throws Piece_ORM_Exception
      */
     private function _addPropertyDefinitions($methodName,
                                              $query,
@@ -644,9 +571,7 @@ class Piece_ORM_Mapper_Generator
                     if (Piece_ORM_Mapper_QueryType::isDelete($methodName)) {
                         $query = $this->_generateDefaultDeleteQuery();
                         if (is_null($query)) {
-                            Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_CONFIGURATION,
-                                                  'The element [ query ] is required to generate a delete method declaration since the table [ ' . $this->_metadata->getTableName(true) . ' ] has no primary keys.'
-                                                  );
+                            throw new Piece_ORM_Exception('The element [ query ] is required to generate a delete method declaration since the table [ ' . $this->_metadata->getTableName(true) . ' ] has no primary keys.');
                         }
 
                         break;
@@ -655,22 +580,14 @@ class Piece_ORM_Mapper_Generator
                     if (Piece_ORM_Mapper_QueryType::isUpdate($methodName)) {
                         $query = $this->_generateDefaultUpdateQuery();
                         if (is_null($query)) {
-                            Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_CONFIGURATION,
-                                                  'The element [ query ] is required to generate a update method declaration since the table [ ' . $this->_metadata->getTableName(true) . ' ] has no primary keys.'
-                                                  );
+                            throw new Piece_ORM_Exception('The element [ query ] is required to generate a update method declaration since the table [ ' . $this->_metadata->getTableName(true) . ' ] has no primary keys.');
                         }
 
                         break;
                     }
 
-                    Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_CONFIGURATION,
-                                          "Invalid method name [ $methodName ] detected."
-                                          );
+                    throw new Piece_ORM_Exception("Invalid method name [ $methodName ] detected.");
                 } while (false);
-
-                if (Piece_ORM_Error::hasErrors()) {
-                    return;
-                }
             }
         }
 
@@ -709,15 +626,12 @@ class Piece_ORM_Mapper_Generator
      * @param string $methodName
      * @param string $query
      * @param string $orderBy
-     * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
+     * @throws Piece_ORM_Exception
      */
     private function _addFindOne($methodName, $query, $orderBy)
     {
         if (!$query) {
-            Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_CONFIGURATION,
-                                  'The element [ query ] or its value is required to generate a findOne method declaration.'
-                                  );
-            return;
+            throw new Piece_ORM_Exception('The element [ query ] or its value is required to generate a findOne method declaration.');
         }
 
         $propertyName = strtolower($methodName);

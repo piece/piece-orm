@@ -116,7 +116,7 @@ class Piece_ORM_Mapper_QueryBuilder
      * Builds a query based on a query source and criteria.
      *
      * @return array
-     * @throws PIECE_ORM_ERROR_CANNOT_INVOKE
+     * @throws Piece_ORM_Exception
      */
     public function build()
     {
@@ -129,10 +129,8 @@ class Piece_ORM_Mapper_QueryBuilder
         ini_restore('track_errors');
         error_reporting($oldLevel);
         if (!is_null($message)) {
-            Piece_ORM_Error::push(PIECE_ORM_ERROR_CANNOT_INVOKE,
-                                  "Failed to build a query for the method [ {$this->_methodName} ] for any reasons. See below for more details.
+            throw new Piece_ORM_Exception("Failed to build a query for the method [ {$this->_methodName} ] for any reasons. See below for more details.
  $message");
-            return;
         }
 
         if (Piece_ORM_Mapper_QueryType::isFindAll($this->_methodName)) {
@@ -276,7 +274,7 @@ class Piece_ORM_Mapper_QueryBuilder
      * @param string $query
      * @param array  $placeHolderFields
      * @return MDB2_Statement_Common
-     * @throws PIECE_ORM_ERROR_CANNOT_INVOKE
+     * @throws Piece_ORM_Exception_PEARException
      */
     private function _buildPreparedStatement($query, $placeHolderFields)
     {
@@ -291,11 +289,7 @@ class Piece_ORM_Mapper_QueryBuilder
         $sth = $dbh->prepare($query, $types, MDB2_PREPARE_MANIP);
         PEAR::staticPopErrorHandling();
         if (MDB2::isError($sth)) {
-            Piece_ORM_Error::pushPEARError($sth,
-                                           PIECE_ORM_ERROR_CANNOT_INVOKE,
-                                           "Failed to invoke MDB2_Driver_{$dbh->phptype}::prepare() for any reasons."
-                                           );
-            return;
+            throw new Piece_ORM_Exception_PEARException($sth);
         }
 
         foreach ($types as $placeHolderField => $type) {

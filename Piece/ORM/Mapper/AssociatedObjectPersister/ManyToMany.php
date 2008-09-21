@@ -92,9 +92,6 @@ class Piece_ORM_Mapper_AssociatedObjectPersister_ManyToMany extends Piece_ORM_Ma
         }
 
         $mapper = Piece_ORM_Mapper_Factory::factory($relationship['through']['table']);
-        if (Piece_ORM_Error::hasErrors()) {
-            return;
-        }
 
         $referencedColumnValue = $this->subject->{ Piece_ORM_Inflector::camelize($relationship['through']['referencedColumn'], true) };
         $object = $mapper->createObject();
@@ -102,9 +99,6 @@ class Piece_ORM_Mapper_AssociatedObjectPersister_ManyToMany extends Piece_ORM_Ma
             $object->{ Piece_ORM_Inflector::camelize($relationship['through']['column'], true) } = $referencedColumnValue;
             $object->{ Piece_ORM_Inflector::camelize($relationship['through']['inverseColumn'], true) } = $associatedObject->{ Piece_ORM_Inflector::camelize($relationship['column'], true) };
             $mapper->insert($object);
-            if (Piece_ORM_Error::hasErrors()) {
-                return;
-            }
         }
     }
 
@@ -127,24 +121,15 @@ class Piece_ORM_Mapper_AssociatedObjectPersister_ManyToMany extends Piece_ORM_Ma
         }
 
         $mapper = Piece_ORM_Mapper_Factory::factory($relationship['through']['table']);
-        if (Piece_ORM_Error::hasErrors()) {
-            return;
-        }
 
         $referencedColumnValue = $this->subject->{ Piece_ORM_Inflector::camelize($relationship['through']['referencedColumn'], true) };
         $mapper->executeQuery("DELETE FROM {$relationship['through']['table']} WHERE {$relationship['through']['column']} = " . $mapper->quote($referencedColumnValue, $relationship['through']['column']), true);
-        if (Piece_ORM_Error::hasErrors()) {
-            return;
-        }
 
         $object = $mapper->createObject();
         foreach ($this->subject->$relationship['mappedAs'] as $associatedObject) {
             $object->{ Piece_ORM_Inflector::camelize($relationship['through']['column'], true) } = $referencedColumnValue;
             $object->{ Piece_ORM_Inflector::camelize($relationship['through']['inverseColumn'], true) } = $associatedObject->{ Piece_ORM_Inflector::camelize($relationship['column'], true) };
             $mapper->insert($object);
-            if (Piece_ORM_Error::hasErrors()) {
-                return;
-            }
         }
     }
 
@@ -164,10 +149,6 @@ class Piece_ORM_Mapper_AssociatedObjectPersister_ManyToMany extends Piece_ORM_Ma
         }
 
         $mapper = Piece_ORM_Mapper_Factory::factory($relationship['through']['table']);
-        if (Piece_ORM_Error::hasErrors()) {
-            return;
-        }
-
         $mapper->executeQuery("DELETE FROM {$relationship['through']['table']} WHERE {$relationship['through']['column']} = " .
                               $mapper->quote($this->subject->$property, $relationship['through']['column']),
                               true

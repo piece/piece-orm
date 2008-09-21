@@ -119,15 +119,7 @@ class Piece_ORM_Mapper_Common
     public function findAllWithQuery($query)
     {
         $result = $this->executeQuery($query);
-        if (Piece_ORM_Error::hasErrors()) {
-            return;
-        }
-
         $objects = $this->_loadAllObjects($result);
-        if (Piece_ORM_Error::hasErrors()) {
-            return;
-        }
-
         return $objects;
     }
 
@@ -159,7 +151,7 @@ class Piece_ORM_Mapper_Common
      *
      * @param integer $limit
      * @param integer $offset
-     * @throws PIECE_ORM_ERROR_CANNOT_INVOKE
+     * @throws Piece_ORM_Exception_PEARException
      */
     public function setLimit($limit, $offset = null)
     {
@@ -167,10 +159,7 @@ class Piece_ORM_Mapper_Common
         $result = $this->_dbh->setLimit($limit, $offset);
         PEAR::staticPopErrorHandling();
         if (MDB2::isError($result)) {
-            Piece_ORM_Error::pushPEARError($result,
-                                           PIECE_ORM_ERROR_CANNOT_INVOKE,
-                                           "Failed to invoke MDB2_Driver_{$this->_dbh->phptype}::setLimit() for any reasons."
-                                           );
+            throw new Piece_ORM_Exception_PEARException($result);
         }
     }
 
@@ -300,16 +289,11 @@ class Piece_ORM_Mapper_Common
     public function findWithQuery($query)
     {
         $objects = $this->findAllWithQuery($query);
-        if (Piece_ORM_Error::hasErrors()) {
+        if (!count($objects)) {
             return;
         }
 
-        if (count($objects)) {
-            return $objects[0];
-        } else {
-            $return = null;
-            return $return;
-        }
+        return $objects[0];
     }
 
     // }}}
@@ -376,10 +360,6 @@ class Piece_ORM_Mapper_Common
     public function findOneWithQuery($query)
     {
         $result = $this->executeQuery($query);
-        if (Piece_ORM_Error::hasErrors()) {
-            return;
-        }
-
         return $this->_loadValue($result);
     }
 
@@ -522,17 +502,11 @@ class Piece_ORM_Mapper_Common
     protected function findObject($methodName, $criteria)
     {
         $objects = $this->findObjects($methodName, $criteria);
-        if (Piece_ORM_Error::hasErrors()) {
-            $return = null;
-            return $return;
+        if (!count($objects)) {
+            return;
         }
 
-        if (count($objects)) {
-            return $objects[0];
-        } else {
-            $return = null;
-            return $return;
-        }
+        return $objects[0];
     }
 
     // }}}
@@ -544,7 +518,7 @@ class Piece_ORM_Mapper_Common
      * @param string   $methodName
      * @param stdClass $criteria
      * @return array
-     * @throws PIECE_ORM_ERROR_UNEXPECTED_VALUE
+     * @throws Piece_ORM_Exception
      */
     protected function findObjects($methodName, $criteria)
     {
@@ -554,29 +528,16 @@ class Piece_ORM_Mapper_Common
 
         if (!is_object($criteria)) {
             if ($methodName == 'findAll') {
-                Piece_ORM_Error::push(PIECE_ORM_ERROR_UNEXPECTED_VALUE,
-                                      'An unexpected value detected. findAll() can only receive object or null.'
-                                      );
-                return;
+                throw new Piece_ORM_Exception('An unexpected value detected. findAll() can only receive object or null.');
             }
 
             $criteria = $this->_createCriteria($methodName, $criteria);
-            if (Piece_ORM_Error::hasErrors()) {
-                return;
-            }
         }
 
         $result = $this->executeQueryWithCriteria($methodName, $criteria);
-        if (Piece_ORM_Error::hasErrors()) {
-            return;
-        }
-
-        $objects = $this->_loadAllObjects($result, $this->{ '__relationship__' . strtolower($methodName) });
-        if (Piece_ORM_Error::hasErrors()) {
-            return;
-        }
-
-        return $objects;
+        return $this->_loadAllObjects($result,
+                                      $this->{ '__relationship__' . strtolower($methodName) }
+                                      );
     }
 
     // }}}
@@ -599,16 +560,9 @@ class Piece_ORM_Mapper_Common
 
         if (!is_object($criteria)) {
             $criteria = $this->_createCriteria($methodName, $criteria);
-            if (Piece_ORM_Error::hasErrors()) {
-                return;
-            }
         }
 
         $result = $this->executeQueryWithCriteria($methodName, $criteria);
-        if (Piece_ORM_Error::hasErrors()) {
-            return;
-        }
-
         return $this->_loadValue($result);
     }
 
@@ -693,21 +647,17 @@ class Piece_ORM_Mapper_Common
      * @param string $methodName
      * @param mixed  $criterion
      * @return stdClass
-     * @throws PIECE_ORM_ERROR_UNEXPECTED_VALUE
+     * @throws Piece_ORM_Exception
      */
     private function _createCriteria($methodName, $criterion)
     {
-        if (preg_match('/By(.+)$/', $methodName, $matches)) {
-            $criteria = new stdClass();
-            $criteria->{ Piece_ORM_Inflector::lowercaseFirstLetter($matches[1]) } = $criterion;
-            return $criteria;
-        } else {
-            Piece_ORM_Error::push(PIECE_ORM_ERROR_UNEXPECTED_VALUE,
-                                  "An unexpected value detected. $methodName() can only receive object or null. Or the method name does not contain the appropriate field name."
-                                  );
-            $return = null;
-            return $return;
+        if (!preg_match('/By(.+)$/', $methodName, $matches)) {
+            throw new Piece_ORM_Exception("An unexpected value detected. $methodName() can only receive object or null. Or the method name does not contain the appropriate field name.");
         }
+
+        $criteria = new stdClass();
+        $criteria->{ Piece_ORM_Inflector::lowercaseFirstLetter($matches[1]) } = $criterion;
+        return $criteria;
     }
 
     /**
@@ -715,7 +665,7 @@ class Piece_ORM_Mapper_Common
      *
      * @param MDB2_Result $result
      * @return string
-     * @throws PIECE_ORM_ERROR_CANNOT_INVOKE
+     * @throws Piece_ORM_Exception_PEARException
      * @since Method available since Release 0.3.0
      */
     private function _loadValue(MDB2_Result $result)
@@ -724,11 +674,7 @@ class Piece_ORM_Mapper_Common
         $value = $result->fetchOne();
         PEAR::staticPopErrorHandling();
         if (MDB2::isError($value)) {
-            Piece_ORM_Error::pushPEARError($value,
-                                           PIECE_ORM_ERROR_CANNOT_INVOKE,
-                                           "Failed to invoke MDB2_Driver_{$this->_dbh->phptype}::fetchOne() for any reasons."
-                                           );
-            return;
+            throw new Piece_ORM_Exception_PEARException($value);
         }
 
         return $value;

@@ -80,13 +80,11 @@ class Piece_ORM_Mapper_AssociatedObjectPersister_ManyToOne extends Piece_ORM_Map
      * Inserts associated objects to a table.
      *
      * @param array $relationship
-     * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
+     * @throws Piece_ORM_Exception
      */
     public function insert(array $relationship)
     {
-        Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_CONFIGURATION,
-                              "This operation does not supported for the relationship type [ {$relationship['type']} ]. Please check your configuration."
-                              );
+        throw new Piece_ORM_Exception("This operation does not supported for the relationship type [ {$relationship['type']} ]. Please check your configuration.");
     }
 
     // }}}
@@ -96,13 +94,11 @@ class Piece_ORM_Mapper_AssociatedObjectPersister_ManyToOne extends Piece_ORM_Map
      * Updates associated objects in a table.
      *
      * @param array $relationship
-     * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
+     * @throws Piece_ORM_Exception
      */
     public function update(array $relationship)
     {
-        Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_CONFIGURATION,
-                              "This operation does not supported for the relationship type [ {$relationship['type']} ]. Please check your configuration."
-                              );
+        throw new Piece_ORM_Exception("This operation does not supported for the relationship type [ {$relationship['type']} ]. Please check your configuration.");
     }
 
     // }}}
@@ -112,13 +108,11 @@ class Piece_ORM_Mapper_AssociatedObjectPersister_ManyToOne extends Piece_ORM_Map
      * Removes associated objects from a table.
      *
      * @param array $relationship
-     * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
+     * @throws Piece_ORM_Exception
      */
     public function delete(array $relationship)
     {
-        Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_CONFIGURATION,
-                              "This operation does not supported for the relationship type [ {$relationship['type']} ]. Please check your configuration."
-                              );
+        throw new Piece_ORM_Exception("This operation does not supported for the relationship type [ {$relationship['type']} ]. Please check your configuration.");
     }
 
     /**#@-*/

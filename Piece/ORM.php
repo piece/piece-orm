@@ -123,16 +123,12 @@ class Piece_ORM
      *
      * @param string $mapperName
      * @return Piece_ORM_Mapper_Common
-     * @throws PIECE_ORM_ERROR_INVALID_OPERATION
+     * @throws Piece_ORM_Exception
      */
     public static function getMapper($mapperName)
     {
         if (!self::$configured) {
-            Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_OPERATION,
-                                  __METHOD__ . ' method must be called after calling configure().'
-                                  );
-            $return = null;
-            return $return;
+            throw new Piece_ORM_Exception(__METHOD__ . ' method must be called after calling configure().');
         }
 
         return Piece_ORM_Mapper_Factory::factory($mapperName);
@@ -145,16 +141,12 @@ class Piece_ORM
      * Gets the Piece_ORM_Config object after calling configure().
      *
      * @return Piece_ORM_Config
-     * @throws PIECE_ORM_ERROR_INVALID_OPERATION
+     * @throws Piece_ORM_Exception
      */
     public static function getConfiguration()
     {
         if (!self::$configured) {
-            Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_OPERATION,
-                                  __METHOD__ . ' method must be called after calling configure().'
-                                  );
-            $return = null;
-            return $return;
+            throw new Piece_ORM_Exception(__METHOD__ . ' method must be called after calling configure().');
         }
 
         $context = Piece_ORM_Context::singleton();
@@ -168,15 +160,12 @@ class Piece_ORM
      * Sets a database as the current database.
      *
      * @param string $database
-     * @throws PIECE_ORM_ERROR_INVALID_OPERATION
+     * @throws Piece_ORM_Exception
      */
     public static function setDatabase($database)
     {
         if (!self::$configured) {
-            Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_OPERATION,
-                                  __METHOD__ . ' method must be called after calling configure().'
-                                  );
-            return;
+            throw new Piece_ORM_Exception(__METHOD__ . ' method must be called after calling configure().');
         }
 
         $context = Piece_ORM_Context::singleton();
@@ -191,25 +180,15 @@ class Piece_ORM
      *
      * @param string $mapperName
      * @return stdClass
-     * @throws PIECE_ORM_ERROR_INVALID_OPERATION
+     * @throws Piece_ORM_Exception
      */
     public static function createObject($mapperName)
     {
         if (!self::$configured) {
-            Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_OPERATION,
-                                  __METHOD__ . ' method must be called after calling configure().'
-                                  );
-            $return = null;
-            return $return;
+            throw new Piece_ORM_Exception(__METHOD__ . ' method must be called after calling configure().');
         }
 
-        $mapper = Piece_ORM_Mapper_Factory::factory($mapperName);
-        if (Piece_ORM_Error::hasErrors()) {
-            $return = null;
-            return $return;
-        }
-
-        return $mapper->createObject();
+        return Piece_ORM_Mapper_Factory::factory($mapperName)->createObject();
     }
 
     // }}}

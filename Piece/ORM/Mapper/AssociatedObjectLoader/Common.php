@@ -148,9 +148,6 @@ abstract class Piece_ORM_Mapper_AssociatedObjectLoader_Common
         $associatedObjects = $mapper->findAllWithQuery($this->buildQuery($relationshipIndex) . (is_null($this->relationships[$relationshipIndex]['orderBy']) ? '' : " ORDER BY {$this->relationships[$relationshipIndex]['orderBy']}"));
         $mapper->setPreloadCallback(null);
         $mapper->setPreloadCallbackArgs(null);
-        if (Piece_ORM_Error::hasErrors()) {
-            return;
-        }
 
         $relationshipKeyPropertyName = Piece_ORM_Inflector::camelize($this->getRelationshipKeyFieldNameInSecondaryQuery($this->relationships[$relationshipIndex]), true);
 

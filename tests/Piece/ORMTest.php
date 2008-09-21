@@ -95,7 +95,6 @@ class Piece_ORMTest extends PHPUnit_Framework_TestCase
                                       'errorHandlingAPIBreak' => true)
                                 );
         $cache->clean();
-        Piece_ORM_Error::clearErrors();
     }
 
     public function testShouldConfigureWithAGivenConfigurationFile()
@@ -194,32 +193,20 @@ class Piece_ORMTest extends PHPUnit_Framework_TestCase
                           );
     }
 
+    /**
+     * @expectedException Piece_ORM_Exception
+     */
     public function testShouldRaiseAnExceptionWhenGetmapperIsCalledBeforeCallingConfigure()
     {
-        Piece_ORM_Error::disableCallback();
-        $mapper = Piece_ORM::getMapper('Employees');
-        Piece_ORM_Error::enableCallback();
-
-        $this->assertNull($mapper);
-        $this->assertTrue(Piece_ORM_Error::hasErrors());
-
-        $error = Piece_ORM_Error::pop();
-
-        $this->assertEquals(PIECE_ORM_ERROR_INVALID_OPERATION, $error['code']);
+        Piece_ORM::getMapper('Employees');
     }
 
+    /**
+     * @expectedException Piece_ORM_Exception
+     */
     public function testShouldRaiseAnExceptionWhenGetconfigurationIsCalledBeforeCallingConfigure()
     {
-        Piece_ORM_Error::disableCallback();
-        $config = Piece_ORM::getConfiguration();
-        Piece_ORM_Error::enableCallback();
-
-        $this->assertNull($config);
-        $this->assertTrue(Piece_ORM_Error::hasErrors());
-
-        $error = Piece_ORM_Error::pop();
-
-        $this->assertEquals(PIECE_ORM_ERROR_INVALID_OPERATION, $error['code']);
+        Piece_ORM::getConfiguration();
     }
 
     public function testShouldSetADatabase()
@@ -283,36 +270,21 @@ class Piece_ORMTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * @expectedException Piece_ORM_Exception
      * @since Method available since Release 0.3.0
      */
     public function testShouldRaiseAnExceptionWhenSetdatabaseIsCalledBeforeCallingConfigure()
     {
-        Piece_ORM_Error::disableCallback();
         Piece_ORM::setDatabase('database2');
-        Piece_ORM_Error::enableCallback();
-
-        $this->assertTrue(Piece_ORM_Error::hasErrors());
-
-        $error = Piece_ORM_Error::pop();
-
-        $this->assertEquals(PIECE_ORM_ERROR_INVALID_OPERATION, $error['code']);
     }
 
     /**
+     * @expectedException Piece_ORM_Exception
      * @since Method available since Release 0.3.0
      */
     public function testShouldRaiseAnExceptionWhenCreateobjectIsCalledBeforeCallingConfigure()
     {
-        Piece_ORM_Error::disableCallback();
-        $employee = Piece_ORM::createObject('Employees');
-        Piece_ORM_Error::enableCallback();
-
-        $this->assertNull($employee);
-        $this->assertTrue(Piece_ORM_Error::hasErrors());
-
-        $error = Piece_ORM_Error::pop();
-
-        $this->assertEquals(PIECE_ORM_ERROR_INVALID_OPERATION, $error['code']);
+        Piece_ORM::createObject('Employees');
     }
 
     /**
@@ -332,6 +304,7 @@ class Piece_ORMTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * @expectedException Piece_ORM_Exception
      * @since Method available since Release 0.7.0
      */
     public function testShouldRaiseAnExceptionWhenUndefinedDatabaseIsGiven()
@@ -340,15 +313,7 @@ class Piece_ORMTest extends PHPUnit_Framework_TestCase
                              $this->_cacheDirectory,
                              $this->_cacheDirectory
                              );
-        Piece_ORM_Error::disableCallback();
         Piece_ORM::setDatabase('foo');
-        Piece_ORM_Error::enableCallback();
-
-        $this->assertTrue(Piece_ORM_Error::hasErrors());
-
-        $error = Piece_ORM_Error::pop();
-
-        $this->assertEquals(PIECE_ORM_ERROR_NOT_FOUND, $error['code']);
     }
 
     /**

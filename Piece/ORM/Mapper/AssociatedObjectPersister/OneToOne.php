@@ -92,9 +92,6 @@ class Piece_ORM_Mapper_AssociatedObjectPersister_OneToOne extends Piece_ORM_Mapp
         }
 
         $mapper = Piece_ORM_Mapper_Factory::factory($relationship['table']);
-        if (Piece_ORM_Error::hasErrors()) {
-            return;
-        }
 
         $this->subject->{ $relationship['mappedAs'] }->{ Piece_ORM_Inflector::camelize($relationship['column'], true) } = $this->subject->{ Piece_ORM_Inflector::camelize($relationship['referencedColumn'], true) };
         $mapper->insert($this->subject->{ $relationship['mappedAs'] });
@@ -119,15 +116,9 @@ class Piece_ORM_Mapper_AssociatedObjectPersister_OneToOne extends Piece_ORM_Mapp
         }
 
         $mapper = Piece_ORM_Mapper_Factory::factory($relationship['table']);
-        if (Piece_ORM_Error::hasErrors()) {
-            return;
-        }
 
         $referencedColumnValue = $this->subject->{ Piece_ORM_Inflector::camelize($relationship['referencedColumn'], true) };
         $oldObject = $mapper->findWithQuery("SELECT * FROM {$relationship['table']} WHERE {$relationship['column']} = " . $mapper->quote($referencedColumnValue, $relationship['column']));
-        if (Piece_ORM_Error::hasErrors()) {
-            return;
-        }
 
         if (is_null($oldObject)) {
             if (!is_null($this->subject->$relationship['mappedAs'])) {
@@ -162,10 +153,6 @@ class Piece_ORM_Mapper_AssociatedObjectPersister_OneToOne extends Piece_ORM_Mapp
         }
 
         $mapper = Piece_ORM_Mapper_Factory::factory($relationship['table']);
-        if (Piece_ORM_Error::hasErrors()) {
-            return;
-        }
-
         $mapper->delete($this->subject->$relationship['mappedAs']);
     }
 

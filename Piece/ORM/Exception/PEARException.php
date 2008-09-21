@@ -4,7 +4,7 @@
 /**
  * PHP version 5
  *
- * Copyright (c) 2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>,
+ * Copyright (c) 2008 KUBO Atsuhiro <iteman@users.sourceforge.net>,
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,24 +29,24 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  * @package    Piece_ORM
- * @copyright  2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
+ * @copyright  2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License (revised)
  * @version    SVN: $Id$
- * @since      File available since Release 0.1.0
+ * @since      File available since Release 2.0.0
  */
 
-// {{{ Piece_ORM_Metadata_FactoryTest
+// {{{ Piece_ORM_Exception_PEARException
 
 /**
- * Some tests for Piece_ORM_Metadata_Factory.
+ * An exception class to convert a PEAR_Error object to an Exception object.
  *
  * @package    Piece_ORM
- * @copyright  2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
+ * @copyright  2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License (revised)
  * @version    Release: @package_version@
- * @since      Class available since Release 0.1.0
+ * @since      Class available since Release 2.0.0
  */
-class Piece_ORM_Metadata_FactoryTest extends PHPUnit_Framework_TestCase
+class Piece_ORM_Exception_PEARException extends Piece_ORM_Exception
 {
 
     // {{{ properties
@@ -61,15 +61,11 @@ class Piece_ORM_Metadata_FactoryTest extends PHPUnit_Framework_TestCase
      * @access protected
      */
 
-    protected $backupGlobals = false;
-
     /**#@-*/
 
     /**#@+
      * @access private
      */
-
-    private $_cacheDirectory;
 
     /**#@-*/
 
@@ -77,46 +73,21 @@ class Piece_ORM_Metadata_FactoryTest extends PHPUnit_Framework_TestCase
      * @access public
      */
 
-    public function setUp()
+    // }}}
+    // {{{ __construct()
+
+    /**
+     * Converts a PEAR_Error object to an Exception object.
+     *
+     * @param PEAR_Error $error
+     */
+    public function __construct(PEAR_Error $error)
     {
-        $this->_cacheDirectory = dirname(__FILE__) . '/' . basename(__FILE__, '.php');
-        $config = new Piece_ORM_Config();
-        $config->setDSN('piece', 'pgsql://piece:piece@pieceorm/piece');
-        $config->setOptions('piece', array('debug' => 2, 'result_buffering' => false));
-        $context = Piece_ORM_Context::singleton();
-        $context->setConfiguration($config);
-        $context->setDatabase('piece');
-        Piece_ORM_Metadata_Factory::setCacheDirectory($this->_cacheDirectory);
-    }
-
-    public function tearDown()
-    {
-        Piece_ORM_Metadata_Factory::restoreCacheDirectory();
-        Piece_ORM_Metadata_Factory::clearInstances();
-        Piece_ORM_Context::clear();
-        $cache = new Cache_Lite(array('cacheDir' => "{$this->_cacheDirectory}/",
-                                      'automaticSerialization' => true,
-                                      'errorHandlingAPIBreak' => true)
-                                );
-        $cache->clean();
-    }
-
-    public function testShouldCreateAnObjectByAGivenMapper()
-    {
-        $metadata = Piece_ORM_Metadata_Factory::factory('Employees');
-
-        $this->assertType('Piece_ORM_Metadata', $metadata);
-        $this->assertEquals('employees', $metadata->getTableName());
-    }
-
-    public function testShouldReturnTheExistingObjectIfItExists()
-    {
-        $metadata1 = Piece_ORM_Metadata_Factory::factory('Employees');
-        $metadata1->foo = 'bar';
-        $metadata2 = Piece_ORM_Metadata_Factory::factory('Employees');
-
-        $this->assertObjectHasAttribute('foo', $metadata2);
-        $this->assertEquals('bar', $metadata2->foo);
+        parent::__construct('Type: ' . get_class($error) .
+                            ' Message: ' . $error->getMessage() .
+                            ' UserInfo: ' . $error->getUserInfo(),
+                            $error->getCode()
+                            );
     }
 
     /**#@-*/

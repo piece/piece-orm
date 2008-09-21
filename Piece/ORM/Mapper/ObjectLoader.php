@@ -123,15 +123,9 @@ class Piece_ORM_Mapper_ObjectLoader
     public function loadAll()
     {
         $this->_loadPrimaryObjects();
-        if (Piece_ORM_Error::hasErrors()) {
-            return;
-        }
 
         if (count($this->_objects)) {
             $this->_loadAssociatedObjects();
-            if (Piece_ORM_Error::hasErrors()) {
-                return;
-            }
         }
 
         return $this->_objects;
@@ -187,7 +181,7 @@ class Piece_ORM_Mapper_ObjectLoader
     /**
      * Loads all objects with a result object for the primary query.
      *
-     * @throws PIECE_ORM_ERROR_CANNOT_INVOKE
+     * @throws Piece_ORM_Exception_PEARException
      */
     private function _loadPrimaryObjects()
     {
@@ -197,11 +191,7 @@ class Piece_ORM_Mapper_ObjectLoader
         for ($i = 0; $row = &$this->_result->fetchRow(); ++$i) {
             if (MDB2::isError($row)) {
                 PEAR::staticPopErrorHandling();
-                Piece_ORM_Error::pushPEARError($row,
-                                               PIECE_ORM_ERROR_CANNOT_INVOKE,
-                                               "Failed to invoke MDB2_Driver_{$this->_result->db->phptype}::fetchRow() for any reasons."
-                                               );
-                return;
+                throw new Piece_ORM_Exception_PEARException($row);
             }
 
             if (!is_null($preloadCallback)) {
@@ -231,14 +221,7 @@ class Piece_ORM_Mapper_ObjectLoader
     {
         for ($i = 0, $count = count($this->_relationships); $i < $count; ++$i) {
             $mapper = Piece_ORM_Mapper_Factory::factory($this->_relationships[$i]['table']);
-            if (Piece_ORM_Error::hasErrors()) {
-                return;
-            }
-
             $this->_associatedObjectLoaders[ $this->_relationships[$i]['type'] ]->loadAll($mapper, $i);
-            if (Piece_ORM_Error::hasErrors()) {
-                return;
-            }
         }
     }
 

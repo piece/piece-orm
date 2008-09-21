@@ -150,15 +150,12 @@ class Piece_ORM_Context
      * Sets a database as the current database.
      *
      * @param string $database
-     * @throws PIECE_ORM_ERROR_NOT_FOUND
+     * @throws Piece_ORM_Exception
      */
     public function setDatabase($database)
     {
         if (!$this->_config->checkDatabase($database)) {
-            Piece_ORM_Error::push(PIECE_ORM_ERROR_NOT_FOUND,
-                                  "The given database [ $database ] not found in the current configuration."
-                                  );
-            return;
+            throw new Piece_ORM_Exception("The given database [ $database ] not found in the current configuration.");
         }
 
         $this->_database = $database;
@@ -204,7 +201,7 @@ class Piece_ORM_Context
      * Gets the database handle for the current database.
      *
      * @return MDB2_Driver_Common
-     * @throws PIECE_ORM_ERROR_CANNOT_INVOKE
+     * @throws Piece_ORM_Exception_PEARException
      */
     public function getConnection()
     {
@@ -212,12 +209,7 @@ class Piece_ORM_Context
         $dbh = MDB2::singleton($this->getDSN(), $this->getOptions());
         PEAR::staticPopErrorHandling();
         if (MDB2::isError($dbh)) {
-            Piece_ORM_Error::pushPEARError($dbh,
-                                           PIECE_ORM_ERROR_CANNOT_INVOKE,
-                                           'Failed to invoke MDB2::singleton() for any reasons.'
-                                           );
-            $return = null;
-            return $return;
+            throw new Piece_ORM_Exception_PEARException($dbh);
         }
 
         $dbh->setFetchMode(MDB2_FETCHMODE_ASSOC);

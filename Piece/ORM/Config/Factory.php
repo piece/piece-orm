@@ -84,37 +84,25 @@ class Piece_ORM_Config_Factory
      * @param string $configDirectory
      * @param string $cacheDirectory
      * @return Piece_ORM_Config
+     * @throws Piece_ORM_Exception
      */
     public static function factory($configDirectory = null, $cacheDirectory = null)
     {
         if (is_null($configDirectory)) {
-            $config = new Piece_ORM_Config();
-            return $config;
+            return new Piece_ORM_Config();
         }
 
         if (!file_exists($configDirectory)) {
-            Piece_ORM_Error::push(PIECE_ORM_ERROR_NOT_FOUND,
-                                  "The configuration directory [ $configDirectory ] is not found."
-                                  );
-            $return = null;
-            return $return;
+            throw new Piece_ORM_Exception("The configuration directory [ $configDirectory ] is not found.");
         }
 
         $configFile = "$configDirectory/piece-orm-config.yaml";
         if (!file_exists($configFile)) {
-            Piece_ORM_Error::push(PIECE_ORM_ERROR_NOT_FOUND,
-                                  "The configuration file [ $configFile ] is not found."
-                                  );
-            $return = null;
-            return $return;
+            throw new Piece_ORM_Exception("The configuration file [ $configFile ] is not found.");
         }
 
         if (!is_readable($configFile)) {
-            Piece_ORM_Error::push(PIECE_ORM_ERROR_NOT_READABLE,
-                                  "The configuration file [ $configFile ] is not readable."
-                                  );
-            $return = null;
-            return $return;
+            throw new Piece_ORM_Exception("The configuration file [ $configFile ] is not readable.");
         }
 
         if (is_null($cacheDirectory)) {

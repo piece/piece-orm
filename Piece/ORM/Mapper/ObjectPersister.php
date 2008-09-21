@@ -130,21 +130,15 @@ class Piece_ORM_Mapper_ObjectPersister
      *
      * @param string $methodName
      * @return integer
-     * @throws PIECE_ORM_ERROR_UNEXPECTED_VALUE
+     * @throws Piece_ORM_Exception
      */
     public function insert($methodName)
     {
         if (!is_object($this->_subject)) {
-            Piece_ORM_Error::push(PIECE_ORM_ERROR_UNEXPECTED_VALUE,
-                                  "An unexpected value detected. $methodName() can only receive object."
-                                  );
-            return;
+            throw new Piece_ORM_Exception("An unexpected value detected. $methodName() can only receive object.");
         }
 
         $this->_mapper->executeQueryWithCriteria($methodName, $this->_subject, true);
-        if (Piece_ORM_Error::hasErrors()) {
-            return;
-        }
 
         $primaryKey = $this->_metadata->getPrimaryKey();
         if ($primaryKey) {
@@ -152,20 +146,12 @@ class Piece_ORM_Mapper_ObjectPersister
         }
 
         if ($this->_metadata->hasID()) {
-            $id = $this->_getLastInsertID();
-            if (Piece_ORM_Error::hasErrors()) {
-                return;
-            }
-
-            $this->_subject->$primaryKeyProperty = $id;
+            $this->_subject->$primaryKeyProperty = $this->_getLastInsertID();
         }
 
         if ($primaryKey) {
             foreach ($this->_relationships as $relationship) {
                 $this->_associatedObjectPersisters[ $relationship['type'] ]->insert($relationship);
-                if (Piece_ORM_Error::hasErrors()) {
-                    return;
-                }
             }
 
             return $this->_subject->$primaryKeyProperty;
@@ -180,34 +166,22 @@ class Piece_ORM_Mapper_ObjectPersister
      *
      * @param string $methodName
      * @return integer
-     * @throws PIECE_ORM_ERROR_UNEXPECTED_VALUE
+     * @throws Piece_ORM_Exception
      */
     public function update($methodName)
     {
         if (!is_object($this->_subject)) {
-            Piece_ORM_Error::push(PIECE_ORM_ERROR_UNEXPECTED_VALUE,
-                                  "An unexpected value detected. $methodName() cannot receive non-object."
-                                  );
-            return;
+            throw new Piece_ORM_Exception("An unexpected value detected. $methodName() cannot receive non-object.");
         }
 
         if ($this->_metadata->hasPrimaryKey() && !$this->_validatePrimaryValues()) {
-            Piece_ORM_Error::push(PIECE_ORM_ERROR_UNEXPECTED_VALUE,
-                                  "An unexpected value detected. Correct values are required for the primary keys to invoke $methodName()."
-                                  );
-            return;
+            throw new Piece_ORM_Exception("An unexpected value detected. Correct values are required for the primary keys to invoke $methodName().");
         }
 
         $affectedRows = $this->_mapper->executeQueryWithCriteria($methodName, $this->_subject, true);
-        if (Piece_ORM_Error::hasErrors()) {
-            return;
-        }
 
         foreach ($this->_relationships as $relationship) {
             $this->_associatedObjectPersisters[ $relationship['type'] ]->update($relationship);
-            if (Piece_ORM_Error::hasErrors()) {
-                return;
-            }
         }
 
         return $affectedRows;
@@ -221,29 +195,20 @@ class Piece_ORM_Mapper_ObjectPersister
      *
      * @param string $methodName
      * @return integer
-     * @throws PIECE_ORM_ERROR_UNEXPECTED_VALUE
+     * @throws Piece_ORM_Exception
      */
     public function delete($methodName)
     {
         if (!is_object($this->_subject)) {
-            Piece_ORM_Error::push(PIECE_ORM_ERROR_UNEXPECTED_VALUE,
-                                  "An unexpected value detected. $methodName() cannot receive non-object."
-                                  );
-            return;
+            throw new Piece_ORM_Exception("An unexpected value detected. $methodName() cannot receive non-object.");
         }
 
         if ($this->_metadata->hasPrimaryKey() && !$this->_validatePrimaryValues()) {
-            Piece_ORM_Error::push(PIECE_ORM_ERROR_UNEXPECTED_VALUE,
-                                  "An unexpected value detected. Correct values are required for the primary keys to invoke $methodName()."
-                                  );
-            return;
+            throw new Piece_ORM_Exception("An unexpected value detected. Correct values are required for the primary keys to invoke $methodName().");
         }
 
         foreach ($this->_relationships as $relationship) {
             $this->_associatedObjectPersisters[ $relationship['type'] ]->delete($relationship);
-            if (Piece_ORM_Error::hasErrors()) {
-                return;
-            }
         }
 
         return $this->_mapper->executeQueryWithCriteria($methodName, $this->_subject, true);
@@ -296,7 +261,7 @@ class Piece_ORM_Mapper_ObjectPersister
      * Returns the value of an ID field if a table has an ID field.
      *
      * @return integer
-     * @throws PIECE_ORM_ERROR_CANNOT_INVOKE
+     * @throws Piece_ORM_Exception_PEARException
      * @since Method available since Release 1.1.0
      */
     private function _getLastInsertID()
@@ -309,11 +274,7 @@ class Piece_ORM_Mapper_ObjectPersister
                                      );
             PEAR::staticPopErrorHandling();
             if (MDB2::isError($id)) {
-                Piece_ORM_Error::pushPEARError($id,
-                                               PIECE_ORM_ERROR_CANNOT_INVOKE,
-                                               "Failed to invoke MDB2_Driver_{$this->_dbh->phptype}::lastInsertID() for any reasons."
-                                               );
-                return;
+                throw new Piece_ORM_Exception_PEARException($id);
             }
 
             return $id;

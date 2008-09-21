@@ -100,9 +100,9 @@ class Piece_ORM_Mapper_QueryExecutor
      * @param string                $query
      * @param MDB2_Statement_Common $sth
      * @return MDB2_Result_Common|integer
-     * @throws PIECE_ORM_ERROR_CANNOT_INVOKE
-     * @throws PIECE_ORM_ERROR_UNEXPECTED_VALUE
-     * @throws PIECE_ORM_ERROR_CONSTRAINT
+     * @throws Piece_ORM_Exception
+     * @throws Piece_ORM_Mapper_QueryExecutor_ConstraintException
+     * @throws Piece_ORM_Exception_PEARException
      */
     public function execute($query, $sth)
     {
@@ -116,11 +116,7 @@ class Piece_ORM_Mapper_QueryExecutor
             } else {
                 if (!is_subclass_of($sth, 'MDB2_Statement_Common')) {
                     PEAR::staticPopErrorHandling();
-                    Piece_ORM_Error::push(PIECE_ORM_ERROR_UNEXPECTED_VALUE,
-                                          'An unexpected value detected. executeQuery() with a prepared statement can only receive a MDB2_Statement_Common object.'
-                                          );
-                    $return = null;
-                    return $return;
+                    throw new Piece_ORM_Exception('An unexpected value detected. executeQuery() with a prepared statement can only receive a MDB2_Statement_Common object.');
                 }
 
                 $result = $sth->execute();
@@ -132,16 +128,10 @@ class Piece_ORM_Mapper_QueryExecutor
 
         if (MDB2::isError($result)) {
             if ($result->getCode() == MDB2_ERROR_CONSTRAINT) {
-                $code = PIECE_ORM_ERROR_CONSTRAINT;
-            } else {
-                $code = PIECE_ORM_ERROR_CANNOT_INVOKE;
+                throw new Piece_ORM_Mapper_QueryExecutor_ConstraintException($result);
             }
-            Piece_ORM_Error::pushPEARError($result,
-                                           $code,
-                                           "Failed to invoke MDB2_Driver_{$dbh->phptype}::query() for any reasons."
-                                           );
-            $return = null;
-            return $return;
+
+            throw new Piece_ORM_Exception_PEARException($result);
         }
 
         return $result;
@@ -165,18 +155,7 @@ class Piece_ORM_Mapper_QueryExecutor
                                                           $this->_isManip
                                                           );
         list($query, $sth) = $queryBuilder->build();
-        if (Piece_ORM_Error::hasErrors()) {
-            $return = null;
-            return $return;
-        }
-
-        $result = $this->execute($query, $sth);
-        if (Piece_ORM_Error::hasErrors()) {
-            $return = null;
-            return $return;
-        }
-
-        return $result;
+        return $this->execute($query, $sth);
     }
 
     /**#@-*/

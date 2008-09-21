@@ -89,7 +89,7 @@ class Piece_ORM_Mapper_Factory
      *
      * @param string $mapperName
      * @return Piece_ORM_Mapper_Common
-     * @throws PIECE_ORM_ERROR_INVALID_MAPPER
+     * @throws Piece_ORM_Exception
      */
     public static function factory($mapperName)
     {
@@ -101,36 +101,17 @@ class Piece_ORM_Mapper_Factory
         $mapperID = sha1($context->getDSN() . ".$mapperName." . realpath(self::$_configDirectory));
         if (!array_key_exists($mapperID, self::$_instances)) {
             Piece_ORM_Mapper_Factory::_load($mapperID, $mapperName);
-            if (Piece_ORM_Error::hasErrors()) {
-                $return = null;
-                return $return;
-            }
-
             $metadata = Piece_ORM_Metadata_Factory::factory($mapperName);
-            if (Piece_ORM_Error::hasErrors()) {
-                $return = null;
-                return $return;
-            }
-
             $mapperClass = Piece_ORM_Mapper_Factory::_getMapperClass($mapperID);
             $mapper = new $mapperClass($metadata);
             if (!is_subclass_of($mapper, 'Piece_ORM_Mapper_Common')) {
-                Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_MAPPER,
-                                      "The mapper class for [ $mapperName ] is invalid."
-                                      );
-                $return = null;
-                return $return;
+                throw new Piece_ORM_Exception("The mapper class for [ $mapperName ] is invalid.");
             }
 
             self::$_instances[$mapperID] = $mapper;
         }
 
         $dbh = $context->getConnection();
-        if (Piece_ORM_Error::hasErrors()) {
-            $return = null;
-            return $return;
-        }
-
         self::$_instances[$mapperID]->setConnection($dbh);
 
         return self::$_instances[$mapperID];
@@ -224,8 +205,8 @@ class Piece_ORM_Mapper_Factory
      * @param string $mapperName
      * @param string $configFile
      * @return string
-     * @throws PIECE_ORM_ERROR_CANNOT_READ
-     * @throws PIECE_ORM_ERROR_CANNOT_WRITE
+     * @throws Piece_ORM_Exception
+     * @throws Piece_ORM_Exception_PEARException
      */
     private function _getMapperSource($mapperID, $mapperName, $configFile)
     {
@@ -245,28 +226,17 @@ class Piece_ORM_Mapper_Factory
          */
         $mapperSource = $cache->get($mapperID);
         if (PEAR::isError($mapperSource)) {
-            Piece_ORM_Error::push(PIECE_ORM_ERROR_CANNOT_READ,
-                                  'Cannot read the mapper source file in the directory [ ' .
-                                  self::$_cacheDirectory . 
-                                  ' ].'
-                                  );
-            return;
+            throw new Piece_ORM_Exception('Cannot read the mapper source file in the directory [ ' .
+                                          self::$_cacheDirectory . 
+                                          ' ].'
+                                          );
         }
 
         if (!$mapperSource) {
             $mapperSource = Piece_ORM_Mapper_Factory::_generateMapperSource($mapperID, $mapperName, $configFile);
-            if (Piece_ORM_Error::hasErrors()) {
-                return;
-            }
-
             $result = $cache->save($mapperSource);
             if (PEAR::isError($result)) {
-                Piece_ORM_Error::push(PIECE_ORM_ERROR_CANNOT_WRITE,
-                                      'Cannot write the mapper source to the cache file in the directory [ ' .
-                                      self::$_cacheDirectory . 
-                                      ' ].'
-                                      );
-                return;
+                throw new Piece_ORM_Exception_PEARException($result);
             }
         }
 
@@ -287,10 +257,6 @@ class Piece_ORM_Mapper_Factory
     private function _generateMapperSource($mapperID, $mapperName, $configFile)
     {
         $metadata = Piece_ORM_Metadata_Factory::factory($mapperName);
-        if (Piece_ORM_Error::hasErrors()) {
-            return;
-        }
-
         $generator = new Piece_ORM_Mapper_Generator(Piece_ORM_Mapper_Factory::_getMapperClass($mapperID), $mapperName, Spyc::YAMLLoad($configFile), $metadata, get_class_methods('Piece_ORM_Mapper_Common'));
         return $generator->generate();
     }
@@ -323,9 +289,7 @@ class Piece_ORM_Mapper_Factory
      *
      * @param string $mapperID
      * @param string $mapperName
-     * @throws PIECE_ORM_ERROR_INVALID_OPERATION
-     * @throws PIECE_ORM_ERROR_NOT_FOUND
-     * @throws PIECE_ORM_ERROR_NOT_READABLE
+     * @throws Piece_ORM_Exception
      */
     private function _load($mapperID, $mapperName)
     {
@@ -334,72 +298,48 @@ class Piece_ORM_Mapper_Factory
         }
 
         if (is_null(self::$_configDirectory)) {
-            Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_OPERATION,
-                                  'The configuration directory must be specified.'
-                                  );
-            return;
+            throw new Piece_ORM_Exception('The configuration directory must be specified.');
         }
 
         if (!file_exists(self::$_configDirectory)) {
-            Piece_ORM_Error::push(PIECE_ORM_ERROR_NOT_FOUND,
-                                  'The configuration directory [ ' .
-                                  self::$_configDirectory .
-                                  ' ] is not found.'
-                                  );
-            return;
+            throw new Piece_ORM_Exception('The configuration directory [ ' .
+                                          self::$_configDirectory .
+                                          ' ] is not found.'
+                                          );
         }
 
         if (is_null(self::$_cacheDirectory)) {
-            Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_OPERATION,
-                                  'The cache directory must be specified.'
-                                  );
-            return;
+            throw new Piece_ORM_Exception('The cache directory must be specified.');
         }
 
         if (!file_exists(self::$_cacheDirectory)) {
-            Piece_ORM_Error::push(PIECE_ORM_ERROR_NOT_FOUND,
-                                  'The cache directory [ ' .
-                                  self::$_cacheDirectory .
-                                  'is not found.'
-                                  );
-            return;
+            throw new Piece_ORM_Exception('The cache directory [ ' .
+                                          self::$_cacheDirectory .
+                                          'is not found.'
+                                          );
         }
 
         if (!is_readable(self::$_cacheDirectory) || !is_writable(self::$_cacheDirectory)) {
-            Piece_ORM_Error::push(PIECE_ORM_ERROR_NOT_READABLE,
-                                  'The cache directory [ ' .
-                                  self::$_cacheDirectory .
-                                  ' ] is not readable or writable.'
-                                  );
-            return;
+            throw new Piece_ORM_Exception('The cache directory [ ' .
+                                          self::$_cacheDirectory .
+                                          ' ] is not readable or writable.'
+                                          );
         }
 
         $configFile = self::$_configDirectory . "/$mapperName.yaml";
         if (!file_exists($configFile)) {
-            Piece_ORM_Error::push(PIECE_ORM_ERROR_NOT_FOUND,
-                                  "The configuration file [ $configFile ] not found."
-                                  );
-            return;
+            throw new Piece_ORM_Exception("The configuration file [ $configFile ] is not found.");
         }
 
         if (!is_readable($configFile)) {
-            Piece_ORM_Error::push(PIECE_ORM_ERROR_NOT_READABLE,
-                                  "The configuration file [ $configFile ] is not readable."
-                                  );
-            return;
+            throw new Piece_ORM_Exception("The configuration file [ $configFile ] is not readable.");
         }
 
         $mapperSource = Piece_ORM_Mapper_Factory::_getMapperSource($mapperID, $mapperName, $configFile);
-        if (Piece_ORM_Error::hasErrors()) {
-            return;
-        }
-
         eval($mapperSource);
 
         if (!Piece_ORM_Mapper_Factory::_loaded($mapperID)) {
-            Piece_ORM_Error::push(PIECE_ORM_ERROR_NOT_FOUND,
-                                  "The mapper [ $mapperName ] not found."
-                                  );
+            throw new Piece_ORM_Exception("The mapper [ $mapperName ] not found.");
         }
     }
 

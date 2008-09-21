@@ -128,7 +128,6 @@ abstract class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_Framework_Tes
         Piece_ORM_Mapper_Factory::restoreConfigDirectory();
         Piece_ORM_Mapper_Factory::clearInstances();
         Piece_ORM_Context::clear();
-        Piece_ORM_Error::clearErrors();
     }
 
     public function testShouldFindAnObject()
@@ -148,18 +147,12 @@ abstract class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_Framework_Tes
         $this->assertObjectHasAttribute('updatedAt', $employee);
     }
 
+    /**
+     * @expectedException Piece_ORM_Exception
+     */
     public function testShouldRaiseAnExceptionWhenAGivenCriteriaIsIncomplete()
     {
-        $mapper = Piece_ORM_Mapper_Factory::factory('Employees');
-        Piece_ORM_Error::disableCallback();
-        $employee = $mapper->findById(null);
-        Piece_ORM_Error::enableCallback();
-
-        $this->assertTrue(Piece_ORM_Error::hasErrors());
-
-        $error = Piece_ORM_Error::pop();
-
-        $this->assertEquals(PIECE_ORM_ERROR_CANNOT_INVOKE, $error['code']);
+        Piece_ORM_Mapper_Factory::factory('Employees')->findById(null);
     }
 
     public function testShouldProvideBuiltinMethods()
@@ -313,105 +306,80 @@ abstract class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_Framework_Tes
         $this->assertObjectNotHasAttribute('foo', $employee2);
     }
 
+    /**
+     * @expectedException Piece_ORM_Exception
+     */
     public function testShouldRaiseAnExceptionWhenAGivenCriteriaIsNull()
     {
         $mapper = Piece_ORM_Mapper_Factory::factory('Employees');
-        $subject = null;
-        Piece_ORM_Error::disableCallback();
-        $mapper->delete($subject);
-        Piece_ORM_Error::enableCallback();
-
-        $this->assertTrue(Piece_ORM_Error::hasErrors());
-
-        $error = Piece_ORM_Error::pop();
-
-        $this->assertEquals(PIECE_ORM_ERROR_CANNOT_INVOKE, $error['code']);
+        $mapper->delete(null);
     }
 
+    /**
+     * @expectedException Piece_ORM_Exception
+     */
     public function testShouldRaiseAnExceptionWhenAGivenCriteriaIsAnEmptyString()
     {
         $mapper = Piece_ORM_Mapper_Factory::factory('Employees');
-        $subject = '';
-        Piece_ORM_Error::disableCallback();
-        $mapper->delete($subject);
-        Piece_ORM_Error::enableCallback();
-
-        $this->assertTrue(Piece_ORM_Error::hasErrors());
-
-        $error = Piece_ORM_Error::pop();
-
-        $this->assertEquals(PIECE_ORM_ERROR_UNEXPECTED_VALUE, $error['code']);
+        $mapper->delete('');
     }
 
+    /**
+     * @expectedException Piece_ORM_Exception
+     */
     public function testShouldRaiseAnExceptionWhenAGivenCriteriaIsAResource()
     {
         $mapper = Piece_ORM_Mapper_Factory::factory('Employees');
         $subject = fopen(__FILE__, 'r');
-        Piece_ORM_Error::disableCallback();
         $mapper->delete($subject);
-        Piece_ORM_Error::enableCallback();
-
-        $this->assertTrue(Piece_ORM_Error::hasErrors());
-
-        $error = Piece_ORM_Error::pop();
-
-        $this->assertEquals(PIECE_ORM_ERROR_UNEXPECTED_VALUE, $error['code']);
     }
 
     public function testShouldRaiseAnExceptionWhenDeletingObjectsByInappropriatePrimaryKey()
     {
         $mapper = Piece_ORM_Mapper_Factory::factory('Employees');
         $subject = $mapper->createObject();
-        Piece_ORM_Error::disableCallback();
-        $mapper->delete($subject);
-        Piece_ORM_Error::enableCallback();
 
-        $this->assertTrue(Piece_ORM_Error::hasErrors());
-
-        $error = Piece_ORM_Error::pop();
-
-        $this->assertEquals(PIECE_ORM_ERROR_UNEXPECTED_VALUE, $error['code']);
+        try {
+            $mapper->delete($subject);
+            $this->fail('An expected exception has not been raised.');
+            return;
+        } catch (Piece_ORM_Exception $e) {
+        }
 
         $subject = $mapper->createObject();
         $subject->id = null;
         $mapper = Piece_ORM_Mapper_Factory::factory('Employees');
-        Piece_ORM_Error::disableCallback();
-        $mapper->delete($subject);
-        Piece_ORM_Error::enableCallback();
 
-        $this->assertTrue(Piece_ORM_Error::hasErrors());
-
-        $error = Piece_ORM_Error::pop();
-
-        $this->assertEquals(PIECE_ORM_ERROR_UNEXPECTED_VALUE, $error['code']);
+        try {
+            $mapper->delete($subject);
+            $this->fail('An expected exception has not been raised.');
+            return;
+        } catch (Piece_ORM_Exception $e) {
+        }
     }
 
     public function testShouldRaiseAnExceptionWhenUpdatingObjectsByInappropriatePrimaryKey()
     {
         $mapper = Piece_ORM_Mapper_Factory::factory('Employees');
         $subject = $mapper->createObject();
-        Piece_ORM_Error::disableCallback();
-        $mapper->update($subject);
-        Piece_ORM_Error::enableCallback();
 
-        $this->assertTrue(Piece_ORM_Error::hasErrors());
-
-        $error = Piece_ORM_Error::pop();
-
-        $this->assertEquals(PIECE_ORM_ERROR_UNEXPECTED_VALUE, $error['code']);
+        try {
+            $mapper->update($subject);
+            $this->fail('An expected exception has not been raised.');
+            return;
+        } catch (Piece_ORM_Exception $e) {
+        }
 
         $subject = $mapper->createObject();
         $subject->id = null;
         $mapper = Piece_ORM_Mapper_Factory::factory('Employees');
-        Piece_ORM_Error::disableCallback();
-        $mapper->update($subject);
-        Piece_ORM_Error::enableCallback();
 
-        $this->assertTrue(Piece_ORM_Error::hasErrors());
-
-        $error = Piece_ORM_Error::pop();
-
-        $this->assertEquals(PIECE_ORM_ERROR_UNEXPECTED_VALUE, $error['code']);
+        try {
+            $mapper->update($subject);
+            $this->fail('An expected exception has not been raised.');
+            return;
+        } catch (Piece_ORM_Exception $e) {
+        }
     }
 
     public function testShouldBeAbleToOverwriteTheBuiltinInsertQuery()
@@ -470,6 +438,9 @@ abstract class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_Framework_Tes
         $this->assertNull($employee->note);
     }
 
+    /**
+     * @expectedException Piece_ORM_Exception
+     */
     public function testShouldRaiseAnExceptionWhenDetectingProblemWhileBuildingQuery()
     {
         $id = $this->_insert();
@@ -477,16 +448,7 @@ abstract class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_Framework_Tes
         $employee = $mapper->findById($id);
         $employee->firstName = 'Seven';
         unset($employee->lastName);
-
-        Piece_ORM_Error::disableCallback();
         $mapper->update($employee);
-        Piece_ORM_Error::enableCallback();
-
-        $this->assertTrue(Piece_ORM_Error::hasErrors());
-
-        $error = Piece_ORM_Error::pop();
-
-        $this->assertEquals(PIECE_ORM_ERROR_CANNOT_INVOKE, $error['code']);
     }
 
     public function testShouldSupportManyToManyRelationships()
@@ -796,15 +758,13 @@ abstract class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_Framework_Tes
             $this->_prepareTableRecords($useMapperNameAsTableName);
             $mapperName = !$useMapperNameAsTableName ? 'Employees' : 'employees';
             $mapper = Piece_ORM_Mapper_Factory::factory($mapperName);
-            Piece_ORM_Error::disableCallback();
-            $mapper->setLimit(-1);
-            Piece_ORM_Error::enableCallback();
 
-            $this->assertTrue(Piece_ORM_Error::hasErrors());
-
-            $error = Piece_ORM_Error::pop();
-
-            $this->assertEquals(PIECE_ORM_ERROR_CANNOT_INVOKE, $error['code']);
+            try {
+                $mapper->setLimit(-1);
+                $this->fail('An expected exception has not been raised.');
+                return;
+            } catch (Piece_ORM_Exception $e) {
+            }
 
             $this->_clearTableRecords();
             if ($useMapperNameAsTableName) {
@@ -823,15 +783,13 @@ abstract class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_Framework_Tes
             $this->_prepareTableRecords($useMapperNameAsTableName);
             $mapperName = !$useMapperNameAsTableName ? 'Employees' : 'employees';
             $mapper = Piece_ORM_Mapper_Factory::factory($mapperName);
-            Piece_ORM_Error::disableCallback();
-            $mapper->setLimit(2, -1);
-            Piece_ORM_Error::enableCallback();
 
-            $this->assertTrue(Piece_ORM_Error::hasErrors());
-
-            $error = Piece_ORM_Error::pop();
-
-            $this->assertEquals(PIECE_ORM_ERROR_CANNOT_INVOKE, $error['code']);
+            try {
+                $mapper->setLimit(2, -1);
+                $this->fail('An expected exception has not been raised.');
+                return;
+            } catch (Piece_ORM_Exception $e) {
+            }
 
             $this->_clearTableRecords();
             if ($useMapperNameAsTableName) {
@@ -1569,6 +1527,7 @@ abstract class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_Framework_Tes
     }
 
     /**
+     * @expectedException Piece_ORM_Mapper_QueryExecutor_ConstraintException
      * @since Method available since Release 0.5.0
      */
     public function testShouldRaiseAnExceptionWhenUniqueConstraintErrorIsOccurred()
@@ -1577,15 +1536,7 @@ abstract class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_Framework_Tes
         $subject = $mapper->createObject();
         $subject->email = 'foo@example.org';
         $mapper->insert($subject);
-        Piece_ORM_Error::disableCallback();
         $mapper->insert($subject);
-        Piece_ORM_Error::enableCallback();
-
-        $this->assertTrue(Piece_ORM_Error::hasErrors());
-
-        $error = Piece_ORM_Error::pop();
-
-        $this->assertEquals(PIECE_ORM_ERROR_CONSTRAINT, $error['code']);
     }
 
     /**
@@ -1737,11 +1688,14 @@ abstract class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_Framework_Tes
         $mapper->insert($subject1);
         $subject2 = $mapper->findByMemberIdAndServiceId($subject1);
         $subject2->point += 50;
-        Piece_ORM_Error::disableCallback();
-        $affectedRows = $mapper->updateByMemberIdAndServiceId($subject2);
-        Piece_ORM_Error::enableCallback();
 
-        $this->assertFalse(Piece_ORM_Error::hasErrors());
+        try {
+            $affectedRows = $mapper->updateByMemberIdAndServiceId($subject2);
+        } catch (Piece_ORM_Exception $e) {
+            $this->fail('An unexpected exception has not been raised.');
+            return;
+        }
+
         $this->assertEquals(1, $affectedRows);
     }
 
@@ -1756,11 +1710,14 @@ abstract class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_Framework_Tes
         $subject1->serviceId = 1;
         $mapper->insert($subject1);
         $subject2 = $mapper->findByMemberIdAndServiceId($subject1);
-        Piece_ORM_Error::disableCallback();
-        $affectedRows = $mapper->deleteByMemberIdAndServiceId($subject2);
-        Piece_ORM_Error::enableCallback();
 
-        $this->assertFalse(Piece_ORM_Error::hasErrors());
+        try {
+            $affectedRows = $mapper->deleteByMemberIdAndServiceId($subject2);
+        } catch (Piece_ORM_Exception $e) {
+            $this->fail('An unexpected exception has not been raised.');
+            return;
+        }
+
         $this->assertEquals(1, $affectedRows);
     }
 
@@ -1933,17 +1890,14 @@ abstract class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_Framework_Tes
         Piece_ORM_Mapper_Factory::setConfigDirectory($this->cacheDirectory);
         Piece_ORM_Mapper_Factory::setCacheDirectory($this->cacheDirectory);
         Piece_ORM_Metadata_Factory::setCacheDirectory($this->cacheDirectory);
-        Piece_ORM_Error::disableCallback();
-        $mapper = Piece_ORM_Mapper_Factory::factory('Case_Sensitive');
-        Piece_ORM_Error::enableCallback();
 
-        $this->assertFalse(Piece_ORM_Error::hasErrors());
-
-        Piece_ORM_Error::disableCallback();
-        $mapper->findAllByFirstName((object)array('firstName' => 'foo'));
-        Piece_ORM_Error::enableCallback();
-
-        $this->assertFalse(Piece_ORM_Error::hasErrors());
+        try {
+            $mapper = Piece_ORM_Mapper_Factory::factory('Case_Sensitive');
+            $mapper->findAllByFirstName((object)array('firstName' => 'foo'));
+        } catch (Piece_ORM_Exception $e) {
+            $this->fail('An unexpected exception has not been raised.');
+            return;
+        }
 
         $dbh = $mapper->getConnection();
 

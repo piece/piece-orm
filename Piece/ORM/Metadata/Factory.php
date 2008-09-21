@@ -95,13 +95,8 @@ class Piece_ORM_Metadata_Factory
 
         $tableID = sha1($context->getDSN() . ".$tableName");
         if (!array_key_exists($tableID, self::$_instances)) {
-            $metadata = Piece_ORM_Metadata_Factory::_createMetadata($tableName, $tableID);
-            if (Piece_ORM_Error::hasErrors()) {
-                $return = null;
-                return $return;
-            }
-
-            self::$_instances[$tableID] = $metadata;
+            self::$_instances[$tableID] =
+                Piece_ORM_Metadata_Factory::_createMetadata($tableName, $tableID);
         }
 
         return self::$_instances[$tableID];
@@ -190,22 +185,11 @@ class Piece_ORM_Metadata_Factory
                           E_USER_WARNING
                           );
 
-            $metadata = Piece_ORM_Metadata_Factory::_createMetadataFromDatabase($tableName);
-            if (Piece_ORM_Error::hasErrors()) {
-                $return = null;
-                return $return;
-            }
-
-            return $metadata;
+            return Piece_ORM_Metadata_Factory::_createMetadataFromDatabase($tableName);
         }
 
         if (!$metadata) {
             $metadata = Piece_ORM_Metadata_Factory::_createMetadataFromDatabase($tableName);
-            if (Piece_ORM_Error::hasErrors()) {
-                $return = null;
-                return $return;
-            }
-
             $result = $cache->save($metadata);
             if (PEAR::isError($result)) {
                 trigger_error('Cannot write the Piece_ORM_Metadata object to the cache file in the directory [ ' .
@@ -227,61 +211,37 @@ class Piece_ORM_Metadata_Factory
      *
      * @param string $tableName
      * @return Piece_ORM_Metadata
-     * @throws PIECE_ORM_ERROR_CANNOT_INVOKE
-     * @throws PIECE_ORM_ERROR_NOT_FOUND
+     * @throws Piece_ORM_Exception_PEARException
+     * @throws Piece_ORM_Metadata_Factory_NoSuchTableException
      */
     private static function _createMetadataFromDatabase($tableName)
     {
         $context = Piece_ORM_Context::singleton();
         $dbh = $context->getConnection();
-        if (Piece_ORM_Error::hasErrors()) {
-            $return = null;
-            return $return;
-        }
 
         PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
         $result = $dbh->setLimit(1);
         PEAR::staticPopErrorHandling();
         if (MDB2::isError($result)) {
-            Piece_ORM_Error::pushPEARError($result,
-                                           PIECE_ORM_ERROR_CANNOT_INVOKE,
-                                           "Failed to invoke MDB2_Driver_{$dbh->phptype}::setLimit() for any reasons."
-                                           );
-            $return = null;
-            return $return;
+            throw new Piece_ORM_Exception_PEARException($result);
         }
 
         PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
         $result = $dbh->query('SELECT 1 FROM ' . $dbh->quoteIdentifier($tableName));
         PEAR::staticPopErrorHandling();
         if (MDB2::isError($result)) {
-            if ($result->getCode() != MDB2_ERROR_NOSUCHTABLE) {
-                Piece_ORM_Error::pushPEARError($result,
-                                               PIECE_ORM_ERROR_CANNOT_INVOKE,
-                                               "Failed to invoke MDB2_Driver_{$dbh->phptype}::query() for any reasons."
-                                               );
-                $return = null;
-                return $return;
+            if ($result->getCode() == MDB2_ERROR_NOSUCHTABLE) {
+                throw new Piece_ORM_Metadata_Factory_NoSuchTableException($result);
             }
 
-            Piece_ORM_Error::pushPEARError($result,
-                                           PIECE_ORM_ERROR_NOT_FOUND,
-                                           "Failed to invoke MDB2_Driver_{$dbh->phptype}::query() for any reasons."
-                                           );
-            $return = null;
-            return $return;
+            throw new Piece_ORM_Exception_PEARException($result);
         }
 
         PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
         $reverse = $dbh->loadModule('Reverse');
         PEAR::staticPopErrorHandling();
         if (MDB2::isError($reverse)) {
-            Piece_ORM_Error::pushPEARError($reverse,
-                                           PIECE_ORM_ERROR_CANNOT_INVOKE,
-                                           'Failed to invoke $dbh->loadModule() for any reasons.'
-                                           );
-            $return = null;
-            return $return;
+            throw new Piece_ORM_Exception_PEARException($reverse);
         }
 
         if ($dbh->phptype == 'mssql') {
@@ -293,12 +253,7 @@ class Piece_ORM_Metadata_Factory
         $tableInfo = $reverse->tableInfo($tableName);
         PEAR::staticPopErrorHandling();
         if (MDB2::isError($tableInfo)) {
-            Piece_ORM_Error::pushPEARError($tableInfo,
-                                           PIECE_ORM_ERROR_CANNOT_INVOKE,
-                                           'Failed to invoke $reverse->tableInfo() for any reasons.'
-                                           );
-            $return = null;
-            return $return;
+            throw new Piece_ORM_Exception_PEARException($tableInfo);
         }
 
         if ($dbh->phptype == 'mysql') {

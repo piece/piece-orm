@@ -105,84 +105,69 @@ class Piece_ORM_Mapper_FactoryTest extends PHPUnit_Framework_TestCase
                                       'errorHandlingAPIBreak' => true)
                                 );
         $cache->clean();
-        Piece_ORM_Error::clearErrors();
     }
 
     public function testShouldRaiseAnExceptionIfTheConfigurationDirectoryIsNotSpecified()
     {
         Piece_ORM_Mapper_Factory::setConfigDirectory(null);
-        Piece_ORM_Error::disableCallback();
-        Piece_ORM_Mapper_Factory::factory('Employees');
-        Piece_ORM_Error::enableCallback();
+        try {
+            Piece_ORM_Mapper_Factory::factory('Employees');
+        } catch (Piece_ORM_Exception $e) {
+            Piece_ORM_Mapper_Factory::restoreConfigDirectory();
+            return;
+        }
 
-        $this->assertTrue(Piece_ORM_Error::hasErrors());
-
-        $error = Piece_ORM_Error::pop();
-
-        $this->assertEquals(PIECE_ORM_ERROR_INVALID_OPERATION, $error['code']);
-
-        Piece_ORM_Mapper_Factory::restoreConfigDirectory();
+        $this->fail('An expected exception has not been raised.');
     }
 
     public function testShouldRaiseAnExceptionIfAGivenConfigurationDirectoryIsNotFound()
     {
         Piece_ORM_Mapper_Factory::setConfigDirectory(dirname(__FILE__) . '/foo');
-        Piece_ORM_Error::disableCallback();
-        Piece_ORM_Mapper_Factory::factory('Employees');
-        Piece_ORM_Error::enableCallback();
 
-        $this->assertTrue(Piece_ORM_Error::hasErrors());
+        try {
+            Piece_ORM_Mapper_Factory::factory('Employees');
+        } catch (Piece_ORM_Exception $e) {
+            Piece_ORM_Mapper_Factory::restoreConfigDirectory();
+            return;
+        }
 
-        $error = Piece_ORM_Error::pop();
-
-        $this->assertEquals(PIECE_ORM_ERROR_NOT_FOUND, $error['code']);
-
-        Piece_ORM_Mapper_Factory::restoreConfigDirectory();
+        $this->fail('An expected exception has not been raised.');
     }
 
     public function testShouldRaiseAnExceptionIfTheCacheDirectoryIsNotSpecified()
     {
         Piece_ORM_Mapper_Factory::setCacheDirectory(null);
-        Piece_ORM_Error::disableCallback();
-        Piece_ORM_Mapper_Factory::factory('Employees');
-        Piece_ORM_Error::enableCallback();
 
-        $this->assertTrue(Piece_ORM_Error::hasErrors());
+        try {
+            Piece_ORM_Mapper_Factory::factory('Employees');
+        } catch (Piece_ORM_Exception $e) {
+            Piece_ORM_Mapper_Factory::restoreCacheDirectory();
+            return;
+        }
 
-        $error = Piece_ORM_Error::pop();
-
-        $this->assertEquals(PIECE_ORM_ERROR_INVALID_OPERATION, $error['code']);
-
-        Piece_ORM_Mapper_Factory::restoreCacheDirectory();
+        $this->fail('An expected exception has not been raised.');
     }
 
     public function testShouldRaiseAnExceptionIfAGivenCacheDirectoryIsNotFound()
     {
         Piece_ORM_Mapper_Factory::setCacheDirectory(dirname(__FILE__) . '/foo');
-        Piece_ORM_Error::disableCallback();
-        Piece_ORM_Mapper_Factory::factory('Employees');
-        Piece_ORM_Error::enableCallback();
 
-        $this->assertTrue(Piece_ORM_Error::hasErrors());
+        try {
+            Piece_ORM_Mapper_Factory::factory('Employees');
+        } catch (Piece_ORM_Exception $e) {
+            Piece_ORM_Mapper_Factory::restoreCacheDirectory();
+            return;
+        }
 
-        $error = Piece_ORM_Error::pop();
-
-        $this->assertEquals(PIECE_ORM_ERROR_NOT_FOUND, $error['code']);
-
-        Piece_ORM_Mapper_Factory::restoreCacheDirectory();
+        $this->fail('An expected exception has not been raised.');
     }
 
+    /**
+     * @expectedException Piece_ORM_Exception
+     */
     public function testShouldRaiseAnExceptionIfAGivenConfigurationFileIsNotFound()
     {
-        Piece_ORM_Error::disableCallback();
         Piece_ORM_Mapper_Factory::factory('Foo');
-        Piece_ORM_Error::enableCallback();
-
-        $this->assertTrue(Piece_ORM_Error::hasErrors());
-
-        $error = Piece_ORM_Error::pop();
-
-        $this->assertEquals(PIECE_ORM_ERROR_NOT_FOUND, $error['code']);
     }
 
     public function testShouldCreateAnObjectByAGivenMapper()

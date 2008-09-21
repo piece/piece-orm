@@ -84,15 +84,18 @@ class Piece_ORM_Mapper_RelationshipNormalizer_ManyToOne extends Piece_ORM_Mapper
 
     /**
      * Normalizes "column" definition.
+     *
+     * @return boolean
      */
     protected function normalizeColumn()
     {
-        if ($primaryKey = $this->relationshipMetadata->getPrimaryKey()) {
-            $this->relationship['column'] = $primaryKey;
-            return true;
-        } else {
+        $primaryKey = $this->relationshipMetadata->getPrimaryKey();
+        if (is_null($primaryKey)) {
             return false;
         }
+
+        $this->relationship['column'] = $primaryKey;
+        return true;
     }
 
     // }}}
@@ -100,15 +103,18 @@ class Piece_ORM_Mapper_RelationshipNormalizer_ManyToOne extends Piece_ORM_Mapper
 
     /**
      * Normalizes "referencedColumn" definition.
+     *
+     * @return boolean
      */
     protected function normalizeReferencedColumn()
     {
-        if ($primaryKey = $this->relationshipMetadata->getPrimaryKey()) {
-            $this->relationship['referencedColumn'] = $this->relationshipMetadata->getTableName(true) . "_$primaryKey";
-            return true;
-        } else {
+        $primaryKey = $this->relationshipMetadata->getPrimaryKey();
+        if (is_null($primaryKey)) {
             return false;
         }
+
+        $this->relationship['referencedColumn'] = $this->relationshipMetadata->getTableName(true) . "_$primaryKey";
+        return true;
     }
 
     // }}}

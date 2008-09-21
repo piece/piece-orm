@@ -91,7 +91,6 @@ class Piece_ORM_Config_FactoryTest extends PHPUnit_Framework_TestCase
                                       'errorHandlingAPIBreak' => true)
                                 );
         $cache->clean();
-        Piece_ORM_Error::clearErrors();
     }
 
     public function testShouldCreateAnObjectWithoutConfigurationFile()
@@ -99,36 +98,22 @@ class Piece_ORM_Config_FactoryTest extends PHPUnit_Framework_TestCase
         $this->assertType('Piece_ORM_Config', Piece_ORM_Config_Factory::factory());
     }
 
+    /**
+     * @expectedException Piece_ORM_Exception
+     */
     public function testShouldRaiseAnExceptionWhenAGivenConfigurationDirectoryIsNotFound()
     {
-        Piece_ORM_Error::disableCallback();
-        $config = Piece_ORM_Config_Factory::factory(dirname(__FILE__) . '/foo',
-                                                    $this->_cacheDirectory
-                                                    );
-        Piece_ORM_Error::enableCallback();
-
-        $this->assertNull($config);
-        $this->assertTrue(Piece_ORM_Error::hasErrors());
-
-        $error = Piece_ORM_Error::pop();
-
-        $this->assertEquals(PIECE_ORM_ERROR_NOT_FOUND, $error['code']);
+        Piece_ORM_Config_Factory::factory(dirname(__FILE__) . '/foo',
+                                          $this->_cacheDirectory
+                                          );
     }
 
+    /**
+     * @expectedException Piece_ORM_Exception
+     */
     public function testShouldRaiseAnExceptionWhenAGivenConfigurationFileIsNotFound()
     {
-        Piece_ORM_Error::disableCallback();
-        $config = Piece_ORM_Config_Factory::factory(dirname(__FILE__),
-                                                    $this->_cacheDirectory
-                                                    );
-        Piece_ORM_Error::enableCallback();
-
-        $this->assertNull($config);
-        $this->assertTrue(Piece_ORM_Error::hasErrors());
-
-        $error = Piece_ORM_Error::pop();
-
-        $this->assertEquals(PIECE_ORM_ERROR_NOT_FOUND, $error['code']);
+        Piece_ORM_Config_Factory::factory(dirname(__FILE__), $this->_cacheDirectory);
     }
 
     public function testShouldCreateAnObjectEvenThoughAGivenCacheDirectoryIsNotFound()
