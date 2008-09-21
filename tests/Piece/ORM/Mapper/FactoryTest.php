@@ -215,13 +215,13 @@ class Piece_ORM_Mapper_FactoryTest extends PHPUnit_Framework_TestCase
                             );
         $mapper1 = Piece_ORM_Mapper_Factory::factory('Employees');
 
-        $this->assertEquals(2, $mapper1->_dbh->options['debug']);
+        $this->assertEquals(2, $mapper1->getConnection()->options['debug']);
 
         $mapper1->foo = 'bar';
         $context->setDatabase('piece1');
         $mapper2 = Piece_ORM_Mapper_Factory::factory('Employees');
 
-        $this->assertEquals(0, $mapper2->_dbh->options['debug']);
+        $this->assertEquals(0, $mapper2->getConnection()->options['debug']);
         $this->assertObjectHasAttribute('foo', $mapper2);;
         $this->assertEquals('bar', $mapper2->foo);
     }

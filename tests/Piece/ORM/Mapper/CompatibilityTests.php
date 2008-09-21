@@ -2094,8 +2094,8 @@ abstract class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_Framework_Tes
         $file = $mapper->findById($id);
 
         $this->assertTrue(file_get_contents($jpegPath) != file_get_contents($pngPath));
-        $this->assertEquals(file_get_contents($jpegPath), $file->picture->load());
-        $this->assertEquals(file_get_contents($pngPath), $file->largePicture->load());
+        $this->assertStringEqualsFile($jpegPath, $file->picture->load());
+        $this->assertStringEqualsFile($pngPath, $file->largePicture->load());
     }
 
     /**
