@@ -280,7 +280,7 @@ class Piece_ORM_Mapper_Generator
         $this->_methodDefinitions[ strtolower($methodName) ] = "
     public function $methodName(\$criteria = null)
     {
-        return \$this->_find('$methodName', \$criteria);
+        return \$this->findObject('$methodName', \$criteria);
     }";
     }
 
@@ -312,7 +312,7 @@ class Piece_ORM_Mapper_Generator
         $this->_methodDefinitions[ strtolower($methodName) ] = "
     public function $methodName(\$subject)
     {
-        return \$this->_insert('$methodName', \$subject);
+        return \$this->insertObject('$methodName', \$subject);
     }";
     }
 
@@ -349,7 +349,7 @@ class Piece_ORM_Mapper_Generator
         $this->_methodDefinitions[ strtolower($methodName) ] = "
     public function $methodName(\$criteria = null)
     {
-        return \$this->_findAll('$methodName', \$criteria);
+        return \$this->findObjects('$methodName', \$criteria);
     }";
     }
 
@@ -511,7 +511,7 @@ class Piece_ORM_Mapper_Generator
         $this->_methodDefinitions[ strtolower($methodName) ] = "
     public function $methodName(\$subject)
     {
-        return \$this->_delete('$methodName', \$subject);
+        return \$this->deleteObjects('$methodName', \$subject);
     }";
     }
 
@@ -557,7 +557,7 @@ class Piece_ORM_Mapper_Generator
         $this->_methodDefinitions[ strtolower($methodName) ] = "
     public function $methodName(\$subject)
     {
-        return \$this->_update('$methodName', \$subject);
+        return \$this->updateObjects('$methodName', \$subject);
     }";
     }
 
@@ -727,7 +727,7 @@ class Piece_ORM_Mapper_Generator
         $this->_methodDefinitions[ strtolower($methodName) ] = "
     public function $methodName(\$criteria = null)
     {
-        return \$this->_findOne('$methodName', \$criteria);
+        return \$this->findValue('$methodName', \$criteria);
     }";
     }
 

@@ -2,7 +2,7 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 
 /**
- * PHP versions 4 and 5
+ * PHP version 5
  *
  * Copyright (c) 2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>,
  * All rights reserved.
@@ -35,18 +35,7 @@
  * @since      File available since Release 0.1.0
  */
 
-require_once 'Piece/ORM/Config.php';
-require_once 'Piece/ORM/Error.php';
-require_once 'Cache/Lite/File.php';
-require_once 'PEAR.php';
-
-if (version_compare(phpversion(), '5.0.0', '<')) {
-    require_once 'spyc.php';
-} else {
-    require_once 'spyc.php5';
-}
-
-require_once 'Piece/ORM/Env.php';
+require_once 'spyc.php5';
 
 // {{{ Piece_ORM_Config_Factory
 
@@ -71,6 +60,12 @@ class Piece_ORM_Config_Factory
     /**#@-*/
 
     /**#@+
+     * @access protected
+     */
+
+    /**#@-*/
+
+    /**#@+
      * @access private
      */
 
@@ -84,24 +79,22 @@ class Piece_ORM_Config_Factory
     // {{{ factory()
 
     /**
-     * Creates a Piece_ORM_Config object from a configuration file or
-     * a cache.
+     * Creates a Piece_ORM_Config object from a configuration file or a cache.
      *
      * @param string $configDirectory
      * @param string $cacheDirectory
      * @return Piece_ORM_Config
-     * @static
      */
-    function &factory($configDirectory = null, $cacheDirectory = null)
+    public static function factory($configDirectory = null, $cacheDirectory = null)
     {
         if (is_null($configDirectory)) {
-            $config = &new Piece_ORM_Config();
+            $config = new Piece_ORM_Config();
             return $config;
         }
 
         if (!file_exists($configDirectory)) {
             Piece_ORM_Error::push(PIECE_ORM_ERROR_NOT_FOUND,
-                                  "The configuration directory [ $configDirectory ] not found."
+                                  "The configuration directory [ $configDirectory ] is not found."
                                   );
             $return = null;
             return $return;
@@ -110,7 +103,7 @@ class Piece_ORM_Config_Factory
         $configFile = "$configDirectory/piece-orm-config.yaml";
         if (!file_exists($configFile)) {
             Piece_ORM_Error::push(PIECE_ORM_ERROR_NOT_FOUND,
-                                  "The configuration file [ $configFile ] not found."
+                                  "The configuration file [ $configFile ] is not found."
                                   );
             $return = null;
             return $return;
@@ -148,8 +141,13 @@ class Piece_ORM_Config_Factory
     /**#@-*/
 
     /**#@+
+     * @access protected
+     */
+
+    /**#@-*/
+
+    /**#@+
      * @access private
-     * @static
      */
 
     // }}}
@@ -162,14 +160,14 @@ class Piece_ORM_Config_Factory
      * @param string $cacheDirectory
      * @return Piece_ORM_Config
      */
-    function &_getConfiguration($masterFile, $cacheDirectory)
+    private function _getConfiguration($masterFile, $cacheDirectory)
     {
         $masterFile = realpath($masterFile);
-        $cache = &new Cache_Lite_File(array('cacheDir' => "$cacheDirectory/",
-                                            'masterFile' => $masterFile,
-                                            'automaticSerialization' => true,
-                                            'errorHandlingAPIBreak' => true)
-                                      );
+        $cache = new Cache_Lite_File(array('cacheDir' => "$cacheDirectory/",
+                                           'masterFile' => $masterFile,
+                                           'automaticSerialization' => true,
+                                           'errorHandlingAPIBreak' => true)
+                                     );
 
         if (!Piece_ORM_Env::isProduction()) {
             $cache->remove($masterFile);
@@ -188,7 +186,7 @@ class Piece_ORM_Config_Factory
         }
 
         if (!$config) {
-            $config = &Piece_ORM_Config_Factory::_createConfigurationFromFile($masterFile);
+            $config = Piece_ORM_Config_Factory::_createConfigurationFromFile($masterFile);
             $result = $cache->save($config);
             if (PEAR::isError($result)) {
                 trigger_error("Cannot write the Piece_ORM_Config object to the cache file in the directory [ $cacheDirectory ].",
@@ -209,9 +207,9 @@ class Piece_ORM_Config_Factory
      * @param string $file
      * @return Piece_ORM_Config
      */
-    function &_createConfigurationFromFile($file)
+    private function _createConfigurationFromFile($file)
     {
-        $config = &new Piece_ORM_Config();
+        $config = new Piece_ORM_Config();
         $yaml = Spyc::YAMLLoad($file);
         foreach ($yaml as $configuration) {
             $config->setDSN($configuration['name'], $configuration['dsn']);

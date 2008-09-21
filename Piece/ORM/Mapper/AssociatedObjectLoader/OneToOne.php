@@ -2,7 +2,7 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 
 /**
- * PHP versions 4 and 5
+ * PHP version 5
  *
  * Copyright (c) 2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>,
  * All rights reserved.
@@ -35,8 +35,6 @@
  * @since      File available since Release 0.2.0
  */
 
-require_once 'Piece/ORM/Mapper/AssociatedObjectLoader/Common.php';
-
 // {{{ Piece_ORM_Mapper_AssociatedObjectLoader_OneToOne
 
 /**
@@ -60,6 +58,12 @@ class Piece_ORM_Mapper_AssociatedObjectLoader_OneToOne extends Piece_ORM_Mapper_
     /**#@-*/
 
     /**#@+
+     * @access protected
+     */
+
+    /**#@-*/
+
+    /**#@+
      * @access private
      */
 
@@ -72,11 +76,11 @@ class Piece_ORM_Mapper_AssociatedObjectLoader_OneToOne extends Piece_ORM_Mapper_
     /**#@-*/
 
     /**#@+
-     * @access private
+     * @access protected
      */
 
     // }}}
-    // {{{ _buildQuery()
+    // {{{ buildQuery()
 
     /**
      * Builds a query to get associated objects.
@@ -84,13 +88,13 @@ class Piece_ORM_Mapper_AssociatedObjectLoader_OneToOne extends Piece_ORM_Mapper_
      * @param integer $relationshipIndex
      * @return string
      */
-    function _buildQuery($relationshipIndex)
+    protected function buildQuery($relationshipIndex)
     {
-        return "SELECT * FROM {$this->_relationships[$relationshipIndex]['table']} WHERE {$this->_relationships[$relationshipIndex]['column']} IN (" . implode(',', $this->_relationshipKeys[$relationshipIndex]) . ')';
+        return "SELECT * FROM {$this->relationships[$relationshipIndex]['table']} WHERE {$this->relationships[$relationshipIndex]['column']} IN (" . implode(',', $this->relationshipKeys[$relationshipIndex]) . ')';
     }
 
     // }}}
-    // {{{ _getRelationshipKeyFieldNameInPrimaryQuery()
+    // {{{ getRelationshipKeyFieldNameInPrimaryQuery()
 
     /**
      * Gets the name of the relationship key field in the primary query.
@@ -98,13 +102,13 @@ class Piece_ORM_Mapper_AssociatedObjectLoader_OneToOne extends Piece_ORM_Mapper_
      * @param array $relationship
      * @return string
      */
-    function _getRelationshipKeyFieldNameInPrimaryQuery($relationship)
+    protected function getRelationshipKeyFieldNameInPrimaryQuery(array $relationship)
     {
         return $relationship['referencedColumn'];
     }
 
     // }}}
-    // {{{ _getRelationshipKeyFieldNameInSecondaryQuery()
+    // {{{ getRelationshipKeyFieldNameInSecondaryQuery()
 
     /**
      * Gets the name of the relationship key field in the secondary query.
@@ -112,27 +116,37 @@ class Piece_ORM_Mapper_AssociatedObjectLoader_OneToOne extends Piece_ORM_Mapper_
      * @param array $relationship
      * @return string
      */
-    function _getRelationshipKeyFieldNameInSecondaryQuery($relationship)
+    protected function getRelationshipKeyFieldNameInSecondaryQuery(array $relationship)
     {
         return $relationship['column'];
     }
 
     // }}}
-    // {{{ _associateObject()
+    // {{{ associateObject()
 
     /**
-     * Associates an object which are loaded by the secondary query into
-     * objects which are loaded by the primary query.
+     * Associates an object which are loaded by the secondary query into objects which
+     * are loaded by the primary query.
      *
-     * @param stdClass                &$associatedObject
-     * @param Piece_ORM_Mapper_Common &$mapper
+     * @param stdClass                $associatedObject
+     * @param Piece_ORM_Mapper_Common $mapper
      * @param string                  $relationshipKeyPropertyName
      * @param integer                 $relationshipIndex
      */
-    function _associateObject(&$associatedObject, &$mapper, $relationshipKeyPropertyName, $relationshipIndex)
+    protected function associateObject($associatedObject,
+                                       Piece_ORM_Mapper_Common $mapper,
+                                       $relationshipKeyPropertyName,
+                                       $relationshipIndex
+                                       )
     {
-        $this->_objects[ $this->_objectIndexes[$relationshipIndex][ $associatedObject->$relationshipKeyPropertyName ] ]->{ $this->_relationships[$relationshipIndex]['mappedAs'] } = &$associatedObject;
+        $this->objects[ $this->objectIndexes[$relationshipIndex][ $associatedObject->$relationshipKeyPropertyName ] ]->{ $this->relationships[$relationshipIndex]['mappedAs'] } = $associatedObject;
     }
+
+    /**#@-*/
+
+    /**#@+
+     * @access private
+     */
 
     /**#@-*/
 

@@ -2,7 +2,7 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 
 /**
- * PHP versions 4 and 5
+ * PHP version 5
  *
  * Copyright (c) 2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>,
  * All rights reserved.
@@ -35,9 +35,6 @@
  * @since      File available since Release 0.2.0
  */
 
-require_once 'Piece/ORM/Mapper/AssociatedObjectLoader/Common.php';
-require_once 'Piece/ORM/Inflector.php';
-
 // {{{ Piece_ORM_Mapper_AssociatedObjectLoader_ManyToMany
 
 /**
@@ -61,12 +58,19 @@ class Piece_ORM_Mapper_AssociatedObjectLoader_ManyToMany extends Piece_ORM_Mappe
     /**#@-*/
 
     /**#@+
+     * @access protected
+     */
+
+    protected $defaultValueOfMappedAs = array();
+
+    /**#@-*/
+
+    /**#@+
      * @access private
      */
 
-    var $_defaultValueOfMappedAs = array();
-    var $_associations = array();
-    var $_loadedRows = array();
+    private $_associations = array();
+    private $_loadedRows = array();
 
     /**#@-*/
 
@@ -78,28 +82,37 @@ class Piece_ORM_Mapper_AssociatedObjectLoader_ManyToMany extends Piece_ORM_Mappe
     // {{{ addAssociation()
 
     /**
-     * Adds an association about what an inverse side record is associated
-     * with an owning side record.
+     * Adds an association about what an inverse side record is associated with
+     * an owning side record.
      *
-     * @param array                   &$row
-     * @param Piece_ORM_Mapper_Common &$mapper
+     * @param array                   $row
+     * @param Piece_ORM_Mapper_Common $mapper
      * @param integer                 $relationshipIndex
      * @return boolean
      */
-    function addAssociation(&$row, &$mapper, $relationshipIndex)
+    public function addAssociation(array $row,
+                                   Piece_ORM_Mapper_Common $mapper,
+                                   $relationshipIndex
+                                   )
     {
-        $metadata = &$mapper->getMetadata();
+        $metadata = $mapper->getMetadata();
         $primaryKey = $metadata->getPrimaryKey();
-        $this->_associations[$relationshipIndex][ $row[$primaryKey] ][] = $row[ $this->_getRelationshipKeyFieldNameInSecondaryQuery($this->_relationships[$relationshipIndex]) ];
+        $this->_associations[$relationshipIndex][ $row[$primaryKey] ][] = $row[ $this->getRelationshipKeyFieldNameInSecondaryQuery($this->relationships[$relationshipIndex]) ];
 
         if (@array_key_exists($row[$primaryKey], $this->_loadedRows[$relationshipIndex])) {
             return false;
         } else {
             @$this->_loadedRows[$relationshipIndex][ $row[$primaryKey] ] = true;
-            unset($row[ $this->_getRelationshipKeyFieldNameInSecondaryQuery($this->_relationships[$relationshipIndex]) ]);
+            unset($row[ $this->getRelationshipKeyFieldNameInSecondaryQuery($this->relationships[$relationshipIndex]) ]);
             return true;
         }
     }
+
+    /**#@-*/
+
+    /**#@+
+     * @access protected
+     */
 
     /**#@-*/
 
@@ -108,7 +121,7 @@ class Piece_ORM_Mapper_AssociatedObjectLoader_ManyToMany extends Piece_ORM_Mappe
      */
 
     // }}}
-    // {{{ _buildQuery()
+    // {{{ buildQuery()
 
     /**
      * Builds a query to get associated objects.
@@ -116,13 +129,13 @@ class Piece_ORM_Mapper_AssociatedObjectLoader_ManyToMany extends Piece_ORM_Mappe
      * @param integer $relationshipIndex
      * @return string
      */
-    function _buildQuery($relationshipIndex)
+    protected function buildQuery($relationshipIndex)
     {
-        return "SELECT {$this->_relationships[$relationshipIndex]['through']['table']}.{$this->_relationships[$relationshipIndex]['through']['column']} AS " . $this->_getRelationshipKeyFieldNameInSecondaryQuery($this->_relationships[$relationshipIndex]) . ", {$this->_relationships[$relationshipIndex]['table']}.* FROM {$this->_relationships[$relationshipIndex]['table']}, {$this->_relationships[$relationshipIndex]['through']['table']} WHERE {$this->_relationships[$relationshipIndex]['through']['table']}.{$this->_relationships[$relationshipIndex]['through']['column']} IN (" . implode(',', $this->_relationshipKeys[$relationshipIndex]) . ") AND {$this->_relationships[$relationshipIndex]['table']}.{$this->_relationships[$relationshipIndex]['column']} = {$this->_relationships[$relationshipIndex]['through']['table']}.{$this->_relationships[$relationshipIndex]['through']['inverseColumn']}";
+        return "SELECT {$this->relationships[$relationshipIndex]['through']['table']}.{$this->relationships[$relationshipIndex]['through']['column']} AS " . $this->getRelationshipKeyFieldNameInSecondaryQuery($this->relationships[$relationshipIndex]) . ", {$this->relationships[$relationshipIndex]['table']}.* FROM {$this->relationships[$relationshipIndex]['table']}, {$this->relationships[$relationshipIndex]['through']['table']} WHERE {$this->relationships[$relationshipIndex]['through']['table']}.{$this->relationships[$relationshipIndex]['through']['column']} IN (" . implode(',', $this->relationshipKeys[$relationshipIndex]) . ") AND {$this->relationships[$relationshipIndex]['table']}.{$this->relationships[$relationshipIndex]['column']} = {$this->relationships[$relationshipIndex]['through']['table']}.{$this->relationships[$relationshipIndex]['through']['inverseColumn']}";
     }
 
     // }}}
-    // {{{ _getRelationshipKeyFieldNameInPrimaryQuery()
+    // {{{ getRelationshipKeyFieldNameInPrimaryQuery()
 
     /**
      * Gets the name of the relationship key field in the primary query.
@@ -130,13 +143,13 @@ class Piece_ORM_Mapper_AssociatedObjectLoader_ManyToMany extends Piece_ORM_Mappe
      * @param array $relationship
      * @return string
      */
-    function _getRelationshipKeyFieldNameInPrimaryQuery($relationship)
+    protected function getRelationshipKeyFieldNameInPrimaryQuery(array $relationship)
     {
         return $relationship['through']['referencedColumn'];
     }
 
     // }}}
-    // {{{ _getRelationshipKeyFieldNameInSecondaryQuery()
+    // {{{ getRelationshipKeyFieldNameInSecondaryQuery()
 
     /**
      * Gets the name of the relationship key field in the secondary query.
@@ -144,44 +157,48 @@ class Piece_ORM_Mapper_AssociatedObjectLoader_ManyToMany extends Piece_ORM_Mappe
      * @param array $relationship
      * @return string
      */
-    function _getRelationshipKeyFieldNameInSecondaryQuery($relationship)
+    protected function getRelationshipKeyFieldNameInSecondaryQuery(array $relationship)
     {
         return "__relationship_key_field";
     }
 
     // }}}
-    // {{{ _associateObject()
+    // {{{ associateObject()
 
     /**
      * Associates an object which are loaded by the secondary query into
      * objects which are loaded by the primary query.
      *
-     * @param stdClass                &$associatedObject
-     * @param Piece_ORM_Mapper_Common &$mapper
+     * @param stdClass                $associatedObject
+     * @param Piece_ORM_Mapper_Common $mapper
      * @param string                  $relationshipKeyPropertyName
      * @param integer                 $relationshipIndex
      */
-    function _associateObject(&$associatedObject, &$mapper, $relationshipKeyPropertyName, $relationshipIndex)
+    protected function associateObject($associatedObject,
+                                       Piece_ORM_Mapper_Common $mapper,
+                                       $relationshipKeyPropertyName,
+                                       $relationshipIndex
+                                       )
     {
-        $metadata = &$mapper->getMetadata();
+        $metadata = $mapper->getMetadata();
         $primaryKey = Piece_ORM_Inflector::camelize($metadata->getPrimaryKey(), true);
 
         for ($j = 0, $count = count($this->_associations[$relationshipIndex][ $associatedObject->$primaryKey ]); $j < $count; ++$j) {
-            $this->_objects[ $this->_objectIndexes[$relationshipIndex][ $this->_associations[$relationshipIndex][ $associatedObject->$primaryKey ][$j] ] ]->{ $this->_relationships[$relationshipIndex]['mappedAs'] }[] = &$associatedObject;
+            $this->objects[ $this->objectIndexes[$relationshipIndex][ $this->_associations[$relationshipIndex][ $associatedObject->$primaryKey ][$j] ] ]->{ $this->relationships[$relationshipIndex]['mappedAs'] }[] = $associatedObject;
         }
     }
 
     // }}}
-    // {{{ _getPreloadCallback()
+    // {{{ getPreloadCallback()
 
     /**
      * Gets the preload callback for a loader.
      *
      * @return callback
      */
-    function _getPreloadCallback()
+    protected function getPreloadCallback()
     {
-        return array(&$this, 'addAssociation');
+        return array($this, 'addAssociation');
     }
 
     /**#@-*/

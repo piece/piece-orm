@@ -2,9 +2,9 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 
 /**
- * PHP versions 4 and 5
+ * PHP version 5
  *
- * Copyright (c) 2007 KUBO Atsuhiro <iteman@users.sourceforge.net>,
+ * Copyright (c) 2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>,
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,28 +29,19 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  * @package    Piece_ORM
- * @copyright  2007 KUBO Atsuhiro <iteman@users.sourceforge.net>
+ * @copyright  2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License (revised)
  * @version    SVN: $Id$
  * @since      File available since Release 0.2.0
  */
 
-// {{{ GLOBALS
-
-$GLOBALS['PIECE_ORM_RelationshipTypes'] = array('manyToMany',
-                                                'oneToMany',
-                                                'manyToOne',
-                                                'oneToOne'
-                                                );
-
-// }}}
 // {{{ Piece_ORM_Mapper_RelationshipType
 
 /**
  * A class to handle relationship types itself.
  *
  * @package    Piece_ORM
- * @copyright  2007 KUBO Atsuhiro <iteman@users.sourceforge.net>
+ * @copyright  2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License (revised)
  * @version    Release: @package_version@
  * @since      Class available since Release 0.2.0
@@ -67,14 +58,25 @@ class Piece_ORM_Mapper_RelationshipType
     /**#@-*/
 
     /**#@+
-     * @access private
+     * @access protected
      */
 
     /**#@-*/
 
     /**#@+
+     * @access private
+     */
+
+    private static $_relationshipTypes = array('manyToMany',
+                                               'oneToMany',
+                                               'manyToOne',
+                                               'oneToOne'
+                                               );
+
+    /**#@-*/
+
+    /**#@+
      * @access public
-     * @static
      */
 
     // }}}
@@ -86,9 +88,9 @@ class Piece_ORM_Mapper_RelationshipType
      * @param string $type
      * @return boolean
      */
-    function isValid($type)
+    public static function isValid($type)
     {
-        return in_array($type, $GLOBALS['PIECE_ORM_RelationshipTypes']);
+        return in_array($type, self::$_relationshipTypes);
     }
 
     // }}}
@@ -99,10 +101,16 @@ class Piece_ORM_Mapper_RelationshipType
      *
      * @return array
      */
-    function getRelationshipTypes()
+    public static function getRelationshipTypes()
     {
-        return $GLOBALS['PIECE_ORM_RelationshipTypes'];
+        return self::$_relationshipTypes;
     }
+
+    /**#@-*/
+
+    /**#@+
+     * @access protected
+     */
 
     /**#@-*/
 

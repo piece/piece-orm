@@ -2,9 +2,9 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 
 /**
- * PHP versions 4 and 5
+ * PHP version 5
  *
- * Copyright (c) 2007 KUBO Atsuhiro <iteman@users.sourceforge.net>,
+ * Copyright (c) 2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>,
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,24 +29,19 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  * @package    Piece_ORM
- * @copyright  2007 KUBO Atsuhiro <iteman@users.sourceforge.net>
+ * @copyright  2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License (revised)
  * @version    SVN: $Id$
  * @since      File available since Release 0.5.0
  */
 
-// {{{ GLOBALS
-
-$GLOBALS['PIECE_ORM_Env_IsProduction'] = true;
-
-// }}}
 // {{{ Piece_ORM_Env
 
 /**
  * The state holder for an application with Piece_ORM.
  *
  * @package    Piece_ORM
- * @copyright  2007 KUBO Atsuhiro <iteman@users.sourceforge.net>
+ * @copyright  2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License (revised)
  * @version    Release: @package_version@
  * @since      Class available since Release 0.5.0
@@ -63,14 +58,21 @@ class Piece_ORM_Env
     /**#@-*/
 
     /**#@+
-     * @access private
+     * @access protected
      */
 
     /**#@-*/
 
     /**#@+
+     * @access private
+     */
+
+    private static $_isProduction = true;
+
+    /**#@-*/
+
+    /**#@+
      * @access public
-     * @static
      */
 
     // }}}
@@ -81,9 +83,9 @@ class Piece_ORM_Env
      *
      * @param boolean $isProduction
      */
-    function setIsProduction($isProduction)
+    public static function setIsProduction($isProduction)
     {
-        $GLOBALS['PIECE_ORM_Env_IsProduction'] = $isProduction;
+        self::$_isProduction = $isProduction;
     }
 
     // }}}
@@ -94,10 +96,16 @@ class Piece_ORM_Env
      *
      * @return boolean
      */
-    function isProduction()
+    public static function isProduction()
     {
-        return $GLOBALS['PIECE_ORM_Env_IsProduction'];
+        return self::$_isProduction;
     }
+
+    /**#@-*/
+
+    /**#@+
+     * @access protected
+     */
 
     /**#@-*/
 

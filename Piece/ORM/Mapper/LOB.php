@@ -2,7 +2,7 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 
 /**
- * PHP versions 4 and 5
+ * PHP version 5
  *
  * Copyright (c) 2008 KUBO Atsuhiro <iteman@users.sourceforge.net>,
  * All rights reserved.
@@ -58,14 +58,20 @@ class Piece_ORM_Mapper_LOB
     /**#@-*/
 
     /**#@+
+     * @access protected
+     */
+
+    /**#@-*/
+
+    /**#@+
      * @access private
      */
 
-    var $_fieldName;
-    var $_source;
-    var $_value;
-    var $_dbh;
-    var $_metadata;
+    private $_fieldName;
+    private $_source;
+    private $_value;
+    private $_dbh;
+    private $_metadata;
 
     /**#@-*/
 
@@ -74,19 +80,22 @@ class Piece_ORM_Mapper_LOB
      */
 
     // }}}
-    // {{{ constructor
+    // {{{ __construct()
 
     /**
      * Sets a database handle and a LOB source.
      *
-     * @param MDB2_Driver_Common &$dbh
-     * @param Piece_ORM_Metadata &$metadata
+     * @param MDB2_Driver_Common $dbh
+     * @param Piece_ORM_Metadata $metadata
      * @param string|resource    $source
      */
-    function Piece_ORM_Mapper_LOB(&$dbh, &$metadata, $source)
+    public function __construct(MDB2_Driver_Common $dbh,
+                                Piece_ORM_Metadata $metadata,
+                                $source
+                                )
     {
-        $this->_dbh = &$dbh;
-        $this->_metadata = &$metadata;
+        $this->_dbh = $dbh;
+        $this->_metadata = $metadata;
 
         if (!is_null($source)) {
             $this->_source = $source;
@@ -101,7 +110,7 @@ class Piece_ORM_Mapper_LOB
      *
      * @param string $fieldName
      */
-    function setFieldName($fieldName)
+    public function setFieldName($fieldName)
     {
         $this->_fieldName = $fieldName;
     }
@@ -114,7 +123,7 @@ class Piece_ORM_Mapper_LOB
      *
      * @param string $value
      */
-    function setValue($value)
+    public function setValue($value)
     {
         $this->_value = $value;
     }
@@ -127,7 +136,7 @@ class Piece_ORM_Mapper_LOB
      *
      * @return string|resource
      */
-    function getSource()
+    public function getSource()
     {
         return $this->_source;
     }
@@ -142,10 +151,10 @@ class Piece_ORM_Mapper_LOB
      * @throws PIECE_ORM_ERROR_CANNOT_INVOKE
      * @throws PIECE_ORM_ERROR_UNEXPECTED_VALUE
      */
-    function load()
+    public function load()
     {
         PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
-        $datatype = &$this->_dbh->loadModule('Datatype');
+        $datatype = $this->_dbh->loadModule('Datatype');
         PEAR::staticPopErrorHandling();
         if (MDB2::isError($datatype)) {
             Piece_ORM_Error::pushPEARError($datatype,
@@ -193,10 +202,16 @@ class Piece_ORM_Mapper_LOB
      *
      * @param string|resource $source
      */
-    function setSource($source)
+    public function setSource($source)
     {
         $this->_source = $source;
     }
+
+    /**#@-*/
+
+    /**#@+
+     * @access protected
+     */
 
     /**#@-*/
 

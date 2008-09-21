@@ -2,7 +2,7 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 
 /**
- * PHP versions 4 and 5
+ * PHP version 5
  *
  * Copyright (c) 2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>,
  * All rights reserved.
@@ -58,10 +58,16 @@ class Piece_ORM_Config
     /**#@-*/
 
     /**#@+
+     * @access protected
+     */
+
+    /**#@-*/
+
+    /**#@+
      * @access private
      */
 
-    var $_configurations = array();
+    private $_configurations = array();
 
     /**#@-*/
 
@@ -78,7 +84,7 @@ class Piece_ORM_Config
      * @param string $database
      * @return mixed
      */
-    function getDSN($database)
+    public function getDSN($database)
     {
         if (!count($this->_configurations)) {
             return;
@@ -104,7 +110,7 @@ class Piece_ORM_Config
      * @param string $database
      * @return array
      */
-    function getOptions($database)
+    public function getOptions($database)
     {
         if (!count($this->_configurations)) {
             return;
@@ -129,7 +135,7 @@ class Piece_ORM_Config
      *
      * @return array
      */
-    function getConfigurations()
+    public function getConfigurations()
     {
         return $this->_configurations;
     }
@@ -140,12 +146,12 @@ class Piece_ORM_Config
     /**
      * Merges the given configuretion into the existing configuration.
      *
-     * @param Piece_ORM_Config &$config
+     * @param Piece_ORM_Config $config
      */
-    function merge(&$config)
+    public function merge(Piece_ORM_Config $config)
     {
         $configurations = $config->getConfigurations();
-        array_walk($configurations, array(&$this, 'mergeConfigurations'));
+        array_walk($configurations, array($this, 'mergeConfigurations'));
     }
 
     // }}}
@@ -157,7 +163,7 @@ class Piece_ORM_Config
      * @param array $configuration
      * @param string $database
      */
-    function mergeConfigurations($configuration, $database)
+    public function mergeConfigurations(array $configuration, $database)
     {
         $this->addConfiguration($database, $configuration['dsn'], $configuration['options']);
     }
@@ -170,7 +176,7 @@ class Piece_ORM_Config
      *
      * @return string
      */
-    function getDefaultDatabase()
+    public function getDefaultDatabase()
     {
         return key($this->_configurations);
     }
@@ -184,7 +190,7 @@ class Piece_ORM_Config
      * @param string $database
      * @return string
      */
-    function getDirectorySuffix($database)
+    public function getDirectorySuffix($database)
     {
         if (!count($this->_configurations)) {
             return;
@@ -210,7 +216,7 @@ class Piece_ORM_Config
      * @param string $database
      * @param mixed  $dsn
      */
-    function setDSN($database, $dsn)
+    public function setDSN($database, $dsn)
     {
         $this->_configurations[$database]['dsn'] = $dsn;
     }
@@ -224,7 +230,7 @@ class Piece_ORM_Config
      * @param string $database
      * @param string $options
      */
-    function setOptions($database, $options)
+    public function setOptions($database, $options)
     {
         $this->_configurations[$database]['options'] = $options;
     }
@@ -238,7 +244,7 @@ class Piece_ORM_Config
      * @param string $database
      * @param string $directorySuffix
      */
-    function setDirectorySuffix($database, $directorySuffix)
+    public function setDirectorySuffix($database, $directorySuffix)
     {
         $this->_configurations[$database]['directorySuffix'] = $directorySuffix;
     }
@@ -253,7 +259,7 @@ class Piece_ORM_Config
      * @param string $database
      * @return boolean
      */
-    function checkDatabase($database)
+    public function checkDatabase($database)
     {
         return array_key_exists($database, $this->_configurations);
     }
@@ -268,7 +274,7 @@ class Piece_ORM_Config
      * @param boolean $useMapperNameAsTableName
      * @since Method available since Release 1.0.0
      */
-    function setUseMapperNameAsTableName($database, $useMapperNameAsTableName)
+    public function setUseMapperNameAsTableName($database, $useMapperNameAsTableName)
     {
         $this->_configurations[$database]['useMapperNameAsTableName'] = $useMapperNameAsTableName;
     }
@@ -283,7 +289,7 @@ class Piece_ORM_Config
      * @return boolean
      * @since Method available since Release 1.0.0
      */
-    function getUseMapperNameAsTableName($database)
+    public function getUseMapperNameAsTableName($database)
     {
         if (!count($this->_configurations)) {
             return;
@@ -299,6 +305,12 @@ class Piece_ORM_Config
 
         return $this->_configurations[$database]['useMapperNameAsTableName'];
     }
+
+    /**#@-*/
+
+    /**#@+
+     * @access protected
+     */
 
     /**#@-*/
 

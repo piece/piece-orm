@@ -2,7 +2,7 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 
 /**
- * PHP versions 4 and 5
+ * PHP version 5
  *
  * Copyright (c) 2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>,
  * All rights reserved.
@@ -35,13 +35,6 @@
  * @since      File available since Release 0.2.0
  */
 
-require_once 'Piece/ORM/Inflector.php';
-require_once 'Piece/ORM/Error.php';
-require_once 'MDB2.php';
-require_once 'PEAR.php';
-require_once 'Piece/ORM/Mapper/RelationshipType.php';
-require_once 'Piece/ORM/Mapper/Factory.php';
-
 // {{{ Piece_ORM_Mapper_ObjectLoader
 
 /**
@@ -65,17 +58,23 @@ class Piece_ORM_Mapper_ObjectLoader
     /**#@-*/
 
     /**#@+
+     * @access protected
+     */
+
+    /**#@-*/
+
+    /**#@+
      * @access private
      */
 
-    var $_mapper;
-    var $_result;
-    var $_relationships;
-    var $_relationshipKeys = array();
-    var $_objects = array();
-    var $_objectIndexes = array();
-    var $_associatedObjectLoaders = array();
-    var $_metadata;
+    private $_mapper;
+    private $_result;
+    private $_relationships;
+    private $_relationshipKeys = array();
+    private $_objects = array();
+    private $_objectIndexes = array();
+    private $_associatedObjectLoaders = array();
+    private $_metadata;
 
     /**#@-*/
 
@@ -84,29 +83,32 @@ class Piece_ORM_Mapper_ObjectLoader
      */
 
     // }}}
-    // {{{ constructor
+    // {{{ __construct()
 
     /**
      * Initializes properties with the given values.
      *
-     * @param Piece_ORM_Mapper_Common &$mapper
-     * @param MDB2_Result             &$result
+     * @param Piece_ORM_Mapper_Common $mapper
+     * @param MDB2_Result             $result
      * @param array                   $relationships
      */
-    function Piece_ORM_Mapper_ObjectLoader(&$mapper, &$result, $relationships)
+    public function __construct(Piece_ORM_Mapper_Common $mapper,
+                                MDB2_Result $result,
+                                array $relationships
+                                )
     {
-        $this->_result = &$result;
+        $this->_result = $result;
 
         if (count($relationships)) {
             foreach (Piece_ORM_Mapper_RelationshipType::getRelationshipTypes() as $relationshipType) {
                 $associatedObjectsLoaderClass = 'Piece_ORM_Mapper_AssociatedObjectLoader_' . ucwords($relationshipType);
                 include_once str_replace('_', '/', $associatedObjectsLoaderClass) . '.php';
-                $this->_associatedObjectLoaders[$relationshipType] = &new $associatedObjectsLoaderClass($relationships, $this->_relationshipKeys, $this->_objects, $this->_objectIndexes, $mapper);
+                $this->_associatedObjectLoaders[$relationshipType] = new $associatedObjectsLoaderClass($relationships, $this->_relationshipKeys, $this->_objects, $this->_objectIndexes, $mapper);
             }
         }
 
-        $this->_metadata = &$mapper->getMetadata();
-        $this->_mapper = &$mapper;
+        $this->_metadata = $mapper->getMetadata();
+        $this->_mapper = $mapper;
         $this->_relationships = $relationships;
     }
 
@@ -118,7 +120,7 @@ class Piece_ORM_Mapper_ObjectLoader
      *
      * @return array
      */
-    function loadAll()
+    public function loadAll()
     {
         $this->_loadPrimaryObjects();
         if (Piece_ORM_Error::hasErrors()) {
@@ -138,6 +140,12 @@ class Piece_ORM_Mapper_ObjectLoader
     /**#@-*/
 
     /**#@+
+     * @access protected
+     */
+
+    /**#@-*/
+
+    /**#@+
      * @access private
      */
 
@@ -147,26 +155,26 @@ class Piece_ORM_Mapper_ObjectLoader
     /**
      * Loads an object with a row.
      *
-     * @param array $row
+     * @param array &$row
      * @return stdClass
      */
-    function &_load($row)
+    private function _load(array &$row)
     {
         if (is_null($row)) {
             return $row;
         }
 
-        $object = &new stdClass();
+        $object = new stdClass();
         foreach ($row as $fieldName => $value) {
             if (!$this->_metadata->isLOB($fieldName)) {
                 $object->{ Piece_ORM_Inflector::camelize($fieldName, true) } = $value;
             } elseif (is_null($value)) {
                 $object->{ Piece_ORM_Inflector::camelize($fieldName, true) } = null;
             } else {
-                $lob = &$this->_mapper->createLOB();
+                $lob = $this->_mapper->createLOB();
                 $lob->setFieldName($fieldName);
                 $lob->setValue($value);
-                $object->{ Piece_ORM_Inflector::camelize($fieldName, true) } = &$lob;
+                $object->{ Piece_ORM_Inflector::camelize($fieldName, true) } = $lob;
             }
         }
 
@@ -181,7 +189,7 @@ class Piece_ORM_Mapper_ObjectLoader
      *
      * @throws PIECE_ORM_ERROR_CANNOT_INVOKE
      */
-    function _loadPrimaryObjects()
+    private function _loadPrimaryObjects()
     {
         $preloadCallback = $this->_mapper->getPreloadCallback();
         $preloadCallbackArgs = $this->_mapper->getPreloadCallbackArgs();
@@ -197,13 +205,13 @@ class Piece_ORM_Mapper_ObjectLoader
             }
 
             if (!is_null($preloadCallback)) {
-                $loadObject = call_user_func_array($preloadCallback, array_merge(array(&$row, &$this->_mapper), $preloadCallbackArgs));
+                $loadObject = call_user_func_array($preloadCallback, array_merge(array(&$row, $this->_mapper), $preloadCallbackArgs));
             } else {
                 $loadObject = true;
             }
 
             if ($loadObject) {
-                $this->_objects[] = &$this->_load($row);
+                $this->_objects[] = $this->_load($row);
             }
 
             for ($j = 0, $count = count($this->_relationships); $j < $count; ++$j) {
@@ -219,10 +227,10 @@ class Piece_ORM_Mapper_ObjectLoader
     /**
      * Loads associated objects into appropriate objects.
      */
-    function _loadAssociatedObjects()
+    private function _loadAssociatedObjects()
     {
         for ($i = 0, $count = count($this->_relationships); $i < $count; ++$i) {
-            $mapper = &Piece_ORM_Mapper_Factory::factory($this->_relationships[$i]['table']);
+            $mapper = Piece_ORM_Mapper_Factory::factory($this->_relationships[$i]['table']);
             if (Piece_ORM_Error::hasErrors()) {
                 return;
             }

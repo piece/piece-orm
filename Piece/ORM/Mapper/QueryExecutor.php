@@ -2,7 +2,7 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 
 /**
- * PHP versions 4 and 5
+ * PHP version 5
  *
  * Copyright (c) 2008 KUBO Atsuhiro <iteman@users.sourceforge.net>,
  * All rights reserved.
@@ -35,11 +35,6 @@
  * @since      File available since Release 1.1.0
  */
 
-require_once 'Piece/ORM/Mapper/QueryBuilder.php';
-require_once 'Piece/ORM/Error.php';
-require_once 'MDB2.php';
-require_once 'PEAR.php';
-
 // {{{ Piece_ORM_Mapper_QueryExecutor
 
 /**
@@ -63,11 +58,17 @@ class Piece_ORM_Mapper_QueryExecutor
     /**#@-*/
 
     /**#@+
+     * @access protected
+     */
+
+    /**#@-*/
+
+    /**#@+
      * @access private
      */
 
-    var $_mapper;
-    var $_isManip;
+    private $_mapper;
+    private $_isManip;
 
     /**#@-*/
 
@@ -76,17 +77,17 @@ class Piece_ORM_Mapper_QueryExecutor
      */
 
     // }}}
-    // {{{ constructor
+    // {{{ __construct()
 
     /**
      * Sets whether a query is for data manipulation.
      *
-     * @param Piece_ORM_Mapper_Common &$mapper
+     * @param Piece_ORM_Mapper_Common $mapper
      * @param boolean                 $isManip
      */
-    function Piece_ORM_Mapper_QueryExecutor(&$mapper, $isManip)
+    public function __construct(Piece_ORM_Mapper_Common $mapper, $isManip)
     {
-        $this->_mapper = &$mapper;
+        $this->_mapper = $mapper;
         $this->_isManip = $isManip;
     }
 
@@ -103,12 +104,12 @@ class Piece_ORM_Mapper_QueryExecutor
      * @throws PIECE_ORM_ERROR_UNEXPECTED_VALUE
      * @throws PIECE_ORM_ERROR_CONSTRAINT
      */
-    function &execute($query, $sth)
+    public function execute($query, $sth)
     {
-        $dbh = &$this->_mapper->getConnection();
+        $dbh = $this->_mapper->getConnection();
         PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
         if (!$this->_isManip) {
-            $result = &$dbh->query($query);
+            $result = $dbh->query($query);
         } else {
             if (is_null($sth)) {
                 $result = $dbh->exec($query);
@@ -156,20 +157,20 @@ class Piece_ORM_Mapper_QueryExecutor
      * @param stdClass $criteria
      * @return MDB2_Result_Common|integer
      */
-    function &executeWithCriteria($methodName, $criteria)
+    public function executeWithCriteria($methodName, $criteria)
     {
-        $queryBuilder = &new Piece_ORM_Mapper_QueryBuilder($this->_mapper,
-                                                           $methodName,
-                                                           $criteria,
-                                                           $this->_isManip
-                                                           );
+        $queryBuilder = new Piece_ORM_Mapper_QueryBuilder($this->_mapper,
+                                                          $methodName,
+                                                          $criteria,
+                                                          $this->_isManip
+                                                          );
         list($query, $sth) = $queryBuilder->build();
         if (Piece_ORM_Error::hasErrors()) {
             $return = null;
             return $return;
         }
 
-        $result = &$this->execute($query, $sth);
+        $result = $this->execute($query, $sth);
         if (Piece_ORM_Error::hasErrors()) {
             $return = null;
             return $return;
