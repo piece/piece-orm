@@ -2,9 +2,9 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 
 /**
- * PHP versions 4 and 5
+ * PHP version 5
  *
- * Copyright (c) 2007 KUBO Atsuhiro <iteman@users.sourceforge.net>,
+ * Copyright (c) 2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>,
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,7 +29,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  * @package    Piece_ORM
- * @copyright  2007 KUBO Atsuhiro <iteman@users.sourceforge.net>
+ * @copyright  2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License (revised)
  * @version    SVN: $Id$
  * @since      File available since Release 0.1.0
@@ -41,7 +41,7 @@
  * A utility class for words operation.
  *
  * @package    Piece_ORM
- * @copyright  2007 KUBO Atsuhiro <iteman@users.sourceforge.net>
+ * @copyright  2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License (revised)
  * @version    Release: @package_version@
  * @since      Class available since Release 0.1.0
@@ -58,6 +58,12 @@ class Piece_ORM_Inflector
     /**#@-*/
 
     /**#@+
+     * @access protected
+     */
+
+    /**#@-*/
+
+    /**#@+
      * @access private
      */
 
@@ -65,7 +71,6 @@ class Piece_ORM_Inflector
 
     /**#@+
      * @access public
-     * @static
      */
 
     // }}}
@@ -79,7 +84,7 @@ class Piece_ORM_Inflector
      * @return string
      * @link http://www.zend.com/codex.php?id=1564&single=1
      */
-    function camelize($word, $lowercaseFirstLetter = false)
+    public static function camelize($word, $lowercaseFirstLetter = false)
     {
         $camelizedWord = str_replace(' ', '', ucwords(preg_replace('/(?:(?<!\d)[^A-Z^a-z^0-9](?!\d))+/', ' ', $word)));
         if (!$lowercaseFirstLetter) {
@@ -99,7 +104,7 @@ class Piece_ORM_Inflector
      * @return string
      * @link http://www.zend.com/codex.php?id=1564&single=1
      */
-    function underscore($word)
+    public static function underscore($word)
     {
         return strtolower(preg_replace('/[^A-Z^a-z^0-9]+/', '_',
                                        preg_replace('/([a-z\d])([A-Z])/', '\1_\2',
@@ -115,10 +120,16 @@ class Piece_ORM_Inflector
      * @param string $word
      * @return string
      */
-    function lowercaseFirstLetter($word)
+    public static function lowercaseFirstLetter($word)
     {
         return strtolower(substr($word, 0, 1)) . substr($word, 1);
     }
+
+    /**#@-*/
+
+    /**#@+
+     * @access protected
+     */
 
     /**#@-*/
 

@@ -2,7 +2,7 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 
 /**
- * PHP versions 4 and 5
+ * PHP version 5
  *
  * Copyright (c) 2008 KUBO Atsuhiro <iteman@users.sourceforge.net>,
  * All rights reserved.
@@ -35,12 +35,6 @@
  * @since      File available since Release 1.1.0
  */
 
-require_once 'Piece/ORM/Mapper/QueryType.php';
-require_once 'Piece/ORM/Inflector.php';
-require_once 'Piece/ORM/Error.php';
-require_once 'MDB2.php';
-require_once 'PEAR.php';
-
 // {{{ Piece_ORM_Mapper_QueryBuilder
 
 /**
@@ -64,16 +58,21 @@ class Piece_ORM_Mapper_QueryBuilder
     /**#@-*/
 
     /**#@+
+     * @access protected
+     */
+
+    /**#@-*/
+
+    /**#@+
      * @access private
      */
 
-    var $_mapper;
-    var $_methodName;
-    var $_quotedCriteria;
-    var $_errorsInEval = array();
-    var $_metadata;
-    var $_isManip;
-    var $_criteria;
+    private $_mapper;
+    private $_methodName;
+    private $_quotedCriteria;
+    private $_metadata;
+    private $_isManip;
+    private $_criteria;
 
     /**#@-*/
 
@@ -82,28 +81,28 @@ class Piece_ORM_Mapper_QueryBuilder
      */
 
     // }}}
-    // {{{ constructor
+    // {{{ __construct()
 
     /**
      * Initializes properties with the given values.
      *
-     * @param Piece_ORM_Mapper_Common &$mapper
+     * @param Piece_ORM_Mapper_Common $mapper
      * @param string                  $methodName
-     * @param stdClass                &$criteria
+     * @param stdClass                $criteria
      * @param boolean                 $isManip
      */
-    function Piece_ORM_Mapper_QueryBuilder(&$mapper,
-                                           $methodName,
-                                           &$criteria,
-                                           $isManip
-                                           )
+    public function __construct(Piece_ORM_Mapper_Common $mapper,
+                                $methodName,
+                                $criteria,
+                                $isManip
+                                )
     {
-        $this->_metadata = &$mapper->getMetadata();
-        $this->_mapper = &$mapper;
+        $this->_metadata = $mapper->getMetadata();
+        $this->_mapper = $mapper;
         $this->_methodName = $methodName;
         $this->_isManip = $isManip;
-        $this->_criteria = &$criteria;
-        $this->_quotedCriteria = &new stdClass();
+        $this->_criteria = $criteria;
+        $this->_quotedCriteria = new stdClass();
 
         $this->_quoteCriteria();
         $this->_setCurrentTimestampToCriteria();
@@ -119,17 +118,17 @@ class Piece_ORM_Mapper_QueryBuilder
      * @return array
      * @throws PIECE_ORM_ERROR_CANNOT_INVOKE
      */
-    function build()
+    public function build()
     {
         extract((array)$this->_quotedCriteria);
         $query = $this->_mapper->getQuery($this->_methodName);
 
-        set_error_handler(array(&$this, 'handleErrorInEval'));
-        eval("\$query = \"$query\";");
-        restore_error_handler();
-        if (count($this->_errorsInEval)) {
-            $message = implode("\n", $this->_errorsInEval);
-            $this->_errorsInEval = array();
+        $oldLevel = error_reporting(0);
+        ini_set('track_errors', true);
+        $message = eval("\$evaluatedQuery = \"$query\"; return \$php_errormsg;");
+        ini_restore('track_errors');
+        error_reporting($oldLevel);
+        if (!is_null($message)) {
             Piece_ORM_Error::push(PIECE_ORM_ERROR_CANNOT_INVOKE,
                                   "Failed to build a query for the method [ {$this->_methodName} ] for any reasons. See below for more details.
  $message");
@@ -137,31 +136,17 @@ class Piece_ORM_Mapper_QueryBuilder
         }
 
         if (Piece_ORM_Mapper_QueryType::isFindAll($this->_methodName)) {
-            $this->_mapper->setLastQueryForGetCount($query);
+            $this->_mapper->setLastQueryForGetCount($evaluatedQuery);
         } else {
             $this->_mapper->setLastQueryForGetCount(null);
         }
 
         if (!$this->_isManip) {
-            $query .= $this->_mapper->getOrderBy($this->_methodName);
+            $evaluatedQuery .= $this->_mapper->getOrderBy($this->_methodName);
             $this->_mapper->clearOrders();
         }
 
-        return array($query, $this->_createPreparedStatement($query));
-    }
-
-    // }}}
-    // {{{ handleErrorInEval()
-
-    /**
-     * Collects error messages raised in eval().
-     *
-     * @param integer $errno
-     * @param string  $errstr
-     */
-    function handleErrorInEval($errno, $errstr)
-    {
-        $this->_errorsInEval[] = $errstr;
+        return array($evaluatedQuery, $this->_createPreparedStatement($evaluatedQuery));
     }
 
     // }}}
@@ -173,10 +158,16 @@ class Piece_ORM_Mapper_QueryBuilder
      * @param string $value
      * @return boolean
      */
-    function isQuotableValue($value)
+    public function isQuotableValue($value)
     {
         return is_scalar($value) || is_null($value);
     }
+
+    /**#@-*/
+
+    /**#@+
+     * @access protected
+     */
 
     /**#@-*/
 
@@ -190,7 +181,7 @@ class Piece_ORM_Mapper_QueryBuilder
     /**
      * Quotes the criteria.
      */
-    function _quoteCriteria()
+    private function _quoteCriteria()
     {
         foreach ($this->_criteria as $key => $value) {
             if ($this->isQuotableValue($value)) {
@@ -201,8 +192,8 @@ class Piece_ORM_Mapper_QueryBuilder
             if (is_array($value)) {
                 $this->_quotedCriteria->$key =
                     implode(', ',
-                            array_map(array(&$this->_mapper, 'quote'),
-                                      array_filter($value, array(&$this, 'isQuotableValue')))
+                            array_map(array($this->_mapper, 'quote'),
+                                      array_filter($value, array($this, 'isQuotableValue')))
                             );
             }
         }
@@ -212,15 +203,16 @@ class Piece_ORM_Mapper_QueryBuilder
     // {{{ _setCurrentTimestampToCriteria()
 
     /**
-     * Sets the current timestmap to the createdAt/updatedAt property in the criteria.
+     * Sets the current timestmap to the createdAt/updatedAt property in
+     * the criteria.
      */
-    function _setCurrentTimestampToCriteria()
+    private function _setCurrentTimestampToCriteria()
     {
         if (Piece_ORM_Mapper_QueryType::isInsert($this->_methodName)
             && $this->_metadata->getDatatype('created_at') == 'timestamp'
             ) {
             $createdAtProperty = Piece_ORM_Inflector::camelize('created_at', true);
-            if (array_key_exists($createdAtProperty, $this->_criteria)) {
+            if (property_exists($this->_criteria, $createdAtProperty)) {
                 $this->_quotedCriteria->$createdAtProperty = 'CURRENT_TIMESTAMP';
             }
         }
@@ -230,7 +222,7 @@ class Piece_ORM_Mapper_QueryBuilder
             && $this->_metadata->getDatatype('updated_at') == 'timestamp'
             ) {
             $updatedAtProperty = Piece_ORM_Inflector::camelize('updated_at', true);
-            if (array_key_exists($updatedAtProperty, $this->_criteria)) {
+            if (property_exists($this->_criteria, $updatedAtProperty)) {
                 $this->_quotedCriteria->$updatedAtProperty = 'CURRENT_TIMESTAMP';
             }
         }
@@ -240,9 +232,10 @@ class Piece_ORM_Mapper_QueryBuilder
     // {{{ _setTableNameToCriteria()
 
     /**
-     * Sets an appropriate table name as a built-in variable $__table to the criteria.
+     * Sets an appropriate table name as a built-in variable $__table to
+     * the criteria.
      */
-    function _setTableNameToCriteria()
+    private function _setTableNameToCriteria()
     {
         $this->_quotedCriteria->__table = $this->_metadata->getTableName();
     }
@@ -256,7 +249,7 @@ class Piece_ORM_Mapper_QueryBuilder
      * @param string $query
      * @return MDB2_Statement_Common
      */
-    function _createPreparedStatement($query)
+    private function _createPreparedStatement($query)
     {
         if (!preg_match_all('/:(\w+)/',
                             $this->_mapper->getQuery($this->_methodName),
@@ -285,7 +278,7 @@ class Piece_ORM_Mapper_QueryBuilder
      * @return MDB2_Statement_Common
      * @throws PIECE_ORM_ERROR_CANNOT_INVOKE
      */
-    function _buildPreparedStatement($query, $placeHolderFields)
+    private function _buildPreparedStatement($query, $placeHolderFields)
     {
         $types = array();
         foreach ($placeHolderFields as $placeHolderField) {
@@ -293,7 +286,7 @@ class Piece_ORM_Mapper_QueryBuilder
                 $this->_metadata->getDatatype($placeHolderField);
         }
 
-        $dbh = &$this->_mapper->getConnection();
+        $dbh = $this->_mapper->getConnection();
         PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
         $sth = $dbh->prepare($query, $types, MDB2_PREPARE_MANIP);
         PEAR::staticPopErrorHandling();
@@ -309,7 +302,7 @@ class Piece_ORM_Mapper_QueryBuilder
             do {
                 $placeHolderProperty =
                     Piece_ORM_Inflector::camelize($placeHolderField, true);
-                if (!array_key_exists($placeHolderProperty, $this->_criteria)) {
+                if (!property_exists($this->_criteria, $placeHolderProperty)) {
                     $value = null;
                     break;
                 }

@@ -2,7 +2,7 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 
 /**
- * PHP versions 4 and 5
+ * PHP version 5
  *
  * Copyright (c) 2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>,
  * All rights reserved.
@@ -35,9 +35,6 @@
  * @since      File available since Release 0.1.0
  */
 
-require_once 'Piece/ORM/Context.php';
-require_once 'Piece/ORM/Inflector.php';
-
 // {{{ Piece_ORM_Metadata
 
 /**
@@ -61,14 +58,20 @@ class Piece_ORM_Metadata
     /**#@-*/
 
     /**#@+
+     * @access protected
+     */
+
+    /**#@-*/
+
+    /**#@+
      * @access private
      */
 
-    var $_tableName;
-    var $_tableInfo = array();
-    var $_aliases = array();
-    var $_hasID = false;
-    var $_primaryKey = array();
+    private $_tableName;
+    private $_tableInfo = array();
+    private $_aliases = array();
+    private $_hasID = false;
+    private $_primaryKey = array();
 
     /**#@-*/
 
@@ -77,14 +80,14 @@ class Piece_ORM_Metadata
      */
 
     // }}}
-    // {{{ constructor
+    // {{{ __construct()
 
     /**
      * Imports information for a table.
      *
      * @param array $tableInfo
      */
-    function Piece_ORM_Metadata($tableInfo)
+    public function __construct(array $tableInfo)
     {
         $this->_tableName = $tableInfo[0]['table'];
         foreach ($tableInfo as $fieldInfo) {
@@ -112,7 +115,7 @@ class Piece_ORM_Metadata
      * @param string $fieldName
      * @return string
      */
-    function getDatatype($fieldName)
+    public function getDatatype($fieldName)
     {
         if (!$this->hasField($fieldName)) {
             return;
@@ -129,7 +132,7 @@ class Piece_ORM_Metadata
      *
      * @return array
      */
-    function getFieldNames()
+    public function getFieldNames()
     {
         return array_keys($this->_tableInfo);
     }
@@ -143,13 +146,13 @@ class Piece_ORM_Metadata
      * @param boolean $notQuoteIdentifier
      * @return string
      */
-    function getTableName($notQuoteIdentifier = false)
+    public function getTableName($notQuoteIdentifier = false)
     {
-        $context = &Piece_ORM_Context::singleton();
+        $context = Piece_ORM_Context::singleton();
         if (!$context->getUseMapperNameAsTableName() || $notQuoteIdentifier) {
             return $this->_tableName;
         } else {
-            $dbh = &$context->getConnection();
+            $dbh = $context->getConnection();
             return $dbh->quoteIdentifier($this->_tableName);
         }
     }
@@ -163,7 +166,7 @@ class Piece_ORM_Metadata
      * @return string
      * @deprecated Method deprecated in Release 1.2.0
      */
-    function getFieldNameWithAlias($alias)
+    public function getFieldNameWithAlias($alias)
     {
         return $this->getFieldNameByAlias($alias);
     }
@@ -176,7 +179,7 @@ class Piece_ORM_Metadata
      *
      * @return boolean
      */
-    function hasID()
+    public function hasID()
     {
         return $this->_hasID;
     }
@@ -190,7 +193,7 @@ class Piece_ORM_Metadata
      * @param string $fieldName
      * @return boolean
      */
-    function isAutoIncrement($fieldName)
+    public function isAutoIncrement($fieldName)
     {
         if (!$this->hasField($fieldName)) {
             return false;
@@ -207,7 +210,7 @@ class Piece_ORM_Metadata
      *
      * @return boolean
      */
-    function hasPrimaryKey()
+    public function hasPrimaryKey()
     {
         return (boolean)count($this->_primaryKey);
     }
@@ -220,7 +223,7 @@ class Piece_ORM_Metadata
      *
      * @return array
      */
-    function getPrimaryKeys()
+    public function getPrimaryKeys()
     {
         if ($this->hasPrimaryKey()) {
             return $this->_primaryKey;
@@ -236,7 +239,7 @@ class Piece_ORM_Metadata
      * @param string $fieldName
      * @return boolean
      */
-    function isPartOfPrimaryKey($fieldName)
+    public function isPartOfPrimaryKey($fieldName)
     {
         if (!$this->hasField($fieldName)) {
             return false;
@@ -258,7 +261,7 @@ class Piece_ORM_Metadata
      * @param string $fieldName
      * @return boolean
      */
-    function hasField($fieldName)
+    public function hasField($fieldName)
     {
         return array_key_exists($fieldName, $this->_tableInfo);
     }
@@ -272,7 +275,7 @@ class Piece_ORM_Metadata
      *
      * @return string
      */
-    function getPrimaryKey()
+    public function getPrimaryKey()
     {
         if ($this->hasPrimaryKey() && !$this->_hasCompositePrimaryKey()) {
             $primaryKeys = $this->_primaryKey;
@@ -290,7 +293,7 @@ class Piece_ORM_Metadata
      * @return boolean
      * @since Method available since Release 0.8.1
      */
-    function hasDefault($fieldName)
+    public function hasDefault($fieldName)
     {
         if (!$this->hasField($fieldName)) {
             return false;
@@ -310,7 +313,7 @@ class Piece_ORM_Metadata
      * @param string $fieldName
      * @return boolean
      */
-    function isLOB($fieldName)
+    public function isLOB($fieldName)
     {
         $datatype = $this->getDatatype($fieldName);
         if (is_null($datatype)) {
@@ -330,7 +333,7 @@ class Piece_ORM_Metadata
      * @return mixed
      * @since Method available since Release 1.2.0
      */
-    function getDefault($fieldName)
+    public function getDefault($fieldName)
     {
         if (!$this->hasDefault($fieldName)) {
             return;
@@ -348,10 +351,16 @@ class Piece_ORM_Metadata
      * @return string
      * @since Method available since Release 1.2.0
      */
-    function getFieldNameByAlias($alias)
+    public function getFieldNameByAlias($alias)
     {
         return $this->_aliases[$alias];
     }
+
+    /**#@-*/
+
+    /**#@+
+     * @access protected
+     */
 
     /**#@-*/
 
@@ -367,7 +376,7 @@ class Piece_ORM_Metadata
      *
      * @return boolean
      */
-    function _hasCompositePrimaryKey()
+    private function _hasCompositePrimaryKey()
     {
         if ($this->hasPrimaryKey()) {
             return (boolean)(count($this->_primaryKey) > 1);

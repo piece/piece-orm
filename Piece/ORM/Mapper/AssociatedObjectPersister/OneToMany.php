@@ -2,7 +2,7 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 
 /**
- * PHP versions 4 and 5
+ * PHP version 5
  *
  * Copyright (c) 2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>,
  * All rights reserved.
@@ -35,11 +35,6 @@
  * @since      File available since Release 0.2.0
  */
 
-require_once 'Piece/ORM/Mapper/AssociatedObjectPersister/Common.php';
-require_once 'Piece/ORM/Mapper/Factory.php';
-require_once 'Piece/ORM/Error.php';
-require_once 'Piece/ORM/Inflector.php';
-
 // {{{ Piece_ORM_Mapper_AssociatedObjectPersister_OneToMany
 
 /**
@@ -63,10 +58,16 @@ class Piece_ORM_Mapper_AssociatedObjectPersister_OneToMany extends Piece_ORM_Map
     /**#@-*/
 
     /**#@+
+     * @access protected
+     */
+
+    /**#@-*/
+
+    /**#@+
      * @access private
      */
 
-    var $_primaryKeyProperty;
+    private $_primaryKeyProperty;
 
     /**#@-*/
 
@@ -82,25 +83,25 @@ class Piece_ORM_Mapper_AssociatedObjectPersister_OneToMany extends Piece_ORM_Map
      *
      * @param array $relationship
      */
-    function insert($relationship)
+    public function insert(array $relationship)
     {
-        if (!array_key_exists($relationship['mappedAs'], $this->_subject)) {
+        if (!property_exists($this->subject, $relationship['mappedAs'])) {
             return;
         }
 
-        if (!is_array($this->_subject->$relationship['mappedAs'])) {
+        if (!is_array($this->subject->$relationship['mappedAs'])) {
             return;
         }
 
-        $mapper = &Piece_ORM_Mapper_Factory::factory($relationship['table']);
+        $mapper = Piece_ORM_Mapper_Factory::factory($relationship['table']);
         if (Piece_ORM_Error::hasErrors()) {
             return;
         }
 
-        $referencedColumnValue = $this->_subject->{ Piece_ORM_Inflector::camelize($relationship['referencedColumn'], true) };
-        for ($i = 0, $count = count($this->_subject->$relationship['mappedAs']); $i < $count; ++$i) {
-            $this->_subject->{ $relationship['mappedAs'] }[$i]->{ Piece_ORM_Inflector::camelize($relationship['column'], true) } = $referencedColumnValue;
-            $mapper->insert($this->_subject->{ $relationship['mappedAs'] }[$i]);
+        $referencedColumnValue = $this->subject->{ Piece_ORM_Inflector::camelize($relationship['referencedColumn'], true) };
+        for ($i = 0, $count = count($this->subject->$relationship['mappedAs']); $i < $count; ++$i) {
+            $this->subject->{ $relationship['mappedAs'] }[$i]->{ Piece_ORM_Inflector::camelize($relationship['column'], true) } = $referencedColumnValue;
+            $mapper->insert($this->subject->{ $relationship['mappedAs'] }[$i]);
             if (Piece_ORM_Error::hasErrors()) {
                 return;
             }
@@ -115,57 +116,57 @@ class Piece_ORM_Mapper_AssociatedObjectPersister_OneToMany extends Piece_ORM_Map
      *
      * @param array $relationship
      */
-    function update($relationship)
+    public function update(array $relationship)
     {
-        if (!array_key_exists($relationship['mappedAs'], $this->_subject)) {
+        if (!property_exists($this->subject, $relationship['mappedAs'])) {
             return;
         }
 
-        if (!is_array($this->_subject->$relationship['mappedAs'])) {
+        if (!is_array($this->subject->$relationship['mappedAs'])) {
             return;
         }
 
-        $mapper = &Piece_ORM_Mapper_Factory::factory($relationship['table']);
+        $mapper = Piece_ORM_Mapper_Factory::factory($relationship['table']);
         if (Piece_ORM_Error::hasErrors()) {
             return;
         }
 
-        $referencedColumnValue = $this->_subject->{ Piece_ORM_Inflector::camelize($relationship['referencedColumn'], true) };
+        $referencedColumnValue = $this->subject->{ Piece_ORM_Inflector::camelize($relationship['referencedColumn'], true) };
         $oldObjects = $mapper->findAllWithQuery("SELECT * FROM {$relationship['table']} WHERE {$relationship['column']} = " . $mapper->quote($referencedColumnValue, $relationship['column']));
         if (Piece_ORM_Error::hasErrors()) {
             return;
         }
 
-        $metadata = &$mapper->getMetadata();
+        $metadata = $mapper->getMetadata();
         $this->_primaryKeyProperty = Piece_ORM_Inflector::camelize($metadata->getPrimaryKey(), true);
         $targetsForInsert = array();
         $targetsForUpdate = array();
         $targetsForDelete = array();
-        for ($i = 0, $count = count($this->_subject->$relationship['mappedAs']); $i < $count; ++$i) {
-            if (!array_key_exists($this->_primaryKeyProperty, $this->_subject->{ $relationship['mappedAs'] }[$i])) {
-                $targetsForInsert[] = &$this->_subject->{ $relationship['mappedAs'] }[$i];
+        for ($i = 0, $count = count($this->subject->$relationship['mappedAs']); $i < $count; ++$i) {
+            if (!property_exists($this->subject->{ $relationship['mappedAs'] }[$i], $this->_primaryKeyProperty)) {
+                $targetsForInsert[] = $this->subject->{ $relationship['mappedAs'] }[$i];
                 continue;
             }
 
-            if (is_null($this->_subject->{ $relationship['mappedAs'] }[$i]->{ $this->_primaryKeyProperty })) {
-                $targetsForInsert[] = &$this->_subject->{ $relationship['mappedAs'] }[$i];
+            if (is_null($this->subject->{ $relationship['mappedAs'] }[$i]->{ $this->_primaryKeyProperty })) {
+                $targetsForInsert[] = $this->subject->{ $relationship['mappedAs'] }[$i];
                 continue;
             }
 
-            $targetsForUpdate[] = &$this->_subject->{ $relationship['mappedAs']}[$i];
+            $targetsForUpdate[] = $this->subject->{ $relationship['mappedAs']}[$i];
         }
 
-        usort($oldObjects, array(&$this, 'sortByPrimaryKey'));
-        usort($targetsForUpdate, array(&$this, 'sortByPrimaryKey'));
+        usort($oldObjects, array($this, 'sortByPrimaryKey'));
+        usort($targetsForUpdate, array($this, 'sortByPrimaryKey'));
 
-        $oldPrimaryKeyValues = array_map(array(&$this, 'getPrimaryKey'), $oldObjects);
-        $newPrimaryKeyValues = array_map(array(&$this, 'getPrimaryKey'), $targetsForUpdate);
+        $oldPrimaryKeyValues = array_map(array($this, 'getPrimaryKey'), $oldObjects);
+        $newPrimaryKeyValues = array_map(array($this, 'getPrimaryKey'), $targetsForUpdate);
         foreach (array_keys(array_diff($oldPrimaryKeyValues, $newPrimaryKeyValues)) as $indexForDelete) {
             $targetsForDelete[] = $oldObjects[$indexForDelete];
         }
 
         foreach (array_keys(array_diff($newPrimaryKeyValues, $oldPrimaryKeyValues)) as $indexForInsert) {
-            $targetsForInsert[] = &$targetsForUpdate[$indexForInsert];
+            $targetsForInsert[] = $targetsForUpdate[$indexForInsert];
             unset($targetsForUpdate[$indexForInsert]);
         }
 
@@ -201,20 +202,20 @@ class Piece_ORM_Mapper_AssociatedObjectPersister_OneToMany extends Piece_ORM_Map
      *
      * @param array $relationship
      */
-    function delete($relationship)
+    public function delete(array $relationship)
     {
         $property = Piece_ORM_Inflector::camelize($relationship['referencedColumn'], true);
-        if (!array_key_exists($property, $this->_subject)) {
+        if (!property_exists($this->subject, $property)) {
             return;
         }
 
-        $mapper = &Piece_ORM_Mapper_Factory::factory($relationship['table']);
+        $mapper = Piece_ORM_Mapper_Factory::factory($relationship['table']);
         if (Piece_ORM_Error::hasErrors()) {
             return;
         }
 
         $mapper->executeQuery("DELETE FROM {$relationship['table']} WHERE {$relationship['column']} = " .
-                              $mapper->quote($this->_subject->$property, $relationship['column']),
+                              $mapper->quote($this->subject->$property, $relationship['column']),
                               true
                               );
     }
@@ -225,10 +226,10 @@ class Piece_ORM_Mapper_AssociatedObjectPersister_OneToMany extends Piece_ORM_Map
     /**
      * Sorts two objects by the primary key.
      *
-     * @param mixed &$a
-     * @param mixed &$b
+     * @param mixed $a
+     * @param mixed $b
      */
-    function sortByPrimaryKey(&$a, &$b)
+    public function sortByPrimaryKey($a, $b)
     {
         if ($a->{ $this->_primaryKeyProperty } == $b->{ $this->_primaryKeyProperty }) {
             return 0;
@@ -243,12 +244,18 @@ class Piece_ORM_Mapper_AssociatedObjectPersister_OneToMany extends Piece_ORM_Map
     /**
      * Gets the primary key of a given object.
      *
-     * @param mixed &$o
+     * @param mixed $o
      */
-    function getPrimaryKey(&$o)
+    public function getPrimaryKey($o)
     {
         return $o->{ $this->_primaryKeyProperty };
     }
+
+    /**#@-*/
+
+    /**#@+
+     * @access protected
+     */
 
     /**#@-*/
 

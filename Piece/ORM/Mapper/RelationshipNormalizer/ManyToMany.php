@@ -2,7 +2,7 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 
 /**
- * PHP versions 4 and 5
+ * PHP version 5
  *
  * Copyright (c) 2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>,
  * All rights reserved.
@@ -35,10 +35,6 @@
  * @since      File available since Release 0.2.0
  */
 
-require_once 'Piece/ORM/Mapper/RelationshipNormalizer/Common.php';
-require_once 'Piece/ORM/Error.php';
-require_once 'Piece/ORM/Metadata/Factory.php';
-
 // {{{ Piece_ORM_Mapper_RelationshipNormalizer_ManyToMany
 
 /**
@@ -62,10 +58,16 @@ class Piece_ORM_Mapper_RelationshipNormalizer_ManyToMany extends Piece_ORM_Mappe
     /**#@-*/
 
     /**#@+
-     * @access private
+     * @access protected
      */
 
-    var $_referencedColumnRequired = false;
+    protected $referencedColumnRequired = false;
+
+    /**#@-*/
+
+    /**#@+
+     * @access private
+     */
 
     /**#@-*/
 
@@ -76,29 +78,29 @@ class Piece_ORM_Mapper_RelationshipNormalizer_ManyToMany extends Piece_ORM_Mappe
     /**#@-*/
 
     /**#@+
-     * @access private
+     * @access protected
      */
 
     // }}}
-    // {{{ _normalizeThrough()
+    // {{{ normalizeThrough()
 
     /**
      * Normalizes "through" definition.
      *
      * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
      */
-    function _normalizeThrough()
+    protected function normalizeThrough()
     {
-        if (!array_key_exists('through', $this->_relationship)) {
-            $this->_relationship['through'] = array();
+        if (!array_key_exists('through', $this->relationship)) {
+            $this->relationship['through'] = array();
         }
 
-        if (!array_key_exists('table', $this->_relationship['through'])) {
-            $throughTableName1 = $this->_metadata->getTableName(true) . "_{$this->_relationship['table']}";
-            $throughTableName2 = "{$this->_relationship['table']}_" . $this->_metadata->getTableName(true);
+        if (!array_key_exists('table', $this->relationship['through'])) {
+            $throughTableName1 = $this->metadata->getTableName(true) . "_{$this->relationship['table']}";
+            $throughTableName2 = "{$this->relationship['table']}_" . $this->metadata->getTableName(true);
             foreach (array($throughTableName1, $throughTableName2) as $throughTableName) {
                 Piece_ORM_Error::disableCallback();
-                $throughMetadata = &Piece_ORM_Metadata_Factory::factory($throughTableName);
+                $throughMetadata = Piece_ORM_Metadata_Factory::factory($throughTableName);
                 Piece_ORM_Error::enableCallback();
                 if (Piece_ORM_Error::hasErrors()) {
                     $error = Piece_ORM_Error::pop();
@@ -115,7 +117,7 @@ class Piece_ORM_Mapper_RelationshipNormalizer_ManyToMany extends Piece_ORM_Mappe
                     continue;
                 }
 
-                $this->_relationship['through']['table'] = $throughTableName;
+                $this->relationship['through']['table'] = $throughTableName;
                 break;
             }
 
@@ -127,14 +129,14 @@ class Piece_ORM_Mapper_RelationshipNormalizer_ManyToMany extends Piece_ORM_Mappe
             }
         }
 
-        $throughMetadata = &Piece_ORM_Metadata_Factory::factory($this->_relationship['through']['table']);
+        $throughMetadata = Piece_ORM_Metadata_Factory::factory($this->relationship['through']['table']);
         if (Piece_ORM_Error::hasErrors()) {
             return;
         }
 
-        if (!array_key_exists('column', $this->_relationship['through'])) {
-            if ($primaryKey = $this->_metadata->getPrimaryKey()) {
-                $this->_relationship['through']['column'] = $this->_metadata->getTableName(true) . "_$primaryKey";
+        if (!array_key_exists('column', $this->relationship['through'])) {
+            if ($primaryKey = $this->metadata->getPrimaryKey()) {
+                $this->relationship['through']['column'] = $this->metadata->getTableName(true) . "_$primaryKey";
             } else {
                 Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_CONFIGURATION,
                                       'A single primary key field is required, if the element [ column ] in the element [ through ] omit.'
@@ -143,16 +145,16 @@ class Piece_ORM_Mapper_RelationshipNormalizer_ManyToMany extends Piece_ORM_Mappe
             }
         } 
 
-        if (!$throughMetadata->hasField($this->_relationship['through']['column'])) {
+        if (!$throughMetadata->hasField($this->relationship['through']['column'])) {
             Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_CONFIGURATION,
-                                  "The field [ {$this->_relationship['through']['column']} ] not found in the table [ " . $throughMetadata->getTableName(true) . ' ].'
+                                  "The field [ {$this->relationship['through']['column']} ] not found in the table [ " . $throughMetadata->getTableName(true) . ' ].'
                                   );
             return;
         }
 
-        if (!array_key_exists('referencedColumn', $this->_relationship['through'])) {
-            if ($primaryKey = $this->_metadata->getPrimaryKey()) {
-                $this->_relationship['through']['referencedColumn'] = $primaryKey;
+        if (!array_key_exists('referencedColumn', $this->relationship['through'])) {
+            if ($primaryKey = $this->metadata->getPrimaryKey()) {
+                $this->relationship['through']['referencedColumn'] = $primaryKey;
             } else {
                 Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_CONFIGURATION,
                                       'A single primary key field is required, if the element [ referencedColumn ] in the element [ through ] omit.'
@@ -161,16 +163,16 @@ class Piece_ORM_Mapper_RelationshipNormalizer_ManyToMany extends Piece_ORM_Mappe
             }
         } 
 
-        if (!$this->_metadata->hasField($this->_relationship['through']['referencedColumn'])) {
+        if (!$this->metadata->hasField($this->relationship['through']['referencedColumn'])) {
             Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_CONFIGURATION,
-                                  "The field [ {$this->_relationship['through']['referencedColumn']} ] not found in the table [ " . $this->_metadata->getTableName(true) . ' ].'
+                                  "The field [ {$this->relationship['through']['referencedColumn']} ] not found in the table [ " . $this->metadata->getTableName(true) . ' ].'
                                   );
             return;
         }
 
-        if (!array_key_exists('inverseColumn', $this->_relationship['through'])) {
-            if ($primaryKey = $this->_relationshipMetadata->getPrimaryKey()) {
-                $this->_relationship['through']['inverseColumn'] = $this->_relationshipMetadata->getTableName(true) . "_$primaryKey";
+        if (!array_key_exists('inverseColumn', $this->relationship['through'])) {
+            if ($primaryKey = $this->relationshipMetadata->getPrimaryKey()) {
+                $this->relationship['through']['inverseColumn'] = $this->relationshipMetadata->getTableName(true) . "_$primaryKey";
             } else {
                 Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_CONFIGURATION,
                                       'A single primary key field is required, if the element [ column ] in the element [ through ] omit.'
@@ -179,24 +181,24 @@ class Piece_ORM_Mapper_RelationshipNormalizer_ManyToMany extends Piece_ORM_Mappe
             }
         } 
 
-        if (!$throughMetadata->hasField($this->_relationship['through']['inverseColumn'])) {
+        if (!$throughMetadata->hasField($this->relationship['through']['inverseColumn'])) {
             Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_CONFIGURATION,
-                                  "The field [ {$this->_relationship['through']['inverseColumn']} ] not found in the table [ " . $throughMetadata->getTableName(true) . ' ].'
+                                  "The field [ {$this->relationship['through']['inverseColumn']} ] not found in the table [ " . $throughMetadata->getTableName(true) . ' ].'
                                   );
             return;
         }
     }
 
     // }}}
-    // {{{ _normalizeColumn()
+    // {{{ normalizeColumn()
 
     /**
      * Normalizes "column" definition.
      */
-    function _normalizeColumn()
+    protected function normalizeColumn()
     {
-        if ($primaryKey = $this->_relationshipMetadata->getPrimaryKey()) {
-            $this->_relationship['column'] = $primaryKey;
+        if ($primaryKey = $this->relationshipMetadata->getPrimaryKey()) {
+            $this->relationship['column'] = $primaryKey;
             return true;
         } else {
             return false;
@@ -204,30 +206,36 @@ class Piece_ORM_Mapper_RelationshipNormalizer_ManyToMany extends Piece_ORM_Mappe
     }
 
     // }}}
-    // {{{ _normalizeReferencedColumn()
+    // {{{ normalizeReferencedColumn()
 
     /**
      * Normalizes "referencedColumn" definition.
      */
-    function _normalizeReferencedColumn()
+    protected function normalizeReferencedColumn()
     {
-        $this->_relationship['referencedColumn'] = null;
+        $this->relationship['referencedColumn'] = null;
         return true;
     }
 
     // }}}
-    // {{{ _checkHavingSinglePrimaryKey()
+    // {{{ checkHavingSinglePrimaryKey()
 
     /**
-     * Returns whether it checks that whether an associated table has
-     * a single primary key.
+     * Returns whether it checks that whether an associated table has a single
+     * primary key.
      *
      * @return boolean
      */
-    function _checkHavingSinglePrimaryKey()
+    protected function checkHavingSinglePrimaryKey()
     {
         return true;
     }
+
+    /**#@-*/
+
+    /**#@+
+     * @access private
+     */
 
     /**#@-*/
 

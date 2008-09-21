@@ -2,7 +2,7 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 
 /**
- * PHP versions 4 and 5
+ * PHP version 5
  *
  * Copyright (c) 2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>,
  * All rights reserved.
@@ -35,12 +35,6 @@
  * @since      File available since Release 0.2.0
  */
 
-require_once 'Piece/ORM/Error.php';
-require_once 'Piece/ORM/Inflector.php';
-require_once 'Piece/ORM/Mapper/RelationshipType.php';
-require_once 'MDB2.php';
-require_once 'PEAR.php';
-
 // {{{ Piece_ORM_Mapper_ObjectPersister
 
 /**
@@ -64,14 +58,20 @@ class Piece_ORM_Mapper_ObjectPersister
     /**#@-*/
 
     /**#@+
+     * @access protected
+     */
+
+    /**#@-*/
+
+    /**#@+
      * @access private
      */
 
-    var $_mapper;
-    var $_subject;
-    var $_relationships;
-    var $_metadata;
-    var $_associatedObjectPersisters = array();
+    private $_mapper;
+    private $_subject;
+    private $_relationships;
+    private $_metadata;
+    private $_associatedObjectPersisters = array();
 
     /**#@-*/
 
@@ -80,21 +80,24 @@ class Piece_ORM_Mapper_ObjectPersister
      */
 
     // }}}
-    // {{{ constructor
+    // {{{ __construct()
 
     /**
      * Initializes properties with the given values.
      *
-     * @param Piece_ORM_Mapper_Common &$mapper
-     * @param mixed                   &$subject
+     * @param Piece_ORM_Mapper_Common $mapper
+     * @param mixed                   $subject
      * @param array                   $relationships
      */
-    function Piece_ORM_Mapper_ObjectPersister(&$mapper, &$subject, $relationships)
+    public function __construct(Piece_ORM_Mapper_Common $mapper,
+                                $subject,
+                                array $relationships
+                                )
     {
-        $metadata = &$mapper->getMetadata();
+        $metadata = $mapper->getMetadata();
 
         if (is_null($subject)) {
-            $subject = &new stdClass();
+            $subject = new stdClass();
 
             if ($metadata->getDatatype('created_at') == 'timestamp') {
                 $subject->createdAt = null;
@@ -109,14 +112,14 @@ class Piece_ORM_Mapper_ObjectPersister
             foreach (Piece_ORM_Mapper_RelationshipType::getRelationshipTypes() as $relationshipType) {
                 $associatedObjectsPersisterClass = 'Piece_ORM_Mapper_AssociatedObjectPersister_' . ucwords($relationshipType);
                 include_once str_replace('_', '/', $associatedObjectsPersisterClass) . '.php';
-                $this->_associatedObjectPersisters[$relationshipType] = &new $associatedObjectsPersisterClass($subject);
+                $this->_associatedObjectPersisters[$relationshipType] = new $associatedObjectsPersisterClass($subject);
             }
         }
 
-        $this->_mapper = &$mapper;
-        $this->_subject = &$subject;
+        $this->_mapper = $mapper;
+        $this->_subject = $subject;
         $this->_relationships = $relationships;
-        $this->_metadata = &$metadata;
+        $this->_metadata = $metadata;
     }
 
     // }}}
@@ -129,7 +132,7 @@ class Piece_ORM_Mapper_ObjectPersister
      * @return integer
      * @throws PIECE_ORM_ERROR_UNEXPECTED_VALUE
      */
-    function insert($methodName)
+    public function insert($methodName)
     {
         if (!is_object($this->_subject)) {
             Piece_ORM_Error::push(PIECE_ORM_ERROR_UNEXPECTED_VALUE,
@@ -179,7 +182,7 @@ class Piece_ORM_Mapper_ObjectPersister
      * @return integer
      * @throws PIECE_ORM_ERROR_UNEXPECTED_VALUE
      */
-    function update($methodName)
+    public function update($methodName)
     {
         if (!is_object($this->_subject)) {
             Piece_ORM_Error::push(PIECE_ORM_ERROR_UNEXPECTED_VALUE,
@@ -220,7 +223,7 @@ class Piece_ORM_Mapper_ObjectPersister
      * @return integer
      * @throws PIECE_ORM_ERROR_UNEXPECTED_VALUE
      */
-    function delete($methodName)
+    public function delete($methodName)
     {
         if (!is_object($this->_subject)) {
             Piece_ORM_Error::push(PIECE_ORM_ERROR_UNEXPECTED_VALUE,
@@ -249,6 +252,12 @@ class Piece_ORM_Mapper_ObjectPersister
     /**#@-*/
 
     /**#@+
+     * @access protected
+     */
+
+    /**#@-*/
+
+    /**#@+
      * @access private
      */
 
@@ -260,11 +269,11 @@ class Piece_ORM_Mapper_ObjectPersister
      *
      * @return boolean
      */
-    function _validatePrimaryValues()
+    private function _validatePrimaryValues()
     {
         foreach ($this->_metadata->getPrimaryKeys() as $primaryKey) {
             $primaryKeyProperty = Piece_ORM_Inflector::camelize($primaryKey, true);
-            if (!array_key_exists($primaryKeyProperty, $this->_subject)) {
+            if (!property_exists($this->_subject, $primaryKeyProperty)) {
                 continue;
             }
 
@@ -290,10 +299,10 @@ class Piece_ORM_Mapper_ObjectPersister
      * @throws PIECE_ORM_ERROR_CANNOT_INVOKE
      * @since Method available since Release 1.1.0
      */
-    function _getLastInsertID()
+    private function _getLastInsertID()
     {
         if ($this->_metadata->hasID()) {
-            $dbh = &$this->_mapper->getConnection();
+            $dbh = $this->_mapper->getConnection();
             PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
             $id = $dbh->lastInsertID($this->_metadata->getTableName(true),
                                      $this->_metadata->getPrimaryKey()

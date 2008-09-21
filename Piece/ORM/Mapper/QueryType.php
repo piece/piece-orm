@@ -2,7 +2,7 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 
 /**
- * PHP versions 4 and 5
+ * PHP version 5
  *
  * Copyright (c) 2008 KUBO Atsuhiro <iteman@users.sourceforge.net>,
  * All rights reserved.
@@ -58,6 +58,12 @@ class Piece_ORM_Mapper_QueryType
     /**#@-*/
 
     /**#@+
+     * @access protected
+     */
+
+    /**#@-*/
+
+    /**#@+
      * @access private
      */
 
@@ -65,7 +71,6 @@ class Piece_ORM_Mapper_QueryType
 
     /**#@+
      * @access public
-     * @static
      */
 
     // }}}
@@ -77,7 +82,7 @@ class Piece_ORM_Mapper_QueryType
      * @param string $methodName
      * @return boolean
      */
-    function isFindAll($methodName)
+    public static function isFindAll($methodName)
     {
         return (boolean)preg_match('/^findAll.*$/i', $methodName);
     }
@@ -91,7 +96,7 @@ class Piece_ORM_Mapper_QueryType
      * @param string $methodName
      * @return boolean
      */
-    function isFindOne($methodName)
+    public static function isFindOne($methodName)
     {
         return (boolean)preg_match('/^findOne.+$/i', $methodName);
     }
@@ -105,7 +110,7 @@ class Piece_ORM_Mapper_QueryType
      * @param string $methodName
      * @return boolean
      */
-    function isFind($methodName)
+    public static function isFind($methodName)
     {
         return (boolean)preg_match('/^find.+$/i', $methodName);
     }
@@ -119,7 +124,7 @@ class Piece_ORM_Mapper_QueryType
      * @param string $methodName
      * @return boolean
      */
-    function isInsert($methodName)
+    public static function isInsert($methodName)
     {
         return (boolean)preg_match('/^insert.*$/i', $methodName);
     }
@@ -133,7 +138,7 @@ class Piece_ORM_Mapper_QueryType
      * @param string $methodName
      * @return boolean
      */
-    function isUpdate($methodName)
+    public static function isUpdate($methodName)
     {
         return (boolean)preg_match('/^update.*$/i', $methodName);
     }
@@ -147,10 +152,16 @@ class Piece_ORM_Mapper_QueryType
      * @param string $methodName
      * @return boolean
      */
-    function isDelete($methodName)
+    public static function isDelete($methodName)
     {
         return (boolean)preg_match('/^delete.*$/i', $methodName);
     }
+
+    /**#@-*/
+
+    /**#@+
+     * @access protected
+     */
 
     /**#@-*/
 

@@ -2,7 +2,7 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 
 /**
- * PHP versions 4 and 5
+ * PHP version 5
  *
  * Copyright (c) 2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>,
  * All rights reserved.
@@ -35,30 +35,8 @@
  * @since      File available since Release 0.1.0
  */
 
-require_once 'Piece/ORM/Error.php';
-require_once 'PEAR.php';
-require_once 'Cache/Lite/File.php';
-require_once 'Piece/ORM/Context.php';
-require_once 'Piece/ORM/Mapper/Common.php';
-require_once 'Piece/ORM/Mapper/Generator.php';
-require_once 'Piece/ORM/Metadata/Factory.php';
-require_once 'Piece/ORM/Inflector.php';
+require_once 'spyc.php5';
 
-if (version_compare(phpversion(), '5.0.0', '<')) {
-    require_once 'spyc.php';
-} else {
-    require_once 'spyc.php5';
-}
-
-require_once 'Piece/ORM/Env.php';
-
-// {{{ GLOBALS
-
-$GLOBALS['PIECE_ORM_Mapper_Instances'] = array();
-$GLOBALS['PIECE_ORM_Mapper_ConfigDirectory'] = null;
-$GLOBALS['PIECE_ORM_Mapper_CacheDirectory'] = null;
-
-// }}}
 // {{{ Piece_ORM_Mapper_Factory
 
 /**
@@ -82,14 +60,25 @@ class Piece_ORM_Mapper_Factory
     /**#@-*/
 
     /**#@+
-     * @access private
+     * @access protected
      */
 
     /**#@-*/
 
     /**#@+
+     * @access private
+     */
+
+    private static $_instances = array();
+    private static $_configDirectory;
+    private static $_cacheDirectory;
+    private static $_configDirectoryStack = array();
+    private static $_cacheDirectoryStack = array();
+
+    /**#@-*/
+
+    /**#@+
      * @access public
-     * @static
      */
 
     // }}}
@@ -102,29 +91,29 @@ class Piece_ORM_Mapper_Factory
      * @return Piece_ORM_Mapper_Common
      * @throws PIECE_ORM_ERROR_INVALID_MAPPER
      */
-    function &factory($mapperName)
+    public static function factory($mapperName)
     {
-        $context = &Piece_ORM_Context::singleton();
+        $context = Piece_ORM_Context::singleton();
         if (!$context->getUseMapperNameAsTableName()) {
             $mapperName = Piece_ORM_Inflector::camelize($mapperName);
         }
 
-        $mapperID = sha1($context->getDSN() . ".$mapperName." . realpath($GLOBALS['PIECE_ORM_Mapper_ConfigDirectory']));
-        if (!array_key_exists($mapperID, $GLOBALS['PIECE_ORM_Mapper_Instances'])) {
+        $mapperID = sha1($context->getDSN() . ".$mapperName." . realpath(self::$_configDirectory));
+        if (!array_key_exists($mapperID, self::$_instances)) {
             Piece_ORM_Mapper_Factory::_load($mapperID, $mapperName);
             if (Piece_ORM_Error::hasErrors()) {
                 $return = null;
                 return $return;
             }
 
-            $metadata = &Piece_ORM_Metadata_Factory::factory($mapperName);
+            $metadata = Piece_ORM_Metadata_Factory::factory($mapperName);
             if (Piece_ORM_Error::hasErrors()) {
                 $return = null;
                 return $return;
             }
 
             $mapperClass = Piece_ORM_Mapper_Factory::_getMapperClass($mapperID);
-            $mapper = &new $mapperClass($metadata);
+            $mapper = new $mapperClass($metadata);
             if (!is_subclass_of($mapper, 'Piece_ORM_Mapper_Common')) {
                 Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_MAPPER,
                                       "The mapper class for [ $mapperName ] is invalid."
@@ -133,18 +122,18 @@ class Piece_ORM_Mapper_Factory
                 return $return;
             }
 
-            $GLOBALS['PIECE_ORM_Mapper_Instances'][$mapperID] = &$mapper;
+            self::$_instances[$mapperID] = $mapper;
         }
 
-        $dbh = &$context->getConnection();
+        $dbh = $context->getConnection();
         if (Piece_ORM_Error::hasErrors()) {
             $return = null;
             return $return;
         }
 
-        $GLOBALS['PIECE_ORM_Mapper_Instances'][$mapperID]->setConnection($dbh);
+        self::$_instances[$mapperID]->setConnection($dbh);
 
-        return $GLOBALS['PIECE_ORM_Mapper_Instances'][$mapperID];
+        return self::$_instances[$mapperID];
     }
 
     // }}}
@@ -153,22 +142,23 @@ class Piece_ORM_Mapper_Factory
     /**
      * Clears the mapper instances.
      */
-    function clearInstances()
+    public static function clearInstances()
     {
-        $GLOBALS['PIECE_ORM_Mapper_Instances'] = array();
+        self::$_instances = array();
     }
 
     // }}}
     // {{{ setConfigDirectory()
 
     /**
-     * Sets a config directory.
+     * Sets a configuration directory.
      *
      * @param string $configDirectory
      */
-    function setConfigDirectory($configDirectory)
+    public static function setConfigDirectory($configDirectory)
     {
-        $GLOBALS['PIECE_ORM_Mapper_ConfigDirectory'] = $configDirectory;
+        array_push(self::$_configDirectoryStack, self::$_configDirectory);
+        self::$_configDirectory = $configDirectory;
     }
 
     // }}}
@@ -179,16 +169,48 @@ class Piece_ORM_Mapper_Factory
      *
      * @param string $cacheDirectory
      */
-    function setCacheDirectory($cacheDirectory)
+    public static function setCacheDirectory($cacheDirectory)
     {
-        $GLOBALS['PIECE_ORM_Mapper_CacheDirectory'] = $cacheDirectory;
+        array_push(self::$_cacheDirectoryStack, self::$_cacheDirectory);
+        self::$_cacheDirectory = $cacheDirectory;
+    }
+
+    // }}}
+    // {{{ restoreConfigDirectory()
+
+    /**
+     * Restores the previous configuration directory.
+     *
+     * @since Method available since Release 2.0.0
+     */
+    public static function restoreConfigDirectory()
+    {
+        self::$_configDirectory = array_pop(self::$_configDirectoryStack);
+    }
+
+    // }}}
+    // {{{ restoreCacheDirectory()
+
+    /**
+     * Restores the previous cache directory.
+     *
+     * @since Method available since Release 2.0.0
+     */
+    public static function restoreCacheDirectory()
+    {
+        self::$_cacheDirectory = array_pop(self::$_cacheDirectoryStack);
     }
 
     /**#@-*/
 
     /**#@+
+     * @access protected
+     */
+
+    /**#@-*/
+
+    /**#@+
      * @access private
-     * @static
      */
 
     // }}}
@@ -205,13 +227,13 @@ class Piece_ORM_Mapper_Factory
      * @throws PIECE_ORM_ERROR_CANNOT_READ
      * @throws PIECE_ORM_ERROR_CANNOT_WRITE
      */
-    function _getMapperSource($mapperID, $mapperName, $configFile)
+    private function _getMapperSource($mapperID, $mapperName, $configFile)
     {
-        $cache = &new Cache_Lite_File(array('cacheDir' => "{$GLOBALS['PIECE_ORM_Mapper_CacheDirectory']}/",
-                                            'masterFile' => $configFile,
-                                            'automaticSerialization' => true,
-                                            'errorHandlingAPIBreak' => true)
-                                      );
+        $cache = new Cache_Lite_File(array('cacheDir' => self::$_cacheDirectory . '/',
+                                           'masterFile' => $configFile,
+                                           'automaticSerialization' => true,
+                                           'errorHandlingAPIBreak' => true)
+                                     );
 
         if (!Piece_ORM_Env::isProduction()) {
             $cache->remove($mapperID);
@@ -224,7 +246,9 @@ class Piece_ORM_Mapper_Factory
         $mapperSource = $cache->get($mapperID);
         if (PEAR::isError($mapperSource)) {
             Piece_ORM_Error::push(PIECE_ORM_ERROR_CANNOT_READ,
-                                  "Cannot read the mapper source file in the directory [ {$GLOBALS['PIECE_ORM_Mapper_CacheDirectory']} ]."
+                                  'Cannot read the mapper source file in the directory [ ' .
+                                  self::$_cacheDirectory . 
+                                  ' ].'
                                   );
             return;
         }
@@ -238,7 +262,9 @@ class Piece_ORM_Mapper_Factory
             $result = $cache->save($mapperSource);
             if (PEAR::isError($result)) {
                 Piece_ORM_Error::push(PIECE_ORM_ERROR_CANNOT_WRITE,
-                                      "Cannot write the mapper source to the cache file in the directory [ {$GLOBALS['PIECE_ORM_Mapper_CacheDirectory']} ]."
+                                      'Cannot write the mapper source to the cache file in the directory [ ' .
+                                      self::$_cacheDirectory . 
+                                      ' ].'
                                       );
                 return;
             }
@@ -258,14 +284,14 @@ class Piece_ORM_Mapper_Factory
      * @param string $configFile
      * @return string
      */
-    function _generateMapperSource($mapperID, $mapperName, $configFile)
+    private function _generateMapperSource($mapperID, $mapperName, $configFile)
     {
-        $metadata = &Piece_ORM_Metadata_Factory::factory($mapperName);
+        $metadata = Piece_ORM_Metadata_Factory::factory($mapperName);
         if (Piece_ORM_Error::hasErrors()) {
             return;
         }
 
-        $generator = &new Piece_ORM_Mapper_Generator(Piece_ORM_Mapper_Factory::_getMapperClass($mapperID), $mapperName, Spyc::YAMLLoad($configFile), $metadata, get_class_methods('Piece_ORM_Mapper_Common'));
+        $generator = new Piece_ORM_Mapper_Generator(Piece_ORM_Mapper_Factory::_getMapperClass($mapperID), $mapperName, Spyc::YAMLLoad($configFile), $metadata, get_class_methods('Piece_ORM_Mapper_Common'));
         return $generator->generate();
     }
 
@@ -273,13 +299,13 @@ class Piece_ORM_Mapper_Factory
     // {{{ _loaded()
 
     /**
-     * Returns whether the mapper class for a given mapper ID has already
-     * been loaded or not.
+     * Returns whether or not the mapper class for a given mapper ID has already been
+     * loaded.
      *
      * @param string $mapperID
      * @return boolean
      */
-    function _loaded($mapperID)
+    private function _loaded($mapperID)
     {
         $mapperClass = Piece_ORM_Mapper_Factory::_getMapperClass($mapperID);
         if (version_compare(phpversion(), '5.0.0', '<')) {
@@ -301,48 +327,54 @@ class Piece_ORM_Mapper_Factory
      * @throws PIECE_ORM_ERROR_NOT_FOUND
      * @throws PIECE_ORM_ERROR_NOT_READABLE
      */
-    function _load($mapperID, $mapperName)
+    private function _load($mapperID, $mapperName)
     {
         if (Piece_ORM_Mapper_Factory::_loaded($mapperID)) {
             return;
         }
 
-        if (is_null($GLOBALS['PIECE_ORM_Mapper_ConfigDirectory'])) {
+        if (is_null(self::$_configDirectory)) {
             Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_OPERATION,
                                   'The configuration directory must be specified.'
                                   );
             return;
         }
 
-        if (!file_exists($GLOBALS['PIECE_ORM_Mapper_ConfigDirectory'])) {
+        if (!file_exists(self::$_configDirectory)) {
             Piece_ORM_Error::push(PIECE_ORM_ERROR_NOT_FOUND,
-                                  "The configuration directory [ {$GLOBALS['PIECE_ORM_Mapper_ConfigDirectory']} ] not found."
+                                  'The configuration directory [ ' .
+                                  self::$_configDirectory .
+                                  ' ] is not found.'
                                   );
             return;
         }
 
-        if (is_null($GLOBALS['PIECE_ORM_Mapper_CacheDirectory'])) {
+        if (is_null(self::$_cacheDirectory)) {
             Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_OPERATION,
                                   'The cache directory must be specified.'
                                   );
             return;
         }
 
-        if (!file_exists($GLOBALS['PIECE_ORM_Mapper_CacheDirectory'])) {
+        if (!file_exists(self::$_cacheDirectory)) {
             Piece_ORM_Error::push(PIECE_ORM_ERROR_NOT_FOUND,
-                                  "The cache directory [ {$GLOBALS['PIECE_ORM_Mapper_CacheDirectory']} ] not found."
+                                  'The cache directory [ ' .
+                                  self::$_cacheDirectory .
+                                  'is not found.'
                                   );
             return;
         }
 
-        if (!is_readable($GLOBALS['PIECE_ORM_Mapper_CacheDirectory']) || !is_writable($GLOBALS['PIECE_ORM_Mapper_CacheDirectory'])) {
+        if (!is_readable(self::$_cacheDirectory) || !is_writable(self::$_cacheDirectory)) {
             Piece_ORM_Error::push(PIECE_ORM_ERROR_NOT_READABLE,
-                                  "The cache directory [ {$GLOBALS['PIECE_ORM_Mapper_CacheDirectory']} ] is not readable or writable."
+                                  'The cache directory [ ' .
+                                  self::$_cacheDirectory .
+                                  ' ] is not readable or writable.'
                                   );
             return;
         }
 
-        $configFile = "{$GLOBALS['PIECE_ORM_Mapper_ConfigDirectory']}/$mapperName.yaml";
+        $configFile = self::$_configDirectory . "/$mapperName.yaml";
         if (!file_exists($configFile)) {
             Piece_ORM_Error::push(PIECE_ORM_ERROR_NOT_FOUND,
                                   "The configuration file [ $configFile ] not found."
@@ -380,7 +412,7 @@ class Piece_ORM_Mapper_Factory
      * @param string $mapperID
      * @return string
      */
-    function _getMapperClass($mapperID)
+    private function _getMapperClass($mapperID)
     {
         return "Piece_ORM_Mapper_$mapperID";
     }

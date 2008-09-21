@@ -2,7 +2,7 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 
 /**
- * PHP versions 4 and 5
+ * PHP version 5
  *
  * Copyright (c) 2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>,
  * All rights reserved.
@@ -35,16 +35,6 @@
  * @since      File available since Release 0.1.0
  */
 
-require_once 'Piece/ORM/Config/Factory.php';
-require_once 'Piece/ORM/Mapper/Factory.php';
-require_once 'Piece/ORM/Metadata/Factory.php';
-require_once 'Piece/ORM/Context.php';
-
-// {{{ GLOBALS
-
-$GLOBALS['PIECE_ORM_Configured'] = false;
-
-// }}}
 // {{{ Piece_ORM
 
 /**
@@ -65,6 +55,14 @@ class Piece_ORM
      * @access public
      */
 
+    public static $configured = false;
+
+    /**#@-*/
+
+    /**#@+
+     * @access protected
+     */
+
     /**#@-*/
 
     /**#@+
@@ -75,7 +73,6 @@ class Piece_ORM
 
     /**#@+
      * @access public
-     * @static
      */
 
     // }}}
@@ -84,28 +81,27 @@ class Piece_ORM
     /**
      * Configures the Piece_ORM environment.
      *
-     * First this method tries to load a configuration from a configuration
-     * file in the given configration directory using
-     * Piece_ORM_Config_Factory::factory(). The method creates a new object
-     * if the load failed.
-     * Second this method sets the configuration to the current context.
-     * And also this method sets the configuration directory for the mapper
-     * configuration, and the cache directory for mappers, and the cache
-     * directory for Piece_ORM_Metadata class.
+     * First this method tries to load a configuration from a configuration file in
+     * the given configration directory using Piece_ORM_Config_Factory::factory().
+     * The method creates a new object if the load failed.
+     * Second this method sets the configuration to the current context. And also
+     * this method sets the configuration directory for the mapper configuration, and
+     * the cache directory for mappers, and the cache directory for
+     * Piece_ORM_Metadata objects.
      *
      * @param string $configDirectory
      * @param string $cacheDirectory
      * @param string $mapperConfigDirectory
      */
-    function configure($configDirectory,
-                       $cacheDirectory,
-                       $mapperConfigDirectory
-                       )
+    public static function configure($configDirectory,
+                                     $cacheDirectory,
+                                     $mapperConfigDirectory
+                                     )
     {
-        $config = &Piece_ORM_Config_Factory::factory($configDirectory,
-                                                     $cacheDirectory
-                                                     );
-        $context = &Piece_ORM_Context::singleton();
+        $config = Piece_ORM_Config_Factory::factory($configDirectory,
+                                                    $cacheDirectory
+                                                    );
+        $context = Piece_ORM_Context::singleton();
         $context->setConfiguration($config);
         $context->setMapperConfigDirectory($mapperConfigDirectory);
         $defaultDatabase = $config->getDefaultDatabase();
@@ -116,7 +112,7 @@ class Piece_ORM
         Piece_ORM_Mapper_Factory::setCacheDirectory($cacheDirectory);
         Piece_ORM_Metadata_Factory::setCacheDirectory($cacheDirectory);
 
-        $GLOBALS['PIECE_ORM_Configured'] = true;
+        self::$configured = true;
     }
 
     // }}}
@@ -129,11 +125,11 @@ class Piece_ORM
      * @return Piece_ORM_Mapper_Common
      * @throws PIECE_ORM_ERROR_INVALID_OPERATION
      */
-    function &getMapper($mapperName)
+    public static function getMapper($mapperName)
     {
-        if (!$GLOBALS['PIECE_ORM_Configured']) {
+        if (!self::$configured) {
             Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_OPERATION,
-                                  __FUNCTION__ . ' method must be called after calling configure().'
+                                  __METHOD__ . ' method must be called after calling configure().'
                                   );
             $return = null;
             return $return;
@@ -151,17 +147,17 @@ class Piece_ORM
      * @return Piece_ORM_Config
      * @throws PIECE_ORM_ERROR_INVALID_OPERATION
      */
-    function &getConfiguration()
+    public static function getConfiguration()
     {
-        if (!$GLOBALS['PIECE_ORM_Configured']) {
+        if (!self::$configured) {
             Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_OPERATION,
-                                  __FUNCTION__ . ' method must be called after calling configure().'
+                                  __METHOD__ . ' method must be called after calling configure().'
                                   );
             $return = null;
             return $return;
         }
 
-        $context = &Piece_ORM_Context::singleton();
+        $context = Piece_ORM_Context::singleton();
         return $context->getConfiguration();
     }
 
@@ -174,16 +170,16 @@ class Piece_ORM
      * @param string $database
      * @throws PIECE_ORM_ERROR_INVALID_OPERATION
      */
-    function setDatabase($database)
+    public static function setDatabase($database)
     {
-        if (!$GLOBALS['PIECE_ORM_Configured']) {
+        if (!self::$configured) {
             Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_OPERATION,
-                                  __FUNCTION__ . ' method must be called after calling configure().'
+                                  __METHOD__ . ' method must be called after calling configure().'
                                   );
             return;
         }
 
-        $context = &Piece_ORM_Context::singleton();
+        $context = Piece_ORM_Context::singleton();
         $context->setDatabase($database);
     }
 
@@ -197,17 +193,17 @@ class Piece_ORM
      * @return stdClass
      * @throws PIECE_ORM_ERROR_INVALID_OPERATION
      */
-    function &createObject($mapperName)
+    public static function createObject($mapperName)
     {
-        if (!$GLOBALS['PIECE_ORM_Configured']) {
+        if (!self::$configured) {
             Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_OPERATION,
-                                  __FUNCTION__ . ' method must be called after calling configure().'
+                                  __METHOD__ . ' method must be called after calling configure().'
                                   );
             $return = null;
             return $return;
         }
 
-        $mapper = &Piece_ORM_Mapper_Factory::factory($mapperName);
+        $mapper = Piece_ORM_Mapper_Factory::factory($mapperName);
         if (Piece_ORM_Error::hasErrors()) {
             $return = null;
             return $return;
@@ -222,22 +218,28 @@ class Piece_ORM
     /**
      * Converts an object into a specified object.
      *
-     * @param stdClass &$oldObject
+     * @param stdClass $oldObject
      * @param mixed    $newObject
      * @return mixed
      */
-    function &dressObject(&$oldObject, $newObject)
+    public static function dressObject($oldObject, $newObject)
     {
         foreach (array_keys(get_object_vars($oldObject)) as $property) {
             if (!is_object($oldObject->$property)) {
                 $newObject->$property = $oldObject->$property;
             } else {
-                $newObject->$property = &$oldObject->$property;
+                $newObject->$property = $oldObject->$property;
             }
         }
 
         return $newObject;
     }
+
+    /**#@-*/
+
+    /**#@+
+     * @access protected
+     */
 
     /**#@-*/
 

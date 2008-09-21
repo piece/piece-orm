@@ -2,7 +2,7 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 
 /**
- * PHP versions 4 and 5
+ * PHP version 5
  *
  * Copyright (c) 2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>,
  * All rights reserved.
@@ -46,7 +46,7 @@
  * @version    Release: @package_version@
  * @since      Class available since Release 0.2.0
  */
-class Piece_ORM_Mapper_AssociatedObjectPersister_Common
+abstract class Piece_ORM_Mapper_AssociatedObjectPersister_Common
 {
 
     // {{{ properties
@@ -58,10 +58,16 @@ class Piece_ORM_Mapper_AssociatedObjectPersister_Common
     /**#@-*/
 
     /**#@+
-     * @access private
+     * @access protected
      */
 
-    var $_subject;
+    protected $subject;
+
+    /**#@-*/
+
+    /**#@+
+     * @access private
+     */
 
     /**#@-*/
 
@@ -70,16 +76,16 @@ class Piece_ORM_Mapper_AssociatedObjectPersister_Common
      */
 
     // }}}
-    // {{{ constructor
+    // {{{ __construct()
 
     /**
      * Sets a Piece_ORM_Mapper_ObjectPersister object as a property.
      *
-     * @param mixed &$subject
+     * @param mixed $subject
      */
-    function Piece_ORM_Mapper_AssociatedObjectPersister_Common(&$subject)
+    function __construct($subject)
     {
-        $this->_subject = &$subject;
+        $this->subject = $subject;
     }
 
     // }}}
@@ -89,9 +95,8 @@ class Piece_ORM_Mapper_AssociatedObjectPersister_Common
      * Inserts associated objects to a table.
      *
      * @param array $relationship
-     * @abstract
      */
-    function insert($relationship) {}
+    abstract public function insert(array $relationship);
 
     // }}}
     // {{{ update()
@@ -100,9 +105,8 @@ class Piece_ORM_Mapper_AssociatedObjectPersister_Common
      * Updates associated objects in a table.
      *
      * @param array $relationship
-     * @abstract
      */
-    function update($relationship) {}
+    abstract public function update(array $relationship);
 
     // }}}
     // {{{ delete()
@@ -112,9 +116,14 @@ class Piece_ORM_Mapper_AssociatedObjectPersister_Common
      *
      * @param array $relationship
      * @return integer
-     * @abstract
      */
-    function delete($relationship) {}
+    abstract public function delete(array $relationship);
+
+    /**#@-*/
+
+    /**#@+
+     * @access protected
+     */
 
     /**#@-*/
 

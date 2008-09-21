@@ -2,7 +2,7 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 
 /**
- * PHP versions 4 and 5
+ * PHP version 5
  *
  * Copyright (c) 2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>,
  * All rights reserved.
@@ -35,9 +35,6 @@
  * @since      File available since Release 0.2.0
  */
 
-require_once 'Piece/ORM/Mapper/RelationshipNormalizer/Common.php';
-require_once 'Piece/ORM/Error.php';
-
 // {{{ Piece_ORM_Mapper_RelationshipNormalizer_ManyToOne
 
 /**
@@ -61,6 +58,12 @@ class Piece_ORM_Mapper_RelationshipNormalizer_ManyToOne extends Piece_ORM_Mapper
     /**#@-*/
 
     /**#@+
+     * @access protected
+     */
+
+    /**#@-*/
+
+    /**#@+
      * @access private
      */
 
@@ -73,19 +76,19 @@ class Piece_ORM_Mapper_RelationshipNormalizer_ManyToOne extends Piece_ORM_Mapper
     /**#@-*/
 
     /**#@+
-     * @access private
+     * @access protected
      */
 
     // }}}
-    // {{{ _normalizeColumn()
+    // {{{ normalizeColumn()
 
     /**
      * Normalizes "column" definition.
      */
-    function _normalizeColumn()
+    protected function normalizeColumn()
     {
-        if ($primaryKey = $this->_relationshipMetadata->getPrimaryKey()) {
-            $this->_relationship['column'] = $primaryKey;
+        if ($primaryKey = $this->relationshipMetadata->getPrimaryKey()) {
+            $this->relationship['column'] = $primaryKey;
             return true;
         } else {
             return false;
@@ -93,15 +96,15 @@ class Piece_ORM_Mapper_RelationshipNormalizer_ManyToOne extends Piece_ORM_Mapper
     }
 
     // }}}
-    // {{{ _normalizeReferencedColumn()
+    // {{{ normalizeReferencedColumn()
 
     /**
      * Normalizes "referencedColumn" definition.
      */
-    function _normalizeReferencedColumn()
+    protected function normalizeReferencedColumn()
     {
-        if ($primaryKey = $this->_relationshipMetadata->getPrimaryKey()) {
-            $this->_relationship['referencedColumn'] = $this->_relationshipMetadata->getTableName(true) . "_$primaryKey";
+        if ($primaryKey = $this->relationshipMetadata->getPrimaryKey()) {
+            $this->relationship['referencedColumn'] = $this->relationshipMetadata->getTableName(true) . "_$primaryKey";
             return true;
         } else {
             return false;
@@ -109,29 +112,35 @@ class Piece_ORM_Mapper_RelationshipNormalizer_ManyToOne extends Piece_ORM_Mapper
     }
 
     // }}}
-    // {{{ _normalizeOrderBy()
+    // {{{ normalizeOrderBy()
 
     /**
      * Normalizes "orderBy" definition.
      */
-    function _normalizeOrderBy()
+    protected function normalizeOrderBy()
     {
-        $this->_relationship['orderBy'] = null;
+        $this->relationship['orderBy'] = null;
     }
 
     // }}}
-    // {{{ _checkHavingSinglePrimaryKey()
+    // {{{ checkHavingSinglePrimaryKey()
 
     /**
-     * Returns whether it checks that whether an associated table has
-     * a single primary key.
+     * Returns whether it checks that whether an associated table has a single
+     * primary key.
      *
      * @return boolean
      */
-    function _checkHavingSinglePrimaryKey()
+    function checkHavingSinglePrimaryKey()
     {
         return false;
     }
+
+    /**#@-*/
+
+    /**#@+
+     * @access private
+     */
 
     /**#@-*/
 

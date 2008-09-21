@@ -2,7 +2,7 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 
 /**
- * PHP versions 4 and 5
+ * PHP version 5
  *
  * Copyright (c) 2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>,
  * All rights reserved.
@@ -35,21 +35,6 @@
  * @since      File available since Release 0.1.0
  */
 
-require_once 'MDB2.php';
-require_once 'Piece/ORM/Metadata.php';
-require_once 'Piece/ORM/Error.php';
-require_once 'Cache/Lite.php';
-require_once 'Piece/ORM/Context.php';
-require_once 'PEAR.php';
-require_once 'Piece/ORM/Inflector.php';
-require_once 'Piece/ORM/Env.php';
-
-// {{{ GLOBALS
-
-$GLOBALS['PIECE_ORM_Metadata_Instances'] = array();
-$GLOBALS['PIECE_ORM_Metadata_CacheDirectory'] = null;
-
-// }}}
 // {{{ Piece_ORM_Metadata_Factory
 
 /**
@@ -73,8 +58,18 @@ class Piece_ORM_Metadata_Factory
     /**#@-*/
 
     /**#@+
+     * @access protected
+     */
+
+    /**#@-*/
+
+    /**#@+
      * @access private
      */
+
+    private static $_instances = array();
+    private static $_cacheDirectory;
+    private static $_cacheDirectoryStack = array();
 
     /**#@-*/
 
@@ -90,27 +85,26 @@ class Piece_ORM_Metadata_Factory
      *
      * @param string $tableName
      * @return Piece_ORM_Metadata
-     * @static
      */
-    function &factory($tableName)
+    public static function factory($tableName)
     {
-        $context = &Piece_ORM_Context::singleton();
+        $context = Piece_ORM_Context::singleton();
         if (!$context->getUseMapperNameAsTableName()) {
             $tableName = Piece_ORM_Inflector::underscore($tableName);
         }
 
         $tableID = sha1($context->getDSN() . ".$tableName");
-        if (!array_key_exists($tableID, $GLOBALS['PIECE_ORM_Metadata_Instances'])) {
-            $metadata = &Piece_ORM_Metadata_Factory::_createMetadata($tableName, $tableID);
+        if (!array_key_exists($tableID, self::$_instances)) {
+            $metadata = Piece_ORM_Metadata_Factory::_createMetadata($tableName, $tableID);
             if (Piece_ORM_Error::hasErrors()) {
                 $return = null;
                 return $return;
             }
 
-            $GLOBALS['PIECE_ORM_Metadata_Instances'][$tableID] = &$metadata;
+            self::$_instances[$tableID] = $metadata;
         }
 
-        return $GLOBALS['PIECE_ORM_Metadata_Instances'][$tableID];
+        return self::$_instances[$tableID];
     }
 
     // }}}
@@ -119,9 +113,9 @@ class Piece_ORM_Metadata_Factory
     /**
      * Clears the Piece_ORM_Metadata instances.
      */
-    function clearInstances()
+    public static function clearInstances()
     {
-        $GLOBALS['PIECE_ORM_Metadata_Instances'] = array();
+        self::$_instances = array();
     }
 
     // }}}
@@ -132,16 +126,35 @@ class Piece_ORM_Metadata_Factory
      *
      * @param string $cacheDirectory
      */
-    function setCacheDirectory($cacheDirectory)
+    public static function setCacheDirectory($cacheDirectory)
     {
-        $GLOBALS['PIECE_ORM_Metadata_CacheDirectory'] = $cacheDirectory;
+        array_push(self::$_cacheDirectoryStack, self::$_cacheDirectory);
+        self::$_cacheDirectory = $cacheDirectory;
+    }
+
+    // }}}
+    // {{{ restoreCacheDirectory()
+
+    /**
+     * Restores the previous cache directory.
+     *
+     * @since Method available since Release 2.0.0
+     */
+    public static function restoreCacheDirectory()
+    {
+        self::$_cacheDirectory = array_pop(self::$_cacheDirectoryStack);
     }
 
     /**#@-*/
 
     /**#@+
+     * @access protected
+     */
+
+    /**#@-*/
+
+    /**#@+
      * @access private
-     * @static
      */
 
     // }}}
@@ -154,12 +167,12 @@ class Piece_ORM_Metadata_Factory
      * @param string $tableID
      * @return Piece_ORM_Metadata
      */
-    function &_getMetadata($tableName, $tableID)
+    private static function _getMetadata($tableName, $tableID)
     {
-        $cache = &new Cache_Lite(array('cacheDir' => "{$GLOBALS['PIECE_ORM_Metadata_CacheDirectory']}/",
-                                       'automaticSerialization' => true,
-                                       'errorHandlingAPIBreak' => true)
-                                 );
+        $cache = new Cache_Lite(array('cacheDir' => self::$_cacheDirectory . '/',
+                                      'automaticSerialization' => true,
+                                      'errorHandlingAPIBreak' => true)
+                                );
 
         if (!Piece_ORM_Env::isProduction()) {
             $cache->remove($tableID);
@@ -171,11 +184,13 @@ class Piece_ORM_Metadata_Factory
          */
         $metadata = $cache->get($tableID);
         if (PEAR::isError($metadata)) {
-            trigger_error("Cannot read the cache file in the directory [ {$GLOBALS['PIECE_ORM_Metadata_CacheDirectory']} ].",
+            trigger_error('Cannot read the cache file in the directory [ ' .
+                          self::$_cacheDirectory .
+                          ' ].',
                           E_USER_WARNING
                           );
 
-            $metadata = &Piece_ORM_Metadata_Factory::_createMetadataFromDatabase($tableName);
+            $metadata = Piece_ORM_Metadata_Factory::_createMetadataFromDatabase($tableName);
             if (Piece_ORM_Error::hasErrors()) {
                 $return = null;
                 return $return;
@@ -185,7 +200,7 @@ class Piece_ORM_Metadata_Factory
         }
 
         if (!$metadata) {
-            $metadata = &Piece_ORM_Metadata_Factory::_createMetadataFromDatabase($tableName);
+            $metadata = Piece_ORM_Metadata_Factory::_createMetadataFromDatabase($tableName);
             if (Piece_ORM_Error::hasErrors()) {
                 $return = null;
                 return $return;
@@ -193,7 +208,9 @@ class Piece_ORM_Metadata_Factory
 
             $result = $cache->save($metadata);
             if (PEAR::isError($result)) {
-                trigger_error("Cannot write the Piece_ORM_Metadata object to the cache file in the directory [ {$GLOBALS['PIECE_ORM_Metadata_CacheDirectory']} ].",
+                trigger_error('Cannot write the Piece_ORM_Metadata object to the cache file in the directory [ ' .
+                              self::$_cacheDirectory .
+                              ' ].',
                               E_USER_WARNING
                               );
             }
@@ -213,10 +230,10 @@ class Piece_ORM_Metadata_Factory
      * @throws PIECE_ORM_ERROR_CANNOT_INVOKE
      * @throws PIECE_ORM_ERROR_NOT_FOUND
      */
-    function &_createMetadataFromDatabase($tableName)
+    private static function _createMetadataFromDatabase($tableName)
     {
-        $context = &Piece_ORM_Context::singleton();
-        $dbh = &$context->getConnection();
+        $context = Piece_ORM_Context::singleton();
+        $dbh = $context->getConnection();
         if (Piece_ORM_Error::hasErrors()) {
             $return = null;
             return $return;
@@ -256,7 +273,7 @@ class Piece_ORM_Metadata_Factory
         }
 
         PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
-        $reverse = &$dbh->loadModule('Reverse');
+        $reverse = $dbh->loadModule('Reverse');
         PEAR::staticPopErrorHandling();
         if (MDB2::isError($reverse)) {
             Piece_ORM_Error::pushPEARError($reverse,
@@ -269,7 +286,7 @@ class Piece_ORM_Metadata_Factory
 
         if ($dbh->phptype == 'mssql') {
             include_once 'Piece/ORM/MDB2/Decorator/Reverse/Mssql.php';
-            $reverse = &new Piece_ORM_MDB2_Decorator_Reverse_Mssql($reverse);
+            $reverse = new Piece_ORM_MDB2_Decorator_Reverse_Mssql($reverse);
         }
 
         PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
@@ -300,7 +317,7 @@ class Piece_ORM_Metadata_Factory
             }
         }
 
-        $metadata = &new Piece_ORM_Metadata($tableInfo);
+        $metadata = new Piece_ORM_Metadata($tableInfo);
         return $metadata;
     }
 
@@ -314,17 +331,21 @@ class Piece_ORM_Metadata_Factory
      * @param string $tableID
      * @return Piece_ORM_Metadata
      */
-    function &_createMetadata($tableName, $tableID)
+    private static function _createMetadata($tableName, $tableID)
     {
-        if (!file_exists($GLOBALS['PIECE_ORM_Metadata_CacheDirectory'])) {
-            trigger_error("The cache directory [ {$GLOBALS['PIECE_ORM_Metadata_CacheDirectory']} ] is not found.",
+        if (!file_exists(self::$_cacheDirectory)) {
+            trigger_error('The cache directory [ ' .
+                          self::$_cacheDirectory .
+                          ' ] is not found.',
                           E_USER_WARNING
                           );
             return Piece_ORM_Metadata_Factory::_createMetadataFromDatabase($tableName);
         }
 
-        if (!is_readable($GLOBALS['PIECE_ORM_Metadata_CacheDirectory']) || !is_writable($GLOBALS['PIECE_ORM_Metadata_CacheDirectory'])) {
-            trigger_error("The cache directory [ {$GLOBALS['PIECE_ORM_Metadata_CacheDirectory']} ] is not readable or writable.",
+        if (!is_readable(self::$_cacheDirectory) || !is_writable(self::$_cacheDirectory)) {
+            trigger_error('The cache directory [ ' .
+                          self::$_cacheDirectory .
+                          ' ] is not readable or writable.',
                           E_USER_WARNING
                           );
             return Piece_ORM_Metadata_Factory::_createMetadataFromDatabase($tableName);

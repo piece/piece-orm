@@ -2,7 +2,7 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 
 /**
- * PHP versions 4 and 5
+ * PHP version 5
  *
  * Copyright (c) 2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>,
  * All rights reserved.
@@ -35,20 +35,16 @@
  * @since      File available since Release 0.1.0
  */
 
-require_once 'Piece/ORM/Inflector.php';
-require_once 'Piece/ORM/Mapper/RelationshipType.php';
-require_once 'Piece/ORM/Mapper/QueryType.php';
-
 // {{{ Piece_ORM_Mapper_Generator
 
 /**
- * The source code generator which generates a mapper source based on
- * a given configuration.
+ * The source code generator which generates a mapper source based on a given
+ * configuration.
  *
  * @package    Piece_ORM
  * @copyright  2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License (revised)
- * @version    Release: 1.2.0
+ * @version    Release: @package_version@
  * @since      Class available since Release 0.1.0
  */
 class Piece_ORM_Mapper_Generator
@@ -63,19 +59,25 @@ class Piece_ORM_Mapper_Generator
     /**#@-*/
 
     /**#@+
+     * @access protected
+     */
+
+    /**#@-*/
+
+    /**#@+
      * @access private
      */
 
-    var $_mapperClass;
-    var $_mapperName;
-    var $_config;
-    var $_metadata;
-    var $_methodDefinitions = array();
-    var $_propertyDefinitions = array('query' => array(),
-                                      'relationship' => array(),
-                                      'orderBy' => array()
-                                      );
-    var $_baseMapperMethods;
+    private $_mapperClass;
+    private $_mapperName;
+    private $_config;
+    private $_metadata;
+    private $_methodDefinitions = array();
+    private $_propertyDefinitions = array('query' => array(),
+                                          'relationship' => array(),
+                                          'orderBy' => array()
+                                          );
+    private $_baseMapperMethods;
 
     /**#@-*/
 
@@ -84,7 +86,7 @@ class Piece_ORM_Mapper_Generator
      */
 
     // }}}
-    // {{{ constructor
+    // {{{ __construct()
 
     /**
      * Initializes the properties with the arguments.
@@ -92,20 +94,20 @@ class Piece_ORM_Mapper_Generator
      * @param string             $mapperClass
      * @param string             $mapperName
      * @param array              $config
-     * @param Piece_ORM_Metadata &$metadata
+     * @param Piece_ORM_Metadata $metadata
      * @param array              $baseMapperMethods
      */
-    function Piece_ORM_Mapper_Generator($mapperClass,
-                                        $mapperName,
-                                        $config,
-                                        &$metadata,
-                                        $baseMapperMethods
-                                        )
+    public function __construct($mapperClass,
+                                $mapperName,
+                                array $config,
+                                Piece_ORM_Metadata $metadata,
+                                $baseMapperMethods
+                                )
     {
         $this->_mapperClass = $mapperClass;
         $this->_mapperName  = $mapperName;
         $this->_config      = $config;
-        $this->_metadata    = &$metadata;
+        $this->_metadata    = $metadata;
         $this->_baseMapperMethods = $baseMapperMethods;
     }
 
@@ -117,7 +119,7 @@ class Piece_ORM_Mapper_Generator
      *
      * @return string
      */
-    function generate()
+    public function generate()
     {
         $this->_generateFind();
         if (Piece_ORM_Error::hasErrors()) {
@@ -162,7 +164,7 @@ class Piece_ORM_Mapper_Generator
      * @return array
      * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
      */
-    function normalizeRelationshipDefinition($relationship)
+    public function normalizeRelationshipDefinition(array $relationship)
     {
         if (!array_key_exists('type', $relationship)) {
             Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_CONFIGURATION,
@@ -180,7 +182,7 @@ class Piece_ORM_Mapper_Generator
 
         $relationshipNormalizerClass = 'Piece_ORM_Mapper_RelationshipNormalizer_' . ucwords($relationship['type']);
         include_once str_replace('_', '/', $relationshipNormalizerClass) . '.php';
-        $relationshipNormalizer = &new $relationshipNormalizerClass($relationship, $this->_metadata);
+        $relationshipNormalizer = new $relationshipNormalizerClass($relationship, $this->_metadata);
         return $relationshipNormalizer->normalize();
     }
 
@@ -194,7 +196,7 @@ class Piece_ORM_Mapper_Generator
      * @return string
      * @since Method available since Release 1.0.0
      */
-    function generateExpression($fieldName)
+    public function generateExpression($fieldName)
     {
         if (!$this->_metadata->isLOB($fieldName)) {
             return '$' . Piece_ORM_Inflector::camelize($fieldName, true);
@@ -211,10 +213,9 @@ class Piece_ORM_Mapper_Generator
      *
      * @param string $methodName
      * @return string
-     * @static
      * @since Method available since Release 1.1.0
      */
-    function getQueryProperty($methodName)
+    public static function getQueryProperty($methodName)
     {
         return '__query__' . strtolower($methodName);
     }
@@ -227,13 +228,18 @@ class Piece_ORM_Mapper_Generator
      *
      * @param string $methodName
      * @return string
-     * @static
      * @since Method available since Release 1.1.0
      */
-    function getOrderByProperty($methodName)
+    public static function getOrderByProperty($methodName)
     {
         return '__orderBy__' . strtolower($methodName);
     }
+
+    /**#@-*/
+
+    /**#@+
+     * @access protected
+     */
 
     /**#@-*/
 
@@ -253,7 +259,11 @@ class Piece_ORM_Mapper_Generator
      * @param string $orderBy
      * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
      */
-    function _addFind($methodName, $query, $relationships = null, $orderBy = null)
+    private function _addFind($methodName,
+                              $query,
+                              array $relationships = array(),
+                              $orderBy = null
+                              )
     {
         if (!$this->_validateMethodName($methodName)) {
             Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_CONFIGURATION,
@@ -268,7 +278,7 @@ class Piece_ORM_Mapper_Generator
         }
 
         $this->_methodDefinitions[ strtolower($methodName) ] = "
-    function &$methodName(\$criteria = null)
+    public function $methodName(\$criteria = null)
     {
         return \$this->_find('$methodName', \$criteria);
     }";
@@ -285,7 +295,7 @@ class Piece_ORM_Mapper_Generator
      * @param array  $relationships
      * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
      */
-    function _addInsert($methodName, $query, $relationships = null)
+    private function _addInsert($methodName, $query, array $relationships = array())
     {
         if (!$this->_validateMethodName($methodName)) {
             Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_CONFIGURATION,
@@ -300,7 +310,7 @@ class Piece_ORM_Mapper_Generator
         }
 
         $this->_methodDefinitions[ strtolower($methodName) ] = "
-    function $methodName(&\$subject)
+    public function $methodName(\$subject)
     {
         return \$this->_insert('$methodName', \$subject);
     }";
@@ -318,7 +328,11 @@ class Piece_ORM_Mapper_Generator
      * @param string $orderBy
      * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
      */
-    function _addFindAll($methodName, $query = null, $relationships = null, $orderBy = null)
+    private function _addFindAll($methodName,
+                                 $query = null,
+                                 array $relationships = array(),
+                                 $orderBy = null
+                                 )
     {
         if (!$this->_validateMethodName($methodName)) {
             Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_CONFIGURATION,
@@ -333,7 +347,7 @@ class Piece_ORM_Mapper_Generator
         }
 
         $this->_methodDefinitions[ strtolower($methodName) ] = "
-    function $methodName(\$criteria = null)
+    public function $methodName(\$criteria = null)
     {
         return \$this->_findAll('$methodName', \$criteria);
     }";
@@ -347,7 +361,7 @@ class Piece_ORM_Mapper_Generator
      *
      * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
      */
-    function _generateFromConfiguration()
+    private function _generateFromConfiguration()
     {
         if (!is_array($this->_config)) {
             return;
@@ -356,32 +370,52 @@ class Piece_ORM_Mapper_Generator
         foreach ($this->_config as $method) {
             do {
                 if (Piece_ORM_Mapper_QueryType::isFindAll($method['name'])) {
-                    $this->_addFindAll($method['name'], @$method['query'], @$method['relationship'], @$method['orderBy']);
+                    $this->_addFindAll($method['name'],
+                                       @$method['query'],
+                                       (array)@$method['relationship'],
+                                       @$method['orderBy']
+                                       );
                     break;
                 }
 
                 if (Piece_ORM_Mapper_QueryType::isFindOne($method['name'])) {
-                    $this->_addFindOne($method['name'], @$method['query'], @$method['orderBy']);
+                    $this->_addFindOne($method['name'],
+                                       @$method['query'],
+                                       @$method['orderBy']
+                                       );
                     break;
                 }
 
                 if (Piece_ORM_Mapper_QueryType::isFind($method['name'])) {
-                    $this->_addFind($method['name'], @$method['query'], @$method['relationship'], @$method['orderBy']);
+                    $this->_addFind($method['name'],
+                                    @$method['query'],
+                                    (array)@$method['relationship'],
+                                    @$method['orderBy']
+                                    );
                     break;
                 }
 
                 if (Piece_ORM_Mapper_QueryType::isInsert($method['name'])) {
-                    $this->_addInsert($method['name'], @$method['query'], @$method['relationship']);
+                    $this->_addInsert($method['name'],
+                                      @$method['query'],
+                                      (array)@$method['relationship']
+                                      );
                     break;
                 }
 
                 if (Piece_ORM_Mapper_QueryType::isUpdate($method['name'])) {
-                    $this->_addUpdate($method['name'], @$method['query'], @$method['relationship']);
+                    $this->_addUpdate($method['name'],
+                                      @$method['query'],
+                                      (array)@$method['relationship']
+                                      );
                     break;
                 }
 
                 if (Piece_ORM_Mapper_QueryType::isDelete($method['name'])) {
-                    $this->_addDelete($method['name'], @$method['query'], @$method['relationship']);
+                    $this->_addDelete($method['name'],
+                                      @$method['query'],
+                                      (array)@$method['relationship']
+                                      );
                     break;
                 }
 
@@ -402,7 +436,7 @@ class Piece_ORM_Mapper_Generator
     /**
      * Generates built-in findXXX, findAll, findAllXXX methods.
      */
-    function _generateFind()
+    private function _generateFind()
     {
         foreach ($this->_metadata->getFieldNames() as $fieldName) {
             $datatype = $this->_metadata->getDatatype($fieldName);
@@ -430,7 +464,7 @@ class Piece_ORM_Mapper_Generator
     /**
      * Generates the built-in insert method.
      */
-    function _generateInsert()
+    private function _generateInsert()
     {
         $this->_addInsert('insert', $this->_generateDefaultInsertQuery());
     }
@@ -441,7 +475,7 @@ class Piece_ORM_Mapper_Generator
     /**
      * Generates the built-in delete method.
      */
-    function _generateDelete()
+    private function _generateDelete()
     {
         $query = $this->_generateDefaultDeleteQuery();
         if (!is_null($query)) {
@@ -460,7 +494,7 @@ class Piece_ORM_Mapper_Generator
      * @param array  $relationships
      * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
      */
-    function _addDelete($methodName, $query, $relationships = null)
+    private function _addDelete($methodName, $query, array $relationships = array())
     {
         if (!$this->_validateMethodName($methodName)) {
             Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_CONFIGURATION,
@@ -475,7 +509,7 @@ class Piece_ORM_Mapper_Generator
         }
 
         $this->_methodDefinitions[ strtolower($methodName) ] = "
-    function $methodName(&\$subject)
+    public function $methodName(\$subject)
     {
         return \$this->_delete('$methodName', \$subject);
     }";
@@ -487,7 +521,7 @@ class Piece_ORM_Mapper_Generator
     /**
      * Generates the built-in update method.
      */
-    function _generateUpdate()
+    private function _generateUpdate()
     {
         $query = $this->_generateDefaultUpdateQuery();
         if (!is_null($query)) {
@@ -506,7 +540,7 @@ class Piece_ORM_Mapper_Generator
      * @param array  $relationships
      * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
      */
-    function _addUpdate($methodName, $query, $relationships = null)
+    private function _addUpdate($methodName, $query, array $relationships = array())
     {
         if (!$this->_validateMethodName($methodName)) {
             Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_CONFIGURATION,
@@ -521,7 +555,7 @@ class Piece_ORM_Mapper_Generator
         }
 
         $this->_methodDefinitions[ strtolower($methodName) ] = "
-    function $methodName(&\$subject)
+    public function $methodName(\$subject)
     {
         return \$this->_update('$methodName', \$subject);
     }";
@@ -536,9 +570,9 @@ class Piece_ORM_Mapper_Generator
      * @param string $propertyName
      * @param string $query
      */
-    function _generateQueryPropertyDeclaration($propertyName, $query)
+    private function _generateQueryPropertyDeclaration($propertyName, $query)
     {
-        return '    var $' .
+        return '    public $' .
             $this->getQueryProperty($propertyName) .
             ' = ' .
             var_export($query, true) .
@@ -556,17 +590,19 @@ class Piece_ORM_Mapper_Generator
      * @param array  $relationships
      * @return string
      */
-    function _generateRelationshipPropertyDeclaration($propertyName, $relationships)
+    private function _generateRelationshipPropertyDeclaration($propertyName,
+                                                              array $relationships
+                                                              )
     {
         if (is_array($relationships)) {
-            $relationships = array_map(array(&$this, 'normalizeRelationshipDefinition'), $relationships);
+            $relationships = array_map(array($this, 'normalizeRelationshipDefinition'), $relationships);
             if (Piece_ORM_Error::hasErrors()) {
                 return;
             }
 
-            return "    var \$__relationship__{$propertyName} = " . var_export($relationships, true) . ';';
+            return "    public \$__relationship__{$propertyName} = " . var_export($relationships, true) . ';';
         } else {
-            return "    var \$__relationship__{$propertyName} = array();";
+            return "    public \$__relationship__{$propertyName} = array();";
         }
     }
 
@@ -582,7 +618,11 @@ class Piece_ORM_Mapper_Generator
      * @param string $orderBy
      * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
      */
-    function _addPropertyDefinitions($methodName, $query, $relationships, $orderBy = null)
+    private function _addPropertyDefinitions($methodName,
+                                             $query,
+                                             array $relationships,
+                                             $orderBy = null
+                                             )
     {
         $propertyName = strtolower($methodName);
 
@@ -651,7 +691,7 @@ class Piece_ORM_Mapper_Generator
      * @param string $methodName
      * @return boolean
      */
-    function _validateMethodName($methodName)
+    private function _validateMethodName($methodName)
     {
         if (version_compare(phpversion(), '5.0.0', '<')) {
             $methodName = strtolower($methodName);
@@ -671,7 +711,7 @@ class Piece_ORM_Mapper_Generator
      * @param string $orderBy
      * @throws PIECE_ORM_ERROR_INVALID_CONFIGURATION
      */
-    function _addFindOne($methodName, $query, $orderBy)
+    private function _addFindOne($methodName, $query, $orderBy)
     {
         if (!$query) {
             Piece_ORM_Error::push(PIECE_ORM_ERROR_INVALID_CONFIGURATION,
@@ -685,7 +725,7 @@ class Piece_ORM_Mapper_Generator
         $this->_propertyDefinitions['orderBy'][$propertyName] = $this->_generateOrderByPropertyDeclaration($propertyName, $orderBy);
 
         $this->_methodDefinitions[ strtolower($methodName) ] = "
-    function $methodName(\$criteria = null)
+    public function $methodName(\$criteria = null)
     {
         return \$this->_findOne('$methodName', \$criteria);
     }";
@@ -700,7 +740,7 @@ class Piece_ORM_Mapper_Generator
      * @return string
      * @since Method available since Release 0.6.0
      */
-    function _generateDefaultInsertQuery()
+    private function _generateDefaultInsertQuery()
     {
         $fields = array();
         foreach ($this->_metadata->getFieldNames() as $fieldName) {
@@ -709,7 +749,7 @@ class Piece_ORM_Mapper_Generator
             }
         }
 
-        return 'INSERT INTO $__table (' . implode(", ", $fields) . ') VALUES (' . implode(', ', array_map(array(&$this, 'generateExpression'), $fields)) . ')';
+        return 'INSERT INTO $__table (' . implode(", ", $fields) . ') VALUES (' . implode(', ', array_map(array($this, 'generateExpression'), $fields)) . ')';
     }
 
     // }}}
@@ -721,7 +761,7 @@ class Piece_ORM_Mapper_Generator
      * @return string
      * @since Method available since Release 0.6.0
      */
-    function _generateDefaultDeleteQuery()
+    private function _generateDefaultDeleteQuery()
     {
         if ($this->_metadata->hasPrimaryKey()) {
             $primaryKeys = $this->_metadata->getPrimaryKeys();
@@ -746,7 +786,7 @@ class Piece_ORM_Mapper_Generator
      * @return string
      * @since Method available since Release 0.6.0
      */
-    function _generateDefaultUpdateQuery()
+    private function _generateDefaultUpdateQuery()
     {
         if ($this->_metadata->hasPrimaryKey()) {
             $primaryKeys = $this->_metadata->getPrimaryKeys();
@@ -793,9 +833,9 @@ class Piece_ORM_Mapper_Generator
      * @return string
      * @since Method available since Release 0.6.0
      */
-    function _generateOrderByPropertyDeclaration($propertyName, $orderBy)
+    private function _generateOrderByPropertyDeclaration($propertyName, $orderBy)
     {
-        return '    var $' .
+        return '    public $' .
             $this->getOrderByProperty($propertyName) .
             ' = ' .
             var_export($orderBy, true) .

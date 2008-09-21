@@ -2,7 +2,7 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 
 /**
- * PHP versions 4 and 5
+ * PHP version 5
  *
  * Copyright (c) 2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>,
  * All rights reserved.
@@ -35,11 +35,6 @@
  * @since      File available since Release 0.2.0
  */
 
-require_once 'Piece/ORM/Mapper/AssociatedObjectPersister/Common.php';
-require_once 'Piece/ORM/Mapper/Factory.php';
-require_once 'Piece/ORM/Error.php';
-require_once 'Piece/ORM/Inflector.php';
-
 // {{{ Piece_ORM_Mapper_AssociatedObjectPersister_OneToOne
 
 /**
@@ -63,6 +58,12 @@ class Piece_ORM_Mapper_AssociatedObjectPersister_OneToOne extends Piece_ORM_Mapp
     /**#@-*/
 
     /**#@+
+     * @access protected
+     */
+
+    /**#@-*/
+
+    /**#@+
      * @access private
      */
 
@@ -80,23 +81,23 @@ class Piece_ORM_Mapper_AssociatedObjectPersister_OneToOne extends Piece_ORM_Mapp
      *
      * @param array $relationship
      */
-    function insert($relationship)
+    public function insert(array $relationship)
     {
-        if (!array_key_exists($relationship['mappedAs'], $this->_subject)) {
+        if (!property_exists($this->subject, $relationship['mappedAs'])) {
             return;
         }
 
-        if (!is_object($this->_subject->$relationship['mappedAs'])) {
+        if (!is_object($this->subject->$relationship['mappedAs'])) {
             return;
         }
 
-        $mapper = &Piece_ORM_Mapper_Factory::factory($relationship['table']);
+        $mapper = Piece_ORM_Mapper_Factory::factory($relationship['table']);
         if (Piece_ORM_Error::hasErrors()) {
             return;
         }
 
-        $this->_subject->{ $relationship['mappedAs'] }->{ Piece_ORM_Inflector::camelize($relationship['column'], true) } = $this->_subject->{ Piece_ORM_Inflector::camelize($relationship['referencedColumn'], true) };
-        $mapper->insert($this->_subject->{ $relationship['mappedAs'] });
+        $this->subject->{ $relationship['mappedAs'] }->{ Piece_ORM_Inflector::camelize($relationship['column'], true) } = $this->subject->{ Piece_ORM_Inflector::camelize($relationship['referencedColumn'], true) };
+        $mapper->insert($this->subject->{ $relationship['mappedAs'] });
     }
 
     // }}}
@@ -107,35 +108,35 @@ class Piece_ORM_Mapper_AssociatedObjectPersister_OneToOne extends Piece_ORM_Mapp
      *
      * @param array $relationship
      */
-    function update($relationship)
+    public function update(array $relationship)
     {
-        if (!array_key_exists($relationship['mappedAs'], $this->_subject)) {
+        if (!property_exists($this->subject, $relationship['mappedAs'])) {
             return;
         }
 
-        if (!is_null($this->_subject->$relationship['mappedAs']) && !is_object($this->_subject->$relationship['mappedAs'])) {
+        if (!is_null($this->subject->$relationship['mappedAs']) && !is_object($this->subject->$relationship['mappedAs'])) {
             return;
         }
 
-        $mapper = &Piece_ORM_Mapper_Factory::factory($relationship['table']);
+        $mapper = Piece_ORM_Mapper_Factory::factory($relationship['table']);
         if (Piece_ORM_Error::hasErrors()) {
             return;
         }
 
-        $referencedColumnValue = $this->_subject->{ Piece_ORM_Inflector::camelize($relationship['referencedColumn'], true) };
+        $referencedColumnValue = $this->subject->{ Piece_ORM_Inflector::camelize($relationship['referencedColumn'], true) };
         $oldObject = $mapper->findWithQuery("SELECT * FROM {$relationship['table']} WHERE {$relationship['column']} = " . $mapper->quote($referencedColumnValue, $relationship['column']));
         if (Piece_ORM_Error::hasErrors()) {
             return;
         }
 
         if (is_null($oldObject)) {
-            if (!is_null($this->_subject->$relationship['mappedAs'])) {
-                $this->_subject->$relationship['mappedAs']->{ Piece_ORM_Inflector::camelize($relationship['column'], true) } = $referencedColumnValue;
-                $mapper->insert($this->_subject->$relationship['mappedAs']);
+            if (!is_null($this->subject->$relationship['mappedAs'])) {
+                $this->subject->$relationship['mappedAs']->{ Piece_ORM_Inflector::camelize($relationship['column'], true) } = $referencedColumnValue;
+                $mapper->insert($this->subject->$relationship['mappedAs']);
             }
         } else {
-            if (!is_null($this->_subject->$relationship['mappedAs'])) {
-                $mapper->update($this->_subject->$relationship['mappedAs']);
+            if (!is_null($this->subject->$relationship['mappedAs'])) {
+                $mapper->update($this->subject->$relationship['mappedAs']);
             } else {
                 $mapper->delete($oldObject);
             }
@@ -150,23 +151,29 @@ class Piece_ORM_Mapper_AssociatedObjectPersister_OneToOne extends Piece_ORM_Mapp
      *
      * @param array $relationship
      */
-    function delete($relationship)
+    public function delete(array $relationship)
     {
-        if (!array_key_exists($relationship['mappedAs'], $this->_subject)) {
+        if (!property_exists($this->subject, $relationship['mappedAs'])) {
             return;
         }
 
-        if (!is_null($this->_subject->$relationship['mappedAs']) && !is_object($this->_subject->$relationship['mappedAs'])) {
+        if (!is_null($this->subject->$relationship['mappedAs']) && !is_object($this->subject->$relationship['mappedAs'])) {
             return;
         }
 
-        $mapper = &Piece_ORM_Mapper_Factory::factory($relationship['table']);
+        $mapper = Piece_ORM_Mapper_Factory::factory($relationship['table']);
         if (Piece_ORM_Error::hasErrors()) {
             return;
         }
 
-        $mapper->delete($this->_subject->$relationship['mappedAs']);
+        $mapper->delete($this->subject->$relationship['mappedAs']);
     }
+
+    /**#@-*/
+
+    /**#@+
+     * @access protected
+     */
 
     /**#@-*/
 

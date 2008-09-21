@@ -2,7 +2,7 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 
 /**
- * PHP versions 4 and 5
+ * PHP version 5
  *
  * Copyright (c) 2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>,
  * All rights reserved.
@@ -35,16 +35,6 @@
  * @since      File available since Release 0.1.0
  */
 
-require_once 'Piece/ORM/Error.php';
-require_once 'MDB2.php';
-require_once 'PEAR.php';
-require_once 'Piece/ORM/Mapper/Factory.php';
-
-// {{{ GLOBALS
-
-$GLOBALS['PIECE_ORM_Context_Instance'] = null;
-
-// }}}
 // {{{ Piece_ORM_Context
 
 /**
@@ -68,12 +58,19 @@ class Piece_ORM_Context
     /**#@-*/
 
     /**#@+
+     * @access protected
+     */
+
+    /**#@-*/
+
+    /**#@+
      * @access private
      */
 
-    var $_config;
-    var $_database;
-    var $_mapperConfigDirectory;
+    private $_config;
+    private $_database;
+    private $_mapperConfigDirectory;
+    private static $_instance;
 
     /**#@-*/
 
@@ -85,20 +82,18 @@ class Piece_ORM_Context
     // {{{ singleton()
 
     /**
-     * Returns the Piece_ORM_Context instance if exists. If not exists,
-     * a new instance of the Piece_ORM_Context class will be created and
-     * returned.
+     * Returns the Piece_ORM_Context instance if exists. If not exists, a new
+     * instance of the Piece_ORM_Context class will be created and returned.
      *
      * @return Piece_ORM_Context
-     * @static
      */
-    function &singleton()
+    public static function singleton()
     {
-        if (is_null($GLOBALS['PIECE_ORM_Context_Instance'])) {
-            $GLOBALS['PIECE_ORM_Context_Instance'] = &new Piece_ORM_Context();
+        if (is_null(self::$_instance)) {
+            self::$_instance = new Piece_ORM_Context();
         }
 
-        return $GLOBALS['PIECE_ORM_Context_Instance'];
+        return self::$_instance;
     }
 
     // }}}
@@ -107,11 +102,11 @@ class Piece_ORM_Context
     /**
      * Sets a Piece_ORM_Config object.
      *
-     * @param Piece_ORM_Config &$config
+     * @param Piece_ORM_Config $config
      */
-    function setConfiguration(&$config)
+    public function setConfiguration(Piece_ORM_Config $config)
     {
-        $this->_config = &$config;
+        $this->_config = $config;
     }
 
     // }}}
@@ -122,7 +117,7 @@ class Piece_ORM_Context
      *
      * @return Piece_ORM_Config
      */
-    function &getConfiguration()
+    public function getConfiguration()
     {
         return $this->_config;
     }
@@ -133,13 +128,16 @@ class Piece_ORM_Context
     /**
      * Removed a single instance safely and clears all database handles.
      *
-     * @static
      * @see $GLOBALS['_MDB2_databases']
      */
-    function clear()
+    public static function clear()
     {
-        unset($GLOBALS['PIECE_ORM_Context_Instance']);
-        $GLOBALS['PIECE_ORM_Context_Instance'] = null;
+        self::$_instance = null;
+
+        if (!array_key_exists('_MDB2_databases', $GLOBALS)) {
+            return;
+        }
+
         foreach (array_keys($GLOBALS['_MDB2_databases']) as $dbIndex) {
             unset($GLOBALS['_MDB2_databases'][$dbIndex]);
         }
@@ -154,7 +152,7 @@ class Piece_ORM_Context
      * @param string $database
      * @throws PIECE_ORM_ERROR_NOT_FOUND
      */
-    function setDatabase($database)
+    public function setDatabase($database)
     {
         if (!$this->_config->checkDatabase($database)) {
             Piece_ORM_Error::push(PIECE_ORM_ERROR_NOT_FOUND,
@@ -181,7 +179,7 @@ class Piece_ORM_Context
      *
      * @return mixed
      */
-    function getDSN()
+    public function getDSN()
     {
         return $this->_config->getDSN($this->_database);
     }
@@ -194,7 +192,7 @@ class Piece_ORM_Context
      *
      * @return array
      */
-    function getOptions()
+    public function getOptions()
     {
         return $this->_config->getOptions($this->_database);
     }
@@ -208,10 +206,10 @@ class Piece_ORM_Context
      * @return MDB2_Driver_Common
      * @throws PIECE_ORM_ERROR_CANNOT_INVOKE
      */
-    function &getConnection()
+    public function getConnection()
     {
         PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
-        $dbh = &MDB2::singleton($this->getDSN(), $this->getOptions());
+        $dbh = MDB2::singleton($this->getDSN(), $this->getOptions());
         PEAR::staticPopErrorHandling();
         if (MDB2::isError($dbh)) {
             Piece_ORM_Error::pushPEARError($dbh,
@@ -226,7 +224,7 @@ class Piece_ORM_Context
 
         $nativeTypeMapperClass = 'Piece_ORM_MDB2_NativeTypeMapper_' . ucwords(strtolower(substr(strrchr(get_class($dbh), '_'), 1)));
         include_once str_replace('_', '/', $nativeTypeMapperClass) . '.php';
-        $nativeTypeMapper = &new $nativeTypeMapperClass();
+        $nativeTypeMapper = new $nativeTypeMapperClass();
         $nativeTypeMapper->mapNativeType($dbh);
 
         if ($this->getUseMapperNameAsTableName()) {
@@ -253,7 +251,7 @@ class Piece_ORM_Context
      *
      * @param string $mapperConfigDirectory
      */
-    function setMapperConfigDirectory($mapperConfigDirectory)
+    public function setMapperConfigDirectory($mapperConfigDirectory)
     {
         $this->_mapperConfigDirectory = $mapperConfigDirectory;
     }
@@ -267,7 +265,7 @@ class Piece_ORM_Context
      * @return boolean
      * @since Method available since Release 1.0.0
      */
-    function getUseMapperNameAsTableName()
+    public function getUseMapperNameAsTableName()
     {
         return $this->_config->getUseMapperNameAsTableName($this->_database);
     }
@@ -275,8 +273,24 @@ class Piece_ORM_Context
     /**#@-*/
 
     /**#@+
+     * @access protected
+     */
+
+    /**#@-*/
+
+    /**#@+
      * @access private
      */
+
+    // }}}
+    // {{{ __construct()
+
+    /**
+     * A private constructor to prevent direct creation of objects.
+     *
+     * @since Method available since Release 2.0.0
+     */
+    private function __construct() {}
 
     /**#@-*/
 

@@ -2,7 +2,7 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 
 /**
- * PHP versions 4 and 5
+ * PHP version 5
  *
  * Copyright (c) 2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>,
  * All rights reserved.
@@ -35,13 +35,11 @@
  * @since      File available since Release 0.5.0
  */
 
-require_once 'PEAR.php';
-
 // {{{ Piece_ORM_MDB2_Decorator_Reverse_Mssql
 
 /**
- * The decorator for the schema reverse engineering module of the MDB2
- * Microsoft SQL Server driver.
+ * The decorator for the schema reverse engineering module of the MDB2 Microsoft SQL
+ * Server driver.
  *
  * @package    Piece_ORM
  * @copyright  2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
@@ -61,10 +59,16 @@ class Piece_ORM_MDB2_Decorator_Reverse_Mssql
     /**#@-*/
 
     /**#@+
+     * @access protected
+     */
+
+    /**#@-*/
+
+    /**#@+
      * @access private
      */
 
-    var $_reverse;
+    private $_reverse;
 
     /**#@-*/
 
@@ -73,17 +77,17 @@ class Piece_ORM_MDB2_Decorator_Reverse_Mssql
      */
 
     // }}}
-    // {{{ constructor
+    // {{{ __construct()
 
     /**
      * Sets a MDB2_Driver_Reverse_mssql instance to the property.
      *
-     * @param MDB2_Driver_Reverse_mssql &$reverse
+     * @param MDB2_Driver_Reverse_mssql $reverse
      * @param string $field
      */
-    function Piece_ORM_MDB2_Decorator_Reverse_Mssql(&$reverse)
+    public function __construct(MDB2_Driver_Reverse_mssql $reverse)
     {
-        $this->_reverse = &$reverse;
+        $this->_reverse = $reverse;
     }
 
     // }}}
@@ -94,7 +98,7 @@ class Piece_ORM_MDB2_Decorator_Reverse_Mssql
      *
      * @return MDB2_Driver_Common|MDB2_Error
      */
-    function &getDBInstance()
+    public function getDBInstance()
     {
         return $this->_reverse->getDBInstance();
     }
@@ -109,7 +113,7 @@ class Piece_ORM_MDB2_Decorator_Reverse_Mssql
      * @param string $field
      * @return array|MDB2_Error
      */
-    function getTableFieldDefinition($table, $field)
+    public function getTableFieldDefinition($table, $field)
     {
         return $this->_reverse->getTableFieldDefinition($table, $field);
     }
@@ -125,9 +129,9 @@ class Piece_ORM_MDB2_Decorator_Reverse_Mssql
      * @return array|MDB2_Error
      * @see MDB2_Driver_Reverse_mssql::getTableIndexDefinition()
      */
-    function getTableIndexDefinition($table, $index_name)
+    public function getTableIndexDefinition($table, $index_name)
     {
-        $db =& $this->getDBInstance();
+        $db = $this->getDBInstance();
         if (PEAR::isError($db)) {
             return $db;
         }
@@ -189,7 +193,7 @@ ORDER BY
         $result->free();
         if (empty($definition['fields'])) {
             return $db->raiseError(MDB2_ERROR_NOT_FOUND, null, null,
-                'it was not specified an existing table index', __FUNCTION__);
+                'it was not specified an existing table index', __METHOD__);
         }
         return $definition;
     }
@@ -204,7 +208,7 @@ ORDER BY
      * @param string $index
      * @return array|MDB2_Error
      */
-    function getTableConstraintDefinition($table, $index)
+    public function getTableConstraintDefinition($table, $index)
     {
         return $this->_reverse->getTableConstraintDefinition($table, $index);
     }
@@ -218,7 +222,7 @@ ORDER BY
      * @param string $sequence
      * @return array|MDB2_Error
      */
-    function getSequenceDefinition($sequence)
+    public function getSequenceDefinition($sequence)
     {
         return $this->_reverse->getSequenceDefinition($sequence);
     }
@@ -232,7 +236,7 @@ ORDER BY
      * @param string $trigger
      * @return array|MDB2_Error
      */
-    function getTriggerDefinition($trigger)
+    public function getTriggerDefinition($trigger)
     {
         return $this->_reverse->getTriggerDefinition($trigger);
     }
@@ -248,16 +252,16 @@ ORDER BY
      * @return array|MDB2_Error
      * @see MDB2_Driver_Reverse_Common::tableInfo()
      */
-    function tableInfo($result, $mode = null)
+    public function tableInfo($result, $mode = null)
     {
-        $db =& $this->getDBInstance();
+        $db = $this->getDBInstance();
         if (PEAR::isError($db)) {
             return $db;
         }
 
         if (!is_string($result)) {
             return $db->raiseError(MDB2_ERROR_UNSUPPORTED, null, null,
-                'method not implemented', __FUNCTION__);
+                'method not implemented', __METHOD__);
         }
 
         $db->loadModule('Manager', null, true);
@@ -358,6 +362,12 @@ ORDER BY
     /**#@-*/
 
     /**#@+
+     * @access protected
+     */
+
+    /**#@-*/
+
+    /**#@+
      * @access private
      */
 
@@ -365,17 +375,16 @@ ORDER BY
     // {{{ _findAutoIncrementField()
 
     /**
-     * Finds auto increment field when using Microsoft SQL Server.
-     * The MDB2 driver for Microsoft SQL Server cannot detect auto
-     * increment field in the table.
+     * Finds auto increment field when using Microsoft SQL Server. The MDB2 driver for
+     * Microsoft SQL Server cannot detect auto increment field in the table.
      *
      * @param string $tableName
      * @param array  $tableInfo
      * @return array|MDB2_Error
      */
-    function _findAutoIncrementField($tableName, $tableInfo)
+    private function _findAutoIncrementField($tableName, array $tableInfo)
     {
-        $dbh = &$this->getDBInstance();
+        $dbh = $this->getDBInstance();
         if (PEAR::isError($dbh)) {
             return $dbh;
         }
