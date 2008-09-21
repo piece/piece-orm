@@ -70,8 +70,6 @@ class Piece_ORM_Mapper_FactoryTest extends PHPUnit_Framework_TestCase
      */
 
     private $_cacheDirectory;
-    private $_oldCacheDirectory;
-    private $_oldMetadataCacheDirectory;
 
     /**#@-*/
 
@@ -89,19 +87,17 @@ class Piece_ORM_Mapper_FactoryTest extends PHPUnit_Framework_TestCase
         $context->setConfiguration($config);
         $context->setMapperConfigDirectory($this->_cacheDirectory);
         $context->setDatabase('piece');
-        $this->_oldCacheDirectory = $GLOBALS['PIECE_ORM_Mapper_ConfigDirectory'];
         Piece_ORM_Mapper_Factory::setConfigDirectory($this->_cacheDirectory);
         Piece_ORM_Mapper_Factory::setCacheDirectory($this->_cacheDirectory);
-        $this->_oldMetadataCacheDirectory = $GLOBALS['PIECE_ORM_Metadata_CacheDirectory'];
         Piece_ORM_Metadata_Factory::setCacheDirectory($this->_cacheDirectory);
     }
 
     public function tearDown()
     {
-        Piece_ORM_Metadata_Factory::setCacheDirectory($this->_oldMetadataCacheDirectory);
+        Piece_ORM_Metadata_Factory::restoreCacheDirectory();
         Piece_ORM_Metadata_Factory::clearInstances();
-        Piece_ORM_Mapper_Factory::setCacheDirectory($this->_oldCacheDirectory);
-        Piece_ORM_Mapper_Factory::setConfigDirectory($this->_oldCacheDirectory);
+        Piece_ORM_Mapper_Factory::restoreCacheDirectory();
+        Piece_ORM_Mapper_Factory::restoreConfigDirectory();
         Piece_ORM_Mapper_Factory::clearInstances();
         Piece_ORM_Context::clear();
         $cache = new Cache_Lite(array('cacheDir' => "{$this->_cacheDirectory}/",
@@ -114,7 +110,6 @@ class Piece_ORM_Mapper_FactoryTest extends PHPUnit_Framework_TestCase
 
     public function testShouldRaiseAnExceptionIfTheConfigurationDirectoryIsNotSpecified()
     {
-        $oldConfigDirectory = $GLOBALS['PIECE_ORM_Mapper_ConfigDirectory'];
         Piece_ORM_Mapper_Factory::setConfigDirectory(null);
         Piece_ORM_Error::disableCallback();
         Piece_ORM_Mapper_Factory::factory('Employees');
@@ -126,12 +121,11 @@ class Piece_ORM_Mapper_FactoryTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals(PIECE_ORM_ERROR_INVALID_OPERATION, $error['code']);
 
-        Piece_ORM_Mapper_Factory::setConfigDirectory($oldConfigDirectory);
+        Piece_ORM_Mapper_Factory::restoreConfigDirectory();
     }
 
     public function testShouldRaiseAnExceptionIfAGivenConfigurationDirectoryIsNotFound()
     {
-        $oldConfigDirectory = $GLOBALS['PIECE_ORM_Mapper_ConfigDirectory'];
         Piece_ORM_Mapper_Factory::setConfigDirectory(dirname(__FILE__) . '/foo');
         Piece_ORM_Error::disableCallback();
         Piece_ORM_Mapper_Factory::factory('Employees');
@@ -143,12 +137,11 @@ class Piece_ORM_Mapper_FactoryTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals(PIECE_ORM_ERROR_NOT_FOUND, $error['code']);
 
-        Piece_ORM_Mapper_Factory::setConfigDirectory($oldConfigDirectory);
+        Piece_ORM_Mapper_Factory::restoreConfigDirectory();
     }
 
     public function testShouldRaiseAnExceptionIfTheCacheDirectoryIsNotSpecified()
     {
-        $oldCacheDirectory = $GLOBALS['PIECE_ORM_Metadata_CacheDirectory'];
         Piece_ORM_Mapper_Factory::setCacheDirectory(null);
         Piece_ORM_Error::disableCallback();
         Piece_ORM_Mapper_Factory::factory('Employees');
@@ -160,12 +153,11 @@ class Piece_ORM_Mapper_FactoryTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals(PIECE_ORM_ERROR_INVALID_OPERATION, $error['code']);
 
-        Piece_ORM_Mapper_Factory::setCacheDirectory($oldCacheDirectory);
+        Piece_ORM_Mapper_Factory::restoreCacheDirectory();
     }
 
     public function testShouldRaiseAnExceptionIfAGivenCacheDirectoryIsNotFound()
     {
-        $oldCacheDirectory = $GLOBALS['PIECE_ORM_Metadata_CacheDirectory'];
         Piece_ORM_Mapper_Factory::setCacheDirectory(dirname(__FILE__) . '/foo');
         Piece_ORM_Error::disableCallback();
         Piece_ORM_Mapper_Factory::factory('Employees');
@@ -177,7 +169,7 @@ class Piece_ORM_Mapper_FactoryTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals(PIECE_ORM_ERROR_NOT_FOUND, $error['code']);
 
-        Piece_ORM_Mapper_Factory::setCacheDirectory($oldCacheDirectory);
+        Piece_ORM_Mapper_Factory::restoreCacheDirectory();
     }
 
     public function testShouldRaiseAnExceptionIfAGivenConfigurationFileIsNotFound()

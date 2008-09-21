@@ -86,7 +86,7 @@ class Piece_ORMTest extends PHPUnit_Framework_TestCase
 
     public function tearDown()
     {
-        $GLOBALS['PIECE_ORM_Configured'] = false;
+        Piece_ORM::$configured = false;
         Piece_ORM_Metadata_Factory::clearInstances();
         Piece_ORM_Mapper_Factory::clearInstances();
         Piece_ORM_Context::clear();
@@ -116,17 +116,35 @@ class Piece_ORMTest extends PHPUnit_Framework_TestCase
             $this->assertEquals($configuration['options'], $config->getOptions($configuration['name']));
         }
 
-        $this->assertEquals($this->_cacheDirectory, $GLOBALS['PIECE_ORM_Mapper_ConfigDirectory']);
-        $this->assertEquals($this->_cacheDirectory, $GLOBALS['PIECE_ORM_Mapper_CacheDirectory']);
-        $this->assertEquals($this->_cacheDirectory, $GLOBALS['PIECE_ORM_Metadata_CacheDirectory']);
+        $this->assertEquals($this->_cacheDirectory,
+                            $this->readAttribute('Piece_ORM_Mapper_Factory',
+                                                 '_configDirectory')
+                            );
+        $this->assertEquals($this->_cacheDirectory,
+                            $this->readAttribute('Piece_ORM_Mapper_Factory',
+                                                 '_cacheDirectory')
+                            );
+        $this->assertEquals($this->_cacheDirectory,
+                            $this->readAttribute('Piece_ORM_Metadata_Factory',
+                                                 '_cacheDirectory')
+                            );
 
         Piece_ORM_Mapper_Factory::setConfigDirectory('./foo');
         Piece_ORM_Mapper_Factory::setCacheDirectory('./bar');
         Piece_ORM_Metadata_Factory::setCacheDirectory('./baz');
 
-        $this->assertEquals('./foo', $GLOBALS['PIECE_ORM_Mapper_ConfigDirectory']);
-        $this->assertEquals('./bar', $GLOBALS['PIECE_ORM_Mapper_CacheDirectory']);
-        $this->assertEquals('./baz', $GLOBALS['PIECE_ORM_Metadata_CacheDirectory']);
+        $this->assertEquals('./foo',
+                            $this->readAttribute('Piece_ORM_Mapper_Factory',
+                                                 '_configDirectory')
+                            );
+        $this->assertEquals('./bar',
+                            $this->readAttribute('Piece_ORM_Mapper_Factory',
+                                                 '_cacheDirectory')
+                            );
+        $this->assertEquals('./baz',
+                            $this->readAttribute('Piece_ORM_Metadata_Factory',
+                                                 '_cacheDirectory')
+                            );
     }
 
     public function testShouldConfigureDynamicallyWithAGivenConfigurationFile()
@@ -210,14 +228,16 @@ class Piece_ORMTest extends PHPUnit_Framework_TestCase
         Piece_ORM::configure($cacheDirectory, $cacheDirectory, $cacheDirectory);
 
         $this->assertEquals("$cacheDirectory/database1",
-                            $GLOBALS['PIECE_ORM_Mapper_ConfigDirectory']
+                            $this->readAttribute('Piece_ORM_Mapper_Factory',
+                                                 '_configDirectory')
                             );
 
         Piece_ORM_Mapper_Factory::setConfigDirectory('./foo');
         Piece_ORM::setDatabase('database2');
 
         $this->assertEquals("$cacheDirectory/database2",
-                            $GLOBALS['PIECE_ORM_Mapper_ConfigDirectory']
+                            $this->readAttribute('Piece_ORM_Mapper_Factory',
+                                                 '_configDirectory')
                             );
 
         $cache = new Cache_Lite(array('cacheDir' => "$cacheDirectory/",

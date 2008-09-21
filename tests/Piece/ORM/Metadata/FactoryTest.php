@@ -70,7 +70,6 @@ class Piece_ORM_Metadata_FactoryTest extends PHPUnit_Framework_TestCase
      */
 
     private $_cacheDirectory;
-    private $_oldCacheDirectory;
 
     /**#@-*/
 
@@ -87,13 +86,12 @@ class Piece_ORM_Metadata_FactoryTest extends PHPUnit_Framework_TestCase
         $context = Piece_ORM_Context::singleton();
         $context->setConfiguration($config);
         $context->setDatabase('piece');
-        $this->_oldCacheDirectory = $GLOBALS['PIECE_ORM_Metadata_CacheDirectory'];
         Piece_ORM_Metadata_Factory::setCacheDirectory($this->_cacheDirectory);
     }
 
     public function tearDown()
     {
-        Piece_ORM_Metadata_Factory::setCacheDirectory($this->_oldCacheDirectory);
+        Piece_ORM_Metadata_Factory::restoreCacheDirectory();
         Piece_ORM_Metadata_Factory::clearInstances();
         Piece_ORM_Context::clear();
         $cache = new Cache_Lite(array('cacheDir' => "{$this->_cacheDirectory}/",
