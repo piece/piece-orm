@@ -2,7 +2,7 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 
 /**
- * PHP versions 4 and 5
+ * PHP version 5
  *
  * Copyright (c) 2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>,
  * All rights reserved.
@@ -35,16 +35,14 @@
  * @since      File available since Release 0.4.0
  */
 
-if (substr(PHP_OS, 0, 3) != 'WIN') {
-    return;
-}
+return;
 
 require_once dirname(__FILE__) . '/CompatibilityTests.php';
 
 // {{{ Piece_ORM_Mapper_MssqlTestCase
 
 /**
- * TestCase for Microsoft SQL Server.
+ * Some tests for Microsoft SQL Server.
  *
  * @package    Piece_ORM
  * @copyright  2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
@@ -64,10 +62,16 @@ class Piece_ORM_Mapper_MssqlTestCase extends Piece_ORM_Mapper_CompatibilityTests
     /**#@-*/
 
     /**#@+
-     * @access private
+     * @access protected
      */
 
-    var $_dsn = 'mssql://piece:piece@pieceorm:1433/piece';
+    protected $dsn = 'mssql://piece:piece@pieceorm:1433/piece';
+
+    /**#@-*/
+
+    /**#@+
+     * @access private
+     */
 
     /**#@-*/
 
@@ -78,14 +82,14 @@ class Piece_ORM_Mapper_MssqlTestCase extends Piece_ORM_Mapper_CompatibilityTests
     /**
      * @since Method available since Release 1.0.0
      */
-    function testShouldSetAFunctionToGetTheCurrentTimestampToTheCreatedatFieldWhenExecutingInsert() {}
+    public function testShouldSetAFunctionToGetTheCurrentTimestampToTheCreatedatFieldWhenExecutingInsert() {}
 
     /**
      * @since Method available since Release 1.2.0
      */
-    function testShouldProvideTheDefaultValueOfAGivenField()
+    public function testShouldProvideTheDefaultValueOfAGivenField()
     {
-        $mapper = &Piece_ORM_Mapper_Factory::factory('Employees');
+        $mapper = Piece_ORM_Mapper_Factory::factory('Employees');
 
         $this->assertNull($mapper->getDefault('id'));
         $this->assertNull($mapper->getDefault('firstName'));

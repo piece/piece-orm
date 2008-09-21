@@ -2,7 +2,7 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 
 /**
- * PHP versions 4 and 5
+ * PHP version 5
  *
  * Copyright (c) 2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>,
  * All rights reserved.
@@ -36,17 +36,11 @@
  */
 
 require_once dirname(__FILE__) . '/CompatibilityTests.php';
-require_once 'MDB2.php';
-require_once 'Piece/ORM/Mapper/Factory.php';
-require_once 'Piece/ORM/Error.php';
-require_once 'Piece/ORM/Config.php';
-require_once 'Piece/ORM/Context.php';
-require_once 'Piece/ORM/Metadata/Factory.php';
 
 // {{{ Piece_ORM_Mapper_MysqlTestCase
 
 /**
- * TestCase for PostgreSQL.
+ * Some tests for MySQL.
  *
  * @package    Piece_ORM
  * @copyright  2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
@@ -66,10 +60,16 @@ class Piece_ORM_Mapper_MysqlTestCase extends Piece_ORM_Mapper_CompatibilityTests
     /**#@-*/
 
     /**#@+
-     * @access private
+     * @access protected
      */
 
-    var $_dsn = 'mysql://piece:piece@pieceorm/piece';
+    protected $dsn = 'mysql://piece:piece@pieceorm/piece';
+
+    /**#@-*/
+
+    /**#@+
+     * @access private
+     */
 
     /**#@-*/
 
@@ -80,9 +80,9 @@ class Piece_ORM_Mapper_MysqlTestCase extends Piece_ORM_Mapper_CompatibilityTests
     /**
      * @since Method available since Release 0.6.0
      */
-    function testDefaultQueryShouldBeGeneratedIfQueryForInsertMethodIsNotGiven()
+    public function testShouldGenerateTheDefaultQueryIfTheQueryForAInsertMethodIsNotGiven()
     {
-        $mapper = &Piece_ORM_Mapper_Factory::factory('Employees');
+        $mapper = Piece_ORM_Mapper_Factory::factory('Employees');
 
         $this->assertEquals('INSERT INTO $__table (first_name, last_name, note, departments_id, created_at) VALUES ($firstName, $lastName, $note, $departmentsId, $createdAt)', $mapper->__query__insertwithnoquery);
     }
@@ -90,9 +90,9 @@ class Piece_ORM_Mapper_MysqlTestCase extends Piece_ORM_Mapper_CompatibilityTests
     /**
      * @since Method available since Release 0.7.0
      */
-    function testCharsetShouldBeAbleToSetByDSN()
+    public function testShouldSetCharsetByDSN()
     {
-        $config = &new Piece_ORM_Config();
+        $config = new Piece_ORM_Config();
         $config->setDSN('CharsetShouldBeAbleToSetByDSN', array('phptype'  => 'mysql',
                                                                'hostspec' => 'pieceorm',
                                                                'database' => 'piece',
@@ -101,12 +101,12 @@ class Piece_ORM_Mapper_MysqlTestCase extends Piece_ORM_Mapper_CompatibilityTests
                                                                'charset'  => 'sjis')
                         );
         $config->setOptions('piece', array('debug' => 2, 'result_buffering' => false));
-        $context = &Piece_ORM_Context::singleton();
+        $context = Piece_ORM_Context::singleton();
         $context->setConfiguration($config);
-        $context->setMapperConfigDirectory($this->_cacheDirectory);
+        $context->setMapperConfigDirectory($this->cacheDirectory);
         $context->setDatabase('CharsetShouldBeAbleToSetByDSN');
-        $mapper = &Piece_ORM_Mapper_Factory::factory('Employees');
-        $subject = &$mapper->createObject();
+        $mapper = Piece_ORM_Mapper_Factory::factory('Employees');
+        $subject = $mapper->createObject();
         $subject->firstName = "\x93\xd6\x8c\x5b";
         $subject->lastName = "\x8b\x76\x95\xdb";
         $id = $mapper->insert($subject);
@@ -116,16 +116,16 @@ class Piece_ORM_Mapper_MysqlTestCase extends Piece_ORM_Mapper_CompatibilityTests
         $this->assertEquals("\x93\xd6\x8c\x5b", $employee->firstName);
         $this->assertEquals("\x8b\x76\x95\xdb", $employee->lastName);
 
-        $dbh = &$context->getConnection();
+        $dbh = $context->getConnection();
         $dbh->setCharset('utf8');
     }
 
     /**
      * @since Method available since Release 1.2.0
      */
-    function testShouldProvideTheDefaultValueOfAGivenField()
+    public function testShouldProvideTheDefaultValueOfAGivenField()
     {
-        $mapper = &Piece_ORM_Mapper_Factory::factory('Employees');
+        $mapper = Piece_ORM_Mapper_Factory::factory('Employees');
 
         $this->assertNull($mapper->getDefault('id'));
         $this->assertNull($mapper->getDefault('firstName'));
@@ -136,6 +136,12 @@ class Piece_ORM_Mapper_MysqlTestCase extends Piece_ORM_Mapper_CompatibilityTests
         $this->assertEquals('CURRENT_TIMESTAMP', $mapper->getDefault('updatedAt'));
         $this->assertEquals('0', $mapper->getDefault('lockVersion'));
     }
+
+    /**#@-*/
+
+    /**#@+
+     * @access protected
+     */
 
     /**#@-*/
 

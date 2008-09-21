@@ -2,7 +2,7 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 
 /**
- * PHP versions 4 and 5
+ * PHP version 5
  *
  * Copyright (c) 2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>,
  * All rights reserved.
@@ -40,7 +40,7 @@ require_once dirname(__FILE__) . '/CompatibilityTests.php';
 // {{{ Piece_ORM_Mapper_PgsqlTestCase
 
 /**
- * TestCase for PostgreSQL.
+ * Some tests for PostgreSQL.
  *
  * @package    Piece_ORM
  * @copyright  2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
@@ -60,10 +60,16 @@ class Piece_ORM_Mapper_PgsqlTestCase extends Piece_ORM_Mapper_CompatibilityTests
     /**#@-*/
 
     /**#@+
-     * @access private
+     * @access protected
      */
 
-    var $_dsn = 'pgsql://piece:piece@pieceorm/piece';
+    protected $dsn = 'pgsql://piece:piece@pieceorm/piece';
+
+    /**#@-*/
+
+    /**#@+
+     * @access private
+     */
 
     /**#@-*/
 
@@ -74,15 +80,15 @@ class Piece_ORM_Mapper_PgsqlTestCase extends Piece_ORM_Mapper_CompatibilityTests
     /**
      * @since Method available since Release 0.7.0
      */
-    function testGeometricTypesShouldWork()
+    public function testShouldSupportGeometricTypes()
     {
-        $this->_tables[] = 'geometric_types';
-        $this->_cacheDirectory = dirname(__FILE__) . '/' . basename(__FILE__, '.php');
-        Piece_ORM_Mapper_Factory::setConfigDirectory($this->_cacheDirectory);
-        Piece_ORM_Mapper_Factory::setCacheDirectory($this->_cacheDirectory);
-        Piece_ORM_Metadata_Factory::setCacheDirectory($this->_cacheDirectory);
-        $mapper = &Piece_ORM_Mapper_Factory::factory('GeometricTypes');
-        $geometricTypes = &$mapper->createObject();
+        $this->tables[] = 'geometric_types';
+        $this->cacheDirectory = dirname(__FILE__) . '/' . basename(__FILE__, '.php');
+        Piece_ORM_Mapper_Factory::setConfigDirectory($this->cacheDirectory);
+        Piece_ORM_Mapper_Factory::setCacheDirectory($this->cacheDirectory);
+        Piece_ORM_Metadata_Factory::setCacheDirectory($this->cacheDirectory);
+        $mapper = Piece_ORM_Mapper_Factory::factory('GeometricTypes');
+        $geometricTypes = $mapper->createObject();
         $geometricTypes->pointField = '(1,1)';
         $geometricTypes->lsegField = '[(1,1),(2,2)]';
         $geometricTypes->boxField = '(2,2),(1,1)';
@@ -100,23 +106,26 @@ class Piece_ORM_Mapper_PgsqlTestCase extends Piece_ORM_Mapper_CompatibilityTests
     /**
      * @since Method available since Release 0.7.0
      */
-    function testCharsetShouldBeAbleToSetByDSN()
+    public function testShouldSetCharsetByDSN()
     {
-        $config = &new Piece_ORM_Config();
-        $config->setDSN('CharsetShouldBeAbleToSetByDSN', array('phptype'  => 'pgsql',
-                                                               'hostspec' => 'pieceorm',
-                                                               'database' => 'piece',
-                                                               'username' => 'piece',
-                                                               'password' => 'piece',
-                                                               'charset'  => 'Shift_JIS')
+        $config = new Piece_ORM_Config();
+        $config->setDSN('CharsetShouldBeAbleToSetByDSN',
+                        array('phptype'  => 'pgsql',
+                              'hostspec' => 'pieceorm',
+                              'database' => 'piece',
+                              'username' => 'piece',
+                              'password' => 'piece',
+                              'charset'  => 'Shift_JIS')
                         );
-        $config->setOptions('piece', array('debug' => 2, 'result_buffering' => false));
-        $context = &Piece_ORM_Context::singleton();
+        $config->setOptions('piece',
+                            array('debug' => 2, 'result_buffering' => false)
+                            );
+        $context = Piece_ORM_Context::singleton();
         $context->setConfiguration($config);
-        $context->setMapperConfigDirectory($this->_cacheDirectory);
+        $context->setMapperConfigDirectory($this->cacheDirectory);
         $context->setDatabase('CharsetShouldBeAbleToSetByDSN');
-        $mapper = &Piece_ORM_Mapper_Factory::factory('Employees');
-        $subject = &$mapper->createObject();
+        $mapper = Piece_ORM_Mapper_Factory::factory('Employees');
+        $subject = $mapper->createObject();
         $subject->firstName = "\x93\xd6\x8c\x5b";
         $subject->lastName = "\x8b\x76\x95\xdb";
         $id = $mapper->insert($subject);
@@ -130,14 +139,14 @@ class Piece_ORM_Mapper_PgsqlTestCase extends Piece_ORM_Mapper_CompatibilityTests
     /**
      * @since Method available since Release 1.0.0
      */
-    function testShouldSetAFunctionToGetTheCurrentTimestampToTheCreatedatFieldWhenExecutingInsert() {}
+    public function testShouldSetAFunctionToGetTheCurrentTimestampToTheCreatedatFieldWhenExecutingInsert() {}
 
     /**
      * @since Method available since Release 1.2.0
      */
-    function testShouldProvideTheDefaultValueOfAGivenField()
+    public function testShouldProvideTheDefaultValueOfAGivenField()
     {
-        $mapper = &Piece_ORM_Mapper_Factory::factory('Employees');
+        $mapper = Piece_ORM_Mapper_Factory::factory('Employees');
 
         $this->assertNull($mapper->getDefault('id'));
         $this->assertNull($mapper->getDefault('firstName'));
@@ -148,6 +157,12 @@ class Piece_ORM_Mapper_PgsqlTestCase extends Piece_ORM_Mapper_CompatibilityTests
         $this->assertEquals('now()', $mapper->getDefault('updatedAt'));
         $this->assertEquals('0', $mapper->getDefault('lockVersion'));
     }
+
+    /**#@-*/
+
+    /**#@+
+     * @access protected
+     */
 
     /**#@-*/
 

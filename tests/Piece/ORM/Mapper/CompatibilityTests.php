@@ -2,7 +2,7 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 
 /**
- * PHP versions 4 and 5
+ * PHP version 5
  *
  * Copyright (c) 2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>,
  * All rights reserved.
@@ -35,20 +35,11 @@
  * @since      File available since Release 0.1.0
  */
 
-require_once realpath(dirname(__FILE__) . '/../../../prepare.php');
-require_once 'PHPUnit.php';
-require_once 'Piece/ORM/Mapper/Factory.php';
-require_once 'Piece/ORM/Error.php';
-require_once 'Cache/Lite.php';
-require_once 'Piece/ORM/Context.php';
-require_once 'Piece/ORM/Config.php';
-require_once 'Piece/ORM/Metadata/Factory.php';
-
 // {{{ Piece_ORM_Mapper_CompatibilityTests
 
 /**
- * The base class for compatibility test. This class provides test cases to
- * check compatibility for various DB implementations.
+ * The base class for compatibility test. This class provides test cases to check
+ * compatibility for various DB implementations.
  *
  * @package    Piece_ORM
  * @copyright  2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
@@ -56,7 +47,7 @@ require_once 'Piece/ORM/Metadata/Factory.php';
  * @version    Release: @package_version@
  * @since      Class available since Release 0.1.0
  */
-class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
+abstract class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_Framework_TestCase
 {
 
     // {{{ properties
@@ -68,29 +59,35 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
     /**#@-*/
 
     /**#@+
+     * @access protected
+     */
+
+    protected $backupGlobals = false;
+    protected $dsn;
+    protected $cacheDirectory;
+    protected $tables = array('employees',
+                              'skills',
+                              'employees_skills',
+                              'departments',
+                              'computers',
+                              'emails',
+                              'employees_emails',
+                              'nonprimarykeys',
+                              'compositeprimarykey',
+                              'unusualname12',
+                              'unusualname1_2',
+                              'unusualname1_2_unusualname_12',
+                              'unusualname_12',
+                              'files'
+                              );
+
+    /**#@-*/
+
+    /**#@+
      * @access private
      */
 
-    var $_cacheDirectory;
-    var $_oldCacheDirectory;
-    var $_oldMetadataCacheDirectory;
-    var $_dsn;
-    var $_tables = array('employees',
-                         'skills',
-                         'employees_skills',
-                         'departments',
-                         'computers',
-                         'emails',
-                         'employees_emails',
-                         'nonprimarykeys',
-                         'compositeprimarykey',
-                         'unusualname12',
-                         'unusualname1_2',
-                         'unusualname1_2_unusualname_12',
-                         'unusualname_12',
-                         'files'
-                         );
-    var $_initialized = false;
+    private $_initialized = false;
 
     /**#@-*/
 
@@ -98,66 +95,64 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
      * @access public
      */
 
-    function setUp()
+    public function setUp()
     {
-        $this->_cacheDirectory = dirname(__FILE__) . '/' . basename(__FILE__, '.php');
+        $this->cacheDirectory = dirname(__FILE__) . '/' . basename(__FILE__, '.php');
 
-        $config = &new Piece_ORM_Config();
-        $config->setDSN('piece', $this->_dsn);
+        $config = new Piece_ORM_Config();
+        $config->setDSN('piece', $this->dsn);
         $config->setOptions('piece', array('debug' => 2, 'result_buffering' => false));
-        $context = &Piece_ORM_Context::singleton();
+        $context = Piece_ORM_Context::singleton();
         $context->setConfiguration($config);
         $context->setDatabase('piece');
-        $this->_oldCacheDirectory = $GLOBALS['PIECE_ORM_Mapper_ConfigDirectory'];
-        Piece_ORM_Mapper_Factory::setConfigDirectory($this->_cacheDirectory);
-        Piece_ORM_Mapper_Factory::setCacheDirectory($this->_cacheDirectory);
-        $this->_oldMetadataCacheDirectory = $GLOBALS['PIECE_ORM_Metadata_CacheDirectory'];
-        Piece_ORM_Metadata_Factory::setCacheDirectory($this->_cacheDirectory);
+        Piece_ORM_Mapper_Factory::setConfigDirectory($this->cacheDirectory);
+        Piece_ORM_Mapper_Factory::setCacheDirectory($this->cacheDirectory);
+        Piece_ORM_Metadata_Factory::setCacheDirectory($this->cacheDirectory);
         if (!$this->_initialized) {
             $this->_clearTableRecords();
             $this->_initialized = true;
         }
     }
 
-    function tearDown()
+    public function tearDown()
     {
         $this->_clearTableRecords();
-        $cache = &new Cache_Lite(array('cacheDir' => "{$this->_cacheDirectory}/",
-                                       'automaticSerialization' => true,
-                                       'errorHandlingAPIBreak' => true)
-                                 );
+        $cache = new Cache_Lite(array('cacheDir' => "{$this->cacheDirectory}/",
+                                      'automaticSerialization' => true,
+                                      'errorHandlingAPIBreak' => true)
+                                );
         $cache->clean();
-        Piece_ORM_Metadata_Factory::setCacheDirectory($this->_oldMetadataCacheDirectory);
+        Piece_ORM_Metadata_Factory::restoreCacheDirectory();
         Piece_ORM_Metadata_Factory::clearInstances();
-        Piece_ORM_Mapper_Factory::setCacheDirectory($this->_oldCacheDirectory);
-        Piece_ORM_Mapper_Factory::setConfigDirectory($this->_oldCacheDirectory);
+        Piece_ORM_Mapper_Factory::restoreCacheDirectory();
+        Piece_ORM_Mapper_Factory::restoreConfigDirectory();
         Piece_ORM_Mapper_Factory::clearInstances();
         Piece_ORM_Context::clear();
         Piece_ORM_Error::clearErrors();
     }
 
-    function testFind()
+    public function testShouldFindAnObject()
     {
         $id = $this->_insert();
-        $mapper = &Piece_ORM_Mapper_Factory::factory('Employees');
-        $employee = &$mapper->findById($id);
+        $mapper = Piece_ORM_Mapper_Factory::factory('Employees');
+        $employee = $mapper->findById($id);
 
-        $this->assertEquals(strtolower('stdClass'), strtolower(get_class($employee)));
-        $this->assertTrue(array_key_exists('id', $employee));
-        $this->assertTrue(array_key_exists('firstName', $employee));
-        $this->assertTrue(array_key_exists('lastName', $employee));
-        $this->assertTrue(array_key_exists('note', $employee));
-        $this->assertTrue(array_key_exists('departmentsId', $employee));
-        $this->assertTrue(array_key_exists('lockVersion', $employee));
-        $this->assertTrue(array_key_exists('createdAt', $employee));
-        $this->assertTrue(array_key_exists('updatedAt', $employee));
+        $this->assertType('stdClass', $employee);
+        $this->assertObjectHasAttribute('id', $employee);
+        $this->assertObjectHasAttribute('firstName', $employee);
+        $this->assertObjectHasAttribute('lastName', $employee);
+        $this->assertObjectHasAttribute('note', $employee);
+        $this->assertTrue(property_exists($employee, 'departmentsId'));
+        $this->assertObjectHasAttribute('lockVersion', $employee);
+        $this->assertObjectHasAttribute('createdAt', $employee);
+        $this->assertObjectHasAttribute('updatedAt', $employee);
     }
 
-    function testFindWithNull()
+    public function testShouldRaiseAnExceptionWhenAGivenCriteriaIsIncomplete()
     {
-        $mapper = &Piece_ORM_Mapper_Factory::factory('Employees');
+        $mapper = Piece_ORM_Mapper_Factory::factory('Employees');
         Piece_ORM_Error::disableCallback();
-        $employee = &$mapper->findById(null);
+        $employee = $mapper->findById(null);
         Piece_ORM_Error::enableCallback();
 
         $this->assertTrue(Piece_ORM_Error::hasErrors());
@@ -167,9 +162,9 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
         $this->assertEquals(PIECE_ORM_ERROR_CANNOT_INVOKE, $error['code']);
     }
 
-    function testBuiltinMethods()
+    public function testShouldProvideBuiltinMethods()
     {
-        $mapper = &Piece_ORM_Mapper_Factory::factory('Employees');
+        $mapper = Piece_ORM_Mapper_Factory::factory('Employees');
 
         $this->assertTrue(method_exists($mapper, 'findById'));
         $this->assertTrue(method_exists($mapper, 'findByFirstName'));
@@ -193,19 +188,19 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
         $this->assertTrue(method_exists($mapper, 'update'));
     }
 
-    function testFindWithCriteria()
+    public function testShouldFindAnObjectWithCriteria()
     {
         $id = $this->_insert();
         $expectedQuery = "SELECT * FROM employees WHERE id = $id";
-        $criteria = &new stdClass();
+        $criteria = new stdClass();
         $criteria->id = $id;
-        $mapper = &Piece_ORM_Mapper_Factory::factory('Employees');
-        $employee = &$mapper->findById($id);
-        $mapper = &Piece_ORM_Mapper_Factory::factory('Employees');
+        $mapper = Piece_ORM_Mapper_Factory::factory('Employees');
+        $employee = $mapper->findById($id);
+        $mapper = Piece_ORM_Mapper_Factory::factory('Employees');
 
         $this->assertEquals($expectedQuery, $mapper->getLastQuery());
 
-        $employeeWithCriteria = &$mapper->findById($criteria);
+        $employeeWithCriteria = $mapper->findById($criteria);
 
         $this->assertEquals($expectedQuery, $mapper->getLastQuery());
 
@@ -215,42 +210,42 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
         }
     }
 
-    function testFindWithUserDefineMethod()
+    public function testShouldFindAnObjectWithUserDefineMethod()
     {
         $id = $this->_insert();
-        $criteria1 = &new stdClass();
+        $criteria1 = new stdClass();
         $criteria1->id = $id;
         $criteria1->note = 'Foo';
-        $criteria2 = &new stdClass();
+        $criteria2 = new stdClass();
         $criteria2->id = $id;
         $criteria2->note = 'Bar';
-        $mapper = &Piece_ORM_Mapper_Factory::factory('Employees');
+        $mapper = Piece_ORM_Mapper_Factory::factory('Employees');
 
         $this->assertNotNull($mapper->findByIdAndNote($criteria1));
         $this->assertNull($mapper->findByIdAndNote($criteria2));
     }
 
-    function testOverwriteBuiltinMethod()
+    public function testShouldBeAbleToOverwriteBuiltinMethods()
     {
         $this->_configure('Overwrite');
         $this->_insert();
-        $criteria1 = &new stdClass();
+        $criteria1 = new stdClass();
         $criteria1->firstName = 'Atsuhiro';
         $criteria1->note = 'Foo';
-        $criteria2 = &new stdClass();
+        $criteria2 = new stdClass();
         $criteria2->firstName = 'Atsuhiro';
         $criteria2->note = 'Bar';
-        $mapper = &Piece_ORM_Mapper_Factory::factory('Employees');
+        $mapper = Piece_ORM_Mapper_Factory::factory('Employees');
 
         $this->assertNull($mapper->findByFirstName($criteria1));
         $this->assertNotNull($mapper->findByFirstName($criteria2));
     }
 
-    function testFindAll()
+    public function testShouldFindObjects()
     {
         $this->_insert();
         $this->_insert();
-        $mapper = &Piece_ORM_Mapper_Factory::factory('Employees');
+        $mapper = Piece_ORM_Mapper_Factory::factory('Employees');
         $employees = $mapper->findAll();
 
         $this->assertEquals('SELECT * FROM employees', $mapper->getLastQuery());
@@ -258,26 +253,26 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
         $this->assertEquals(2, count($employees));
 
         foreach ($employees as $employee) {
-            $this->assertEquals(strtolower('stdClass'), strtolower(get_class($employee)));
-            $this->assertTrue(array_key_exists('id', $employee));
-            $this->assertTrue(array_key_exists('firstName', $employee));
-            $this->assertTrue(array_key_exists('lastName', $employee));
-            $this->assertTrue(array_key_exists('note', $employee));
-            $this->assertTrue(array_key_exists('departmentsId', $employee));
-            $this->assertTrue(array_key_exists('lockVersion', $employee));
-            $this->assertTrue(array_key_exists('createdAt', $employee));
-            $this->assertTrue(array_key_exists('updatedAt', $employee));
+            $this->assertType('stdClass', $employee);
+            $this->assertObjectHasAttribute('id', $employee);
+            $this->assertObjectHasAttribute('firstName', $employee);
+            $this->assertObjectHasAttribute('lastName', $employee);
+            $this->assertObjectHasAttribute('note', $employee);
+            $this->assertTrue(property_exists($employee, 'departmentsId'));
+            $this->assertObjectHasAttribute('lockVersion', $employee);
+            $this->assertObjectHasAttribute('createdAt', $employee);
+            $this->assertObjectHasAttribute('updatedAt', $employee);
         }
     }
 
-    function testFindAllWithCriteria()
+    public function testShouldFindObjectsWithCriteria()
     {
         $this->_insert();
         $this->_insert();
         $expectedQuery = "SELECT * FROM employees WHERE note = 'Foo'";
-        $criteria = &new stdClass();
+        $criteria = new stdClass();
         $criteria->note = 'Foo';
-        $mapper = &Piece_ORM_Mapper_Factory::factory('Employees');
+        $mapper = Piece_ORM_Mapper_Factory::factory('Employees');
         $employees = $mapper->findAllByNote('Foo');
 
         $this->assertEquals($expectedQuery, $mapper->getLastQuery());
@@ -297,30 +292,30 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
         }
     }
 
-    function testUpdate()
+    public function testShouldUpdateObjects()
     {
         $id = $this->_insert();
-        $mapper = &Piece_ORM_Mapper_Factory::factory('Employees');
-        $employee1 = &$mapper->findById($id);
+        $mapper = Piece_ORM_Mapper_Factory::factory('Employees');
+        $employee1 = $mapper->findById($id);
         $employee1->firstName = 'Seven';
         $affectedRows = $mapper->update($employee1);
 
         $this->assertEquals(1, $affectedRows);
 
-        $employee2 = &$mapper->findById($id);
+        $employee2 = $mapper->findById($id);
 
         $this->assertEquals('Seven', $employee2->firstName);
 
         $employee1->foo = 'bar';
 
-        $this->assertTrue(array_key_exists('foo', $employee1));
+        $this->assertObjectHasAttribute('foo', $employee1);
         $this->assertEquals('bar', $employee1->foo);
-        $this->assertFalse(array_key_exists('foo', $employee2));
+        $this->assertObjectNotHasAttribute('foo', $employee2);
     }
 
-    function testDeleteByNull()
+    public function testShouldRaiseAnExceptionWhenAGivenCriteriaIsNull()
     {
-        $mapper = &Piece_ORM_Mapper_Factory::factory('Employees');
+        $mapper = Piece_ORM_Mapper_Factory::factory('Employees');
         $subject = null;
         Piece_ORM_Error::disableCallback();
         $mapper->delete($subject);
@@ -333,9 +328,9 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
         $this->assertEquals(PIECE_ORM_ERROR_CANNOT_INVOKE, $error['code']);
     }
 
-    function testDeleteByEmptyString()
+    public function testShouldRaiseAnExceptionWhenAGivenCriteriaIsAnEmptyString()
     {
-        $mapper = &Piece_ORM_Mapper_Factory::factory('Employees');
+        $mapper = Piece_ORM_Mapper_Factory::factory('Employees');
         $subject = '';
         Piece_ORM_Error::disableCallback();
         $mapper->delete($subject);
@@ -348,9 +343,9 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
         $this->assertEquals(PIECE_ORM_ERROR_UNEXPECTED_VALUE, $error['code']);
     }
 
-    function testDeleteByResource()
+    public function testShouldRaiseAnExceptionWhenAGivenCriteriaIsAResource()
     {
-        $mapper = &Piece_ORM_Mapper_Factory::factory('Employees');
+        $mapper = Piece_ORM_Mapper_Factory::factory('Employees');
         $subject = fopen(__FILE__, 'r');
         Piece_ORM_Error::disableCallback();
         $mapper->delete($subject);
@@ -363,10 +358,10 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
         $this->assertEquals(PIECE_ORM_ERROR_UNEXPECTED_VALUE, $error['code']);
     }
 
-    function testDeleteByInappropriatePrimaryKey()
+    public function testShouldRaiseAnExceptionWhenDeletingObjectsByInappropriatePrimaryKey()
     {
-        $mapper = &Piece_ORM_Mapper_Factory::factory('Employees');
-        $subject = &$mapper->createObject();
+        $mapper = Piece_ORM_Mapper_Factory::factory('Employees');
+        $subject = $mapper->createObject();
         Piece_ORM_Error::disableCallback();
         $mapper->delete($subject);
         Piece_ORM_Error::enableCallback();
@@ -377,9 +372,9 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
 
         $this->assertEquals(PIECE_ORM_ERROR_UNEXPECTED_VALUE, $error['code']);
 
-        $subject = &$mapper->createObject();
+        $subject = $mapper->createObject();
         $subject->id = null;
-        $mapper = &Piece_ORM_Mapper_Factory::factory('Employees');
+        $mapper = Piece_ORM_Mapper_Factory::factory('Employees');
         Piece_ORM_Error::disableCallback();
         $mapper->delete($subject);
         Piece_ORM_Error::enableCallback();
@@ -391,10 +386,10 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
         $this->assertEquals(PIECE_ORM_ERROR_UNEXPECTED_VALUE, $error['code']);
     }
 
-    function testUpdateByInappropriatePrimaryKey()
+    public function testShouldRaiseAnExceptionWhenUpdatingObjectsByInappropriatePrimaryKey()
     {
-        $mapper = &Piece_ORM_Mapper_Factory::factory('Employees');
-        $subject = &$mapper->createObject();
+        $mapper = Piece_ORM_Mapper_Factory::factory('Employees');
+        $subject = $mapper->createObject();
         Piece_ORM_Error::disableCallback();
         $mapper->update($subject);
         Piece_ORM_Error::enableCallback();
@@ -405,9 +400,9 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
 
         $this->assertEquals(PIECE_ORM_ERROR_UNEXPECTED_VALUE, $error['code']);
 
-        $subject = &$mapper->createObject();
+        $subject = $mapper->createObject();
         $subject->id = null;
-        $mapper = &Piece_ORM_Mapper_Factory::factory('Employees');
+        $mapper = Piece_ORM_Mapper_Factory::factory('Employees');
         Piece_ORM_Error::disableCallback();
         $mapper->update($subject);
         Piece_ORM_Error::enableCallback();
@@ -419,15 +414,15 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
         $this->assertEquals(PIECE_ORM_ERROR_UNEXPECTED_VALUE, $error['code']);
     }
 
-    function testOverwriteInsertQuery()
+    public function testShouldBeAbleToOverwriteTheBuiltinInsertQuery()
     {
         $this->_configure('Overwrite');
         $id = $this->_insert();
 
         $this->assertNotNull($id);
 
-        $mapper = &Piece_ORM_Mapper_Factory::factory('Employees');
-        $employee = &$mapper->findById($id);
+        $mapper = Piece_ORM_Mapper_Factory::factory('Employees');
+        $employee = $mapper->findById($id);
 
         $this->assertNotNull($employee);
         $this->assertEquals('Atsuhiro', $employee->firstName);
@@ -439,18 +434,18 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
         $this->assertNull($mapper->findById($id));
     }
 
-    function testOverwriteUpdateQuery()
+    public function testShouldBeAbleToOverwriteTheBuiltinUpdateQuery()
     {
         $this->_configure('Overwrite');
         $id = $this->_insert();
-        $mapper = &Piece_ORM_Mapper_Factory::factory('Employees');
-        $employee1 = &$mapper->findById($id);
+        $mapper = Piece_ORM_Mapper_Factory::factory('Employees');
+        $employee1 = $mapper->findById($id);
         $employee1->firstName = 'Seven';
         $affectedRows = $mapper->update($employee1);
 
         $this->assertEquals(1, $affectedRows);
 
-        $employee2 = &$mapper->findById($id);
+        $employee2 = $mapper->findById($id);
 
         $this->assertNotNull($employee2);
         $this->assertEquals('Seven', $employee2->firstName);
@@ -460,26 +455,26 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
         $this->assertNull($mapper->findById($id));
     }
 
-    function testReplaceEmptyStringWithNull()
+    public function testShouldReplaceAnEmptyStringWithNull()
     {
-        $mapper = &Piece_ORM_Mapper_Factory::factory('Employees');
-        $subject = &$mapper->createObject();
+        $mapper = Piece_ORM_Mapper_Factory::factory('Employees');
+        $subject = $mapper->createObject();
         $subject->firstName = 'Foo';
         $subject->lastName = 'Bar';
         $subject->note = '';
         $id = $mapper->insert($subject);
 
-        $employee = &$mapper->findById($id);
+        $employee = $mapper->findById($id);
 
         $this->assertNotNull($employee);
         $this->assertNull($employee->note);
     }
 
-    function testThrowExceptionIfDetectingProblemWhenBuildingQuery()
+    public function testShouldRaiseAnExceptionWhenDetectingProblemWhileBuildingQuery()
     {
         $id = $this->_insert();
-        $mapper = &Piece_ORM_Mapper_Factory::factory('Employees');
-        $employee = &$mapper->findById($id);
+        $mapper = Piece_ORM_Mapper_Factory::factory('Employees');
+        $employee = $mapper->findById($id);
         $employee->firstName = 'Seven';
         unset($employee->lastName);
 
@@ -494,7 +489,7 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
         $this->assertEquals(PIECE_ORM_ERROR_CANNOT_INVOKE, $error['code']);
     }
 
-    function testManyToManyRelationships()
+    public function testShouldSupportManyToManyRelationships()
     {
         foreach (array(false, true) as $useMapperNameAsTableName) {
             if ($useMapperNameAsTableName) {
@@ -503,7 +498,7 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
 
             $this->_prepareTableRecords($useMapperNameAsTableName);
             $mapperName = !$useMapperNameAsTableName ? 'Employees' : 'employees';
-            $mapper = &Piece_ORM_Mapper_Factory::factory($mapperName);
+            $mapper = Piece_ORM_Mapper_Factory::factory($mapperName);
             $employees = $mapper->findAllWithSkills2();
 
             $this->assertTrue(is_array($employees));
@@ -553,7 +548,7 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
         }
     }
 
-    function testManyToManyRelationshipsWithBuiltinMethod()
+    public function testShouldSupportManyToManyRelationshipsWithBuiltinMethod()
     {
         foreach (array(false, true) as $useMapperNameAsTableName) {
             if ($useMapperNameAsTableName) {
@@ -562,7 +557,7 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
 
             $this->_prepareTableRecords($useMapperNameAsTableName);
             $mapperName = !$useMapperNameAsTableName ? 'Employees' : 'employees';
-            $mapper = &Piece_ORM_Mapper_Factory::factory($mapperName);
+            $mapper = Piece_ORM_Mapper_Factory::factory($mapperName);
             $employees = $mapper->findAllByFirstName('Qux');
 
             $this->assertTrue(is_array($employees));
@@ -577,7 +572,7 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
         }
     }
 
-    function testOneToManyRelationships()
+    public function testShouldSupportOneToManyRelationships()
     {
         foreach (array(false, true) as $useMapperNameAsTableName) {
             if ($useMapperNameAsTableName) {
@@ -586,7 +581,7 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
 
             $this->_prepareTableRecords($useMapperNameAsTableName);
             $mapperName = !$useMapperNameAsTableName ? 'Departments' : 'departments';
-            $mapper = &Piece_ORM_Mapper_Factory::factory($mapperName);
+            $mapper = Piece_ORM_Mapper_Factory::factory($mapperName);
             $departments = $mapper->findAllWithEmployees2();
 
             $this->assertTrue(is_array($departments));
@@ -625,7 +620,7 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
         }
     }
 
-    function testManyToOneRelationships()
+    public function testShouldSupportManyToOneRelationships()
     {
         foreach (array(false, true) as $useMapperNameAsTableName) {
             if ($useMapperNameAsTableName) {
@@ -634,14 +629,14 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
 
             $this->_prepareTableRecords($useMapperNameAsTableName);
             $mapperName = !$useMapperNameAsTableName ? 'Employees' : 'employees';
-            $mapper = &Piece_ORM_Mapper_Factory::factory($mapperName);
+            $mapper = Piece_ORM_Mapper_Factory::factory($mapperName);
             $employees = $mapper->findAllWithDepartment2();
 
             $this->assertTrue(is_array($employees));
             $this->assertEquals(4, count($employees));
 
             foreach ($employees as $employee) {
-                $this->assertTrue(array_key_exists('department', $employee));
+                $this->assertTrue(property_exists($employee, 'department'));
 
                 switch ($employee->firstName) {
                 case 'Foo':
@@ -682,7 +677,7 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
         }
     }
 
-    function testOneToOneRelationships()
+    public function testShouldSupportOneToOneRelationships()
     {
         foreach (array(false, true) as $useMapperNameAsTableName) {
             if ($useMapperNameAsTableName) {
@@ -691,14 +686,14 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
 
             $this->_prepareTableRecords($useMapperNameAsTableName);
             $mapperName = !$useMapperNameAsTableName ? 'Employees' : 'employees';
-            $mapper = &Piece_ORM_Mapper_Factory::factory($mapperName);
+            $mapper = Piece_ORM_Mapper_Factory::factory($mapperName);
             $employees = $mapper->findAllWithComputer2();
 
             $this->assertTrue(is_array($employees));
             $this->assertEquals(4, count($employees));
 
             foreach ($employees as $employee) {
-                $this->assertTrue(array_key_exists('computer', $employee));
+                $this->assertTrue(property_exists($employee, 'computer'));
 
                 switch ($employee->firstName) {
                 case 'Foo':
@@ -739,7 +734,7 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
         }
     }
 
-    function testLimit()
+    public function testShouldSupportLimitByMethod()
     {
         foreach (array(false, true) as $useMapperNameAsTableName) {
             if ($useMapperNameAsTableName) {
@@ -748,7 +743,7 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
 
             $this->_prepareTableRecords($useMapperNameAsTableName);
             $mapperName = !$useMapperNameAsTableName ? 'Employees' : 'employees';
-            $mapper = &Piece_ORM_Mapper_Factory::factory($mapperName);
+            $mapper = Piece_ORM_Mapper_Factory::factory($mapperName);
             $mapper->setLimit(2);
             $employees = $mapper->findAllWithSkills1();
 
@@ -766,7 +761,7 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
         }
     }
 
-    function testOffset()
+    public function testShouldSupportOffsetByMethod()
     {
         foreach (array(false, true) as $useMapperNameAsTableName) {
             if ($useMapperNameAsTableName) {
@@ -775,7 +770,7 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
 
             $this->_prepareTableRecords($useMapperNameAsTableName);
             $mapperName = !$useMapperNameAsTableName ? 'Employees' : 'employees';
-            $mapper = &Piece_ORM_Mapper_Factory::factory($mapperName);
+            $mapper = Piece_ORM_Mapper_Factory::factory($mapperName);
             $mapper->setLimit(2, 2);
             $employees = $mapper->findAllWithSkills1();
 
@@ -791,7 +786,7 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
         }
     }
 
-    function testLimitFailure()
+    public function testShouldRaiseAnExceptionWhenAWrongLimitIsGiven()
     {
         foreach (array(false, true) as $useMapperNameAsTableName) {
             if ($useMapperNameAsTableName) {
@@ -800,7 +795,7 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
 
             $this->_prepareTableRecords($useMapperNameAsTableName);
             $mapperName = !$useMapperNameAsTableName ? 'Employees' : 'employees';
-            $mapper = &Piece_ORM_Mapper_Factory::factory($mapperName);
+            $mapper = Piece_ORM_Mapper_Factory::factory($mapperName);
             Piece_ORM_Error::disableCallback();
             $mapper->setLimit(-1);
             Piece_ORM_Error::enableCallback();
@@ -818,7 +813,7 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
         }
     }
 
-    function testOffsetFailure()
+    public function testShouldRaiseAnExceptionWhenAWrongOffsetIsGiven()
     {
         foreach (array(false, true) as $useMapperNameAsTableName) {
             if ($useMapperNameAsTableName) {
@@ -827,7 +822,7 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
 
             $this->_prepareTableRecords($useMapperNameAsTableName);
             $mapperName = !$useMapperNameAsTableName ? 'Employees' : 'employees';
-            $mapper = &Piece_ORM_Mapper_Factory::factory($mapperName);
+            $mapper = Piece_ORM_Mapper_Factory::factory($mapperName);
             Piece_ORM_Error::disableCallback();
             $mapper->setLimit(2, -1);
             Piece_ORM_Error::enableCallback();
@@ -845,7 +840,7 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
         }
     }
 
-    function testOrder()
+    public function testShouldSupportOrderByMethod()
     {
         foreach (array(false, true) as $useMapperNameAsTableName) {
             if ($useMapperNameAsTableName) {
@@ -854,7 +849,7 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
 
             $this->_prepareTableRecords($useMapperNameAsTableName);
             $mapperName = !$useMapperNameAsTableName ? 'Employees' : 'employees';
-            $mapper = &Piece_ORM_Mapper_Factory::factory($mapperName);
+            $mapper = Piece_ORM_Mapper_Factory::factory($mapperName);
             $mapper->addOrder('first_name');
             $mapper->addOrder('id');
             $employees = $mapper->findAllWithSkills1();
@@ -887,7 +882,7 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
         }
     }
 
-    function testOrderOnManyToManyRelationships()
+    public function testShouldSupportOrderWithManyToManyRelationships()
     {
         foreach (array(false, true) as $useMapperNameAsTableName) {
             if ($useMapperNameAsTableName) {
@@ -896,7 +891,7 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
 
             $this->_prepareTableRecords($useMapperNameAsTableName);
             $mapperName = !$useMapperNameAsTableName ? 'Employees' : 'employees';
-            $mapper = &Piece_ORM_Mapper_Factory::factory($mapperName);
+            $mapper = Piece_ORM_Mapper_Factory::factory($mapperName);
             $mapper->addOrder('id');
             $employees = $mapper->findAllWithOrderedSkills();
 
@@ -913,7 +908,7 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
         }
     }
 
-    function testOrderOnOneToManyRelationships()
+    public function testShouldSupportOrderWithOneToManyRelationships()
     {
         foreach (array(false, true) as $useMapperNameAsTableName) {
             if ($useMapperNameAsTableName) {
@@ -922,7 +917,7 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
 
             $this->_prepareTableRecords($useMapperNameAsTableName);
             $mapperName = !$useMapperNameAsTableName ? 'Departments' : 'departments';
-            $mapper = &Piece_ORM_Mapper_Factory::factory($mapperName);
+            $mapper = Piece_ORM_Mapper_Factory::factory($mapperName);
             $mapper->addOrder('id');
             $departments = $mapper->findAllWithOrderedEmployees();
 
@@ -938,38 +933,38 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
         }
     }
 
-    function testDelete()
+    public function testShouldDeleteObjects()
     {
         $id = $this->_insert();
-        $mapper = &Piece_ORM_Mapper_Factory::factory('Employees');
-        $employee1 = &$mapper->findById($id);
+        $mapper = Piece_ORM_Mapper_Factory::factory('Employees');
+        $employee1 = $mapper->findById($id);
 
         $this->assertEquals(strtolower('stdClass'), strtolower(get_class($employee1)));
 
         $mapper->delete($employee1);
-        $employee2 = &$mapper->findById($id);
+        $employee2 = $mapper->findById($id);
 
         $this->assertNull($employee2);
     }
 
-    function testCreateObject()
+    public function testShouldCreateAnObject()
     {
-        $mapper = &Piece_ORM_Mapper_Factory::factory('Employees');
-        $subject = &$mapper->createObject();
+        $mapper = Piece_ORM_Mapper_Factory::factory('Employees');
+        $subject = $mapper->createObject();
 
-        $this->assertEquals(strtolower('stdClass'), strtolower(get_class($subject)));
-        $this->assertEquals(8, count(array_keys((array)($subject))));
-        $this->assertTrue(array_key_exists('id', $subject));
-        $this->assertTrue(array_key_exists('firstName', $subject));
-        $this->assertTrue(array_key_exists('lastName', $subject));
-        $this->assertTrue(array_key_exists('note', $subject));
-        $this->assertTrue(array_key_exists('departmentsId', $subject));
-        $this->assertTrue(array_key_exists('lockVersion', $subject));
-        $this->assertTrue(array_key_exists('createdAt', $subject));
-        $this->assertTrue(array_key_exists('updatedAt', $subject));
+        $this->assertType('stdClass', $subject);
+        $this->assertEquals(8, count(get_object_vars($subject)));
+        $this->assertTrue(property_exists($subject, 'id'));
+        $this->assertTrue(property_exists($subject, 'firstName'));
+        $this->assertTrue(property_exists($subject, 'lastName'));
+        $this->assertTrue(property_exists($subject, 'note'));
+        $this->assertTrue(property_exists($subject, 'departmentsId'));
+        $this->assertTrue(property_exists($subject, 'lockVersion'));
+        $this->assertTrue(property_exists($subject, 'createdAt'));
+        $this->assertTrue(property_exists($subject, 'updatedAt'));
     }
 
-    function testCascadeUpdateOnManyToManyRelationships()
+    public function testShouldSupportCascadeUpdateWithManyToManyRelationships()
     {
         foreach (array(false, true) as $useMapperNameAsTableName) {
             if ($useMapperNameAsTableName) {
@@ -978,25 +973,25 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
 
             $this->_prepareTableRecords($useMapperNameAsTableName);
             $mapperName = !$useMapperNameAsTableName ? 'Skills' : 'skills';
-            $skillsMapper = &Piece_ORM_Mapper_Factory::factory($mapperName);
+            $skillsMapper = Piece_ORM_Mapper_Factory::factory($mapperName);
             $skills = $skillsMapper->findAll();
             $mapperName = !$useMapperNameAsTableName ? 'Employees' : 'employees';
-            $employeeMapper = &Piece_ORM_Mapper_Factory::factory($mapperName);
-            $employee1 = &$employeeMapper->findWithSkillsByFirstName('Foo');
+            $employeeMapper = Piece_ORM_Mapper_Factory::factory($mapperName);
+            $employee1 = $employeeMapper->findWithSkillsByFirstName('Foo');
 
             $this->assertEquals(0, count($employee1->skills));
 
             $employee1->skills = $skills;
             $employeeMapper->update($employee1);
-            $employee2 = &$employeeMapper->findWithSkillsByFirstName('Foo');
+            $employee2 = $employeeMapper->findWithSkillsByFirstName('Foo');
 
             $this->assertEquals(2, count($employee2->skills));
 
             $employee1->foo = 'bar';
 
-            $this->assertTrue(array_key_exists('foo', $employee1));
+            $this->assertObjectHasAttribute('foo', $employee1);
             $this->assertEquals('bar', $employee1->foo);
-            $this->assertFalse(array_key_exists('foo', $employee2));
+            $this->assertObjectNotHasAttribute('foo', $employee2);
 
             unset($employee1->foo);
             unset($employee1->skills);
@@ -1015,7 +1010,7 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
         }
     }
 
-    function testCascadeUpdateOnOneToManyRelationships()
+    public function testShouldSupportCascadeUpdateWithOneToManyRelationships()
     {
         foreach (array(false, true) as $useMapperNameAsTableName) {
             if ($useMapperNameAsTableName) {
@@ -1024,31 +1019,31 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
 
             $this->_prepareTableRecords($useMapperNameAsTableName);
             $mapperName = !$useMapperNameAsTableName ? 'Departments' : 'departments';
-            $departmentsMapper = &Piece_ORM_Mapper_Factory::factory($mapperName);
-            $department1 = &$departmentsMapper->findWithEmployeesByName('Bar');
+            $departmentsMapper = Piece_ORM_Mapper_Factory::factory($mapperName);
+            $department1 = $departmentsMapper->findWithEmployeesByName('Bar');
 
             $this->assertEquals(2, count($department1->employees));
 
             $mapperName = !$useMapperNameAsTableName ? 'Employees' : 'employees';
-            $employeesMapper = &Piece_ORM_Mapper_Factory::factory($mapperName);
+            $employeesMapper = Piece_ORM_Mapper_Factory::factory($mapperName);
 
-            $subject1 = &$employeesMapper->createObject();
+            $subject1 = $employeesMapper->createObject();
             $subject1->firstName = 'Quux';
             $subject1->lastName = 'Quuux';
-            $department1->employees[] = &$subject1;
+            $department1->employees[] = $subject1;
             array_shift($department1->employees);
 
             $this->assertEquals('Baz', $department1->employees[0]->firstName);
 
             $department1->employees[0]->firstName = 'Qux2';
             $department1->employees[0]->lastName = 'Quux2';
-            $subject2 = &$employeesMapper->createObject();
+            $subject2 = $employeesMapper->createObject();
             $subject2->firstName = 'Quuux';
             $subject2->lastName = 'Quuuux';
-            $department1->employees[] = &$subject2;
+            $department1->employees[] = $subject2;
             $departmentsMapper->update($department1);
 
-            $department2 = &$departmentsMapper->findWithEmployeesByName('Bar');
+            $department2 = $departmentsMapper->findWithEmployeesByName('Bar');
 
             $this->assertEquals(3, count($department2->employees));
             $this->assertEquals('Quuux', $department2->employees[0]->firstName);
@@ -1057,9 +1052,9 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
 
             $department1->foo = 'bar';
 
-            $this->assertTrue(array_key_exists('foo', $department1));
+            $this->assertObjectHasAttribute('foo', $department1);
             $this->assertEquals('bar', $department1->foo);
-            $this->assertFalse(array_key_exists('foo', $department2));
+            $this->assertObjectNotHasAttribute('foo', $department2);
 
             unset($department1->employees);
             unset($department1->foo);
@@ -1076,7 +1071,7 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
         }
     }
 
-    function testCascadeUpdateOnOneToOneRelationships()
+    public function testShouldSupportCascadeUpdateWithOneToOneRelationships()
     {
         foreach (array(false, true) as $useMapperNameAsTableName) {
             if ($useMapperNameAsTableName) {
@@ -1085,20 +1080,20 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
 
             $this->_prepareTableRecords($useMapperNameAsTableName);
             $mapperName = !$useMapperNameAsTableName ? 'Employees' : 'employees';
-            $employeesMapper = &Piece_ORM_Mapper_Factory::factory($mapperName);
-            $employee1 = &$employeesMapper->findWithComputerByFirstName('Foo');
+            $employeesMapper = Piece_ORM_Mapper_Factory::factory($mapperName);
+            $employee1 = $employeesMapper->findWithComputerByFirstName('Foo');
 
             $this->assertNull($employee1->computer);
 
             $mapperName = !$useMapperNameAsTableName ? 'Computers' : 'computers';
-            $computersMapper = &Piece_ORM_Mapper_Factory::factory($mapperName);
+            $computersMapper = Piece_ORM_Mapper_Factory::factory($mapperName);
 
-            $subject1 = &$computersMapper->createObject();
+            $subject1 = $computersMapper->createObject();
             $subject1->name = 'Qux';
-            $employee1->computer = &$subject1;
+            $employee1->computer = $subject1;
             $employeesMapper->update($employee1);
 
-            $employee2 = &$employeesMapper->findWithComputerByFirstName('Foo');
+            $employee2 = $employeesMapper->findWithComputerByFirstName('Foo');
 
             $this->assertNotNull($employee2->computer);
             $this->assertEquals('Qux', $employee2->computer->name);
@@ -1112,14 +1107,14 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
 
             $this->assertEquals($employee1, $employee2);
 
-            $employee1 = &$employeesMapper->findWithComputerByFirstName('Foo');
+            $employee1 = $employeesMapper->findWithComputerByFirstName('Foo');
 
             $this->assertNotNull($employee1->computer);
 
             $employee1->computer = null;
             $employeesMapper->update($employee1);
 
-            $employee2 = &$employeesMapper->findWithComputerByFirstName('Foo');
+            $employee2 = $employeesMapper->findWithComputerByFirstName('Foo');
 
             $this->assertNull($employee2->computer);
 
@@ -1132,7 +1127,7 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
 
             $this->assertEquals($employee1, $employee2);
 
-            $employee1 = &$employeesMapper->findWithComputerByFirstName('Bar');
+            $employee1 = $employeesMapper->findWithComputerByFirstName('Bar');
 
             $this->assertNotNull($employee1->computer);
             $this->assertEquals('Baz', $employee1->computer->name);
@@ -1140,16 +1135,16 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
             $employee1->computer->name = 'Baz2';
             $employeesMapper->update($employee1);
 
-            $employee2 = &$employeesMapper->findWithComputerByFirstName('Bar');
+            $employee2 = $employeesMapper->findWithComputerByFirstName('Bar');
 
             $this->assertNotNull($employee2->computer);
             $this->assertEquals('Baz2', $employee2->computer->name);
 
             $employee1->foo = 'employee';
 
-            $this->assertTrue(array_key_exists('foo', $employee1));
+            $this->assertObjectHasAttribute('foo', $employee1);
             $this->assertEquals('employee', $employee1->foo);
-            $this->assertFalse(array_key_exists('foo', $employee2));
+            $this->assertObjectNotHasAttribute('foo', $employee2);
 
             unset($employee1->computer);
             unset($employee1->foo);
@@ -1168,7 +1163,7 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
         }
     }
 
-    function testCascadeDeleteManyToManyRelationships()
+    public function testShouldSupportCascadeDeleteWithManyToManyRelationships()
     {
         foreach (array(false, true) as $useMapperNameAsTableName) {
             if ($useMapperNameAsTableName) {
@@ -1177,10 +1172,10 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
 
             $this->_prepareTableRecords($useMapperNameAsTableName);
             $mapperName = !$useMapperNameAsTableName ? 'Employees' : 'employees';
-            $employeesMapper = &Piece_ORM_Mapper_Factory::factory($mapperName);
-            $employee = &$employeesMapper->findWithSkillsByFirstName('Qux');
+            $employeesMapper = Piece_ORM_Mapper_Factory::factory($mapperName);
+            $employee = $employeesMapper->findWithSkillsByFirstName('Qux');
             $mapperName = !$useMapperNameAsTableName ? 'EmployeesSkills' : 'employees_skills';
-            $employeesSkillsMapper = &Piece_ORM_Mapper_Factory::factory($mapperName);
+            $employeesSkillsMapper = Piece_ORM_Mapper_Factory::factory($mapperName);
 
             $this->assertEquals(2, count($employeesSkillsMapper->findAllByEmployeesId($employee->id)));
 
@@ -1195,7 +1190,7 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
         }
     }
 
-    function testCascadeDeleteOnOneToManyRelationships()
+    public function testShouldSupportCascadeDeleteWithOneToManyRelationships()
     {
         foreach (array(false, true) as $useMapperNameAsTableName) {
             if ($useMapperNameAsTableName) {
@@ -1204,11 +1199,11 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
 
             $this->_prepareTableRecords($useMapperNameAsTableName);
             $mapperName = !$useMapperNameAsTableName ? 'Departments' : 'departments';
-            $departmentsMapper = &Piece_ORM_Mapper_Factory::factory($mapperName);
-            $department = &$departmentsMapper->findWithEmployeesByName('Bar');
+            $departmentsMapper = Piece_ORM_Mapper_Factory::factory($mapperName);
+            $department = $departmentsMapper->findWithEmployeesByName('Bar');
             $departmentsId = $department->id;
             $mapperName = !$useMapperNameAsTableName ? 'Employees' : 'employees';
-            $employeesMapper = &Piece_ORM_Mapper_Factory::factory($mapperName);
+            $employeesMapper = Piece_ORM_Mapper_Factory::factory($mapperName);
 
             $this->assertEquals(2, count($employeesMapper->findAllByDepartmentsId($department->id)));
 
@@ -1223,7 +1218,7 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
         }
     }
 
-    function testCascadeDeleteOnOneToOneRelationships()
+    public function testShouldSupportCascadeDeleteWithOneToOneRelationships()
     {
         foreach (array(false, true) as $useMapperNameAsTableName) {
             if ($useMapperNameAsTableName) {
@@ -1232,10 +1227,10 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
 
             $this->_prepareTableRecords($useMapperNameAsTableName);
             $mapperName = !$useMapperNameAsTableName ? 'Employees' : 'employees';
-            $employeesMapper = &Piece_ORM_Mapper_Factory::factory($mapperName);
-            $employee = &$employeesMapper->findWithComputerByFirstName('Baz');
+            $employeesMapper = Piece_ORM_Mapper_Factory::factory($mapperName);
+            $employee = $employeesMapper->findWithComputerByFirstName('Baz');
             $mapperName = !$useMapperNameAsTableName ? 'Computers' : 'computers';
-            $computersMapper = &Piece_ORM_Mapper_Factory::factory($mapperName);
+            $computersMapper = Piece_ORM_Mapper_Factory::factory($mapperName);
 
             $this->assertNotNull($computersMapper->findByEmployeesId($employee->id));
 
@@ -1253,7 +1248,7 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
     /**
      * @since Method available since Release 0.3.0
      */
-    function testGetCount()
+    public function testShouldProvideCountForTheLastQuery()
     {
         foreach (array(false, true) as $useMapperNameAsTableName) {
             if ($useMapperNameAsTableName) {
@@ -1262,7 +1257,7 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
 
             $this->_prepareTableRecords($useMapperNameAsTableName);
             $mapperName = !$useMapperNameAsTableName ? 'Employees' : 'employees';
-            $mapper = &Piece_ORM_Mapper_Factory::factory($mapperName);
+            $mapper = Piece_ORM_Mapper_Factory::factory($mapperName);
 
             $this->assertNull($mapper->getCount());
 
@@ -1292,7 +1287,7 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
     /**
      * @since Method available since Release 0.3.0
      */
-    function testFindOne()
+    public function testShouldFindAValue()
     {
         foreach (array(false, true) as $useMapperNameAsTableName) {
             if ($useMapperNameAsTableName) {
@@ -1301,7 +1296,7 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
 
             $this->_prepareTableRecords($useMapperNameAsTableName);
             $mapperName = !$useMapperNameAsTableName ? 'Employees' : 'employees';
-            $mapper = &Piece_ORM_Mapper_Factory::factory($mapperName);
+            $mapper = Piece_ORM_Mapper_Factory::factory($mapperName);
 
             $this->assertNull($mapper->findOneForFirstNameByFirstName('NonExisting'));
 
@@ -1320,7 +1315,7 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
     /**
      * @since Method available since Release 0.4.0
      */
-    function testGetCountShouldWorkWithFindAll()
+    public function testShouldProvideCountWithFindAll()
     {
         foreach (array(false, true) as $useMapperNameAsTableName) {
             if ($useMapperNameAsTableName) {
@@ -1329,7 +1324,7 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
 
             $this->_prepareTableRecords($useMapperNameAsTableName);
             $mapperName = !$useMapperNameAsTableName ? 'Employees' : 'employees';
-            $mapper = &Piece_ORM_Mapper_Factory::factory($mapperName);
+            $mapper = Piece_ORM_Mapper_Factory::factory($mapperName);
 
             $this->assertNull($mapper->getCount());
 
@@ -1347,10 +1342,10 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
     /**
      * @since Method available since Release 0.4.1
      */
-    function testPHPNULLShouldBeExtractedAsDatabaseNULL()
+    public function testShouldExtractPhpNullAsDatabaseNull()
     {
-        $mapper = &Piece_ORM_Mapper_Factory::factory('Employees');
-        $subject = &$mapper->createObject();
+        $mapper = Piece_ORM_Mapper_Factory::factory('Employees');
+        $subject = $mapper->createObject();
         $subject->firstName = 'Atsuhiro';
         $subject->lastName = 'Kubo';
 
@@ -1364,15 +1359,15 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
     /**
      * @since Method available since Release 0.5.0
      */
-    function testObjectsReturnByFindAllShouldBeCorrectWithNoPrimaryKeysInSQL()
+    public function testShouldFindObjectsWithoutThePrimaryKey()
     {
-        $mapper = &Piece_ORM_Mapper_Factory::factory('Employees');
-        $subject = &$mapper->createObject();
+        $mapper = Piece_ORM_Mapper_Factory::factory('Employees');
+        $subject = $mapper->createObject();
         $subject->firstName = 'Taro';
         $subject->lastName = 'ITEMAN';
         $subject->note = 'Foo';
         $mapper->insert($subject);
-        $subject = &$mapper->createObject();
+        $subject = $mapper->createObject();
         $subject->firstName = 'Taro';
         $subject->lastName = 'ITEMAN';
         $subject->note = 'Bar';
@@ -1388,7 +1383,7 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
     /**
      * @since Method available since Release 0.5.0
      */
-    function testGetCountShouldWorkWhenOrderIsSet()
+    public function testShouldProvideCountEvenThoughOrderIsSet()
     {
         foreach (array(false, true) as $useMapperNameAsTableName) {
             if ($useMapperNameAsTableName) {
@@ -1397,7 +1392,7 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
 
             $this->_prepareTableRecords($useMapperNameAsTableName);
             $mapperName = !$useMapperNameAsTableName ? 'Employees' : 'employees';
-            $mapper = &Piece_ORM_Mapper_Factory::factory($mapperName);
+            $mapper = Piece_ORM_Mapper_Factory::factory($mapperName);
 
             $this->assertNull($mapper->getCount());
 
@@ -1416,10 +1411,10 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
     /**
      * @since Method available since Release 0.5.0
      */
-    function testInsertMethodShouldBeAbleToDefinedByUser()
+    public function testShouldBeAbleToDefineAnyInsertMethodsByConfiguration()
     {
-        $mapper = &Piece_ORM_Mapper_Factory::factory('Employees');
-        $subject = &$mapper->createObject();
+        $mapper = Piece_ORM_Mapper_Factory::factory('Employees');
+        $subject = $mapper->createObject();
         $subject->firstName = 'Taro';
         $subject->lastName = 'ITEMAN';
         $subject->note = 'Foo';
@@ -1428,8 +1423,8 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
 
         $this->assertNotNull($id);
 
-        $mapper = &Piece_ORM_Mapper_Factory::factory('Employees');
-        $employee = &$mapper->findById($id);
+        $mapper = Piece_ORM_Mapper_Factory::factory('Employees');
+        $employee = $mapper->findById($id);
 
         $this->assertNotNull($employee);
         $this->assertEquals('Taro', $employee->firstName);
@@ -1444,17 +1439,17 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
     /**
      * @since Method available since Release 0.5.0
      */
-    function testUpdateMethodShouldBeAbleToDefinedByUser()
+    public function testShouldBeAbleToDefineAnyUpdateMethodsByConfiguration()
     {
         $id = $this->_insert();
-        $mapper = &Piece_ORM_Mapper_Factory::factory('Employees');
-        $employee1 = &$mapper->findById($id);
+        $mapper = Piece_ORM_Mapper_Factory::factory('Employees');
+        $employee1 = $mapper->findById($id);
         $employee1->note = 'Baz';
         $affectedRows = $mapper->updateUserDefined($employee1);
 
         $this->assertEquals(1, $affectedRows);
 
-        $employee2 = &$mapper->findById($id);
+        $employee2 = $mapper->findById($id);
 
         $this->assertNotNull($employee2);
         $this->assertEquals('Baz', $employee2->note);
@@ -1467,12 +1462,12 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
     /**
      * @since Method available since Release 0.5.0
      */
-    function testPrimaryKeyValuesShouldNotBeRequiredWhenExecutingUpdate()
+    public function testShouldUpdateObjectsWithoutThePrimaryKey()
     {
         $id1 = $this->_insert();
         $id2 = $this->_insert();
-        $mapper = &Piece_ORM_Mapper_Factory::factory('Employees');
-        $subject = &new stdClass();
+        $mapper = Piece_ORM_Mapper_Factory::factory('Employees');
+        $subject = new stdClass();
         $subject->note = 'Baz';
         $subject->oldNote = 'Foo';
         $subject->updatedAt = null;
@@ -1480,11 +1475,11 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
 
         $this->assertEquals(2, $affectedRows);
 
-        $employee1 = &$mapper->findById($id1);
+        $employee1 = $mapper->findById($id1);
 
         $this->assertEquals('Baz', $employee1->note);
 
-        $employee2 = &$mapper->findById($id2);
+        $employee2 = $mapper->findById($id2);
 
         $this->assertEquals('Baz', $employee2->note);
     }
@@ -1492,12 +1487,12 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
     /**
      * @since Method available since Release 0.5.0
      */
-    function testPrimaryKeyValuesShouldNotBeRequiredWhenExecutingDelete()
+    public function testShouldDeleteObjectsWithoutThePrimaryKey()
     {
         $id1 = $this->_insert();
         $id2 = $this->_insert();
-        $mapper = &Piece_ORM_Mapper_Factory::factory('Employees');
-        $subject = &new stdClass();
+        $mapper = Piece_ORM_Mapper_Factory::factory('Employees');
+        $subject = new stdClass();
         $subject->note = 'Foo';
         $affectedRows = $mapper->deleteByNote($subject);
 
@@ -1511,9 +1506,9 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
     /**
      * @since Method available since Release 0.5.0
      */
-    function testStaticQueryShouldBeAbleToExecuteWithFind()
+    public function testShouldFindAnObjectWithAStaticQuery()
     {
-        $mapper = &Piece_ORM_Mapper_Factory::factory('Employees');
+        $mapper = Piece_ORM_Mapper_Factory::factory('Employees');
         $employee = $mapper->findWithStaticQuery();
 
         $this->assertEquals(1, $employee->one);
@@ -1522,9 +1517,9 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
     /**
      * @since Method available since Release 0.5.0
      */
-    function testStaticQueryShouldBeAbleToExecuteWithFindAll()
+    public function testShouldFindObjectsWithAStaticQuery()
     {
-        $mapper = &Piece_ORM_Mapper_Factory::factory('Employees');
+        $mapper = Piece_ORM_Mapper_Factory::factory('Employees');
         $employees = $mapper->findAllWithStaticQuery();
 
         $this->assertEquals(1, count($employees));
@@ -1534,9 +1529,9 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
     /**
      * @since Method available since Release 0.5.0
      */
-    function testStaticQueryShouldBeAbleToExecuteWithFindOne()
+    public function testShouldFindAValueWithAStaticQuery()
     {
-        $mapper = &Piece_ORM_Mapper_Factory::factory('Employees');
+        $mapper = Piece_ORM_Mapper_Factory::factory('Employees');
 
         $this->assertEquals(1, $mapper->findOneWithStaticQuery());
     }
@@ -1544,9 +1539,9 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
     /**
      * @since Method available since Release 0.5.0
      */
-    function testStaticQueryShouldBeAbleToExecuteWithInsert()
+    public function testShouldInsertAnObjectWithAStaticQuery()
     {
-        $mapper = &Piece_ORM_Mapper_Factory::factory('Employees');
+        $mapper = Piece_ORM_Mapper_Factory::factory('Employees');
         $id = @$mapper->insertWithStaticQuery();
 
         $this->assertNotNull($id);
@@ -1556,9 +1551,9 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
     /**
      * @since Method available since Release 0.5.0
      */
-    function testStaticQueryShouldBeAbleToExecuteWithUpdate()
+    public function testShouldUpdateObjectsWithAStaticQuery()
     {
-        $mapper = &Piece_ORM_Mapper_Factory::factory('Employees');
+        $mapper = Piece_ORM_Mapper_Factory::factory('Employees');
 
         $this->assertEquals(0, @$mapper->updateWithStaticQuery());
     }
@@ -1566,9 +1561,9 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
     /**
      * @since Method available since Release 0.5.0
      */
-    function testStaticQueryShouldBeAbleToExecuteWithDelete()
+    public function testShouldDeleteObjectsWithAStaticQuery()
     {
-        $mapper = &Piece_ORM_Mapper_Factory::factory('Employees');
+        $mapper = Piece_ORM_Mapper_Factory::factory('Employees');
 
         $this->assertEquals(0, @$mapper->deleteWithStaticQuery());
     }
@@ -1576,10 +1571,10 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
     /**
      * @since Method available since Release 0.5.0
      */
-    function testConstraintExceptionShouldBeRaisedWhenUniqueConstraintErrorIsOccurred()
+    public function testShouldRaiseAnExceptionWhenUniqueConstraintErrorIsOccurred()
     {
-        $mapper = &Piece_ORM_Mapper_Factory::factory('Emails');
-        $subject = &$mapper->createObject();
+        $mapper = Piece_ORM_Mapper_Factory::factory('Emails');
+        $subject = $mapper->createObject();
         $subject->email = 'foo@example.org';
         $mapper->insert($subject);
         Piece_ORM_Error::disableCallback();
@@ -1596,9 +1591,9 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
     /**
      * @since Method available since Release 0.6.0
      */
-    function testDefaultQueryShouldBeGeneratedIfQueryForInsertMethodIsNotGiven()
+    public function testShouldGenerateTheDefaultQueryIfTheQueryForAInsertMethodIsNotGiven()
     {
-        $mapper = &Piece_ORM_Mapper_Factory::factory('Employees');
+        $mapper = Piece_ORM_Mapper_Factory::factory('Employees');
 
         $this->assertEquals('INSERT INTO $__table (first_name, last_name, note, departments_id) VALUES ($firstName, $lastName, $note, $departmentsId)', $mapper->__query__insertwithnoquery);
     }
@@ -1606,9 +1601,9 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
     /**
      * @since Method available since Release 0.6.0
      */
-    function testDefaultQueryShouldBeGeneratedIfQueryForUpdateMethodIsNotGiven()
+    public function testShouldGenerateTheDefaultQueryIfTheQueryForAUpdateMethodIsNotGiven()
     {
-        $mapper = &Piece_ORM_Mapper_Factory::factory('Employees');
+        $mapper = Piece_ORM_Mapper_Factory::factory('Employees');
 
         $this->assertEquals('UPDATE $__table SET first_name = $firstName, last_name = $lastName, note = $note, departments_id = $departmentsId, created_at = $createdAt, updated_at = $updatedAt, lock_version = lock_version + 1 WHERE id = $id AND lock_version = $lockVersion', $mapper->__query__updatewithnoquery);
     }
@@ -1616,9 +1611,9 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
     /**
      * @since Method available since Release 0.6.0
      */
-    function testDefaultQueryShouldBeGeneratedIfQueryForDeleteMethodIsNotGiven()
+    public function testShouldGenerateTheDefaultQueryIfTheQueryForADeleteMethodIsNotGiven()
     {
-        $mapper = &Piece_ORM_Mapper_Factory::factory('Employees');
+        $mapper = Piece_ORM_Mapper_Factory::factory('Employees');
 
         $this->assertEquals('DELETE FROM $__table WHERE id = $id', $mapper->__query__deletewithnoquery);
     }
@@ -1626,7 +1621,7 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
     /**
      * @since Method available since Release 0.6.0
      */
-    function testManyToManyRelationshipsWithUnderscoreSeparatedPrimaryKeyShouldWork()
+    public function testShouldTreatManyToManyRelationshipsWithUnderscoreTheSeparatedPrimaryKey()
     {
         foreach (array(false, true) as $useMapperNameAsTableName) {
             if ($useMapperNameAsTableName) {
@@ -1634,31 +1629,31 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
             }
 
             $mapperName = !$useMapperNameAsTableName ? 'Emails' : 'emails';
-            $emailsMapper = &Piece_ORM_Mapper_Factory::factory($mapperName);
+            $emailsMapper = Piece_ORM_Mapper_Factory::factory($mapperName);
 
-            $subject1 = &$emailsMapper->createObject();
+            $subject1 = $emailsMapper->createObject();
             $subject1->email = 'foo@example.org';
             $emailsMapper->insert($subject1);
 
-            $subject2 = &$emailsMapper->createObject();
+            $subject2 = $emailsMapper->createObject();
             $subject2->email = 'bar@example.org';
             $emailsMapper->insert($subject2);
 
             $mapperName = !$useMapperNameAsTableName ? 'Employees' : 'employees';
-            $employeesMapper = &Piece_ORM_Mapper_Factory::factory($mapperName);
+            $employeesMapper = Piece_ORM_Mapper_Factory::factory($mapperName);
 
-            $subject = &$employeesMapper->createObject();
+            $subject = $employeesMapper->createObject();
             $subject->firstName = 'Foo';
             $subject->lastName = 'Bar';
             $subject->emails = array();
-            $subject->emails[] = &$subject1;
-            $subject->emails[] = &$subject2;
+            $subject->emails[] = $subject1;
+            $subject->emails[] = $subject2;
             $employeesMapper->insertWithEmails($subject);
 
             $employees = $employeesMapper->findAllWithEmails();
 
             $this->assertEquals(1, count($employees));
-            $this->assertTrue(array_key_exists('emails', $employees[0]));
+            $this->assertTrue(property_exists($employees[0], 'emails'));
             $this->assertTrue(is_array($employees[0]->emails));
             $this->assertEquals(2, count($employees[0]->emails));
             $this->assertEquals('foo@example.org', $employees[0]->emails[0]->email);
@@ -1674,14 +1669,14 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
     /**
      * @since Method available since Release 0.6.0
      */
-    function testSortOrderShouldBeAbleToDefinedByMapperDefinitionFile()
+    public function testShouldDefineSortOrdersByConfiguration()
     {
-        $mapper = &Piece_ORM_Mapper_Factory::factory('Employees');
-        $subject = &$mapper->createObject();
+        $mapper = Piece_ORM_Mapper_Factory::factory('Employees');
+        $subject = $mapper->createObject();
         $subject->firstName = 'Bar';
         $subject->lastName = 'Foo';
         $mapper->insert($subject);
-        $subject = &$mapper->createObject();
+        $subject = $mapper->createObject();
         $subject->firstName = 'Baz';
         $subject->lastName = 'Bar';
         $mapper->insert($subject);
@@ -1692,7 +1687,7 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
         $this->assertEquals('Bar', $employees[0]->lastName);
         $this->assertEquals('Foo', $employees[1]->lastName);
 
-        $employee = &$mapper->findOrderByLastName();
+        $employee = $mapper->findOrderByLastName();
 
         $this->assertNotNull($employee);
         $this->assertEquals('Bar', $employee->lastName);
@@ -1706,14 +1701,14 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
     /**
      * @since Method available since Release 0.6.0
      */
-    function testDynamicSortOrderShouldBePreferredToStaticSortOrder()
+    public function testShouldPreferDynamicSortOrdersToStaticSortOrders()
     {
-        $mapper = &Piece_ORM_Mapper_Factory::factory('Employees');
-        $subject = &$mapper->createObject();
+        $mapper = Piece_ORM_Mapper_Factory::factory('Employees');
+        $subject = $mapper->createObject();
         $subject->firstName = 'Bar';
         $subject->lastName = 'Foo';
         $mapper->insert($subject);
-        $subject = &$mapper->createObject();
+        $subject = $mapper->createObject();
         $subject->firstName = 'Baz';
         $subject->lastName = 'Bar';
         $mapper->insert($subject);
@@ -1728,19 +1723,19 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
     /**
      * @since Method available since Release 0.7.0
      */
-    function testCharsetShouldBeAbleToSetByDSN() {}
+    public function testShouldSetCharsetByDSN() {}
 
     /**
      * @since Method available since Release 0.8.0
      */
-    function testUpdateShouldWorkWithTableWhichHasNoPrimaryKeys()
+    public function testShouldUpdateObjectsOfATableWhichDoesNotHaveThePrimaryKey()
     {
-        $mapper = &Piece_ORM_Mapper_Factory::factory('Nonprimarykeys');
-        $subject1 = &$mapper->createObject();
+        $mapper = Piece_ORM_Mapper_Factory::factory('Nonprimarykeys');
+        $subject1 = $mapper->createObject();
         $subject1->memberId = 1;
         $subject1->serviceId = 1;
         $mapper->insert($subject1);
-        $subject2 = &$mapper->findByMemberIdAndServiceId($subject1);
+        $subject2 = $mapper->findByMemberIdAndServiceId($subject1);
         $subject2->point += 50;
         Piece_ORM_Error::disableCallback();
         $affectedRows = $mapper->updateByMemberIdAndServiceId($subject2);
@@ -1753,14 +1748,14 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
     /**
      * @since Method available since Release 0.8.0
      */
-    function testDeleteShouldWorkWithTableWhichHasNoPrimaryKeys()
+    public function testShouldDeleteFromATableWhichDoesNotHaveThePrimaryKey()
     {
-        $mapper = &Piece_ORM_Mapper_Factory::factory('Nonprimarykeys');
-        $subject1 = &$mapper->createObject();
+        $mapper = Piece_ORM_Mapper_Factory::factory('Nonprimarykeys');
+        $subject1 = $mapper->createObject();
         $subject1->memberId = 1;
         $subject1->serviceId = 1;
         $mapper->insert($subject1);
-        $subject2 = &$mapper->findByMemberIdAndServiceId($subject1);
+        $subject2 = $mapper->findByMemberIdAndServiceId($subject1);
         Piece_ORM_Error::disableCallback();
         $affectedRows = $mapper->deleteByMemberIdAndServiceId($subject2);
         Piece_ORM_Error::enableCallback();
@@ -1772,10 +1767,10 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
     /**
      * @since Method available since Release 0.8.1
      */
-    function testCompositePrimaryKeyShouldWork()
+    public function testShouldWorkWithATableWhichHasTheCompositePrimaryKey()
     {
-        $mapper = &Piece_ORM_Mapper_Factory::factory('Compositeprimarykey');
-        $subject = &$mapper->createObject();
+        $mapper = Piece_ORM_Mapper_Factory::factory('Compositeprimarykey');
+        $subject = $mapper->createObject();
         $subject->album = 'On Stage';
         $subject->artist = 'Rainbow';
         $subject->track = 1;
@@ -1819,7 +1814,7 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
     /**
      * @since Method available since Release 0.8.1
      */
-    function testUnusualNamesShouldWork()
+    public function testShouldWorkWithATableWhichHasTheUnusualName()
     {
         foreach (array(false, true) as $useMapperNameAsTableName) {
             if ($useMapperNameAsTableName) {
@@ -1827,19 +1822,19 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
             }
 
             $mapperName = !$useMapperNameAsTableName ? 'Unusualname_12' : 'unusualname_12';
-            $inverseMapper = &Piece_ORM_Mapper_Factory::factory($mapperName);
-            $inverseSubject = &$inverseMapper->createObject();
+            $inverseMapper = Piece_ORM_Mapper_Factory::factory($mapperName);
+            $inverseSubject = $inverseMapper->createObject();
             $inverseSubject->name = 'foo';
             $inverseMapper->insert($inverseSubject);
 
             $this->assertEquals(1, count($inverseMapper->findAll()));
 
             $mapperName = !$useMapperNameAsTableName ? 'Unusualname1_2' : 'unusualname1_2';
-            $mapper = &Piece_ORM_Mapper_Factory::factory($mapperName);
-            $subject = &$mapper->createObject();
+            $mapper = Piece_ORM_Mapper_Factory::factory($mapperName);
+            $subject = $mapper->createObject();
             $subject->name = 'bar';
             $subject->baz = array();
-            $subject->baz[] = &$inverseSubject;
+            $subject->baz[] = $inverseSubject;
             $mapper->insert($subject);
 
             $objects = $mapper->findAll();
@@ -1851,14 +1846,14 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
             $this->assertEquals('foo', $objects[0]->baz[0]->name);
 
             $mapperName = !$useMapperNameAsTableName ? 'Unusualname1_2_unusualname_12' : 'unusualname1_2_unusualname_12';
-            $throughMapper = &Piece_ORM_Mapper_Factory::factory($mapperName);
+            $throughMapper = Piece_ORM_Mapper_Factory::factory($mapperName);
             $objects = $throughMapper->findAll();
 
             $this->assertEquals(1, count($objects));
             $this->assertEquals(3, count(array_keys((array)$objects[0])));
-            $this->assertTrue(array_key_exists('id', $objects[0]));
-            $this->assertTrue(array_key_exists('unusualname1_2_id', $objects[0]));
-            $this->assertTrue(array_key_exists('unusualname_12_id', $objects[0]));
+            $this->assertObjectHasAttribute('id', $objects[0]);
+            $this->assertObjectHasAttribute('unusualname1_2_id', $objects[0]);
+            $this->assertObjectHasAttribute('unusualname_12_id', $objects[0]);
 
             $this->_clearTableRecords();
             if ($useMapperNameAsTableName) {
@@ -1870,7 +1865,7 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
     /**
      * @since Method available since Release 0.8.1
      */
-    function testShouldWorkAnyFinderMethodCallsForAMapperWhichHasAlreadyUsedInRelationships()
+    public function testShouldWorkWithAnyFinderMethodCallsForAMapperWhichHasAlreadyUsedInRelationships()
     {
         foreach (array(false, true) as $useMapperNameAsTableName) {
             if ($useMapperNameAsTableName) {
@@ -1879,10 +1874,10 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
 
             $this->_prepareTableRecords($useMapperNameAsTableName);
             $mapperName = !$useMapperNameAsTableName ? 'Employees' : 'employees';
-            $employeesMapper = &Piece_ORM_Mapper_Factory::factory($mapperName);
+            $employeesMapper = Piece_ORM_Mapper_Factory::factory($mapperName);
             $employeesMapper->findAllWithSkills2();
             $mapperName = !$useMapperNameAsTableName ? 'Skills' : 'skills';
-            $skillsMapper = &Piece_ORM_Mapper_Factory::factory($mapperName);
+            $skillsMapper = Piece_ORM_Mapper_Factory::factory($mapperName);
             $skills = $skillsMapper->findAll();
 
             $this->assertEquals(2, $skillsMapper->getCount());
@@ -1898,11 +1893,11 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
     /**
      * @since Method available since Release 0.8.1
      */
-    function testShouldTreatMethodNamesAsCaseInsensitive()
+    public function testShouldTreatMethodNamesAsCaseInsensitive()
     {
         $this->_configure('Overwrite');
         $id = $this->_insert();
-        $mapper = &Piece_ORM_Mapper_Factory::factory('Employees');
+        $mapper = Piece_ORM_Mapper_Factory::factory('Employees');
 
         $this->assertNotNull($mapper->findByLastName((object)array('lastName' => 'Kubo')));
     }
@@ -1910,36 +1905,36 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
     /**
      * @since Method available since Release 1.0.0
      */
-    function testShouldExpandValuesWithACommaIfAPropertyIsAnArray()
+    public function testShouldExpandValuesWithACommaIfAPropertyIsAnArray()
     {
         $ids = array();
         $ids[] = $this->_insert();
         $ids[] = $this->_insert();
         $this->_insert();
-        $employeesMapper = &Piece_ORM_Mapper_Factory::factory('Employees');
+        $employeesMapper = Piece_ORM_Mapper_Factory::factory('Employees');
 
         $this->assertEquals(3, count($employeesMapper->findAll()));
         $this->assertEquals(2, count($employeesMapper->findAllByIds((object)array('ids' => $ids))));
-        $this->assertTrue(preg_match('/IN \(\d+, \d+\)/', $employeesMapper->getLastQuery()));
+        $this->assertRegexp('/IN \(\d+, \d+\)/', $employeesMapper->getLastQuery());
     }
 
     /**
      * @since Method available since Release 1.0.0
      */
-    function testShouldUseAMapperNameAsATableNameIfEnabled()
+    public function testShouldUseAMapperNameAsATableNameIfEnabled()
     {
-        $config = &new Piece_ORM_Config();
-        $config->setDSN('caseSensitive', $this->_dsn);
+        $config = new Piece_ORM_Config();
+        $config->setDSN('caseSensitive', $this->dsn);
         $config->setOptions('caseSensitive', array('debug' => 2, 'result_buffering' => false));
         $config->setUseMapperNameAsTableName('caseSensitive', true);
-        $context = &Piece_ORM_Context::singleton();
+        $context = Piece_ORM_Context::singleton();
         $context->setConfiguration($config);
         $context->setDatabase('caseSensitive');
-        Piece_ORM_Mapper_Factory::setConfigDirectory($this->_cacheDirectory);
-        Piece_ORM_Mapper_Factory::setCacheDirectory($this->_cacheDirectory);
-        Piece_ORM_Metadata_Factory::setCacheDirectory($this->_cacheDirectory);
+        Piece_ORM_Mapper_Factory::setConfigDirectory($this->cacheDirectory);
+        Piece_ORM_Mapper_Factory::setCacheDirectory($this->cacheDirectory);
+        Piece_ORM_Metadata_Factory::setCacheDirectory($this->cacheDirectory);
         Piece_ORM_Error::disableCallback();
-        $mapper = &Piece_ORM_Mapper_Factory::factory('Case_Sensitive');
+        $mapper = Piece_ORM_Mapper_Factory::factory('Case_Sensitive');
         Piece_ORM_Error::enableCallback();
 
         $this->assertFalse(Piece_ORM_Error::hasErrors());
@@ -1950,19 +1945,19 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
 
         $this->assertFalse(Piece_ORM_Error::hasErrors());
 
-        $dbh = &$mapper->getConnection();
+        $dbh = $mapper->getConnection();
 
-        $this->assertTrue(preg_match('/FROM ' . preg_quote($dbh->quoteIdentifier('Case_Sensitive'), '/') . '/', $mapper->getLastQuery()));
+        $this->assertRegexp('/FROM ' . preg_quote($dbh->quoteIdentifier('Case_Sensitive'), '/') . '/', $mapper->getLastQuery());
     }
 
     /**
      * @since Method available since Release 1.0.0
      */
-    function testShouldWorkAfterInsertUsingAnObjectReturnedFromFind()
+    public function testShouldWorkAfterInsertUsingAnObjectReturnedFromFind()
     {
         $id1 = $this->_insert();
-        $mapper = &Piece_ORM_Mapper_Factory::factory('Employees');
-        $employee = &$mapper->findById($id1);
+        $mapper = Piece_ORM_Mapper_Factory::factory('Employees');
+        $employee = $mapper->findById($id1);
         $id2 = $mapper->insert($employee);
         $mapper->addOrder('id');
         $employees = $mapper->findAll();
@@ -1975,63 +1970,63 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
     /**
      * @since Method available since Release 1.0.0
      */
-    function testShouldSupportLob()
+    public function testShouldSupportLob()
     {
-        $jpegPath = "{$this->_cacheDirectory}/picture.jpg";
-        $pngPath = "{$this->_cacheDirectory}/picture.png";
-        $mapper = &Piece_ORM_Mapper_Factory::factory('Files');
-        $subject = &$mapper->createObject();
-        $subject->picture = &$mapper->createLOB("file://$jpegPath");
+        $jpegPath = "{$this->cacheDirectory}/picture.jpg";
+        $pngPath = "{$this->cacheDirectory}/picture.png";
+        $mapper = Piece_ORM_Mapper_Factory::factory('Files');
+        $subject = $mapper->createObject();
+        $subject->picture = $mapper->createLOB("file://$jpegPath");
         $id = $mapper->insert($subject);
-        $file1 = &$mapper->findById($id);
+        $file1 = $mapper->findById($id);
 
-        $this->assertEquals(strtolower('Piece_ORM_Mapper_LOB'), strtolower(get_class($file1->picture)));
-        $this->assertEquals(file_get_contents($jpegPath), $file1->picture->load());
+        $this->assertType('Piece_ORM_Mapper_LOB', $file1->picture);
+        $this->assertStringEqualsFile($jpegPath, $file1->picture->load());
 
         $file1->picture->setSource("file://$pngPath");
         $mapper->update($file1);
-        $file2 = &$mapper->findById($id);
+        $file2 = $mapper->findById($id);
 
-        $this->assertTrue(file_get_contents($jpegPath) != $file2->picture->load());
-        $this->assertEquals(file_get_contents($pngPath), $file2->picture->load());
+        $this->assertStringNotEqualsFile($jpegPath, $file2->picture->load());
+        $this->assertStringEqualsFile($pngPath, $file2->picture->load());
     }
 
     /**
      * @since Method available since Release 1.0.0
      */
-    function testShouldSetAFunctionToGetTheCurrentTimestampToTheCreatedatFieldWhenExecutingInsert()
+    public function testShouldSetAFunctionToGetTheCurrentTimestampToTheCreatedatFieldWhenExecutingInsert()
     {
-        $mapper = &Piece_ORM_Mapper_Factory::factory('Employees');
-        $subject = &$mapper->createObject();
+        $mapper = Piece_ORM_Mapper_Factory::factory('Employees');
+        $subject = $mapper->createObject();
         $subject->firstName = 'Foo';
         $subject->lastName = 'Bar';
         $mapper->insert($subject);
 
-        $this->assertTrue(preg_match('/CURRENT_TIMESTAMP/', $mapper->getLastQuery()));
+        $this->assertRegexp('/CURRENT_TIMESTAMP/', $mapper->getLastQuery());
     }
 
     /**
      * @since Method available since Release 1.0.0
      */
-    function testShouldSetAFunctionToGetTheCurrentTimestampToTheUpdatedatFieldWhenExecutingUpdate()
+    public function testShouldSetAFunctionToGetTheCurrentTimestampToTheUpdatedatFieldWhenExecutingUpdate()
     {
         $id = $this->_insert();
-        $mapper = &Piece_ORM_Mapper_Factory::factory('Employees');
-        $employee = &$mapper->findById($id);
+        $mapper = Piece_ORM_Mapper_Factory::factory('Employees');
+        $employee = $mapper->findById($id);
         $mapper->update($employee);
 
-        $this->assertTrue(preg_match('/CURRENT_TIMESTAMP/', $mapper->getLastQuery()));
+        $this->assertRegexp('/CURRENT_TIMESTAMP/', $mapper->getLastQuery());
     }
 
     /**
      * @since Method available since Release 1.0.0
      */
-    function testShouldSupportOptimisticLockingByTheLockversionFieldOnlyInDefaultQueries()
+    public function testShouldSupportOptimisticLockingByTheLockversionFieldOnlyInDefaultQueries()
     {
         $id = $this->_insert();
-        $mapper = &Piece_ORM_Mapper_Factory::factory('Employees');
-        $employee1 = &$mapper->findById($id);
-        $employee2 = &$mapper->findById($id);
+        $mapper = Piece_ORM_Mapper_Factory::factory('Employees');
+        $employee1 = $mapper->findById($id);
+        $employee2 = $mapper->findById($id);
 
         $this->assertEquals(0, $employee1->lockVersion);
         $this->assertEquals(0, $employee2->lockVersion);
@@ -2040,7 +2035,7 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
 
         $this->assertEquals(1, $affectedRows);
 
-        $employee1 = &$mapper->findById($id);
+        $employee1 = $mapper->findById($id);
 
         $this->assertEquals(1, $employee1->lockVersion);
 
@@ -2048,7 +2043,7 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
 
         $this->assertEquals(0, $affectedRows);
 
-        $employee2 = &$mapper->findById($id);
+        $employee2 = $mapper->findById($id);
 
         $this->assertEquals(1, $employee2->lockVersion);
     }
@@ -2056,13 +2051,13 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
     /**
      * @since Method available since Release 1.1.0
      */
-    function testShouldWorkWithNullLobFields()
+    public function testShouldWorkWithNullLobFields()
     {
-        $jpegPath = "{$this->_cacheDirectory}/picture.jpg";
-        $mapper = &Piece_ORM_Mapper_Factory::factory('Files');
-        $subject = &$mapper->createObject();
+        $jpegPath = "{$this->cacheDirectory}/picture.jpg";
+        $mapper = Piece_ORM_Mapper_Factory::factory('Files');
+        $subject = $mapper->createObject();
         $id = $mapper->insert($subject);
-        $file = &$mapper->findById($id);
+        $file = $mapper->findById($id);
 
         $this->assertNull($file->picture);
     }
@@ -2070,16 +2065,16 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
     /**
      * @since Method available since Release 1.1.0
      */
-    function testShouldKeepALobFieldValueAfterInvokingUpdateIfTheValueIsNotChanged()
+    public function testShouldKeepALobFieldValueAfterInvokingUpdateIfTheValueIsNotChanged()
     {
-        $jpegPath = "{$this->_cacheDirectory}/picture.jpg";
-        $mapper = &Piece_ORM_Mapper_Factory::factory('Files');
-        $subject = &$mapper->createObject();
-        $subject->picture = &$mapper->createLOB("file://$jpegPath");
+        $jpegPath = "{$this->cacheDirectory}/picture.jpg";
+        $mapper = Piece_ORM_Mapper_Factory::factory('Files');
+        $subject = $mapper->createObject();
+        $subject->picture = $mapper->createLOB("file://$jpegPath");
         $id = $mapper->insert($subject);
-        $file1 = &$mapper->findById($id);
+        $file1 = $mapper->findById($id);
         $mapper->update($file1);
-        $file2 = &$mapper->findById($id);
+        $file2 = $mapper->findById($id);
 
         $this->assertEquals($file1->picture->load(), $file2->picture->load());
     }
@@ -2087,16 +2082,16 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
     /**
      * @since Method available since Release 1.1.0
      */
-    function testShouldTreatIndividualBlobs()
+    public function testShouldTreatIndividualBlobs()
     {
-        $jpegPath = "{$this->_cacheDirectory}/picture.jpg";
-        $pngPath = "{$this->_cacheDirectory}/picture.png";
-        $mapper = &Piece_ORM_Mapper_Factory::factory('Files');
-        $subject = &$mapper->createObject();
-        $subject->picture = &$mapper->createLOB("file://$jpegPath");
-        $subject->largePicture = &$mapper->createLOB("file://$pngPath");
+        $jpegPath = "{$this->cacheDirectory}/picture.jpg";
+        $pngPath = "{$this->cacheDirectory}/picture.png";
+        $mapper = Piece_ORM_Mapper_Factory::factory('Files');
+        $subject = $mapper->createObject();
+        $subject->picture = $mapper->createLOB("file://$jpegPath");
+        $subject->largePicture = $mapper->createLOB("file://$pngPath");
         $id = $mapper->insert($subject);
-        $file = &$mapper->findById($id);
+        $file = $mapper->findById($id);
 
         $this->assertTrue(file_get_contents($jpegPath) != file_get_contents($pngPath));
         $this->assertEquals(file_get_contents($jpegPath), $file->picture->load());
@@ -2104,15 +2099,14 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
     }
 
     /**
-     * @abstract
      * @since Method available since Release 1.2.0
      */
-    function testShouldProvideTheDefaultValueOfAGivenField() {}
+    abstract public function testShouldProvideTheDefaultValueOfAGivenField();
 
     /**
      * @since Method available since Release 1.2.0
      */
-    function testShouldTreatInverseThroughTablesOnManyToManyRelationships()
+    public function testShouldTreatInverseThroughTablesOnManyToManyRelationships()
     {
         foreach (array(false, true) as $useMapperNameAsTableName) {
             if ($useMapperNameAsTableName) {
@@ -2121,7 +2115,7 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
 
             $this->_prepareTableRecords($useMapperNameAsTableName);
             $mapperName = !$useMapperNameAsTableName ? 'Skills' : 'skills';
-            $mapper = &Piece_ORM_Mapper_Factory::factory($mapperName);
+            $mapper = Piece_ORM_Mapper_Factory::factory($mapperName);
             $skills = $mapper->findAllWithEmployees();
 
             $this->assertTrue(is_array($skills));
@@ -2164,128 +2158,134 @@ class Piece_ORM_Mapper_CompatibilityTests extends PHPUnit_TestCase
     /**#@-*/
 
     /**#@+
+     * @access protected
+     */
+
+    /**#@-*/
+
+    /**#@+
      * @access private
      */
 
-    function _insert()
+    public function _insert()
     {
-        $mapper = &Piece_ORM_Mapper_Factory::factory('Employees');
-        $subject = &$mapper->createObject();
+        $mapper = Piece_ORM_Mapper_Factory::factory('Employees');
+        $subject = $mapper->createObject();
         $subject->firstName = 'Atsuhiro';
         $subject->lastName = 'Kubo';
         $subject->note = 'Foo';
         return $mapper->insert($subject);
     }
 
-    function _prepareTableRecords($useMapperNameAsTableName = false)
+    public function _prepareTableRecords($useMapperNameAsTableName = false)
     {
         $mapperName = !$useMapperNameAsTableName ? 'Skills' : 'skills';
-        $skillsMapper = &Piece_ORM_Mapper_Factory::factory($mapperName);
+        $skillsMapper = Piece_ORM_Mapper_Factory::factory($mapperName);
 
-        $skill1 = &$skillsMapper->createObject();
+        $skill1 = $skillsMapper->createObject();
         $skill1->name = 'Foo';
         $skillsMapper->insert($skill1);
 
-        $skill2 = &$skillsMapper->createObject();
+        $skill2 = $skillsMapper->createObject();
         $skill2->name = 'Bar';
         $skillsMapper->insert($skill2);
 
         $mapperName = !$useMapperNameAsTableName ? 'Departments' : 'departments';
-        $departmentsMapper = &Piece_ORM_Mapper_Factory::factory($mapperName);
+        $departmentsMapper = Piece_ORM_Mapper_Factory::factory($mapperName);
 
-        $department1 = &$departmentsMapper->createObject();
+        $department1 = $departmentsMapper->createObject();
         $department1->name = 'Foo';
         $departmentsMapper->insert($department1);
 
-        $department2 = &$departmentsMapper->createObject();
+        $department2 = $departmentsMapper->createObject();
         $department2->name = 'Bar';
         $departmentsMapper->insert($department2);
 
         $mapperName = !$useMapperNameAsTableName ? 'Computers' : 'computers';
-        $computersMapper = &Piece_ORM_Mapper_Factory::factory($mapperName);
+        $computersMapper = Piece_ORM_Mapper_Factory::factory($mapperName);
 
-        $computer1 = &$computersMapper->createObject();
+        $computer1 = $computersMapper->createObject();
         $computer1->name = 'Foo';
 
-        $computer2 = &$computersMapper->createObject();
+        $computer2 = $computersMapper->createObject();
         $computer2->name = 'Bar';
 
-        $computer3 = &$computersMapper->createObject();
+        $computer3 = $computersMapper->createObject();
         $computer3->name = 'Baz';
 
         $mapperName = !$useMapperNameAsTableName ? 'Employees' : 'employees';
-        $employeesMapper = &Piece_ORM_Mapper_Factory::factory($mapperName);
+        $employeesMapper = Piece_ORM_Mapper_Factory::factory($mapperName);
 
-        $employee1 = &$employeesMapper->createObject();
+        $employee1 = $employeesMapper->createObject();
         $employee1->firstName = 'Foo';
         $employee1->lastName = 'Bar';
         $employeesMapper->insert($employee1);
 
-        $employee2 = &$employeesMapper->createObject();
+        $employee2 = $employeesMapper->createObject();
         $employee2->firstName = 'Bar';
         $employee2->lastName = 'Baz';
         $employee2->skills = array();
-        $employee2->skills[] = &$skill1;
+        $employee2->skills[] = $skill1;
         $employee2->departmentsId = $department1->id;
-        $employee2->computer = &$computer3;
+        $employee2->computer = $computer3;
         $employeesMapper->insert($employee2);
 
-        $employee3 = &$employeesMapper->createObject();
+        $employee3 = $employeesMapper->createObject();
         $employee3->firstName = 'Baz';
         $employee3->lastName = 'Qux';
         $employee3->skills = array();
-        $employee3->skills[] = &$skill2;
+        $employee3->skills[] = $skill2;
         $employee3->departmentsId = $department2->id;
-        $employee3->computer = &$computer2;
+        $employee3->computer = $computer2;
         $employeesMapper->insert($employee3);
 
-        $employee4 = &$employeesMapper->createObject();
+        $employee4 = $employeesMapper->createObject();
         $employee4->firstName = 'Qux';
         $employee4->lastName = 'Quux';
         $employee4->skills = array();
-        $employee4->skills[] = &$skill1;
-        $employee4->skills[] = &$skill2;
+        $employee4->skills[] = $skill1;
+        $employee4->skills[] = $skill2;
         $employee4->departmentsId = $department2->id;
-        $employee4->computer = &$computer1;
+        $employee4->computer = $computer1;
         $employeesMapper->insert($employee4);
     }
 
-    function _configure($cacheDirectory)
+    public function _configure($cacheDirectory)
     {
-        $this->_cacheDirectory = "{$this->_cacheDirectory}/$cacheDirectory";
-        Piece_ORM_Mapper_Factory::setConfigDirectory($this->_cacheDirectory);
-        Piece_ORM_Mapper_Factory::setCacheDirectory($this->_cacheDirectory);
-        Piece_ORM_Metadata_Factory::setCacheDirectory($this->_cacheDirectory);
+        $this->cacheDirectory = "{$this->cacheDirectory}/$cacheDirectory";
+        Piece_ORM_Mapper_Factory::setConfigDirectory($this->cacheDirectory);
+        Piece_ORM_Mapper_Factory::setCacheDirectory($this->cacheDirectory);
+        Piece_ORM_Metadata_Factory::setCacheDirectory($this->cacheDirectory);
     }
 
-    function _clearTableRecords()
+    public function _clearTableRecords()
     {
-        $context = &Piece_ORM_Context::singleton();
-        $dbh = &$context->getConnection();
-        foreach ($this->_tables as $table) {
+        $context = Piece_ORM_Context::singleton();
+        $dbh = $context->getConnection();
+        foreach ($this->tables as $table) {
             $dbh->exec("TRUNCATE TABLE $table");
         }
     }
 
-    function _prepareCaseSensitiveContext()
+    public function _prepareCaseSensitiveContext()
     {
-        $config = &new Piece_ORM_Config();
-        $config->setDSN('caseSensitive', $this->_dsn);
+        $config = new Piece_ORM_Config();
+        $config->setDSN('caseSensitive', $this->dsn);
         $config->setUseMapperNameAsTableName('caseSensitive', true);
-        $context = &Piece_ORM_Context::singleton();
+        $context = Piece_ORM_Context::singleton();
         $context->setConfiguration($config);
         $context->setDatabase('caseSensitive');
-        Piece_ORM_Mapper_Factory::setConfigDirectory("{$this->_cacheDirectory}/CaseSensitive");
-        Piece_ORM_Mapper_Factory::setCacheDirectory("{$this->_cacheDirectory}/CaseSensitive");
-        Piece_ORM_Metadata_Factory::setCacheDirectory("{$this->_cacheDirectory}/CaseSensitive");
+        Piece_ORM_Mapper_Factory::setConfigDirectory("{$this->cacheDirectory}/CaseSensitive");
+        Piece_ORM_Mapper_Factory::setCacheDirectory("{$this->cacheDirectory}/CaseSensitive");
+        Piece_ORM_Metadata_Factory::setCacheDirectory("{$this->cacheDirectory}/CaseSensitive");
     }
 
-    function _clearCaseSensitiveContext()
+    public function _clearCaseSensitiveContext()
     {
-        $cache = &new Cache_Lite(array('cacheDir' => "{$this->_cacheDirectory}/CaseSensitive/",
-                                       'automaticSerialization' => true,
-                                       'errorHandlingAPIBreak' => true)
-                                 );
+        $cache = new Cache_Lite(array('cacheDir' => "{$this->cacheDirectory}/CaseSensitive/",
+                                      'automaticSerialization' => true,
+                                      'errorHandlingAPIBreak' => true)
+                                );
         $cache->clean();
     }
 
