@@ -41,7 +41,7 @@ use Piece::ORM::Metadata::MetadataFactory;
 use Piece::ORM::Config;
 use Piece::ORM::Context;
 
-// {{{ Piece::ORM::Metadata::FactoryTest
+// {{{ Piece::ORM::Metadata::MetadataFactoryTest
 
 /**
  * Some tests for Piece::ORM::Metadata::MetadataFactory.
@@ -52,7 +52,7 @@ use Piece::ORM::Context;
  * @version    Release: @package_version@
  * @since      Class available since Release 0.1.0
  */
-class FactoryTest extends ::PHPUnit_Framework_TestCase
+class MetadataFactoryTest extends ::PHPUnit_Framework_TestCase
 {
 
     // {{{ properties
