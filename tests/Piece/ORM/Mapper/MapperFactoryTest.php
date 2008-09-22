@@ -54,7 +54,7 @@ use Piece::ORM::Exception;
  * @version    Release: @package_version@
  * @since      Class available since Release 0.1.0
  */
-class FactoryTest extends ::PHPUnit_Framework_TestCase
+class MapperFactoryTest extends ::PHPUnit_Framework_TestCase
 {
 
     // {{{ properties
