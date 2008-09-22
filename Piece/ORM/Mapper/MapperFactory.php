@@ -113,7 +113,7 @@ class MapperFactory
         if (!array_key_exists($mapperID, self::$_instances)) {
             self::_load($mapperID, $mapperName);
             $metadata = MetadataFactory::factory($mapperName);
-            $mapperClass = __NAMESPACE__ . '::' . self::_getMapperClass($mapperID);
+            $mapperClass = __NAMESPACE__ . "::$mapperID";
             $mapper = new $mapperClass($metadata);
             if (!$mapper instanceof Common) {
                 throw new Exception("The mapper class for [ $mapperName ] is invalid.");
@@ -267,7 +267,7 @@ class MapperFactory
      */
     private function _generateMapperSource($mapperID, $mapperName, $configFile)
     {
-        $generator = new Generator(self::_getMapperClass($mapperID),
+        $generator = new Generator($mapperID,
                                    $mapperName,
                                    ::Spyc::YAMLLoad($configFile),
                                    MetadataFactory::factory($mapperName),
@@ -288,9 +288,7 @@ class MapperFactory
      */
     private function _loaded($mapperID)
     {
-        return class_exists(__NAMESPACE__ . '::' . self::_getMapperClass($mapperID),
-                            false
-                            );
+        return class_exists(__NAMESPACE__ . "::$mapperID", false);
     }
 
     // }}}
@@ -355,20 +353,6 @@ class MapperFactory
         if (!self::_loaded($mapperID)) {
             throw new Exception("The mapper [ $mapperName ] not found.");
         }
-    }
-
-    // }}}
-    // {{{ _getMapperClass()
-
-    /**
-     * Gets the class name for a given mapper ID.
-     *
-     * @param string $mapperID
-     * @return string
-     */
-    private function _getMapperClass($mapperID)
-    {
-        return $mapperID;
     }
 
     /**#@-*/
