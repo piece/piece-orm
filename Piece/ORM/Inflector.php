@@ -35,7 +35,9 @@
  * @since      File available since Release 0.1.0
  */
 
-// {{{ Piece_ORM_Inflector
+namespace Piece::ORM;
+
+// {{{ Inflector
 
 /**
  * A utility class for words operation.
@@ -46,7 +48,7 @@
  * @version    Release: @package_version@
  * @since      Class available since Release 0.1.0
  */
-class Piece_ORM_Inflector
+class Inflector
 {
 
     // {{{ properties
@@ -90,7 +92,7 @@ class Piece_ORM_Inflector
         if (!$lowercaseFirstLetter) {
             return $camelizedWord;
         } else {
-            return Piece_ORM_Inflector::lowercaseFirstLetter($camelizedWord);
+            return self::lowercaseFirstLetter($camelizedWord);
         }
     }
 

@@ -35,10 +35,13 @@
  * @since      File available since Release 0.1.0
  */
 
-// {{{ Piece_ORM_InflectorTest
+namespace Piece::ORM;
+use Piece::ORM::Inflector;
+
+// {{{ InflectorTest
 
 /**
- * Some tests for Piece_ORM_Inflector.
+ * Some tests for Piece::ORM::Inflector.
  *
  * @package    Piece_ORM
  * @copyright  2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
@@ -46,7 +49,7 @@
  * @version    Release: @package_version@
  * @since      Class available since Release 0.1.0
  */
-class Piece_ORM_InflectorTest extends PHPUnit_Framework_TestCase
+class InflectorTest extends ::PHPUnit_Framework_TestCase
 {
 
     // {{{ properties
@@ -75,14 +78,14 @@ class Piece_ORM_InflectorTest extends PHPUnit_Framework_TestCase
 
     public function testShouldUnderscoreWords()
     {
-        $this->assertEquals('keyword_id', Piece_ORM_Inflector::underscore('keywordId'));
-        $this->assertEquals('keyword1_id', Piece_ORM_Inflector::underscore('keyword1_id'));
-        $this->assertEquals('keyword1_id', Piece_ORM_Inflector::underscore('keyword1Id'));
-        $this->assertEquals('foo_123', Piece_ORM_Inflector::underscore('Foo_123'));
-        $this->assertEquals('foo1_23', Piece_ORM_Inflector::underscore('Foo1_23'));
-        $this->assertEquals('foo123', Piece_ORM_Inflector::underscore('Foo123'));
-        $this->assertEquals('unusualname1_2_unusualname_12', Piece_ORM_Inflector::underscore('Unusualname1_2_unusualname_12'));
-        $this->assertEquals('unusualname1_2_unusualname_12', Piece_ORM_Inflector::underscore('Unusualname1_2Unusualname_12'));
+        $this->assertEquals('keyword_id', Inflector::underscore('keywordId'));
+        $this->assertEquals('keyword1_id', Inflector::underscore('keyword1_id'));
+        $this->assertEquals('keyword1_id', Inflector::underscore('keyword1Id'));
+        $this->assertEquals('foo_123', Inflector::underscore('Foo_123'));
+        $this->assertEquals('foo1_23', Inflector::underscore('Foo1_23'));
+        $this->assertEquals('foo123', Inflector::underscore('Foo123'));
+        $this->assertEquals('unusualname1_2_unusualname_12', Inflector::underscore('Unusualname1_2_unusualname_12'));
+        $this->assertEquals('unusualname1_2_unusualname_12', Inflector::underscore('Unusualname1_2Unusualname_12'));
     }
 
     /**
@@ -90,15 +93,15 @@ class Piece_ORM_InflectorTest extends PHPUnit_Framework_TestCase
      */
     public function testShouldCamelizeWords()
     {
-        $this->assertEquals('keywordId', Piece_ORM_Inflector::camelize('keyword_id', true));
-        $this->assertEquals('keyword1_id', Piece_ORM_Inflector::camelize('keyword1_id', true));
-        $this->assertEquals('Foo_123', Piece_ORM_Inflector::camelize('foo_123', false));
-        $this->assertEquals('Foo1_23', Piece_ORM_Inflector::camelize('foo1_23', false));
-        $this->assertEquals('Foo123', Piece_ORM_Inflector::camelize('foo123', false));
-        $this->assertEquals('foo_123', Piece_ORM_Inflector::camelize('foo_123', true));
-        $this->assertEquals('foo1_23', Piece_ORM_Inflector::camelize('foo1_23', true));
-        $this->assertEquals('foo123', Piece_ORM_Inflector::camelize('foo123', true));
-        $this->assertEquals('Unusualname1_2_unusualname_12', Piece_ORM_Inflector::camelize('unusualname1_2_unusualname_12', false));
+        $this->assertEquals('keywordId', Inflector::camelize('keyword_id', true));
+        $this->assertEquals('keyword1_id', Inflector::camelize('keyword1_id', true));
+        $this->assertEquals('Foo_123', Inflector::camelize('foo_123', false));
+        $this->assertEquals('Foo1_23', Inflector::camelize('foo1_23', false));
+        $this->assertEquals('Foo123', Inflector::camelize('foo123', false));
+        $this->assertEquals('foo_123', Inflector::camelize('foo_123', true));
+        $this->assertEquals('foo1_23', Inflector::camelize('foo1_23', true));
+        $this->assertEquals('foo123', Inflector::camelize('foo123', true));
+        $this->assertEquals('Unusualname1_2_unusualname_12', Inflector::camelize('unusualname1_2_unusualname_12', false));
     }
 
     /**#@-*/
