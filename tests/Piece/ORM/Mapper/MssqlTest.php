@@ -35,12 +35,12 @@
  * @since      File available since Release 0.4.0
  */
 
-return;
-
 namespace Piece::ORM::Mapper;
 
 use Piece::ORM::Mapper::CompatibilityTests;
 use Piece::ORM::Mapper::MapperFactory;
+
+return;
 
 // {{{ Piece::ORM::Mapper::MssqlTest
 
