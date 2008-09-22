@@ -37,9 +37,9 @@
 
 error_reporting(E_ALL & ~E_DEPRECATED);
 
-if (file_exists(dirname(__FILE__) . '/../Piece/ORM.php')) {
+if (file_exists(dirname(__FILE__) . '/../src/Piece/ORM.php')) {
     set_include_path(realpath(dirname(__FILE__)) . PATH_SEPARATOR .
-                     realpath(dirname(__FILE__) . '/..') . PATH_SEPARATOR .
+                     realpath(dirname(__FILE__) . '/../src') . PATH_SEPARATOR .
                      get_include_path()
                      );
 }
