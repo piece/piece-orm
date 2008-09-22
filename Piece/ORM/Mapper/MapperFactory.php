@@ -36,6 +36,7 @@
  */
 
 namespace Piece::ORM::Mapper;
+
 use Piece::ORM::Context;
 use Piece::ORM::Inflector;
 use Piece::ORM::Metadata::MetadataFactory;

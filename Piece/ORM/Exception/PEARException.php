@@ -36,6 +36,7 @@
  */
 
 namespace Piece::ORM::Exception;
+
 use Piece::ORM::Exception;
 
 // {{{ Piece::ORM::Exception::PEARException

@@ -36,6 +36,7 @@
  */
 
 namespace Piece::ORM;
+
 use Piece::ORM::Config;
 use Piece::ORM::Exception;
 use Piece::ORM::Mapper::MapperFactory;
