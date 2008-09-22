@@ -35,10 +35,13 @@
  * @since      File available since Release 0.1.0
  */
 
-// {{{ Piece_ORM_ConfigTest
+namespace Piece::ORM;
+use Piece::ORM::Config;
+
+// {{{ ConfigTest
 
 /**
- * Some tests for Piece_ORM_Config.
+ * Some tests for Piece::ORM::Config.
  *
  * @package    Piece_ORM
  * @copyright  2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
@@ -46,7 +49,7 @@
  * @version    Release: @package_version@
  * @since      Class available since Release 0.1.0
  */
-class Piece_ORM_ConfigTest extends PHPUnit_Framework_TestCase
+class ConfigTest extends ::PHPUnit_Framework_TestCase
 {
 
     // {{{ properties
@@ -75,11 +78,11 @@ class Piece_ORM_ConfigTest extends PHPUnit_Framework_TestCase
 
     public function testShouldReturnNullIfNoConfigurationsAreFound()
     {
-        $config1 = new Piece_ORM_Config();
+        $config1 = new Config();
 
         $this->assertNull($config1->getDSN(null));
 
-        $config2 = new Piece_ORM_Config();
+        $config2 = new Config();
         $config2->setDSN('foo', 'bar');
 
         $this->assertNull($config2->getDSN('baz'));
