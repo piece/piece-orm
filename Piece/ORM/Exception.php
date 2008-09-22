@@ -37,7 +37,7 @@
 
 namespace Piece::ORM;
 
-// {{{ Exception
+// {{{ Piece::ORM::Exception
 
 /**
  * The base exception class for all Piece_ORM runtime exceptions.

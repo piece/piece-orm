@@ -42,7 +42,7 @@ use Piece::ORM::Env;
 
 require_once 'spyc.php5';
 
-// {{{ ConfigFactory
+// {{{ Piece::ORM::Config::ConfigFactory
 
 /**
  * A factory class for creating Piece::ORM::Config objects.

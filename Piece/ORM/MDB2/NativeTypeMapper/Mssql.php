@@ -35,7 +35,11 @@
  * @since      File available since Release 0.7.0
  */
 
-// {{{ Piece_ORM_MDB2_NativeTypeMapper_Mssql
+namespace Piece::ORM::MDB2::NativeTypeMapper;
+
+use Piece::ORM::MDB2::NativeTypeMapper::Common;
+
+// {{{ Piece::ORM::MDB2::NativeTypeMapper::Mssql
 
 /**
  * A helper class to map native datatypes of Microsoft SQL Server to MDB2 datatypes.
@@ -46,7 +50,7 @@
  * @version    Release: @package_version@
  * @since      Class available since Release 0.7.0
  */
-class Piece_ORM_MDB2_NativeTypeMapper_Mssql extends Piece_ORM_MDB2_NativeTypeMapper_Common
+class Mssql extends Common
 {
 
     // {{{ properties

@@ -37,7 +37,7 @@
 
 namespace Piece::ORM;
 
-// {{{ Config
+// {{{ Piece::ORM::Config
 
 /**
  * The configuration container for Piece_ORM mappers.

@@ -35,7 +35,9 @@
  * @since      File available since Release 1.0.0
  */
 
-// {{{ Piece_ORM_Mapper_QueryType
+namespace Piece::ORM::Mapper;
+
+// {{{ Piece::ORM::Mapper::QueryType
 
 /**
  * A class to handle query types itself.
@@ -46,7 +48,7 @@
  * @version    Release: @package_version@
  * @since      Class available since Release 1.0.0
  */
-class Piece_ORM_Mapper_QueryType
+class QueryType
 {
 
     // {{{ properties

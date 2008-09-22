@@ -37,9 +37,12 @@
 
 return;
 
-require_once dirname(__FILE__) . '/CompatibilityTests.php';
+namespace Piece::ORM::Mapper;
 
-// {{{ Piece_ORM_Mapper_MssqlTest
+use Piece::ORM::Mapper::CompatibilityTests;
+use Piece::ORM::Mapper::MapperFactory;
+
+// {{{ Piece::ORM::Mapper::MssqlTest
 
 /**
  * Some tests for Microsoft SQL Server.
@@ -50,7 +53,7 @@ require_once dirname(__FILE__) . '/CompatibilityTests.php';
  * @version    Release: @package_version@
  * @since      Class available since Release 0.4.0
  */
-class Piece_ORM_Mapper_MssqlTest extends Piece_ORM_Mapper_CompatibilityTests
+class MssqlTest extends CompatibilityTests
 {
 
     // {{{ properties
@@ -89,7 +92,7 @@ class Piece_ORM_Mapper_MssqlTest extends Piece_ORM_Mapper_CompatibilityTests
      */
     public function testShouldProvideTheDefaultValueOfAGivenField()
     {
-        $mapper = Piece_ORM_Mapper_Factory::factory('Employees');
+        $mapper = MapperFactory::factory('Employees');
 
         $this->assertNull($mapper->getDefault('id'));
         $this->assertNull($mapper->getDefault('firstName'));
@@ -99,6 +102,17 @@ class Piece_ORM_Mapper_MssqlTest extends Piece_ORM_Mapper_CompatibilityTests
         $this->assertEquals('getdate', $mapper->getDefault('createdAt'));
         $this->assertEquals('getdate', $mapper->getDefault('updatedAt'));
         $this->assertEquals('0', $mapper->getDefault('lockVersion'));
+    }
+
+    /**#@-*/
+
+    /**#@+
+     * @access protected
+     */
+
+    protected function getTestDirectory()
+    {
+        return dirname(__FILE__);
     }
 
     /**#@-*/

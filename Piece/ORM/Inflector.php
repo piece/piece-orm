@@ -37,7 +37,7 @@
 
 namespace Piece::ORM;
 
-// {{{ Inflector
+// {{{ Piece::ORM::Inflector
 
 /**
  * A utility class for words operation.

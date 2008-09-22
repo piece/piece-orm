@@ -35,7 +35,9 @@
  * @since      File available since Release 0.2.0
  */
 
-// {{{ Piece_ORM_Mapper_RelationshipType
+namespace Piece::ORM::Mapper;
+
+// {{{ Piece::ORM::Mapper::RelationshipType
 
 /**
  * A class to handle relationship types itself.
@@ -46,7 +48,7 @@
  * @version    Release: @package_version@
  * @since      Class available since Release 0.2.0
  */
-class Piece_ORM_Mapper_RelationshipType
+class RelationshipType
 {
 
     // {{{ properties

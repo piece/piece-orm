@@ -36,9 +36,10 @@
  */
 
 namespace Piece::ORM;
+
 use Piece::ORM::Inflector;
 
-// {{{ InflectorTest
+// {{{ Piece::ORM::InflectorTest
 
 /**
  * Some tests for Piece::ORM::Inflector.

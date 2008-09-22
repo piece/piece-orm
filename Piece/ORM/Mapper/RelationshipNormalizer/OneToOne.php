@@ -35,7 +35,11 @@
  * @since      File available since Release 0.2.0
  */
 
-// {{{ Piece_ORM_Mapper_RelationshipNormalizer_OneToOne
+namespace Piece::ORM::Mapper::RelationshipNormalizer;
+
+use Piece::ORM::Mapper::RelationshipNormalizer::Common;
+
+// {{{ Piece::ORM::Mapper::RelationshipNormalizer::OneToOne
 
 /**
  * An relationship normalizer for One-to-One relationships.
@@ -46,7 +50,7 @@
  * @version    Release: @package_version@
  * @since      Class available since Release 0.2.0
  */
-class Piece_ORM_Mapper_RelationshipNormalizer_OneToOne extends Piece_ORM_Mapper_RelationshipNormalizer_Common
+class OneToOne extends Common
 {
 
     // {{{ properties

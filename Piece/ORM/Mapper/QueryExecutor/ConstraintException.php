@@ -35,7 +35,11 @@
  * @since      File available since Release 2.0.0
  */
 
-// {{{ Piece_ORM_Mapper_QueryExecutor_ConstraintException
+namespace Piece::ORM::Mapper::QueryExecutor;
+
+use Piece::ORM::Exception::PEARException;
+
+// {{{ Piece::ORM::Mapper::QueryExecutor::ConstraintException
 
 /**
  * An exception class which is raised when a constraint violation is occurred.
@@ -46,7 +50,7 @@
  * @version    Release: @package_version@
  * @since      Class available since Release 2.0.0
  */
-class Piece_ORM_Mapper_QueryExecutor_ConstraintException extends Piece_ORM_Exception_PEARException {}
+class ConstraintException extends PEARException {}
 
 // }}}
 

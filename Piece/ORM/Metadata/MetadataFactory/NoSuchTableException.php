@@ -4,7 +4,7 @@
 /**
  * PHP version 5
  *
- * Copyright (c) 2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>,
+ * Copyright (c) 2008 KUBO Atsuhiro <iteman@users.sourceforge.net>,
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,96 +29,28 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  * @package    Piece_ORM
- * @copyright  2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
+ * @copyright  2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License (revised)
  * @version    SVN: $Id$
- * @since      File available since Release 0.5.0
+ * @since      File available since Release 2.0.0
  */
 
-namespace Piece::ORM;
+namespace Piece::ORM::Metadata::MetadataFactory;
 
-// {{{ Piece::ORM::Env
+use Piece::ORM::Exception::PEARException;
+
+// {{{ Piece::ORM::Metadata::MetadataFactory::NoSuchTableException
 
 /**
- * The state holder for an application with Piece_ORM.
+ * An exception class which is raised when a table is not found in a database.
  *
  * @package    Piece_ORM
- * @copyright  2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
+ * @copyright  2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License (revised)
  * @version    Release: @package_version@
- * @since      Class available since Release 0.5.0
+ * @since      Class available since Release 2.0.0
  */
-class Env
-{
-
-    // {{{ properties
-
-    /**#@+
-     * @access public
-     */
-
-    /**#@-*/
-
-    /**#@+
-     * @access protected
-     */
-
-    /**#@-*/
-
-    /**#@+
-     * @access private
-     */
-
-    private static $_isProduction = true;
-
-    /**#@-*/
-
-    /**#@+
-     * @access public
-     */
-
-    // }}}
-    // {{{ setIsProduction()
-
-    /**
-     * Sets whether the current environment is production or not.
-     *
-     * @param boolean $isProduction
-     */
-    public static function setIsProduction($isProduction)
-    {
-        self::$_isProduction = $isProduction;
-    }
-
-    // }}}
-    // {{{ isProduction()
-
-    /**
-     * Returns whether the current environment is production or not.
-     *
-     * @return boolean
-     */
-    public static function isProduction()
-    {
-        return self::$_isProduction;
-    }
-
-    /**#@-*/
-
-    /**#@+
-     * @access protected
-     */
-
-    /**#@-*/
-
-    /**#@+
-     * @access private
-     */
-
-    /**#@-*/
-
-    // }}}
-}
+class NoSuchTableException extends PEARException {}
 
 // }}}
 

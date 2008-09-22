@@ -35,7 +35,12 @@
  * @since      File available since Release 0.1.0
  */
 
-// {{{ Piece_ORM_Metadata
+namespace Piece::ORM;
+
+use Piece::ORM::Inflector;
+use Piece::ORM::Context;
+
+// {{{ Piece::ORM::Metadata
 
 /**
  * The metadata interface.
@@ -46,7 +51,7 @@
  * @version    Release: @package_version@
  * @since      Class available since Release 0.1.0
  */
-class Piece_ORM_Metadata
+class Metadata
 {
 
     // {{{ properties
@@ -92,7 +97,7 @@ class Piece_ORM_Metadata
         $this->_tableName = $tableInfo[0]['table'];
         foreach ($tableInfo as $fieldInfo) {
             $this->_tableInfo[ $fieldInfo['name'] ] = $fieldInfo;
-            $this->_aliases[ strtolower(Piece_ORM_Inflector::camelize($fieldInfo['name'])) ] = $fieldInfo['name'];
+            $this->_aliases[ strtolower(Piece::ORM::Inflector::camelize($fieldInfo['name'])) ] = $fieldInfo['name'];
 
             if (strpos($fieldInfo['flags'], 'primary_key') !== false) {
                 $this->_primaryKey[] = $fieldInfo['name'];
@@ -148,7 +153,7 @@ class Piece_ORM_Metadata
      */
     public function getTableName($notQuoteIdentifier = false)
     {
-        $context = Piece_ORM_Context::singleton();
+        $context = Context::singleton();
         if (!$context->getUseMapperNameAsTableName() || $notQuoteIdentifier) {
             return $this->_tableName;
         } else {
@@ -378,11 +383,11 @@ class Piece_ORM_Metadata
      */
     private function _hasCompositePrimaryKey()
     {
-        if ($this->hasPrimaryKey()) {
-            return (boolean)(count($this->_primaryKey) > 1);
-        } else {
+        if (!$this->hasPrimaryKey()) {
             return false;
         }
+
+        return (boolean)(count($this->_primaryKey) > 1);
     }
 
     /**#@-*/

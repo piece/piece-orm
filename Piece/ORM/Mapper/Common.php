@@ -35,7 +35,19 @@
  * @since      File available since Release 0.1.0
  */
 
-// {{{ Piece_ORM_Mapper_Common
+namespace Piece::ORM::Mapper;
+
+use Piece::ORM::Metadata;
+use Piece::ORM::Exception::PEARException;
+use Piece::ORM::Inflector;
+use Piece::ORM::Mapper::QueryExecutor;
+use Piece::ORM::Mapper::ObjectPersister;
+use Piece::ORM::Mapper::Generator;
+use Piece::ORM::Mapper::LOB;
+use Piece::ORM::Exception;
+use Piece::ORM::Mapper::ObjectLoader;
+
+// {{{ Piece::ORM::Mapper::Common
 
 /**
  * The base class for mappers.
@@ -46,7 +58,7 @@
  * @version    Release: @package_version@
  * @since      Class available since Release 0.1.0
  */
-class Piece_ORM_Mapper_Common
+class Common
 {
 
     // {{{ properties
@@ -85,11 +97,11 @@ class Piece_ORM_Mapper_Common
     // {{{ __construct()
 
     /**
-     * Sets the Piece_ORM_Metadata object for this mapper.
+     * Sets the Piece::ORM::Metadata object for this mapper.
      *
-     * @param Piece_ORM_Metadata $metadata
+     * @param Piece::ORM::Metadata $metadata
      */
-    public function __construct(Piece_ORM_Metadata $metadata)
+    public function __construct(Metadata $metadata)
     {
         $this->_metadata = $metadata;
     }
@@ -119,8 +131,7 @@ class Piece_ORM_Mapper_Common
     public function findAllWithQuery($query)
     {
         $result = $this->executeQuery($query);
-        $objects = $this->_loadAllObjects($result);
-        return $objects;
+        return $this->_loadAllObjects($result);
     }
 
     // }}}
@@ -151,15 +162,15 @@ class Piece_ORM_Mapper_Common
      *
      * @param integer $limit
      * @param integer $offset
-     * @throws Piece_ORM_Exception_PEARException
+     * @throws Piece::ORM::Exception::PEARException
      */
     public function setLimit($limit, $offset = null)
     {
-        PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
+        ::PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
         $result = $this->_dbh->setLimit($limit, $offset);
-        PEAR::staticPopErrorHandling();
-        if (MDB2::isError($result)) {
-            throw new Piece_ORM_Exception_PEARException($result);
+        ::PEAR::staticPopErrorHandling();
+        if (::MDB2::isError($result)) {
+            throw new PEARException($result);
         }
     }
 
@@ -235,7 +246,7 @@ class Piece_ORM_Mapper_Common
     /**
      * Gets the metadata object for this mapper.
      *
-     * @return Piece_ORM_Metadata
+     * @return Piece::ORM::Metadata
      */
     public function getMetadata()
     {
@@ -254,7 +265,7 @@ class Piece_ORM_Mapper_Common
     {
         $object = new stdClass();
         foreach ($this->_metadata->getFieldNames() as $fieldName) {
-            $object->{ Piece_ORM_Inflector::camelize($fieldName, true) } = null;
+            $object->{ Inflector::camelize($fieldName, true) } = null;
         }
 
         return $object;
@@ -271,9 +282,12 @@ class Piece_ORM_Mapper_Common
      * @param MDB2_Statement_Common $sth
      * @return MDB2_Result_Common|integer
      */
-    public function executeQuery($query, $isManip = false, MDB2_Statement_Common $sth = null)
+    public function executeQuery($query,
+                                 $isManip = false,
+                                 MDB2_Statement_Common $sth = null
+                                 )
     {
-        $queryExecutor = new Piece_ORM_Mapper_QueryExecutor($this, $isManip);
+        $queryExecutor = new QueryExecutor($this, $isManip);
         return $queryExecutor->execute($query, $sth);
     }
 
@@ -309,7 +323,7 @@ class Piece_ORM_Mapper_Common
      */
     public function executeQueryWithCriteria($methodName, $criteria, $isManip = false)
     {
-        $queryExecutor = new Piece_ORM_Mapper_QueryExecutor($this, $isManip);
+        $queryExecutor = new QueryExecutor($this, $isManip);
         return $queryExecutor->executeWithCriteria($methodName, $criteria);
     }
 
@@ -319,9 +333,9 @@ class Piece_ORM_Mapper_Common
     /**
      * Sets the database handle for this mapper.
      *
-     * @param MDB2_Driver_Common $dbh
+     * @param ::MDB2_Driver_Common $dbh
      */
-    public function setConnection(MDB2_Driver_Common $dbh)
+    public function setConnection(::MDB2_Driver_Common $dbh)
     {
         $this->_dbh = $dbh;
     }
@@ -370,12 +384,11 @@ class Piece_ORM_Mapper_Common
      * Creates a LOB object.
      *
      * @param string $source
-     * @return Piece_ORM_Mapper_LOB
+     * @return Piece::ORM::Mapper::LOB
      */
     public function createLOB($source = null)
     {
-        $lob = new Piece_ORM_Mapper_LOB($this->_dbh, $this->_metadata, $source);
-        return $lob;
+        return new LOB($this->_dbh, $this->_metadata, $source);
     }
 
     // }}}
@@ -390,7 +403,7 @@ class Piece_ORM_Mapper_Common
      */
     public function getQuery($methodName)
     {
-        return $this->{ Piece_ORM_Mapper_Generator::getQueryProperty($methodName) };
+        return $this->{ Generator::getQueryProperty($methodName) };
     }
 
     // }}}
@@ -436,8 +449,8 @@ class Piece_ORM_Mapper_Common
             return ' ORDER BY ' . implode(', ', $this->_orders);
         }
 
-        if (!is_null($this->{ Piece_ORM_Mapper_Generator::getOrderByProperty($methodName) })) {
-            return ' ORDER BY ' . $this->{ Piece_ORM_Mapper_Generator::getOrderByProperty($methodName) };
+        if (!is_null($this->{ Generator::getOrderByProperty($methodName) })) {
+            return ' ORDER BY ' . $this->{ Generator::getOrderByProperty($methodName) };
         }
     }
 
@@ -518,7 +531,7 @@ class Piece_ORM_Mapper_Common
      * @param string   $methodName
      * @param stdClass $criteria
      * @return array
-     * @throws Piece_ORM_Exception
+     * @throws Piece::ORM::Exception
      */
     protected function findObjects($methodName, $criteria)
     {
@@ -528,7 +541,7 @@ class Piece_ORM_Mapper_Common
 
         if (!is_object($criteria)) {
             if ($methodName == 'findAll') {
-                throw new Piece_ORM_Exception('An unexpected value detected. findAll() can only receive object or null.');
+                throw new Exception('An unexpected value detected. findAll() can only receive object or null.');
             }
 
             $criteria = $this->_createCriteria($methodName, $criteria);
@@ -578,7 +591,10 @@ class Piece_ORM_Mapper_Common
      */
     protected function insertObject($methodName, $subject)
     {
-        $persister = new Piece_ORM_Mapper_ObjectPersister($this, $subject, $this->{ '__relationship__' . strtolower($methodName) });
+        $persister = new ObjectPersister($this,
+                                         $subject,
+                                         $this->{ '__relationship__' . strtolower($methodName) }
+                                         );
         return $persister->insert($methodName);
     }
 
@@ -594,7 +610,10 @@ class Piece_ORM_Mapper_Common
      */
     protected function deleteObjects($methodName, $subject)
     {
-        $persister = new Piece_ORM_Mapper_ObjectPersister($this, $subject, $this->{ '__relationship__' . strtolower($methodName) });
+        $persister = new ObjectPersister($this,
+                                         $subject,
+                                         $this->{ '__relationship__' . strtolower($methodName) }
+                                         );
         return $persister->delete($methodName);
     }
 
@@ -610,7 +629,10 @@ class Piece_ORM_Mapper_Common
      */
     protected function updateObjects($methodName, $subject)
     {
-        $persister = new Piece_ORM_Mapper_ObjectPersister($this, $subject, $this->{ '__relationship__' . strtolower($methodName) });
+        $persister = new ObjectPersister($this,
+                                         $subject,
+                                         $this->{ '__relationship__' . strtolower($methodName) }
+                                         );
         return $persister->update($methodName);
     }
 
@@ -626,13 +648,13 @@ class Piece_ORM_Mapper_Common
     /**
      * Loads all objects with a result object.
      *
-     * @param MDB2_Result $result
-     * @param array       $relationships
+     * @param ::MDB2_Result $result
+     * @param array         $relationships
      * @return array
      */
-    private function _loadAllObjects(MDB2_Result $result, $relationships = array())
+    private function _loadAllObjects(::MDB2_Result $result, $relationships = array())
     {
-        $loader = new Piece_ORM_Mapper_ObjectLoader($this, $result, $relationships);
+        $loader = new ObjectLoader($this, $result, $relationships);
         $objects = $loader->loadAll();
         $this->_loadCallback = null;
         return $objects;
@@ -647,34 +669,34 @@ class Piece_ORM_Mapper_Common
      * @param string $methodName
      * @param mixed  $criterion
      * @return stdClass
-     * @throws Piece_ORM_Exception
+     * @throws Piece::ORM::Exception
      */
     private function _createCriteria($methodName, $criterion)
     {
         if (!preg_match('/By(.+)$/', $methodName, $matches)) {
-            throw new Piece_ORM_Exception("An unexpected value detected. $methodName() can only receive object or null. Or the method name does not contain the appropriate field name.");
+            throw new Exception("An unexpected value detected. $methodName() can only receive object or null. Or the method name does not contain the appropriate field name.");
         }
 
         $criteria = new stdClass();
-        $criteria->{ Piece_ORM_Inflector::lowercaseFirstLetter($matches[1]) } = $criterion;
+        $criteria->{ Inflector::lowercaseFirstLetter($matches[1]) } = $criterion;
         return $criteria;
     }
 
     /**
      * Loads a value with a result object.
      *
-     * @param MDB2_Result $result
+     * @param ::MDB2_Result $result
      * @return string
-     * @throws Piece_ORM_Exception_PEARException
+     * @throws Piece::ORM::Exception::PEARException
      * @since Method available since Release 0.3.0
      */
-    private function _loadValue(MDB2_Result $result)
+    private function _loadValue(::MDB2_Result $result)
     {
-        PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
+        ::PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
         $value = $result->fetchOne();
-        PEAR::staticPopErrorHandling();
-        if (MDB2::isError($value)) {
-            throw new Piece_ORM_Exception_PEARException($value);
+        ::PEAR::staticPopErrorHandling();
+        if (::MDB2::isError($value)) {
+            throw new PEARException($value);
         }
 
         return $value;

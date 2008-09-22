@@ -35,7 +35,9 @@
  * @since      File available since Release 0.7.0
  */
 
-// {{{ Piece_ORM_MDB2_NativeTypeMapper_Common
+namespace Piece::ORM::MDB2::NativeTypeMapper;
+
+// {{{ Piece::ORM::MDB2::NativeTypeMapper::Common
 
 /**
  * A helper class to map native datatypes of the DBMS to MDB2 datatypes.
@@ -46,7 +48,7 @@
  * @version    Release: @package_version@
  * @since      Class available since Release 0.7.0
  */
-class Piece_ORM_MDB2_NativeTypeMapper_Common
+class Common
 {
 
     // {{{ properties
@@ -93,9 +95,9 @@ class Piece_ORM_MDB2_NativeTypeMapper_Common
     /**
      * Maps a native datatype of the DBMS to a MDB2 datatype.
      *
-     * @param MDB2_Driver_Common $dbh
+     * @param ::MDB2_Driver_Common $dbh
      */
-    public function mapNativeType(MDB2_Driver_Common $dbh)
+    public function mapNativeType(::MDB2_Driver_Common $dbh)
     {
         if (!array_key_exists($this->_driverName, self::$_nativeTypeMap)) {
             return;
@@ -115,11 +117,11 @@ class Piece_ORM_MDB2_NativeTypeMapper_Common
     /**
      * Gets the MDB2 datatype information of a native array description of a field.
      *
-     * @param MDB2_Driver_Common $dbh
+     * @param ::MDB2_Driver_Common $dbh
      * @param array              $field
      * @return array
      */
-    public function getMDB2TypeInfo(MDB2_Driver_Common $dbh, array $field)
+    public function getMDB2TypeInfo(::MDB2_Driver_Common $dbh, array $field)
     {
         return array(array(self::$_nativeTypeMap[ $this->_driverName ][ $field['type'] ]),
                      null,

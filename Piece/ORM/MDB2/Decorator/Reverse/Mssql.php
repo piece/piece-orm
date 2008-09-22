@@ -35,7 +35,9 @@
  * @since      File available since Release 0.5.0
  */
 
-// {{{ Piece_ORM_MDB2_Decorator_Reverse_Mssql
+namespace Piece::ORM::MDB2::Decorator::Reverse;
+
+// {{{ Piece::ORM::MDB2::Decorator::Reverse::Mssql
 
 /**
  * The decorator for the schema reverse engineering module of the MDB2 Microsoft SQL
@@ -47,7 +49,7 @@
  * @version    Release: @package_version@
  * @since      Class available since Release 0.5.0
  */
-class Piece_ORM_MDB2_Decorator_Reverse_Mssql
+class Mssql
 {
 
     // {{{ properties
@@ -80,12 +82,12 @@ class Piece_ORM_MDB2_Decorator_Reverse_Mssql
     // {{{ __construct()
 
     /**
-     * Sets a MDB2_Driver_Reverse_mssql instance to the property.
+     * Sets a ::MDB2_Driver_Reverse_mssql instance to the property.
      *
-     * @param MDB2_Driver_Reverse_mssql $reverse
+     * @param ::MDB2_Driver_Reverse_mssql $reverse
      * @param string $field
      */
-    public function __construct(MDB2_Driver_Reverse_mssql $reverse)
+    public function __construct(::MDB2_Driver_Reverse_mssql $reverse)
     {
         $this->_reverse = $reverse;
     }
@@ -96,7 +98,7 @@ class Piece_ORM_MDB2_Decorator_Reverse_Mssql
     /**
      * Delegates to the original object.
      *
-     * @return MDB2_Driver_Common|MDB2_Error
+     * @return ::MDB2_Driver_Common|::MDB2_Error
      */
     public function getDBInstance()
     {
@@ -111,7 +113,7 @@ class Piece_ORM_MDB2_Decorator_Reverse_Mssql
      *
      * @param string $table
      * @param string $field
-     * @return array|MDB2_Error
+     * @return array|::MDB2_Error
      */
     public function getTableFieldDefinition($table, $field)
     {
@@ -126,13 +128,13 @@ class Piece_ORM_MDB2_Decorator_Reverse_Mssql
      *
      * @param string $table
      * @param string $index_name
-     * @return array|MDB2_Error
-     * @see MDB2_Driver_Reverse_mssql::getTableIndexDefinition()
+     * @return array|::MDB2_Error
+     * @see ::MDB2_Driver_Reverse_mssql::getTableIndexDefinition()
      */
     public function getTableIndexDefinition($table, $index_name)
     {
         $db = $this->getDBInstance();
-        if (PEAR::isError($db)) {
+        if (::PEAR::isError($db)) {
             return $db;
         }
 
@@ -162,13 +164,13 @@ ORDER BY
 
         $index_name_mdb2 = $db->getIndexName($index_name);
         $result = $db->queryRow(sprintf($query, $index_name_mdb2));
-        if (!PEAR::isError($result) && !is_null($result)) {
+        if (!::PEAR::isError($result) && !is_null($result)) {
             // apply 'idxname_format' only if the query succeeded, otherwise
             // fallback to the given $index_name, without transformation
             $index_name = $index_name_mdb2;
         }
         $result = $db->query(sprintf($query, $index_name));
-        if (PEAR::isError($result)) {
+        if (::PEAR::isError($result)) {
             return $result;
         }
 
@@ -206,7 +208,7 @@ ORDER BY
      *
      * @param string $table
      * @param string $index
-     * @return array|MDB2_Error
+     * @return array|::MDB2_Error
      */
     public function getTableConstraintDefinition($table, $index)
     {
@@ -220,7 +222,7 @@ ORDER BY
      * Delegates to the original object.
      *
      * @param string $sequence
-     * @return array|MDB2_Error
+     * @return array|::MDB2_Error
      */
     public function getSequenceDefinition($sequence)
     {
@@ -234,7 +236,7 @@ ORDER BY
      * Delegates to the original object.
      *
      * @param string $trigger
-     * @return array|MDB2_Error
+     * @return array|::MDB2_Error
      */
     public function getTriggerDefinition($trigger)
     {
@@ -247,15 +249,15 @@ ORDER BY
     /**
      * Returns information about a table or a result set
      *
-     * @param string|MDB2_Result_Common $result
-     * @param integer                   $mode
-     * @return array|MDB2_Error
-     * @see MDB2_Driver_Reverse_Common::tableInfo()
+     * @param string|::MDB2_Result_Common $result
+     * @param integer                     $mode
+     * @return array|::MDB2_Error
+     * @see ::MDB2_Driver_Reverse_Common::tableInfo()
      */
     public function tableInfo($result, $mode = null)
     {
         $db = $this->getDBInstance();
-        if (PEAR::isError($db)) {
+        if (::PEAR::isError($db)) {
             return $db;
         }
 
@@ -266,7 +268,7 @@ ORDER BY
 
         $db->loadModule('Manager', null, true);
         $fields = $db->manager->listTableFields($result);
-        if (PEAR::isError($fields)) {
+        if (::PEAR::isError($fields)) {
             return $fields;
         }
 
@@ -276,14 +278,14 @@ ORDER BY
         $db->setOption('idxname_format', '%s');
 
         $indexes = $db->manager->listTableIndexes($result);
-        if (PEAR::isError($indexes)) {
+        if (::PEAR::isError($indexes)) {
             $db->setOption('idxname_format', $idxname_format);
             return $indexes;
         }
 
         foreach ($indexes as $index) {
             $definition = $this->getTableIndexDefinition($result, $index);
-            if (PEAR::isError($definition)) {
+            if (::PEAR::isError($definition)) {
                 $db->setOption('idxname_format', $idxname_format);
                 return $definition;
             }
@@ -295,13 +297,13 @@ ORDER BY
         }
 
         $constraints = $db->manager->listTableConstraints($result);
-        if (PEAR::isError($constraints)) {
+        if (::PEAR::isError($constraints)) {
             return $constraints;
         }
 
         foreach ($constraints as $constraint) {
             $definition = $this->getTableConstraintDefinition($result, $constraint);
-            if (PEAR::isError($definition)) {
+            if (::PEAR::isError($definition)) {
                 $db->setOption('idxname_format', $idxname_format);
                 return $definition;
             }
@@ -323,7 +325,7 @@ ORDER BY
 
         foreach ($fields as $i => $field) {
             $definition = $this->getTableFieldDefinition($result, $field);
-            if (PEAR::isError($definition)) {
+            if (::PEAR::isError($definition)) {
                 $db->setOption('idxname_format', $idxname_format);
                 return $definition;
             }
@@ -380,12 +382,12 @@ ORDER BY
      *
      * @param string $tableName
      * @param array  $tableInfo
-     * @return array|MDB2_Error
+     * @return array|::MDB2_Error
      */
     private function _findAutoIncrementField($tableName, array $tableInfo)
     {
         $dbh = $this->getDBInstance();
-        if (PEAR::isError($dbh)) {
+        if (::PEAR::isError($dbh)) {
             return $dbh;
         }
 

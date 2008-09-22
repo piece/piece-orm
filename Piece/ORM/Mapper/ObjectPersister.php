@@ -35,7 +35,15 @@
  * @since      File available since Release 0.2.0
  */
 
-// {{{ Piece_ORM_Mapper_ObjectPersister
+namespace Piece::ORM::Mapper;
+
+use Piece::ORM::Mapper::Common;
+use Piece::ORM::Mapper::RelationshipType;
+use Piece::ORM::Exception;
+use Piece::ORM::Inflector;
+use Piece::ORM::Exception::PEARException;
+
+// {{{ Piece::ORM::Mapper::ObjectPersister
 
 /**
  * An object persister for storing objects to database.
@@ -46,7 +54,7 @@
  * @version    Release: @package_version@
  * @since      Class available since Release 0.2.0
  */
-class Piece_ORM_Mapper_ObjectPersister
+class ObjectPersister
 {
 
     // {{{ properties
@@ -85,14 +93,11 @@ class Piece_ORM_Mapper_ObjectPersister
     /**
      * Initializes properties with the given values.
      *
-     * @param Piece_ORM_Mapper_Common $mapper
-     * @param mixed                   $subject
-     * @param array                   $relationships
+     * @param Piece::ORM::Mapper::Common $mapper
+     * @param mixed                      $subject
+     * @param array                      $relationships
      */
-    public function __construct(Piece_ORM_Mapper_Common $mapper,
-                                $subject,
-                                array $relationships
-                                )
+    public function __construct(Common $mapper, $subject, array $relationships)
     {
         $metadata = $mapper->getMetadata();
 
@@ -109,9 +114,11 @@ class Piece_ORM_Mapper_ObjectPersister
         }
 
         if (count($relationships)) {
-            foreach (Piece_ORM_Mapper_RelationshipType::getRelationshipTypes() as $relationshipType) {
-                $associatedObjectsPersisterClass = 'Piece_ORM_Mapper_AssociatedObjectPersister_' . ucwords($relationshipType);
-                include_once str_replace('_', '/', $associatedObjectsPersisterClass) . '.php';
+            foreach (RelationshipType::getRelationshipTypes() as $relationshipType) {
+                $associatedObjectsPersisterClass =
+                    __NAMESPACE__ .
+                    '::AssociatedObjectPersister::' .
+                    ucwords($relationshipType);
                 $this->_associatedObjectPersisters[$relationshipType] = new $associatedObjectsPersisterClass($subject);
             }
         }
@@ -130,19 +137,19 @@ class Piece_ORM_Mapper_ObjectPersister
      *
      * @param string $methodName
      * @return integer
-     * @throws Piece_ORM_Exception
+     * @throws Piece::ORM::Exception
      */
     public function insert($methodName)
     {
         if (!is_object($this->_subject)) {
-            throw new Piece_ORM_Exception("An unexpected value detected. $methodName() can only receive object.");
+            throw new Exception("An unexpected value detected. $methodName() can only receive object.");
         }
 
         $this->_mapper->executeQueryWithCriteria($methodName, $this->_subject, true);
 
         $primaryKey = $this->_metadata->getPrimaryKey();
         if ($primaryKey) {
-            $primaryKeyProperty = Piece_ORM_Inflector::camelize($primaryKey, true);
+            $primaryKeyProperty = Inflector::camelize($primaryKey, true);
         }
 
         if ($this->_metadata->hasID()) {
@@ -166,16 +173,16 @@ class Piece_ORM_Mapper_ObjectPersister
      *
      * @param string $methodName
      * @return integer
-     * @throws Piece_ORM_Exception
+     * @throws Piece::ORM::Exception
      */
     public function update($methodName)
     {
         if (!is_object($this->_subject)) {
-            throw new Piece_ORM_Exception("An unexpected value detected. $methodName() cannot receive non-object.");
+            throw new Exception("An unexpected value detected. $methodName() cannot receive non-object.");
         }
 
         if ($this->_metadata->hasPrimaryKey() && !$this->_validatePrimaryValues()) {
-            throw new Piece_ORM_Exception("An unexpected value detected. Correct values are required for the primary keys to invoke $methodName().");
+            throw new Exception("An unexpected value detected. Correct values are required for the primary keys to invoke $methodName().");
         }
 
         $affectedRows = $this->_mapper->executeQueryWithCriteria($methodName, $this->_subject, true);
@@ -195,16 +202,16 @@ class Piece_ORM_Mapper_ObjectPersister
      *
      * @param string $methodName
      * @return integer
-     * @throws Piece_ORM_Exception
+     * @throws Piece::ORM::Exception
      */
     public function delete($methodName)
     {
         if (!is_object($this->_subject)) {
-            throw new Piece_ORM_Exception("An unexpected value detected. $methodName() cannot receive non-object.");
+            throw new Exception("An unexpected value detected. $methodName() cannot receive non-object.");
         }
 
         if ($this->_metadata->hasPrimaryKey() && !$this->_validatePrimaryValues()) {
-            throw new Piece_ORM_Exception("An unexpected value detected. Correct values are required for the primary keys to invoke $methodName().");
+            throw new Exception("An unexpected value detected. Correct values are required for the primary keys to invoke $methodName().");
         }
 
         foreach ($this->_relationships as $relationship) {
@@ -237,7 +244,7 @@ class Piece_ORM_Mapper_ObjectPersister
     private function _validatePrimaryValues()
     {
         foreach ($this->_metadata->getPrimaryKeys() as $primaryKey) {
-            $primaryKeyProperty = Piece_ORM_Inflector::camelize($primaryKey, true);
+            $primaryKeyProperty = Inflector::camelize($primaryKey, true);
             if (!property_exists($this->_subject, $primaryKeyProperty)) {
                 continue;
             }
@@ -261,20 +268,20 @@ class Piece_ORM_Mapper_ObjectPersister
      * Returns the value of an ID field if a table has an ID field.
      *
      * @return integer
-     * @throws Piece_ORM_Exception_PEARException
+     * @throws Piece::ORM::Exception::PEARException
      * @since Method available since Release 1.1.0
      */
     private function _getLastInsertID()
     {
         if ($this->_metadata->hasID()) {
             $dbh = $this->_mapper->getConnection();
-            PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
+            ::PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
             $id = $dbh->lastInsertID($this->_metadata->getTableName(true),
                                      $this->_metadata->getPrimaryKey()
                                      );
-            PEAR::staticPopErrorHandling();
-            if (MDB2::isError($id)) {
-                throw new Piece_ORM_Exception_PEARException($id);
+            ::PEAR::staticPopErrorHandling();
+            if (::MDB2::isError($id)) {
+                throw new PEARException($id);
             }
 
             return $id;

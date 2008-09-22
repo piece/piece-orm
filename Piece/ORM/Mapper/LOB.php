@@ -35,7 +35,13 @@
  * @since      File available since Release 1.0.0
  */
 
-// {{{ Piece_ORM_Mapper_LOB
+namespace Piece::ORM::Mapper;
+
+use Piece::ORM::Metadata;
+use Piece::ORM::Exception::PEARException;
+use Piece::ORM::Exception;
+
+// {{{ Piece::ORM::Mapper::LOB
 
 /**
  * The LOB representation class.
@@ -46,7 +52,7 @@
  * @version    Release: @package_version@
  * @since      Class available since Release 1.0.0
  */
-class Piece_ORM_Mapper_LOB
+class LOB
 {
 
     // {{{ properties
@@ -85,12 +91,12 @@ class Piece_ORM_Mapper_LOB
     /**
      * Sets a database handle and a LOB source.
      *
-     * @param MDB2_Driver_Common $dbh
-     * @param Piece_ORM_Metadata $metadata
-     * @param string|resource    $source
+     * @param ::MDB2_Driver_Common $dbh
+     * @param Piece::ORM::Metadata $metadata
+     * @param string|resource      $source
      */
-    public function __construct(MDB2_Driver_Common $dbh,
-                                Piece_ORM_Metadata $metadata,
+    public function __construct(::MDB2_Driver_Common $dbh,
+                                Metadata $metadata,
                                 $source
                                 )
     {
@@ -148,29 +154,29 @@ class Piece_ORM_Mapper_LOB
      * Loads the LOB data of this field.
      *
      * @return string
-     * @throws Piece_ORM_Exception_PEARException
-     * @throws Piece_ORM_Exception
+     * @throws Piece::ORM::Exception::PEARException
+     * @throws Piece::ORM::Exception
      */
     public function load()
     {
-        PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
+        ::PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
         $datatype = $this->_dbh->loadModule('Datatype');
-        PEAR::staticPopErrorHandling();
-        if (MDB2::isError($datatype)) {
-            throw new Piece_ORM_Exception_PEARException($datatype);
+        ::PEAR::staticPopErrorHandling();
+        if (::MDB2::isError($datatype)) {
+            throw new PEARException($datatype);
         }
 
-        PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
+        ::PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
         $lob = $datatype->convertResult($this->_value,
                                         $this->_metadata->getDatatype($this->_fieldName)
                                         );
-        PEAR::staticPopErrorHandling();
-        if (MDB2::isError($lob)) {
-            throw new Piece_ORM_Exception_PEARException($lob);
+        ::PEAR::staticPopErrorHandling();
+        if (::MDB2::isError($lob)) {
+            throw new PEARException($lob);
         }
 
         if (!is_resource($lob)) {
-            throw new Piece_ORM_Exception('An unexpected value detected. $datatype->convertResult() should return a resource.');
+            throw new Exception('An unexpected value detected. $datatype->convertResult() should return a resource.');
         }
 
         $data = '';

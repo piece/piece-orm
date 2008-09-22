@@ -35,7 +35,16 @@
  * @since      File available since Release 1.1.0
  */
 
-// {{{ Piece_ORM_Mapper_QueryBuilder
+namespace Piece::ORM::Mapper;
+
+use Piece::ORM::Mapper::Common;
+use Piece::ORM::Exception;
+use Piece::ORM::Mapper::QueryType;
+use Piece::ORM::Inflector;
+use Piece::ORM::Exception::PEARException;
+use Piece::ORM::Mapper::LOB;
+
+// {{{ Piece::ORM::Mapper::QueryBuilder
 
 /**
  * The query builder which builds a query based on a query source and criteria.
@@ -46,7 +55,7 @@
  * @version    Release: @package_version@
  * @since      Class available since Release 1.1.0
  */
-class Piece_ORM_Mapper_QueryBuilder
+class QueryBuilder
 {
 
     // {{{ properties
@@ -86,16 +95,12 @@ class Piece_ORM_Mapper_QueryBuilder
     /**
      * Initializes properties with the given values.
      *
-     * @param Piece_ORM_Mapper_Common $mapper
-     * @param string                  $methodName
-     * @param stdClass                $criteria
-     * @param boolean                 $isManip
+     * @param Piece::ORM::Mapper::Common $mapper
+     * @param string                     $methodName
+     * @param stdClass                   $criteria
+     * @param boolean                    $isManip
      */
-    public function __construct(Piece_ORM_Mapper_Common $mapper,
-                                $methodName,
-                                $criteria,
-                                $isManip
-                                )
+    public function __construct(Common $mapper, $methodName, $criteria, $isManip)
     {
         $this->_metadata = $mapper->getMetadata();
         $this->_mapper = $mapper;
@@ -116,7 +121,7 @@ class Piece_ORM_Mapper_QueryBuilder
      * Builds a query based on a query source and criteria.
      *
      * @return array
-     * @throws Piece_ORM_Exception
+     * @throws Piece::ORM::Exception
      */
     public function build()
     {
@@ -129,11 +134,11 @@ class Piece_ORM_Mapper_QueryBuilder
         ini_restore('track_errors');
         error_reporting($oldLevel);
         if (!is_null($message)) {
-            throw new Piece_ORM_Exception("Failed to build a query for the method [ {$this->_methodName} ] for any reasons. See below for more details.
+            throw new Exception("Failed to build a query for the method [ {$this->_methodName} ] for any reasons. See below for more details.
  $message");
         }
 
-        if (Piece_ORM_Mapper_QueryType::isFindAll($this->_methodName)) {
+        if (QueryType::isFindAll($this->_methodName)) {
             $this->_mapper->setLastQueryForGetCount($evaluatedQuery);
         } else {
             $this->_mapper->setLastQueryForGetCount(null);
@@ -206,20 +211,20 @@ class Piece_ORM_Mapper_QueryBuilder
      */
     private function _setCurrentTimestampToCriteria()
     {
-        if (Piece_ORM_Mapper_QueryType::isInsert($this->_methodName)
+        if (QueryType::isInsert($this->_methodName)
             && $this->_metadata->getDatatype('created_at') == 'timestamp'
             ) {
-            $createdAtProperty = Piece_ORM_Inflector::camelize('created_at', true);
+            $createdAtProperty = Inflector::camelize('created_at', true);
             if (property_exists($this->_criteria, $createdAtProperty)) {
                 $this->_quotedCriteria->$createdAtProperty = 'CURRENT_TIMESTAMP';
             }
         }
 
-        if ((Piece_ORM_Mapper_QueryType::isInsert($this->_methodName)
-             || Piece_ORM_Mapper_QueryType::isUpdate($this->_methodName))
+        if ((QueryType::isInsert($this->_methodName)
+             || QueryType::isUpdate($this->_methodName))
             && $this->_metadata->getDatatype('updated_at') == 'timestamp'
             ) {
-            $updatedAtProperty = Piece_ORM_Inflector::camelize('updated_at', true);
+            $updatedAtProperty = Inflector::camelize('updated_at', true);
             if (property_exists($this->_criteria, $updatedAtProperty)) {
                 $this->_quotedCriteria->$updatedAtProperty = 'CURRENT_TIMESTAMP';
             }
@@ -245,7 +250,7 @@ class Piece_ORM_Mapper_QueryBuilder
      * Creates a prepared statement for LOB on insert()/update().
      *
      * @param string $query
-     * @return MDB2_Statement_Common
+     * @return ::MDB2_Statement_Common
      */
     private function _createPreparedStatement($query)
     {
@@ -273,8 +278,8 @@ class Piece_ORM_Mapper_QueryBuilder
      *
      * @param string $query
      * @param array  $placeHolderFields
-     * @return MDB2_Statement_Common
-     * @throws Piece_ORM_Exception_PEARException
+     * @return ::MDB2_Statement_Common
+     * @throws Piece::ORM::Exception::PEARException
      */
     private function _buildPreparedStatement($query, $placeHolderFields)
     {
@@ -285,17 +290,17 @@ class Piece_ORM_Mapper_QueryBuilder
         }
 
         $dbh = $this->_mapper->getConnection();
-        PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
+        ::PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
         $sth = $dbh->prepare($query, $types, MDB2_PREPARE_MANIP);
-        PEAR::staticPopErrorHandling();
-        if (MDB2::isError($sth)) {
-            throw new Piece_ORM_Exception_PEARException($sth);
+        ::PEAR::staticPopErrorHandling();
+        if (::MDB2::isError($sth)) {
+            throw new PEARException($sth);
         }
 
         foreach ($types as $placeHolderField => $type) {
             do {
                 $placeHolderProperty =
-                    Piece_ORM_Inflector::camelize($placeHolderField, true);
+                    Inflector::camelize($placeHolderField, true);
                 if (!property_exists($this->_criteria, $placeHolderProperty)) {
                     $value = null;
                     break;
@@ -316,7 +321,7 @@ class Piece_ORM_Mapper_QueryBuilder
                     break;
                 }
 
-                if (strtolower(get_class($this->_criteria->$placeHolderProperty)) != strtolower('Piece_ORM_Mapper_LOB')) {
+                if (!$this->_criteria->$placeHolderProperty instanceof LOB) {
                     $value = null;
                     break;
                 }

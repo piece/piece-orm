@@ -35,7 +35,15 @@
  * @since      File available since Release 0.1.0
  */
 
-// {{{ Piece_ORM_Mapper_Generator
+namespace Piece::ORM::Mapper;
+
+use Piece::ORM::Metadata;
+use Piece::ORM::Exception;
+use Piece::ORM::Mapper::RelationshipType;
+use Piece::ORM::Inflector;
+use Piece::ORM::Mapper::QueryType;
+
+// {{{ Piece::ORM::Mapper::Generator
 
 /**
  * The source code generator which generates a mapper source based on a given
@@ -47,7 +55,7 @@
  * @version    Release: @package_version@
  * @since      Class available since Release 0.1.0
  */
-class Piece_ORM_Mapper_Generator
+class Generator
 {
 
     // {{{ properties
@@ -91,16 +99,16 @@ class Piece_ORM_Mapper_Generator
     /**
      * Initializes the properties with the arguments.
      *
-     * @param string             $mapperClass
-     * @param string             $mapperName
-     * @param array              $config
-     * @param Piece_ORM_Metadata $metadata
-     * @param array              $baseMapperMethods
+     * @param string               $mapperClass
+     * @param string               $mapperName
+     * @param array                $config
+     * @param Piece::ORM::Metadata $metadata
+     * @param array                $baseMapperMethods
      */
     public function __construct($mapperClass,
                                 $mapperName,
                                 array $config,
-                                Piece_ORM_Metadata $metadata,
+                                Metadata $metadata,
                                 $baseMapperMethods
                                 )
     {
@@ -127,7 +135,9 @@ class Piece_ORM_Mapper_Generator
         $this->_generateUpdate();
         $this->_generateFromConfiguration();
 
-        return "class {$this->_mapperClass} extends Piece_ORM_Mapper_Common
+        return "namespace Piece::ORM::Mapper;
+use Piece::ORM::Mapper::Common;
+class {$this->_mapperClass} extends Common
 {\n" .
             implode("\n", $this->_propertyDefinitions['query']) . "\n" .
             implode("\n", $this->_propertyDefinitions['relationship']) . "\n" .
@@ -143,21 +153,21 @@ class Piece_ORM_Mapper_Generator
      *
      * @param array $relationship
      * @return array
-     * @throws Piece_ORM_Exception
+     * @throws Piece::ORM::Exception
      */
     public function normalizeRelationshipDefinition(array $relationship)
     {
         if (!array_key_exists('type', $relationship)) {
-            throw new Piece_ORM_Exception('The element [ type ] is required to generate a relationship property declaration.');
+            throw new Exception('The element [ type ] is required to generate a relationship property declaration.');
         }
 
-        if (!Piece_ORM_Mapper_RelationshipType::isValid($relationship['type'])) {
-            throw new Piece_ORM_Exception('The value of the element [ type ] must be one of ' . implode(', ', Piece_ORM_Mapper_RelationshipType::getRelationshipTypes()));
+        if (!RelationshipType::isValid($relationship['type'])) {
+            throw new Exception('The value of the element [ type ] must be one of ' . implode(', ', RelationshipType::getRelationshipTypes()));
         }
 
-        $relationshipNormalizerClass = 'Piece_ORM_Mapper_RelationshipNormalizer_' . ucwords($relationship['type']);
-        include_once str_replace('_', '/', $relationshipNormalizerClass) . '.php';
-        $relationshipNormalizer = new $relationshipNormalizerClass($relationship, $this->_metadata);
+        $relationshipNormalizerClass = 'Piece::ORM::Mapper::RelationshipNormalizer::' . ucwords($relationship['type']);
+        $relationshipNormalizer =
+            new $relationshipNormalizerClass($relationship, $this->_metadata);
         return $relationshipNormalizer->normalize();
     }
 
@@ -174,7 +184,7 @@ class Piece_ORM_Mapper_Generator
     public function generateExpression($fieldName)
     {
         if (!$this->_metadata->isLOB($fieldName)) {
-            return '$' . Piece_ORM_Inflector::camelize($fieldName, true);
+            return '$' . Inflector::camelize($fieldName, true);
         } else {
             return ":$fieldName";
         }
@@ -232,7 +242,7 @@ class Piece_ORM_Mapper_Generator
      * @param string $query
      * @param array  $relationships
      * @param string $orderBy
-     * @throws Piece_ORM_Exception
+     * @throws Piece::ORM::Exception
      */
     private function _addFind($methodName,
                               $query,
@@ -241,7 +251,7 @@ class Piece_ORM_Mapper_Generator
                               )
     {
         if (!$this->_validateMethodName($methodName)) {
-            throw new Piece_ORM_Exception("Cannot use the method name [ $methodName ] since it is a reserved for internal use only.");
+            throw new Exception("Cannot use the method name [ $methodName ] since it is a reserved for internal use only.");
         }
 
         $this->_addPropertyDefinitions($methodName, $query, $relationships, $orderBy);
@@ -262,12 +272,12 @@ class Piece_ORM_Mapper_Generator
      * @param string $methodName
      * @param string $query
      * @param array  $relationships
-     * @throws Piece_ORM_Exception
+     * @throws Piece::ORM::Exception
      */
     private function _addInsert($methodName, $query, array $relationships = array())
     {
         if (!$this->_validateMethodName($methodName)) {
-            throw new Piece_ORM_Exception("Cannot use the method name [ $methodName ] since it is a reserved for internal use only.");
+            throw new Exception("Cannot use the method name [ $methodName ] since it is a reserved for internal use only.");
         }
 
         $this->_addPropertyDefinitions($methodName, $query, $relationships);
@@ -289,7 +299,7 @@ class Piece_ORM_Mapper_Generator
      * @param string $query
      * @param array  $relationships
      * @param string $orderBy
-     * @throws Piece_ORM_Exception
+     * @throws Piece::ORM::Exception
      */
     private function _addFindAll($methodName,
                                  $query = null,
@@ -298,7 +308,7 @@ class Piece_ORM_Mapper_Generator
                                  )
     {
         if (!$this->_validateMethodName($methodName)) {
-            throw new Piece_ORM_Exception("Cannot use the method name [ $methodName ] since it is a reserved for internal use only.");
+            throw new Exception("Cannot use the method name [ $methodName ] since it is a reserved for internal use only.");
         }
 
         $this->_addPropertyDefinitions($methodName, $query, $relationships, $orderBy);
@@ -316,7 +326,7 @@ class Piece_ORM_Mapper_Generator
     /**
      * Generates methods from configuration.
      *
-     * @throws Piece_ORM_Exception
+     * @throws Piece::ORM::Exception
      */
     private function _generateFromConfiguration()
     {
@@ -325,7 +335,7 @@ class Piece_ORM_Mapper_Generator
         }
 
         foreach ($this->_config as $method) {
-            if (Piece_ORM_Mapper_QueryType::isFindAll($method['name'])) {
+            if (QueryType::isFindAll($method['name'])) {
                 $this->_addFindAll($method['name'],
                                    @$method['query'],
                                    (array)@$method['relationship'],
@@ -334,7 +344,7 @@ class Piece_ORM_Mapper_Generator
                 continue;
             }
 
-            if (Piece_ORM_Mapper_QueryType::isFindOne($method['name'])) {
+            if (QueryType::isFindOne($method['name'])) {
                 $this->_addFindOne($method['name'],
                                    @$method['query'],
                                    @$method['orderBy']
@@ -342,7 +352,7 @@ class Piece_ORM_Mapper_Generator
                 continue;
             }
 
-            if (Piece_ORM_Mapper_QueryType::isFind($method['name'])) {
+            if (QueryType::isFind($method['name'])) {
                 $this->_addFind($method['name'],
                                 @$method['query'],
                                 (array)@$method['relationship'],
@@ -351,7 +361,7 @@ class Piece_ORM_Mapper_Generator
                 continue;
             }
 
-            if (Piece_ORM_Mapper_QueryType::isInsert($method['name'])) {
+            if (QueryType::isInsert($method['name'])) {
                 $this->_addInsert($method['name'],
                                   @$method['query'],
                                   (array)@$method['relationship']
@@ -359,7 +369,7 @@ class Piece_ORM_Mapper_Generator
                 continue;
             }
 
-            if (Piece_ORM_Mapper_QueryType::isUpdate($method['name'])) {
+            if (QueryType::isUpdate($method['name'])) {
                 $this->_addUpdate($method['name'],
                                   @$method['query'],
                                   (array)@$method['relationship']
@@ -367,7 +377,7 @@ class Piece_ORM_Mapper_Generator
                 continue;
             }
 
-            if (Piece_ORM_Mapper_QueryType::isDelete($method['name'])) {
+            if (QueryType::isDelete($method['name'])) {
                 $this->_addDelete($method['name'],
                                   @$method['query'],
                                   (array)@$method['relationship']
@@ -375,7 +385,7 @@ class Piece_ORM_Mapper_Generator
                 continue;
             }
 
-            throw new Piece_ORM_Exception("Invalid method name [ {$method['name']} ] detected.");
+            throw new Exception("Invalid method name [ {$method['name']} ] detected.");
         }
     }
 
@@ -391,9 +401,9 @@ class Piece_ORM_Mapper_Generator
             $datatype = $this->_metadata->getDatatype($fieldName);
             if ($datatype == 'integer' || $datatype == 'text') {
                 
-                $camelizedFieldName = Piece_ORM_Inflector::camelize($fieldName);
-                $this->_addFind("findBy$camelizedFieldName", "SELECT * FROM \$__table WHERE $fieldName = \$" . Piece_ORM_Inflector::lowerCaseFirstLetter($camelizedFieldName));
-                $this->_addFindAll("findAllBy$camelizedFieldName", "SELECT * FROM \$__table WHERE $fieldName = \$" . Piece_ORM_Inflector::lowerCaseFirstLetter($camelizedFieldName));
+                $camelizedFieldName = Inflector::camelize($fieldName);
+                $this->_addFind("findBy$camelizedFieldName", "SELECT * FROM \$__table WHERE $fieldName = \$" . Inflector::lowerCaseFirstLetter($camelizedFieldName));
+                $this->_addFindAll("findAllBy$camelizedFieldName", "SELECT * FROM \$__table WHERE $fieldName = \$" . Inflector::lowerCaseFirstLetter($camelizedFieldName));
             }
         }
 
@@ -434,12 +444,12 @@ class Piece_ORM_Mapper_Generator
      * @param string $methodName
      * @param string $query
      * @param array  $relationships
-     * @throws Piece_ORM_Exception
+     * @throws Piece::ORM::Exception
      */
     private function _addDelete($methodName, $query, array $relationships = array())
     {
         if (!$this->_validateMethodName($methodName)) {
-            throw new Piece_ORM_Exception("Cannot use the method name [ $methodName ] since it is a reserved for internal use only.");
+            throw new Exception("Cannot use the method name [ $methodName ] since it is a reserved for internal use only.");
         }
 
         $this->_addPropertyDefinitions($methodName, $query, $relationships);
@@ -474,12 +484,12 @@ class Piece_ORM_Mapper_Generator
      * @param string $methodName
      * @param string $query
      * @param array  $relationships
-     * @throws Piece_ORM_Exception
+     * @throws Piece::ORM::Exception
      */
     private function _addUpdate($methodName, $query, array $relationships = array())
     {
         if (!$this->_validateMethodName($methodName)) {
-            throw new Piece_ORM_Exception("Cannot use the method name [ $methodName ] since it is a reserved for internal use only.");
+            throw new Exception("Cannot use the method name [ $methodName ] since it is a reserved for internal use only.");
         }
 
         $this->_addPropertyDefinitions($methodName, $query, $relationships);
@@ -543,7 +553,7 @@ class Piece_ORM_Mapper_Generator
      * @param string $query
      * @param array  $relationships
      * @param string $orderBy
-     * @throws Piece_ORM_Exception
+     * @throws Piece::ORM::Exception
      */
     private function _addPropertyDefinitions($methodName,
                                              $query,
@@ -556,37 +566,37 @@ class Piece_ORM_Mapper_Generator
         if (!$query) {
             if (!array_key_exists($propertyName, $this->_propertyDefinitions['query'])) {
                 do {
-                    if (Piece_ORM_Mapper_QueryType::isFindAll($methodName)
-                        || Piece_ORM_Mapper_QueryType::isFind($methodName)
+                    if (QueryType::isFindAll($methodName)
+                        || QueryType::isFind($methodName)
                         ) {
                         $query = 'SELECT * FROM $__table';
                         break;
                     }
 
-                    if (Piece_ORM_Mapper_QueryType::isInsert($methodName)) {
+                    if (QueryType::isInsert($methodName)) {
                         $query = $this->_generateDefaultInsertQuery();
                         break;
                     }
 
-                    if (Piece_ORM_Mapper_QueryType::isDelete($methodName)) {
+                    if (QueryType::isDelete($methodName)) {
                         $query = $this->_generateDefaultDeleteQuery();
                         if (is_null($query)) {
-                            throw new Piece_ORM_Exception('The element [ query ] is required to generate a delete method declaration since the table [ ' . $this->_metadata->getTableName(true) . ' ] has no primary keys.');
+                            throw new Exception('The element [ query ] is required to generate a delete method declaration since the table [ ' . $this->_metadata->getTableName(true) . ' ] has no primary keys.');
                         }
 
                         break;
                     }
 
-                    if (Piece_ORM_Mapper_QueryType::isUpdate($methodName)) {
+                    if (QueryType::isUpdate($methodName)) {
                         $query = $this->_generateDefaultUpdateQuery();
                         if (is_null($query)) {
-                            throw new Piece_ORM_Exception('The element [ query ] is required to generate a update method declaration since the table [ ' . $this->_metadata->getTableName(true) . ' ] has no primary keys.');
+                            throw new Exception('The element [ query ] is required to generate a update method declaration since the table [ ' . $this->_metadata->getTableName(true) . ' ] has no primary keys.');
                         }
 
                         break;
                     }
 
-                    throw new Piece_ORM_Exception("Invalid method name [ $methodName ] detected.");
+                    throw new Exception("Invalid method name [ $methodName ] detected.");
                 } while (false);
             }
         }
@@ -626,12 +636,12 @@ class Piece_ORM_Mapper_Generator
      * @param string $methodName
      * @param string $query
      * @param string $orderBy
-     * @throws Piece_ORM_Exception
+     * @throws Piece::ORM::Exception
      */
     private function _addFindOne($methodName, $query, $orderBy)
     {
         if (!$query) {
-            throw new Piece_ORM_Exception('The element [ query ] or its value is required to generate a findOne method declaration.');
+            throw new Exception('The element [ query ] or its value is required to generate a findOne method declaration.');
         }
 
         $propertyName = strtolower($methodName);
@@ -680,9 +690,9 @@ class Piece_ORM_Mapper_Generator
         if ($this->_metadata->hasPrimaryKey()) {
             $primaryKeys = $this->_metadata->getPrimaryKeys();
             $fieldName = array_shift($primaryKeys);
-            $whereClause = "$fieldName = \$" . Piece_ORM_Inflector::camelize($fieldName, true);
+            $whereClause = "$fieldName = \$" . Inflector::camelize($fieldName, true);
             foreach ($primaryKeys as $partOfPrimeryKey) {
-                $whereClause .= " AND $partOfPrimeryKey = \$" . Piece_ORM_Inflector::camelize($partOfPrimeryKey, true);
+                $whereClause .= " AND $partOfPrimeryKey = \$" . Inflector::camelize($partOfPrimeryKey, true);
             }
 
             return "DELETE FROM \$__table WHERE $whereClause";
@@ -705,9 +715,9 @@ class Piece_ORM_Mapper_Generator
         if ($this->_metadata->hasPrimaryKey()) {
             $primaryKeys = $this->_metadata->getPrimaryKeys();
             $fieldName = array_shift($primaryKeys);
-            $whereClause = "$fieldName = \$" . Piece_ORM_Inflector::camelize($fieldName, true);
+            $whereClause = "$fieldName = \$" . Inflector::camelize($fieldName, true);
             foreach ($primaryKeys as $partOfPrimeryKey) {
-                $whereClause .= " AND $partOfPrimeryKey = \$" . Piece_ORM_Inflector::camelize($partOfPrimeryKey, true);
+                $whereClause .= " AND $partOfPrimeryKey = \$" . Inflector::camelize($partOfPrimeryKey, true);
             }
 
             if ($this->_metadata->getDatatype('lock_version') == 'integer') {

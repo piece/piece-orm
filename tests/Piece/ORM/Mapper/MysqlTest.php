@@ -35,9 +35,14 @@
  * @since      File available since Release 0.1.0
  */
 
-require_once dirname(__FILE__) . '/CompatibilityTests.php';
+namespace Piece::ORM::Mapper;
 
-// {{{ Piece_ORM_Mapper_MysqlTest
+use Piece::ORM::Mapper::CompatibilityTests;
+use Piece::ORM::Mapper::MapperFactory;
+use Piece::ORM::Config;
+use Piece::ORM::Context;
+
+// {{{ Piece::ORM::Mapper::MysqlTest
 
 /**
  * Some tests for MySQL.
@@ -48,7 +53,7 @@ require_once dirname(__FILE__) . '/CompatibilityTests.php';
  * @version    Release: @package_version@
  * @since      Class available since Release 0.1.0
  */
-class Piece_ORM_Mapper_MysqlTest extends Piece_ORM_Mapper_CompatibilityTests
+class MysqlTest extends CompatibilityTests
 {
 
     // {{{ properties
@@ -82,7 +87,7 @@ class Piece_ORM_Mapper_MysqlTest extends Piece_ORM_Mapper_CompatibilityTests
      */
     public function testShouldGenerateTheDefaultQueryIfTheQueryForAInsertMethodIsNotGiven()
     {
-        $mapper = Piece_ORM_Mapper_Factory::factory('Employees');
+        $mapper = MapperFactory::factory('Employees');
 
         $this->assertEquals('INSERT INTO $__table (first_name, last_name, note, departments_id, created_at) VALUES ($firstName, $lastName, $note, $departmentsId, $createdAt)', $mapper->__query__insertwithnoquery);
     }
@@ -92,7 +97,7 @@ class Piece_ORM_Mapper_MysqlTest extends Piece_ORM_Mapper_CompatibilityTests
      */
     public function testShouldSetCharsetByDSN()
     {
-        $config = new Piece_ORM_Config();
+        $config = new Config();
         $config->setDSN('CharsetShouldBeAbleToSetByDSN', array('phptype'  => 'mysql',
                                                                'hostspec' => 'pieceorm',
                                                                'database' => 'piece',
@@ -101,11 +106,11 @@ class Piece_ORM_Mapper_MysqlTest extends Piece_ORM_Mapper_CompatibilityTests
                                                                'charset'  => 'sjis')
                         );
         $config->setOptions('piece', array('debug' => 2, 'result_buffering' => false));
-        $context = Piece_ORM_Context::singleton();
+        $context = Context::singleton();
         $context->setConfiguration($config);
         $context->setMapperConfigDirectory($this->cacheDirectory);
         $context->setDatabase('CharsetShouldBeAbleToSetByDSN');
-        $mapper = Piece_ORM_Mapper_Factory::factory('Employees');
+        $mapper = MapperFactory::factory('Employees');
         $subject = $mapper->createObject();
         $subject->firstName = "\x93\xd6\x8c\x5b";
         $subject->lastName = "\x8b\x76\x95\xdb";
@@ -125,7 +130,7 @@ class Piece_ORM_Mapper_MysqlTest extends Piece_ORM_Mapper_CompatibilityTests
      */
     public function testShouldProvideTheDefaultValueOfAGivenField()
     {
-        $mapper = Piece_ORM_Mapper_Factory::factory('Employees');
+        $mapper = MapperFactory::factory('Employees');
 
         $this->assertNull($mapper->getDefault('id'));
         $this->assertNull($mapper->getDefault('firstName'));
@@ -142,6 +147,11 @@ class Piece_ORM_Mapper_MysqlTest extends Piece_ORM_Mapper_CompatibilityTests
     /**#@+
      * @access protected
      */
+
+    protected function getTestDirectory()
+    {
+        return dirname(__FILE__);
+    }
 
     /**#@-*/
 

@@ -35,7 +35,12 @@
  * @since      File available since Release 0.2.0
  */
 
-// {{{ Piece_ORM_Mapper_AssociatedObjectLoader_OneToMany
+namespace Piece::ORM::Mapper::AssociatedObjectLoader;
+
+use Piece::ORM::Mapper::AssociatedObjectLoader::Common;
+use Piece::ORM::Mapper::Common as MapperCommon;
+
+// {{{ Piece::ORM::Mapper::AssociatedObjectLoader::OneToMany
 
 /**
  * An associated object loader for One-to-Many relationships.
@@ -46,7 +51,7 @@
  * @version    Release: @package_version@
  * @since      Class available since Release 0.2.0
  */
-class Piece_ORM_Mapper_AssociatedObjectLoader_OneToMany extends Piece_ORM_Mapper_AssociatedObjectLoader_Common
+class OneToMany extends Common
 {
 
     // {{{ properties
@@ -130,13 +135,13 @@ class Piece_ORM_Mapper_AssociatedObjectLoader_OneToMany extends Piece_ORM_Mapper
      * Associates an object which are loaded by the secondary query into objects which
      * are loaded by the primary query.
      *
-     * @param stdClass                $associatedObject
-     * @param Piece_ORM_Mapper_Common $mapper
-     * @param string                  $relationshipKeyPropertyName
-     * @param integer                 $relationshipIndex
+     * @param stdClass                   $associatedObject
+     * @param Piece::ORM::Mapper::Common $mapper
+     * @param string                     $relationshipKeyPropertyName
+     * @param integer                    $relationshipIndex
      */
     protected function associateObject($associatedObject,
-                                       Piece_ORM_Mapper_Common $mapper,
+                                       MapperCommon $mapper,
                                        $relationshipKeyPropertyName,
                                        $relationshipIndex
                                        )

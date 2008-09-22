@@ -35,7 +35,9 @@
  * @since      File available since Release 0.2.0
  */
 
-// {{{ Piece_ORM_Mapper_AssociatedObjectPersister_Common
+namespace Piece::ORM::Mapper::AssociatedObjectPersister;
+
+// {{{ Piece::ORM::Mapper::AssociatedObjectPersister::Common
 
 /**
  * The base class for associated object persisters.
@@ -46,7 +48,7 @@
  * @version    Release: @package_version@
  * @since      Class available since Release 0.2.0
  */
-abstract class Piece_ORM_Mapper_AssociatedObjectPersister_Common
+abstract class Common
 {
 
     // {{{ properties
@@ -79,7 +81,7 @@ abstract class Piece_ORM_Mapper_AssociatedObjectPersister_Common
     // {{{ __construct()
 
     /**
-     * Sets a Piece_ORM_Mapper_ObjectPersister object as a property.
+     * Sets a Piece::ORM::Mapper::ObjectPersister object as a property.
      *
      * @param mixed $subject
      */

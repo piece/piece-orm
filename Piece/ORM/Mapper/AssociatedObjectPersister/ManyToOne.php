@@ -35,7 +35,12 @@
  * @since      File available since Release 0.2.0
  */
 
-// {{{ Piece_ORM_Mapper_AssociatedObjectPersister_ManyToOne
+namespace Piece::ORM::Mapper::AssociatedObjectPersister;
+
+use Piece::ORM::Mapper::AssociatedObjectPersister::Common;
+use Piece::ORM::Exception;
+
+// {{{ Piece::ORM::Mapper::AssociatedObjectPersister::ManyToOne
 
 /**
  * An associated object persister for Many-to-One relationships.
@@ -46,7 +51,7 @@
  * @version    Release: @package_version@
  * @since      Class available since Release 0.2.0
  */
-class Piece_ORM_Mapper_AssociatedObjectPersister_ManyToOne extends Piece_ORM_Mapper_AssociatedObjectPersister_Common
+class ManyToOne extends Common
 {
 
     // {{{ properties
@@ -80,11 +85,11 @@ class Piece_ORM_Mapper_AssociatedObjectPersister_ManyToOne extends Piece_ORM_Map
      * Inserts associated objects to a table.
      *
      * @param array $relationship
-     * @throws Piece_ORM_Exception
+     * @throws Piece::ORM::Exception
      */
     public function insert(array $relationship)
     {
-        throw new Piece_ORM_Exception("This operation does not supported for the relationship type [ {$relationship['type']} ]. Please check your configuration.");
+        throw new Exception("This operation does not supported for the relationship type [ {$relationship['type']} ]. Please check your configuration.");
     }
 
     // }}}
@@ -94,11 +99,11 @@ class Piece_ORM_Mapper_AssociatedObjectPersister_ManyToOne extends Piece_ORM_Map
      * Updates associated objects in a table.
      *
      * @param array $relationship
-     * @throws Piece_ORM_Exception
+     * @throws Piece::ORM::Exception
      */
     public function update(array $relationship)
     {
-        throw new Piece_ORM_Exception("This operation does not supported for the relationship type [ {$relationship['type']} ]. Please check your configuration.");
+        throw new Exception("This operation does not supported for the relationship type [ {$relationship['type']} ]. Please check your configuration.");
     }
 
     // }}}
@@ -108,11 +113,11 @@ class Piece_ORM_Mapper_AssociatedObjectPersister_ManyToOne extends Piece_ORM_Map
      * Removes associated objects from a table.
      *
      * @param array $relationship
-     * @throws Piece_ORM_Exception
+     * @throws Piece::ORM::Exception
      */
     public function delete(array $relationship)
     {
-        throw new Piece_ORM_Exception("This operation does not supported for the relationship type [ {$relationship['type']} ]. Please check your configuration.");
+        throw new Exception("This operation does not supported for the relationship type [ {$relationship['type']} ]. Please check your configuration.");
     }
 
     /**#@-*/

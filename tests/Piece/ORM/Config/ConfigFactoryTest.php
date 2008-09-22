@@ -36,11 +36,12 @@
  */
 
 namespace Piece::ORM::Config;
+
 use Piece::ORM::Config::ConfigFactory;
 
 require_once 'spyc.php5';
 
-// {{{ ConfigFactoryTest
+// {{{ Piece::ORM::Config::ConfigFactoryTest
 
 /**
  * Some tests for Piece::ORM::Config::ConfigFactory.

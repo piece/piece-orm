@@ -35,9 +35,19 @@
  * @since      File available since Release 0.1.0
  */
 
+namespace Piece::ORM::Mapper;
+use Piece::ORM::Context;
+use Piece::ORM::Inflector;
+use Piece::ORM::Metadata::MetadataFactory;
+use Piece::ORM::Exception;
+use Piece::ORM::Env;
+use Piece::ORM::Exception::PEARException;
+use Piece::ORM::Mapper::Generator;
+use Piece::ORM::Mapper::Common;
+
 require_once 'spyc.php5';
 
-// {{{ Piece_ORM_Mapper_Factory
+// {{{ Piece::ORM::Mapper::MapperFactory
 
 /**
  * A factory class for creating mapper objects.
@@ -48,7 +58,7 @@ require_once 'spyc.php5';
  * @version    Release: @package_version@
  * @since      Class available since Release 0.1.0
  */
-class Piece_ORM_Mapper_Factory
+class MapperFactory
 {
 
     // {{{ properties
@@ -88,32 +98,32 @@ class Piece_ORM_Mapper_Factory
      * Creates a mapper object for a given mapper name.
      *
      * @param string $mapperName
-     * @return Piece_ORM_Mapper_Common
-     * @throws Piece_ORM_Exception
+     * @return Piece::ORM::Mapper::Common
+     * @throws Piece::ORM::Exception
      */
     public static function factory($mapperName)
     {
-        $context = Piece_ORM_Context::singleton();
+        $context = Context::singleton();
         if (!$context->getUseMapperNameAsTableName()) {
-            $mapperName = Piece_ORM_Inflector::camelize($mapperName);
+            $mapperName = Inflector::camelize($mapperName);
         }
 
-        $mapperID = sha1($context->getDSN() . ".$mapperName." . realpath(self::$_configDirectory));
+        $mapperID = "{$mapperName}_" . sha1($context->getDSN() . ".$mapperName." . realpath(self::$_configDirectory));
         if (!array_key_exists($mapperID, self::$_instances)) {
-            Piece_ORM_Mapper_Factory::_load($mapperID, $mapperName);
-            $metadata = Piece_ORM_Metadata_Factory::factory($mapperName);
-            $mapperClass = Piece_ORM_Mapper_Factory::_getMapperClass($mapperID);
+            self::_load($mapperID, $mapperName);
+            $metadata = MetadataFactory::factory($mapperName);
+            $mapperClass = __NAMESPACE__ . '::' . self::_getMapperClass($mapperID);
             $mapper = new $mapperClass($metadata);
-            if (!is_subclass_of($mapper, 'Piece_ORM_Mapper_Common')) {
-                throw new Piece_ORM_Exception("The mapper class for [ $mapperName ] is invalid.");
+            if (!$mapper instanceof Common) {
+                throw new Exception("The mapper class for [ $mapperName ] is invalid.");
             }
 
             self::$_instances[$mapperID] = $mapper;
         }
 
         $dbh = $context->getConnection();
-        self::$_instances[$mapperID]->setConnection($dbh);
 
+        self::$_instances[$mapperID]->setConnection($dbh);
         return self::$_instances[$mapperID];
     }
 
@@ -205,18 +215,18 @@ class Piece_ORM_Mapper_Factory
      * @param string $mapperName
      * @param string $configFile
      * @return string
-     * @throws Piece_ORM_Exception
-     * @throws Piece_ORM_Exception_PEARException
+     * @throws Piece::ORM::Exception
+     * @throws Piece::ORM::Exception::PEARException
      */
     private function _getMapperSource($mapperID, $mapperName, $configFile)
     {
-        $cache = new Cache_Lite_File(array('cacheDir' => self::$_cacheDirectory . '/',
-                                           'masterFile' => $configFile,
-                                           'automaticSerialization' => true,
-                                           'errorHandlingAPIBreak' => true)
-                                     );
+        $cache = new ::Cache_Lite_File(array('cacheDir' => self::$_cacheDirectory . '/',
+                                             'masterFile' => $configFile,
+                                             'automaticSerialization' => true,
+                                             'errorHandlingAPIBreak' => true)
+                                       );
 
-        if (!Piece_ORM_Env::isProduction()) {
+        if (!Env::isProduction()) {
             $cache->remove($mapperID);
         }
 
@@ -225,18 +235,18 @@ class Piece_ORM_Mapper_Factory
          * calling PEAR::raiseError in default.
          */
         $mapperSource = $cache->get($mapperID);
-        if (PEAR::isError($mapperSource)) {
-            throw new Piece_ORM_Exception('Cannot read the mapper source file in the directory [ ' .
-                                          self::$_cacheDirectory . 
-                                          ' ].'
-                                          );
+        if (::PEAR::isError($mapperSource)) {
+            throw new Exception('Cannot read the mapper source file in the directory [ ' .
+                                self::$_cacheDirectory . 
+                                ' ].'
+                                );
         }
 
         if (!$mapperSource) {
-            $mapperSource = Piece_ORM_Mapper_Factory::_generateMapperSource($mapperID, $mapperName, $configFile);
+            $mapperSource = self::_generateMapperSource($mapperID, $mapperName, $configFile);
             $result = $cache->save($mapperSource);
-            if (PEAR::isError($result)) {
-                throw new Piece_ORM_Exception_PEARException($result);
+            if (::PEAR::isError($result)) {
+                throw new PEARException($result);
             }
         }
 
@@ -256,8 +266,12 @@ class Piece_ORM_Mapper_Factory
      */
     private function _generateMapperSource($mapperID, $mapperName, $configFile)
     {
-        $metadata = Piece_ORM_Metadata_Factory::factory($mapperName);
-        $generator = new Piece_ORM_Mapper_Generator(Piece_ORM_Mapper_Factory::_getMapperClass($mapperID), $mapperName, Spyc::YAMLLoad($configFile), $metadata, get_class_methods('Piece_ORM_Mapper_Common'));
+        $generator = new Generator(self::_getMapperClass($mapperID),
+                                   $mapperName,
+                                   ::Spyc::YAMLLoad($configFile),
+                                   MetadataFactory::factory($mapperName),
+                                   get_class_methods('Piece::ORM::Mapper::Common')
+                                   );
         return $generator->generate();
     }
 
@@ -273,12 +287,9 @@ class Piece_ORM_Mapper_Factory
      */
     private function _loaded($mapperID)
     {
-        $mapperClass = Piece_ORM_Mapper_Factory::_getMapperClass($mapperID);
-        if (version_compare(phpversion(), '5.0.0', '<')) {
-            return class_exists($mapperClass);
-        } else {
-            return class_exists($mapperClass, false);
-        }
+        return class_exists(__NAMESPACE__ . '::' . self::_getMapperClass($mapperID),
+                            false
+                            );
     }
 
     // }}}
@@ -289,57 +300,59 @@ class Piece_ORM_Mapper_Factory
      *
      * @param string $mapperID
      * @param string $mapperName
-     * @throws Piece_ORM_Exception
+     * @throws Piece::ORM::Exception
      */
     private function _load($mapperID, $mapperName)
     {
-        if (Piece_ORM_Mapper_Factory::_loaded($mapperID)) {
+        if (self::_loaded($mapperID)) {
             return;
         }
 
         if (is_null(self::$_configDirectory)) {
-            throw new Piece_ORM_Exception('The configuration directory must be specified.');
+            throw new Exception('The configuration directory must be specified.');
         }
 
         if (!file_exists(self::$_configDirectory)) {
-            throw new Piece_ORM_Exception('The configuration directory [ ' .
-                                          self::$_configDirectory .
-                                          ' ] is not found.'
-                                          );
+            throw new Exception('The configuration directory [ ' .
+                                self::$_configDirectory .
+                                ' ] is not found.'
+                                );
         }
 
         if (is_null(self::$_cacheDirectory)) {
-            throw new Piece_ORM_Exception('The cache directory must be specified.');
+            throw new Exception('The cache directory must be specified.');
         }
 
         if (!file_exists(self::$_cacheDirectory)) {
-            throw new Piece_ORM_Exception('The cache directory [ ' .
-                                          self::$_cacheDirectory .
-                                          'is not found.'
-                                          );
+            throw new Exception('The cache directory [ ' .
+                                self::$_cacheDirectory .
+                                'is not found.'
+                                );
         }
 
-        if (!is_readable(self::$_cacheDirectory) || !is_writable(self::$_cacheDirectory)) {
-            throw new Piece_ORM_Exception('The cache directory [ ' .
-                                          self::$_cacheDirectory .
-                                          ' ] is not readable or writable.'
-                                          );
+        if (!is_readable(self::$_cacheDirectory)
+            || !is_writable(self::$_cacheDirectory)
+            ) {
+            throw new Exception('The cache directory [ ' .
+                                self::$_cacheDirectory .
+                                ' ] is not readable or writable.'
+                                );
         }
 
         $configFile = self::$_configDirectory . "/$mapperName.yaml";
         if (!file_exists($configFile)) {
-            throw new Piece_ORM_Exception("The configuration file [ $configFile ] is not found.");
+            throw new Exception("The configuration file [ $configFile ] is not found.");
         }
 
         if (!is_readable($configFile)) {
-            throw new Piece_ORM_Exception("The configuration file [ $configFile ] is not readable.");
+            throw new Exception("The configuration file [ $configFile ] is not readable.");
         }
 
-        $mapperSource = Piece_ORM_Mapper_Factory::_getMapperSource($mapperID, $mapperName, $configFile);
+        $mapperSource = self::_getMapperSource($mapperID, $mapperName, $configFile);
         eval($mapperSource);
 
-        if (!Piece_ORM_Mapper_Factory::_loaded($mapperID)) {
-            throw new Piece_ORM_Exception("The mapper [ $mapperName ] not found.");
+        if (!self::_loaded($mapperID)) {
+            throw new Exception("The mapper [ $mapperName ] not found.");
         }
     }
 
@@ -354,7 +367,7 @@ class Piece_ORM_Mapper_Factory
      */
     private function _getMapperClass($mapperID)
     {
-        return "Piece_ORM_Mapper_$mapperID";
+        return $mapperID;
     }
 
     /**#@-*/

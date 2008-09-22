@@ -35,7 +35,11 @@
  * @since      File available since Release 0.7.0
  */
 
-// {{{ Piece_ORM_MDB2_NativeTypeMapper_Pgsql
+namespace Piece::ORM::MDB2::NativeTypeMapper;
+
+use Piece::ORM::MDB2::NativeTypeMapper::Common;
+
+// {{{ Piece::ORM::MDB2::NativeTypeMapper::Pgsql
 
 /**
  * A helper class to map native datatypes of PostgreSQL to MDB2 datatypes.
@@ -46,7 +50,7 @@
  * @version    Release: @package_version@
  * @since      Class available since Release 0.7.0
  */
-class Piece_ORM_MDB2_NativeTypeMapper_Pgsql extends Piece_ORM_MDB2_NativeTypeMapper_Common
+class Pgsql extends Common
 {
 
     // {{{ properties
@@ -107,13 +111,13 @@ class Piece_ORM_MDB2_NativeTypeMapper_Pgsql extends Piece_ORM_MDB2_NativeTypeMap
 
 // }}}
 
-Piece_ORM_MDB2_NativeTypeMapper_Pgsql::addMap('timestamptz', 'timestamp');
-Piece_ORM_MDB2_NativeTypeMapper_Pgsql::addMap('point', 'decimal');
-Piece_ORM_MDB2_NativeTypeMapper_Pgsql::addMap('lseg', 'decimal');
-Piece_ORM_MDB2_NativeTypeMapper_Pgsql::addMap('box', 'decimal');
-Piece_ORM_MDB2_NativeTypeMapper_Pgsql::addMap('path', 'decimal');
-Piece_ORM_MDB2_NativeTypeMapper_Pgsql::addMap('polygon', 'decimal');
-Piece_ORM_MDB2_NativeTypeMapper_Pgsql::addMap('circle', 'decimal');
+Pgsql::addMap('timestamptz', 'timestamp');
+Pgsql::addMap('point', 'decimal');
+Pgsql::addMap('lseg', 'decimal');
+Pgsql::addMap('box', 'decimal');
+Pgsql::addMap('path', 'decimal');
+Pgsql::addMap('polygon', 'decimal');
+Pgsql::addMap('circle', 'decimal');
 
 /*
  * Local Variables:

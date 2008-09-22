@@ -35,7 +35,12 @@
  * @since      File available since Release 0.2.0
  */
 
-// {{{ Piece_ORM_Mapper_AssociatedObjectLoader_Common
+namespace Piece::ORM::Mapper::AssociatedObjectLoader;
+
+use Piece::ORM::Mapper::Common as MapperCommon;
+use Piece::ORM::Inflector;
+
+// {{{ Piece::ORM::Mapper::AssociatedObjectLoader::Common
 
 /**
  * The base class for associated object loaders.
@@ -46,7 +51,7 @@
  * @version    Release: @package_version@
  * @since      Class available since Release 0.2.0
  */
-abstract class Piece_ORM_Mapper_AssociatedObjectLoader_Common
+abstract class Common
 {
 
     // {{{ properties
@@ -88,17 +93,17 @@ abstract class Piece_ORM_Mapper_AssociatedObjectLoader_Common
     /**
      * Initializes properties with the given value.
      *
-     * @param array                   $relationships
-     * @param array                   &$relationshipKeys
-     * @param array                   &$objects
-     * @param array                   &$objectIndexes
-     * @param Piece_ORM_Mapper_Common $mapper
+     * @param array                      $relationships
+     * @param array                      &$relationshipKeys
+     * @param array                      &$objects
+     * @param array                      &$objectIndexes
+     * @param Piece::ORM::Mapper::Common $mapper
      */
     public function __construct(array $relationships,
                                 array &$relationshipKeys,
                                 array &$objects,
                                 array &$objectIndexes,
-                                Piece_ORM_Mapper_Common $mapper
+                                MapperCommon $mapper
                                 )
     {
         $this->relationships = $relationships;
@@ -138,10 +143,10 @@ abstract class Piece_ORM_Mapper_AssociatedObjectLoader_Common
     /**
      * Loads all associated objects into appropriate objects.
      *
-     * @param Piece_ORM_Mapper_Common $mapper
-     * @param integer                 $relationshipIndex
+     * @param Piece::ORM::Mapper::Common $mapper
+     * @param integer                    $relationshipIndex
      */
-    public function loadAll(Piece_ORM_Mapper_Common $mapper, $relationshipIndex)
+    public function loadAll(MapperCommon $mapper, $relationshipIndex)
     {
         $mapper->setPreloadCallback($this->getPreloadCallback());
         $mapper->setPreloadCallbackArgs(array($relationshipIndex));
@@ -149,7 +154,7 @@ abstract class Piece_ORM_Mapper_AssociatedObjectLoader_Common
         $mapper->setPreloadCallback(null);
         $mapper->setPreloadCallbackArgs(null);
 
-        $relationshipKeyPropertyName = Piece_ORM_Inflector::camelize($this->getRelationshipKeyFieldNameInSecondaryQuery($this->relationships[$relationshipIndex]), true);
+        $relationshipKeyPropertyName = Inflector::camelize($this->getRelationshipKeyFieldNameInSecondaryQuery($this->relationships[$relationshipIndex]), true);
 
         for ($j = 0, $count = count($associatedObjects); $j < $count; ++$j) {
             $this->associateObject($associatedObjects[$j], $mapper, $relationshipKeyPropertyName, $relationshipIndex);
@@ -200,13 +205,13 @@ abstract class Piece_ORM_Mapper_AssociatedObjectLoader_Common
      * Associates an object which are loaded by the secondary query into objects which
      * are loaded by the primary query.
      *
-     * @param stdClass                $associatedObject
-     * @param Piece_ORM_Mapper_Common $mapper
-     * @param string                  $relationshipKeyPropertyName
-     * @param integer                 $relationshipIndex
+     * @param stdClass                   $associatedObject
+     * @param Piece::ORM::Mapper::Common $mapper
+     * @param string                     $relationshipKeyPropertyName
+     * @param integer                    $relationshipIndex
      */
     abstract protected function associateObject($associatedObject,
-                                                Piece_ORM_Mapper_Common $mapper,
+                                                MapperCommon $mapper,
                                                 $relationshipKeyPropertyName,
                                                 $relationshipIndex
                                                 );

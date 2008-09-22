@@ -35,7 +35,14 @@
  * @since      File available since Release 0.2.0
  */
 
-// {{{ Piece_ORM_Mapper_RelationshipNormalizer_ManyToMany
+namespace Piece::ORM::Mapper::RelationshipNormalizer;
+
+use Piece::ORM::Mapper::RelationshipNormalizer::Common;
+use Piece::ORM::Metadata::MetadataFactory;
+use Piece::ORM::Metadata::MetadataFactory::NoSuchTableException;
+use Piece::ORM::Exception;
+
+// {{{ Piece::ORM::Mapper::RelationshipNormalizer::ManyToMany
 
 /**
  * An relationship normalizer for Many-to-Many relationships.
@@ -46,7 +53,7 @@
  * @version    Release: @package_version@
  * @since      Class available since Release 0.2.0
  */
-class Piece_ORM_Mapper_RelationshipNormalizer_ManyToMany extends Piece_ORM_Mapper_RelationshipNormalizer_Common
+class ManyToMany extends Common
 {
 
     // {{{ properties
@@ -87,7 +94,7 @@ class Piece_ORM_Mapper_RelationshipNormalizer_ManyToMany extends Piece_ORM_Mappe
     /**
      * Normalizes "through" definition.
      *
-     * @throws Piece_ORM_Exception
+     * @throws Piece::ORM::Exception
      */
     protected function normalizeThrough()
     {
@@ -100,10 +107,10 @@ class Piece_ORM_Mapper_RelationshipNormalizer_ManyToMany extends Piece_ORM_Mappe
             $throughTableName2 = "{$this->relationship['table']}_" . $this->metadata->getTableName(true);
             foreach (array($throughTableName1, $throughTableName2) as $throughTableName) {
                 try {
-                    $throughMetadata = Piece_ORM_Metadata_Factory::factory($throughTableName);
-                } catch (Piece_ORM_Metadata_Factory_NoSuchTableException $e) {
+                    $throughMetadata = MetadataFactory::factory($throughTableName);
+                } catch (NoSuchTableException $e) {
                     continue;
-                } catch (Piece_ORM_Exception $e) {
+                } catch (Exception $e) {
                     throw $e;
                 }
 
@@ -112,49 +119,49 @@ class Piece_ORM_Mapper_RelationshipNormalizer_ManyToMany extends Piece_ORM_Mappe
             }
 
             if (!$throughMetadata) {
-                throw new Piece_ORM_Exception("One of [ $throughTableName1 ] or [ $throughTableName2 ] must exists in the database, if the element [ table ] in the element [ through ] omit.");
+                throw new Exception("One of [ $throughTableName1 ] or [ $throughTableName2 ] must exists in the database, if the element [ table ] in the element [ through ] omit.");
             }
         }
 
-        $throughMetadata = Piece_ORM_Metadata_Factory::factory($this->relationship['through']['table']);
+        $throughMetadata = MetadataFactory::factory($this->relationship['through']['table']);
 
         if (!array_key_exists('column', $this->relationship['through'])) {
             $primaryKey = $this->metadata->getPrimaryKey();
             if (is_null($primaryKey)) {
-                throw new Piece_ORM_Exception('A single primary key field is required, if the element [ column ] in the element [ through ] omit.');
+                throw new Exception('A single primary key field is required, if the element [ column ] in the element [ through ] omit.');
             }
                 
             $this->relationship['through']['column'] = $this->metadata->getTableName(true) . "_$primaryKey";
         } 
 
         if (!$throughMetadata->hasField($this->relationship['through']['column'])) {
-            throw new Piece_ORM_Exception("The field [ {$this->relationship['through']['column']} ] not found in the table [ " . $throughMetadata->getTableName(true) . ' ].');
+            throw new Exception("The field [ {$this->relationship['through']['column']} ] not found in the table [ " . $throughMetadata->getTableName(true) . ' ].');
         }
 
         if (!array_key_exists('referencedColumn', $this->relationship['through'])) {
             $primaryKey = $this->metadata->getPrimaryKey();
             if (is_null($primaryKey)) {
-                throw new Piece_ORM_Exception('A single primary key field is required, if the element [ referencedColumn ] in the element [ through ] omit.');
+                throw new Exception('A single primary key field is required, if the element [ referencedColumn ] in the element [ through ] omit.');
             }
 
             $this->relationship['through']['referencedColumn'] = $primaryKey;
         } 
 
         if (!$this->metadata->hasField($this->relationship['through']['referencedColumn'])) {
-            throw new Piece_ORM_Exception("The field [ {$this->relationship['through']['referencedColumn']} ] not found in the table [ " . $this->metadata->getTableName(true) . ' ].');
+            throw new Exception("The field [ {$this->relationship['through']['referencedColumn']} ] not found in the table [ " . $this->metadata->getTableName(true) . ' ].');
         }
 
         if (!array_key_exists('inverseColumn', $this->relationship['through'])) {
             $primaryKey = $this->relationshipMetadata->getPrimaryKey();
             if (is_null($primaryKey)) {
-                throw new Piece_ORM_Exception('A single primary key field is required, if the element [ column ] in the element [ through ] omit.');
+                throw new Exception('A single primary key field is required, if the element [ column ] in the element [ through ] omit.');
             }
 
             $this->relationship['through']['inverseColumn'] = $this->relationshipMetadata->getTableName(true) . "_$primaryKey";
         } 
 
         if (!$throughMetadata->hasField($this->relationship['through']['inverseColumn'])) {
-            throw new Piece_ORM_Exception("The field [ {$this->relationship['through']['inverseColumn']} ] not found in the table [ " . $throughMetadata->getTableName(true) . ' ].');
+            throw new Exception("The field [ {$this->relationship['through']['inverseColumn']} ] not found in the table [ " . $throughMetadata->getTableName(true) . ' ].');
         }
     }
 

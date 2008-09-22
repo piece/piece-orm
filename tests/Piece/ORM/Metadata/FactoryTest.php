@@ -35,10 +35,16 @@
  * @since      File available since Release 0.1.0
  */
 
-// {{{ Piece_ORM_Metadata_FactoryTest
+namespace Piece::ORM::Metadata;
+
+use Piece::ORM::Metadata::MetadataFactory;
+use Piece::ORM::Config;
+use Piece::ORM::Context;
+
+// {{{ Piece::ORM::Metadata::FactoryTest
 
 /**
- * Some tests for Piece_ORM_Metadata_Factory.
+ * Some tests for Piece::ORM::Metadata::MetadataFactory.
  *
  * @package    Piece_ORM
  * @copyright  2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
@@ -46,7 +52,7 @@
  * @version    Release: @package_version@
  * @since      Class available since Release 0.1.0
  */
-class Piece_ORM_Metadata_FactoryTest extends PHPUnit_Framework_TestCase
+class FactoryTest extends ::PHPUnit_Framework_TestCase
 {
 
     // {{{ properties
@@ -80,40 +86,42 @@ class Piece_ORM_Metadata_FactoryTest extends PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->_cacheDirectory = dirname(__FILE__) . '/' . basename(__FILE__, '.php');
-        $config = new Piece_ORM_Config();
+        $config = new Config();
         $config->setDSN('piece', 'pgsql://piece:piece@pieceorm/piece');
-        $config->setOptions('piece', array('debug' => 2, 'result_buffering' => false));
-        $context = Piece_ORM_Context::singleton();
+        $config->setOptions('piece',
+                            array('debug' => 2, 'result_buffering' => false)
+                            );
+        $context = Context::singleton();
         $context->setConfiguration($config);
         $context->setDatabase('piece');
-        Piece_ORM_Metadata_Factory::setCacheDirectory($this->_cacheDirectory);
+        MetadataFactory::setCacheDirectory($this->_cacheDirectory);
     }
 
     public function tearDown()
     {
-        Piece_ORM_Metadata_Factory::restoreCacheDirectory();
-        Piece_ORM_Metadata_Factory::clearInstances();
-        Piece_ORM_Context::clear();
-        $cache = new Cache_Lite(array('cacheDir' => "{$this->_cacheDirectory}/",
-                                      'automaticSerialization' => true,
-                                      'errorHandlingAPIBreak' => true)
-                                );
+        MetadataFactory::restoreCacheDirectory();
+        MetadataFactory::clearInstances();
+        Context::clear();
+        $cache = new ::Cache_Lite(array('cacheDir' => "{$this->_cacheDirectory}/",
+                                        'automaticSerialization' => true,
+                                        'errorHandlingAPIBreak' => true)
+                                  );
         $cache->clean();
     }
 
     public function testShouldCreateAnObjectByAGivenMapper()
     {
-        $metadata = Piece_ORM_Metadata_Factory::factory('Employees');
+        $metadata = MetadataFactory::factory('Employees');
 
-        $this->assertType('Piece_ORM_Metadata', $metadata);
+        $this->assertType('Piece::ORM::Metadata', $metadata);
         $this->assertEquals('employees', $metadata->getTableName());
     }
 
     public function testShouldReturnTheExistingObjectIfItExists()
     {
-        $metadata1 = Piece_ORM_Metadata_Factory::factory('Employees');
+        $metadata1 = MetadataFactory::factory('Employees');
         $metadata1->foo = 'bar';
-        $metadata2 = Piece_ORM_Metadata_Factory::factory('Employees');
+        $metadata2 = MetadataFactory::factory('Employees');
 
         $this->assertObjectHasAttribute('foo', $metadata2);
         $this->assertEquals('bar', $metadata2->foo);

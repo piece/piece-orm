@@ -35,7 +35,11 @@
  * @since      File available since Release 0.2.0
  */
 
-// {{{ Piece_ORM_Mapper_RelationshipNormalizer_OneToMany
+namespace Piece::ORM::Mapper::RelationshipNormalizer;
+
+use Piece::ORM::Mapper::RelationshipNormalizer::Common;
+
+// {{{ Piece::ORM::Mapper::RelationshipNormalizer::OneToMany
 
 /**
  * An relationship normalizer for One-to-Many relationships.
@@ -46,7 +50,7 @@
  * @version    Release: @package_version@
  * @since      Class available since Release 0.2.0
  */
-class Piece_ORM_Mapper_RelationshipNormalizer_OneToMany extends Piece_ORM_Mapper_RelationshipNormalizer_Common
+class OneToMany extends Common
 {
 
     // {{{ properties
@@ -94,7 +98,8 @@ class Piece_ORM_Mapper_RelationshipNormalizer_OneToMany extends Piece_ORM_Mapper
             return false;
         }
 
-        $this->relationship['column'] = $this->metadata->getTableName(true) . "_$primaryKey";
+        $this->relationship['column'] =
+            $this->metadata->getTableName(true) . "_$primaryKey";
         return true;
     }
 

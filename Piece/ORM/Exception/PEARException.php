@@ -35,7 +35,10 @@
  * @since      File available since Release 2.0.0
  */
 
-// {{{ Piece_ORM_Exception_PEARException
+namespace Piece::ORM::Exception;
+use Piece::ORM::Exception;
+
+// {{{ Piece::ORM::Exception::PEARException
 
 /**
  * An exception class to convert a PEAR_Error object to an Exception object.
@@ -46,7 +49,7 @@
  * @version    Release: @package_version@
  * @since      Class available since Release 2.0.0
  */
-class Piece_ORM_Exception_PEARException extends Piece_ORM_Exception
+class PEARException extends Exception
 {
 
     // {{{ properties
@@ -79,9 +82,9 @@ class Piece_ORM_Exception_PEARException extends Piece_ORM_Exception
     /**
      * Converts a PEAR_Error object to an Exception object.
      *
-     * @param PEAR_Error $error
+     * @param ::PEAR_Error $error
      */
-    public function __construct(PEAR_Error $error)
+    public function __construct(::PEAR_Error $error)
     {
         parent::__construct('Type: ' . get_class($error) .
                             ' Message: ' . $error->getMessage() .

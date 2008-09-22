@@ -35,7 +35,13 @@
  * @since      File available since Release 0.1.0
  */
 
-// {{{ Piece_ORM_Context
+namespace Piece::ORM;
+use Piece::ORM::Config;
+use Piece::ORM::Exception;
+use Piece::ORM::Mapper::MapperFactory;
+use Piece::ORM::Exception::PEARException;
+
+// {{{ Piece::ORM::Context
 
 /**
  * The mapper context holder for Piece_ORM mappers.
@@ -46,7 +52,7 @@
  * @version    Release: @package_version@
  * @since      Class available since Release 0.1.0
  */
-class Piece_ORM_Context
+class Context
 {
 
     // {{{ properties
@@ -82,15 +88,15 @@ class Piece_ORM_Context
     // {{{ singleton()
 
     /**
-     * Returns the Piece_ORM_Context instance if exists. If not exists, a new
-     * instance of the Piece_ORM_Context class will be created and returned.
+     * Returns the Piece::ORM::Context instance if exists. If not exists, a new
+     * instance of the Piece::ORM::Context class will be created and returned.
      *
-     * @return Piece_ORM_Context
+     * @return Piece::ORM::Context
      */
     public static function singleton()
     {
         if (is_null(self::$_instance)) {
-            self::$_instance = new Piece_ORM_Context();
+            self::$_instance = new self();
         }
 
         return self::$_instance;
@@ -100,11 +106,11 @@ class Piece_ORM_Context
     // {{{ setConfiguration()
 
     /**
-     * Sets a Piece_ORM_Config object.
+     * Sets a Piece::ORM::Config object.
      *
-     * @param Piece_ORM_Config $config
+     * @param Piece::ORM::Config $config
      */
-    public function setConfiguration(Piece_ORM_Config $config)
+    public function setConfiguration(Config $config)
     {
         $this->_config = $config;
     }
@@ -113,9 +119,9 @@ class Piece_ORM_Context
     // {{{ getConfiguration()
 
     /**
-     * Gets the Piece_ORM_Config object.
+     * Gets the Piece::ORM::Config object.
      *
-     * @return Piece_ORM_Config
+     * @return Piece::ORM::Config
      */
     public function getConfiguration()
     {
@@ -150,21 +156,21 @@ class Piece_ORM_Context
      * Sets a database as the current database.
      *
      * @param string $database
-     * @throws Piece_ORM_Exception
+     * @throws Piece::ORM::Exception
      */
     public function setDatabase($database)
     {
         if (!$this->_config->checkDatabase($database)) {
-            throw new Piece_ORM_Exception("The given database [ $database ] not found in the current configuration.");
+            throw new Exception("The given database [ $database ] not found in the current configuration.");
         }
 
         $this->_database = $database;
 
         $directorySuffix = $this->_config->getDirectorySuffix($this->_database);
         if (is_null($directorySuffix) || !strlen($directorySuffix)) {
-            Piece_ORM_Mapper_Factory::setConfigDirectory($this->_mapperConfigDirectory);
+            MapperFactory::setConfigDirectory($this->_mapperConfigDirectory);
         } else {
-            Piece_ORM_Mapper_Factory::setConfigDirectory("{$this->_mapperConfigDirectory}/$directorySuffix");
+            MapperFactory::setConfigDirectory("{$this->_mapperConfigDirectory}/$directorySuffix");
         }
     }
 
@@ -201,21 +207,21 @@ class Piece_ORM_Context
      * Gets the database handle for the current database.
      *
      * @return MDB2_Driver_Common
-     * @throws Piece_ORM_Exception_PEARException
+     * @throws Piece::ORM::Exception::PEARException
      */
     public function getConnection()
     {
-        PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
-        $dbh = MDB2::singleton($this->getDSN(), $this->getOptions());
-        PEAR::staticPopErrorHandling();
-        if (MDB2::isError($dbh)) {
-            throw new Piece_ORM_Exception_PEARException($dbh);
+        ::PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
+        $dbh = ::MDB2::singleton($this->getDSN(), $this->getOptions());
+        ::PEAR::staticPopErrorHandling();
+        if (::MDB2::isError($dbh)) {
+            throw new PEARException($dbh);
         }
 
         $dbh->setFetchMode(MDB2_FETCHMODE_ASSOC);
 
-        $nativeTypeMapperClass = 'Piece_ORM_MDB2_NativeTypeMapper_' . ucwords(strtolower(substr(strrchr(get_class($dbh), '_'), 1)));
-        include_once str_replace('_', '/', $nativeTypeMapperClass) . '.php';
+        $nativeTypeMapperClass = 'Piece::ORM::MDB2::NativeTypeMapper::' .
+            ucwords(strtolower(substr(strrchr(get_class($dbh), '_'), 1)));
         $nativeTypeMapper = new $nativeTypeMapperClass();
         $nativeTypeMapper->mapNativeType($dbh);
 

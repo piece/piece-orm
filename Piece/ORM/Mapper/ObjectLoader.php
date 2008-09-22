@@ -35,7 +35,15 @@
  * @since      File available since Release 0.2.0
  */
 
-// {{{ Piece_ORM_Mapper_ObjectLoader
+namespace Piece::ORM::Mapper;
+
+use Piece::ORM::Mapper::Common;
+use Piece::ORM::Mapper::RelationshipType;
+use Piece::ORM::Inflector;
+use Piece::ORM::Exception::PEARException;
+use Piece::ORM::Mapper::MapperFactory;
+
+// {{{ Piece::ORM::Mapper::ObjectLoader
 
 /**
  * An object loader for loading all objects with a result object.
@@ -46,7 +54,7 @@
  * @version    Release: @package_version@
  * @since      Class available since Release 0.2.0
  */
-class Piece_ORM_Mapper_ObjectLoader
+class ObjectLoader
 {
 
     // {{{ properties
@@ -88,22 +96,30 @@ class Piece_ORM_Mapper_ObjectLoader
     /**
      * Initializes properties with the given values.
      *
-     * @param Piece_ORM_Mapper_Common $mapper
-     * @param MDB2_Result             $result
-     * @param array                   $relationships
+     * @param Piece::ORM::Mapper::Common $mapper
+     * @param ::MDB2_Result              $result
+     * @param array                      $relationships
      */
-    public function __construct(Piece_ORM_Mapper_Common $mapper,
-                                MDB2_Result $result,
+    public function __construct(Common $mapper,
+                                ::MDB2_Result $result,
                                 array $relationships
                                 )
     {
         $this->_result = $result;
 
         if (count($relationships)) {
-            foreach (Piece_ORM_Mapper_RelationshipType::getRelationshipTypes() as $relationshipType) {
-                $associatedObjectsLoaderClass = 'Piece_ORM_Mapper_AssociatedObjectLoader_' . ucwords($relationshipType);
-                include_once str_replace('_', '/', $associatedObjectsLoaderClass) . '.php';
-                $this->_associatedObjectLoaders[$relationshipType] = new $associatedObjectsLoaderClass($relationships, $this->_relationshipKeys, $this->_objects, $this->_objectIndexes, $mapper);
+            foreach (RelationshipType::getRelationshipTypes() as $relationshipType) {
+                $associatedObjectsLoaderClass =
+                    __NAMESPACE__ .
+                    '::AssociatedObjectLoader::' .
+                    ucwords($relationshipType);
+                $this->_associatedObjectLoaders[$relationshipType] =
+                    new $associatedObjectsLoaderClass($relationships,
+                                                      $this->_relationshipKeys,
+                                                      $this->_objects,
+                                                      $this->_objectIndexes,
+                                                      $mapper
+                                                      );
             }
         }
 
@@ -161,14 +177,14 @@ class Piece_ORM_Mapper_ObjectLoader
         $object = new stdClass();
         foreach ($row as $fieldName => $value) {
             if (!$this->_metadata->isLOB($fieldName)) {
-                $object->{ Piece_ORM_Inflector::camelize($fieldName, true) } = $value;
+                $object->{ Inflector::camelize($fieldName, true) } = $value;
             } elseif (is_null($value)) {
-                $object->{ Piece_ORM_Inflector::camelize($fieldName, true) } = null;
+                $object->{ Inflector::camelize($fieldName, true) } = null;
             } else {
                 $lob = $this->_mapper->createLOB();
                 $lob->setFieldName($fieldName);
                 $lob->setValue($value);
-                $object->{ Piece_ORM_Inflector::camelize($fieldName, true) } = $lob;
+                $object->{ Inflector::camelize($fieldName, true) } = $lob;
             }
         }
 
@@ -181,17 +197,17 @@ class Piece_ORM_Mapper_ObjectLoader
     /**
      * Loads all objects with a result object for the primary query.
      *
-     * @throws Piece_ORM_Exception_PEARException
+     * @throws Piece::ORM::Exception::PEARException
      */
     private function _loadPrimaryObjects()
     {
         $preloadCallback = $this->_mapper->getPreloadCallback();
         $preloadCallbackArgs = $this->_mapper->getPreloadCallbackArgs();
-        PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
+        ::PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
         for ($i = 0; $row = &$this->_result->fetchRow(); ++$i) {
-            if (MDB2::isError($row)) {
-                PEAR::staticPopErrorHandling();
-                throw new Piece_ORM_Exception_PEARException($row);
+            if (::MDB2::isError($row)) {
+                ::PEAR::staticPopErrorHandling();
+                throw new PEARException($row);
             }
 
             if (!is_null($preloadCallback)) {
@@ -208,7 +224,7 @@ class Piece_ORM_Mapper_ObjectLoader
                 $this->_associatedObjectLoaders[ $this->_relationships[$j]['type'] ]->prepareLoading($row, $i, $j);
             }
         }
-        PEAR::staticPopErrorHandling();
+        ::PEAR::staticPopErrorHandling();
     }
 
     // }}}
@@ -220,7 +236,7 @@ class Piece_ORM_Mapper_ObjectLoader
     private function _loadAssociatedObjects()
     {
         for ($i = 0, $count = count($this->_relationships); $i < $count; ++$i) {
-            $mapper = Piece_ORM_Mapper_Factory::factory($this->_relationships[$i]['table']);
+            $mapper = MapperFactory::factory($this->_relationships[$i]['table']);
             $this->_associatedObjectLoaders[ $this->_relationships[$i]['type'] ]->loadAll($mapper, $i);
         }
     }

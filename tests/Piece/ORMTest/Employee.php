@@ -32,21 +32,72 @@
  * @copyright  2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License (revised)
  * @version    SVN: $Id$
- * @since      File available since Release 2.0.0
+ * @see        Piece::ORMTest
+ * @since      File available since Release 0.1.0
  */
 
-// {{{ Piece_ORM_Metadata_Factory_NoSuchTableException
+namespace Piece::ORMTest;
+
+// {{{ Piece::ORMTest::Employee
 
 /**
- * An exception class which is raised when a table is not found in a database.
+ * A class for unit tests.
  *
  * @package    Piece_ORM
  * @copyright  2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License (revised)
  * @version    Release: @package_version@
- * @since      Class available since Release 2.0.0
+ * @see        Piece::ORMTest
+ * @since      Class available since Release 0.1.0
  */
-class Piece_ORM_Metadata_Factory_NoSuchTableException extends Piece_ORM_Exception_PEARException {}
+class Employee
+{
+
+    // {{{ properties
+
+    /**#@+
+     * @access public
+     */
+
+    /**#@-*/
+
+    /**#@+
+     * @access protected
+     */
+
+    /**#@-*/
+
+    /**#@+
+     * @access private
+     */
+
+    /**#@-*/
+
+    /**#@+
+     * @access public
+     */
+
+    public function generatePassword()
+    {
+        return 'Baz';
+    }
+
+    /**#@-*/
+
+    /**#@+
+     * @access protected
+     */
+
+    /**#@-*/
+
+    /**#@+
+     * @access private
+     */
+
+    /**#@-*/
+
+    // }}}
+}
 
 // }}}
 

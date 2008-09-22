@@ -35,7 +35,15 @@
  * @since      File available since Release 0.1.0
  */
 
-// {{{ Piece_ORM
+namespace Piece;
+
+use Piece::ORM::Config::ConfigFactory;
+use Piece::ORM::Context;
+use Piece::ORM::Mapper::MapperFactory;
+use Piece::ORM::Metadata::MetadataFactory;
+use Piece::ORM::Exception;
+
+// {{{ Piece::ORM
 
 /**
  * A single entry point for Piece_ORM mappers.
@@ -46,7 +54,7 @@
  * @version    Release: @package_version@
  * @since      Class available since Release 0.1.0
  */
-class Piece_ORM
+class ORM
 {
 
     // {{{ properties
@@ -82,12 +90,13 @@ class Piece_ORM
      * Configures the Piece_ORM environment.
      *
      * First this method tries to load a configuration from a configuration file in
-     * the given configration directory using Piece_ORM_Config_Factory::factory().
-     * The method creates a new object if the load failed.
+     * the given configration directory using
+     * Piece::ORM::Config::ConfigFactory::factory(). The method creates a new object
+     * if the load failed.
      * Second this method sets the configuration to the current context. And also
      * this method sets the configuration directory for the mapper configuration, and
      * the cache directory for mappers, and the cache directory for
-     * Piece_ORM_Metadata objects.
+     * Piece::ORM::Metadata objects.
      *
      * @param string $configDirectory
      * @param string $cacheDirectory
@@ -98,10 +107,8 @@ class Piece_ORM
                                      $mapperConfigDirectory
                                      )
     {
-        $config = Piece_ORM_Config_Factory::factory($configDirectory,
-                                                    $cacheDirectory
-                                                    );
-        $context = Piece_ORM_Context::singleton();
+        $config = ConfigFactory::factory($configDirectory, $cacheDirectory);
+        $context = Context::singleton();
         $context->setConfiguration($config);
         $context->setMapperConfigDirectory($mapperConfigDirectory);
         $defaultDatabase = $config->getDefaultDatabase();
@@ -109,8 +116,8 @@ class Piece_ORM
             $context->setDatabase($defaultDatabase);
         }
 
-        Piece_ORM_Mapper_Factory::setCacheDirectory($cacheDirectory);
-        Piece_ORM_Metadata_Factory::setCacheDirectory($cacheDirectory);
+        MapperFactory::setCacheDirectory($cacheDirectory);
+        MetadataFactory::setCacheDirectory($cacheDirectory);
 
         self::$configured = true;
     }
@@ -122,34 +129,34 @@ class Piece_ORM
      * Gets a mapper object for a given mapper name.
      *
      * @param string $mapperName
-     * @return Piece_ORM_Mapper_Common
-     * @throws Piece_ORM_Exception
+     * @return Piece::ORM::Mapper::Common
+     * @throws Piece::ORM::Exception
      */
     public static function getMapper($mapperName)
     {
         if (!self::$configured) {
-            throw new Piece_ORM_Exception(__METHOD__ . ' method must be called after calling configure().');
+            throw new Exception(__METHOD__ . ' method must be called after calling configure().');
         }
 
-        return Piece_ORM_Mapper_Factory::factory($mapperName);
+        return MapperFactory::factory($mapperName);
     }
 
     // }}}
     // {{{ getConfiguration()
 
     /**
-     * Gets the Piece_ORM_Config object after calling configure().
+     * Gets the Piece::ORM::Config object after calling configure().
      *
-     * @return Piece_ORM_Config
-     * @throws Piece_ORM_Exception
+     * @return Piece::ORM::Config
+     * @throws Piece::ORM::Exception
      */
     public static function getConfiguration()
     {
         if (!self::$configured) {
-            throw new Piece_ORM_Exception(__METHOD__ . ' method must be called after calling configure().');
+            throw new Exception(__METHOD__ . ' method must be called after calling configure().');
         }
 
-        $context = Piece_ORM_Context::singleton();
+        $context = Context::singleton();
         return $context->getConfiguration();
     }
 
@@ -160,15 +167,15 @@ class Piece_ORM
      * Sets a database as the current database.
      *
      * @param string $database
-     * @throws Piece_ORM_Exception
+     * @throws Piece::ORM::Exception
      */
     public static function setDatabase($database)
     {
         if (!self::$configured) {
-            throw new Piece_ORM_Exception(__METHOD__ . ' method must be called after calling configure().');
+            throw new Exception(__METHOD__ . ' method must be called after calling configure().');
         }
 
-        $context = Piece_ORM_Context::singleton();
+        $context = Context::singleton();
         $context->setDatabase($database);
     }
 
@@ -180,15 +187,15 @@ class Piece_ORM
      *
      * @param string $mapperName
      * @return stdClass
-     * @throws Piece_ORM_Exception
+     * @throws Piece::ORM::Exception
      */
     public static function createObject($mapperName)
     {
         if (!self::$configured) {
-            throw new Piece_ORM_Exception(__METHOD__ . ' method must be called after calling configure().');
+            throw new Exception(__METHOD__ . ' method must be called after calling configure().');
         }
 
-        return Piece_ORM_Mapper_Factory::factory($mapperName)->createObject();
+        return MapperFactory::factory($mapperName)->createObject();
     }
 
     // }}}

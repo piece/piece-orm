@@ -35,7 +35,13 @@
  * @since      File available since Release 0.2.0
  */
 
-// {{{ Piece_ORM_Mapper_RelationshipNormalizer_Common
+namespace Piece::ORM::Mapper::RelationshipNormalizer;
+
+use Piece::ORM::Metadata;
+use Piece::ORM::Exception;
+use Piece::ORM::Metadata::MetadataFactory;
+
+// {{{ Piece::ORM::Mapper::RelationshipNormalizer::Common
 
 /**
  * The base class for relationship normalizers.
@@ -46,7 +52,7 @@
  * @version    Release: @package_version@
  * @since      Class available since Release 0.2.0
  */
-abstract class Piece_ORM_Mapper_RelationshipNormalizer_Common
+abstract class Common
 {
 
     // {{{ properties
@@ -84,10 +90,10 @@ abstract class Piece_ORM_Mapper_RelationshipNormalizer_Common
     /**
      * Initializes properties with the given values.
      *
-     * @param array $relationship
-     * @param Piece_ORM_Metadata $metadata
+     * @param array                $relationship
+     * @param Piece::ORM::Metadata $metadata
      */
-    public function __construct($relationship, Piece_ORM_Metadata $metadata)
+    public function __construct($relationship, Metadata $metadata)
     {
         $this->relationship = $relationship;
         $this->metadata = $metadata;
@@ -100,44 +106,44 @@ abstract class Piece_ORM_Mapper_RelationshipNormalizer_Common
      * Normalizes a relationship definition.
      *
      * @return array
-     * @throws Piece_ORM_Exception
+     * @throws Piece::ORM::Exception
      */
     public function normalize()
     {
         if (!array_key_exists('table', $this->relationship)) {
-            throw new Piece_ORM_Exception('The element [ table ] is required to generate a relationship property declaration.');
+            throw new Exception('The element [ table ] is required to generate a relationship property declaration.');
         }
 
         if (!array_key_exists('mappedAs', $this->relationship)) {
-            throw new Piece_ORM_Exception('The element [ mappedAs ] is required to generate a relationship property declaration.');
+            throw new Exception('The element [ mappedAs ] is required to generate a relationship property declaration.');
         }
 
-        $this->relationshipMetadata = Piece_ORM_Metadata_Factory::factory($this->relationship['table']);
+        $this->relationshipMetadata = MetadataFactory::factory($this->relationship['table']);
 
         if ($this->checkHavingSinglePrimaryKey()) {
             if (!$this->relationshipMetadata->getPrimaryKey()) {
-                throw new Piece_ORM_Exception('A single primary key field is required in the table [ ' . $this->relationshipMetadata->getTableName(true) . ' ].');
+                throw new Exception('A single primary key field is required in the table [ ' . $this->relationshipMetadata->getTableName(true) . ' ].');
             }
         }
 
         if (!array_key_exists('column', $this->relationship)) {
             if (!$this->normalizeColumn()) {
-                throw new Piece_ORM_Exception('A single primary key field is required, if the element [ column ] in the element [ relationship ] omit.');
+                throw new Exception('A single primary key field is required, if the element [ column ] in the element [ relationship ] omit.');
             }
         } 
 
         if (!$this->relationshipMetadata->hasField($this->relationship['column'])) {
-            throw new Piece_ORM_Exception("The field [ {$this->relationship['column']} ] not found in the table [ " . $this->relationshipMetadata->getTableName(true) . ' ].');
+            throw new Exception("The field [ {$this->relationship['column']} ] not found in the table [ " . $this->relationshipMetadata->getTableName(true) . ' ].');
         }
 
         if (!array_key_exists('referencedColumn', $this->relationship)) {
             if (!$this->normalizeReferencedColumn()) {
-                throw new Piece_ORM_Exception('A single primary key field is required, if the element [ referencedColumn ] in the element [ relationship ] omit.');
+                throw new Exception('A single primary key field is required, if the element [ referencedColumn ] in the element [ relationship ] omit.');
             }
         } 
 
         if ($this->referencedColumnRequired && !$this->metadata->hasField($this->relationship['referencedColumn'])) {
-            throw new Piece_ORM_Exception("The field [ {$this->relationship['referencedColumn']} ] not found in the table [ " . $this->metadata->getTableName(true) . ' ].');
+            throw new Exception("The field [ {$this->relationship['referencedColumn']} ] not found in the table [ " . $this->metadata->getTableName(true) . ' ].');
         }
 
         if (!array_key_exists('orderBy', $this->relationship)) {

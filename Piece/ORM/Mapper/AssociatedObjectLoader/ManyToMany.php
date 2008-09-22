@@ -35,7 +35,13 @@
  * @since      File available since Release 0.2.0
  */
 
-// {{{ Piece_ORM_Mapper_AssociatedObjectLoader_ManyToMany
+namespace Piece::ORM::Mapper::AssociatedObjectLoader;
+
+use Piece::ORM::Mapper::AssociatedObjectLoader::Common;
+use Piece::ORM::Mapper::Common as MapperCommon;
+use Piece::ORM::Inflector;
+
+// {{{ Piece::ORM::Mapper::AssociatedObjectLoader::ManyToMany
 
 /**
  * An associated object loader for Many-to-Many relationships.
@@ -46,7 +52,7 @@
  * @version    Release: @package_version@
  * @since      Class available since Release 0.2.0
  */
-class Piece_ORM_Mapper_AssociatedObjectLoader_ManyToMany extends Piece_ORM_Mapper_AssociatedObjectLoader_Common
+class ManyToMany extends Common
 {
 
     // {{{ properties
@@ -85,13 +91,13 @@ class Piece_ORM_Mapper_AssociatedObjectLoader_ManyToMany extends Piece_ORM_Mappe
      * Adds an association about what an inverse side record is associated with
      * an owning side record.
      *
-     * @param array                   $row
-     * @param Piece_ORM_Mapper_Common $mapper
-     * @param integer                 $relationshipIndex
+     * @param array                      $row
+     * @param Piece::ORM::Mapper::Common $mapper
+     * @param integer                    $relationshipIndex
      * @return boolean
      */
     public function addAssociation(array $row,
-                                   Piece_ORM_Mapper_Common $mapper,
+                                   MapperCommon $mapper,
                                    $relationshipIndex
                                    )
     {
@@ -166,22 +172,22 @@ class Piece_ORM_Mapper_AssociatedObjectLoader_ManyToMany extends Piece_ORM_Mappe
     // {{{ associateObject()
 
     /**
-     * Associates an object which are loaded by the secondary query into
-     * objects which are loaded by the primary query.
+     * Associates an object which are loaded by the secondary query into objects which
+     * are loaded by the primary query.
      *
-     * @param stdClass                $associatedObject
-     * @param Piece_ORM_Mapper_Common $mapper
-     * @param string                  $relationshipKeyPropertyName
-     * @param integer                 $relationshipIndex
+     * @param stdClass                   $associatedObject
+     * @param Piece::ORM::Mapper::Common $mapper
+     * @param string                     $relationshipKeyPropertyName
+     * @param integer                    $relationshipIndex
      */
     protected function associateObject($associatedObject,
-                                       Piece_ORM_Mapper_Common $mapper,
+                                       MapperCommon $mapper,
                                        $relationshipKeyPropertyName,
                                        $relationshipIndex
                                        )
     {
         $metadata = $mapper->getMetadata();
-        $primaryKey = Piece_ORM_Inflector::camelize($metadata->getPrimaryKey(), true);
+        $primaryKey = Inflector::camelize($metadata->getPrimaryKey(), true);
 
         for ($j = 0, $count = count($this->_associations[$relationshipIndex][ $associatedObject->$primaryKey ]); $j < $count; ++$j) {
             $this->objects[ $this->objectIndexes[$relationshipIndex][ $this->_associations[$relationshipIndex][ $associatedObject->$primaryKey ][$j] ] ]->{ $this->relationships[$relationshipIndex]['mappedAs'] }[] = $associatedObject;

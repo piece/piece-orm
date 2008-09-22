@@ -35,7 +35,15 @@
  * @since      File available since Release 1.1.0
  */
 
-// {{{ Piece_ORM_Mapper_QueryExecutor
+namespace Piece::ORM::Mapper;
+
+use Piece::ORM::Mapper::Common;
+use Piece::ORM::Exception;
+use Piece::ORM::Mapper::QueryExecutor::ConstraintException;
+use Piece::ORM::Exception::PEARException;
+use Piece::ORM::Mapper::QueryBuilder;
+
+// {{{ Piece::ORM::Mapper::QueryExecutor
 
 /**
  * The query executor which executes a query based on a query source and criteria.
@@ -46,7 +54,7 @@
  * @version    Release: @package_version@
  * @since      Class available since Release 1.1.0
  */
-class Piece_ORM_Mapper_QueryExecutor
+class QueryExecutor
 {
 
     // {{{ properties
@@ -82,10 +90,10 @@ class Piece_ORM_Mapper_QueryExecutor
     /**
      * Sets whether a query is for data manipulation.
      *
-     * @param Piece_ORM_Mapper_Common $mapper
-     * @param boolean                 $isManip
+     * @param Piece::ORM::Mapper::Common $mapper
+     * @param boolean                    $isManip
      */
-    public function __construct(Piece_ORM_Mapper_Common $mapper, $isManip)
+    public function __construct(Common $mapper, $isManip)
     {
         $this->_mapper = $mapper;
         $this->_isManip = $isManip;
@@ -97,41 +105,41 @@ class Piece_ORM_Mapper_QueryExecutor
     /**
      * Executes a query.
      *
-     * @param string                $query
-     * @param MDB2_Statement_Common $sth
-     * @return MDB2_Result_Common|integer
-     * @throws Piece_ORM_Exception
-     * @throws Piece_ORM_Mapper_QueryExecutor_ConstraintException
-     * @throws Piece_ORM_Exception_PEARException
+     * @param string                  $query
+     * @param ::MDB2_Statement_Common $sth
+     * @return ::MDB2_Result_Common|integer
+     * @throws Piece::ORM::Exception
+     * @throws Piece::ORM::Mapper::QueryExecutor::ConstraintException
+     * @throws Piece::ORM::Exception::PEARException
      */
     public function execute($query, $sth)
     {
         $dbh = $this->_mapper->getConnection();
-        PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
+        ::PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
         if (!$this->_isManip) {
             $result = $dbh->query($query);
         } else {
             if (is_null($sth)) {
                 $result = $dbh->exec($query);
             } else {
-                if (!is_subclass_of($sth, 'MDB2_Statement_Common')) {
-                    PEAR::staticPopErrorHandling();
-                    throw new Piece_ORM_Exception('An unexpected value detected. executeQuery() with a prepared statement can only receive a MDB2_Statement_Common object.');
+                if (!$sth instanceof ::MDB2_Statement_Common) {
+                    ::PEAR::staticPopErrorHandling();
+                    throw new Exception('An unexpected value detected. executeQuery() with a prepared statement can only receive a ::MDB2_Statement_Common object.');
                 }
 
                 $result = $sth->execute();
             }
         }
-        PEAR::staticPopErrorHandling();
+        ::PEAR::staticPopErrorHandling();
 
         $this->_mapper->setLastQuery($dbh->last_query);
 
-        if (MDB2::isError($result)) {
+        if (::MDB2::isError($result)) {
             if ($result->getCode() == MDB2_ERROR_CONSTRAINT) {
-                throw new Piece_ORM_Mapper_QueryExecutor_ConstraintException($result);
+                throw new ConstraintException($result);
             }
 
-            throw new Piece_ORM_Exception_PEARException($result);
+            throw new PEARException($result);
         }
 
         return $result;
@@ -145,15 +153,15 @@ class Piece_ORM_Mapper_QueryExecutor
      *
      * @param string   $methodName
      * @param stdClass $criteria
-     * @return MDB2_Result_Common|integer
+     * @return ::MDB2_Result_Common|integer
      */
     public function executeWithCriteria($methodName, $criteria)
     {
-        $queryBuilder = new Piece_ORM_Mapper_QueryBuilder($this->_mapper,
-                                                          $methodName,
-                                                          $criteria,
-                                                          $this->_isManip
-                                                          );
+        $queryBuilder = new QueryBuilder($this->_mapper,
+                                         $methodName,
+                                         $criteria,
+                                         $this->_isManip
+                                         );
         list($query, $sth) = $queryBuilder->build();
         return $this->execute($query, $sth);
     }

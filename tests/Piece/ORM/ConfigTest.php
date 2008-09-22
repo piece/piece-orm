@@ -36,9 +36,10 @@
  */
 
 namespace Piece::ORM;
+
 use Piece::ORM::Config;
 
-// {{{ ConfigTest
+// {{{ Piece::ORM::ConfigTest
 
 /**
  * Some tests for Piece::ORM::Config.

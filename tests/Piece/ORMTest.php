@@ -35,9 +35,17 @@
  * @since      File available since Release 0.1.0
  */
 
+namespace Piece;
+
+use Piece::ORM;
+use Piece::ORM::Metadata::MetadataFactory;
+use Piece::ORM::Mapper::MapperFactory;
+use Piece::ORM::Context;
+use Piece::ORMTest::Employee;
+
 require_once 'spyc.php5';
 
-// {{{ Piece_ORMTest
+// {{{ Piece::ORMTest
 
 /**
  * Some tests for Piece_ORM.
@@ -48,7 +56,7 @@ require_once 'spyc.php5';
  * @version    Release: @package_version@
  * @since      Class available since Release 0.1.0
  */
-class Piece_ORMTest extends PHPUnit_Framework_TestCase
+class ORMTest extends ::PHPUnit_Framework_TestCase
 {
 
     // {{{ properties
@@ -86,28 +94,28 @@ class Piece_ORMTest extends PHPUnit_Framework_TestCase
 
     public function tearDown()
     {
-        Piece_ORM::$configured = false;
-        Piece_ORM_Metadata_Factory::clearInstances();
-        Piece_ORM_Mapper_Factory::clearInstances();
-        Piece_ORM_Context::clear();
-        $cache = new Cache_Lite(array('cacheDir' => "{$this->_cacheDirectory}/",
-                                      'automaticSerialization' => true,
-                                      'errorHandlingAPIBreak' => true)
-                                );
+        ORM::$configured = false;
+        MetadataFactory::clearInstances();
+        MapperFactory::clearInstances();
+        Context::clear();
+        $cache = new ::Cache_Lite(array('cacheDir' => "{$this->_cacheDirectory}/",
+                                        'automaticSerialization' => true,
+                                        'errorHandlingAPIBreak' => true)
+                                  );
         $cache->clean();
     }
 
     public function testShouldConfigureWithAGivenConfigurationFile()
     {
-        $yaml = Spyc::YAMLLoad("{$this->_cacheDirectory}/piece-orm-config.yaml");
+        $yaml = ::Spyc::YAMLLoad("{$this->_cacheDirectory}/piece-orm-config.yaml");
 
         $this->assertEquals(4, count($yaml));
 
-        Piece_ORM::configure($this->_cacheDirectory,
-                             $this->_cacheDirectory,
-                             $this->_cacheDirectory
-                             );
-        $context = Piece_ORM_Context::singleton();
+        ORM::configure($this->_cacheDirectory,
+                       $this->_cacheDirectory,
+                       $this->_cacheDirectory
+                       );
+        $context = Context::singleton();
         $config = $context->getConfiguration();
 
         foreach ($yaml as $configuration) {
@@ -116,47 +124,47 @@ class Piece_ORMTest extends PHPUnit_Framework_TestCase
         }
 
         $this->assertEquals($this->_cacheDirectory,
-                            $this->readAttribute('Piece_ORM_Mapper_Factory',
+                            $this->readAttribute('Piece::ORM::Mapper::MapperFactory',
                                                  '_configDirectory')
                             );
         $this->assertEquals($this->_cacheDirectory,
-                            $this->readAttribute('Piece_ORM_Mapper_Factory',
+                            $this->readAttribute('Piece::ORM::Mapper::MapperFactory',
                                                  '_cacheDirectory')
                             );
         $this->assertEquals($this->_cacheDirectory,
-                            $this->readAttribute('Piece_ORM_Metadata_Factory',
+                            $this->readAttribute('Piece::ORM::Metadata::MetadataFactory',
                                                  '_cacheDirectory')
                             );
 
-        Piece_ORM_Mapper_Factory::setConfigDirectory('./foo');
-        Piece_ORM_Mapper_Factory::setCacheDirectory('./bar');
-        Piece_ORM_Metadata_Factory::setCacheDirectory('./baz');
+        MapperFactory::setConfigDirectory('./foo');
+        MapperFactory::setCacheDirectory('./bar');
+        MetadataFactory::setCacheDirectory('./baz');
 
         $this->assertEquals('./foo',
-                            $this->readAttribute('Piece_ORM_Mapper_Factory',
+                            $this->readAttribute('Piece::ORM::Mapper::MapperFactory',
                                                  '_configDirectory')
                             );
         $this->assertEquals('./bar',
-                            $this->readAttribute('Piece_ORM_Mapper_Factory',
+                            $this->readAttribute('Piece::ORM::Mapper::MapperFactory',
                                                  '_cacheDirectory')
                             );
         $this->assertEquals('./baz',
-                            $this->readAttribute('Piece_ORM_Metadata_Factory',
+                            $this->readAttribute('Piece::ORM::Metadata::MetadataFactory',
                                                  '_cacheDirectory')
                             );
     }
 
     public function testShouldConfigureDynamicallyWithAGivenConfigurationFile()
     {
-        $yaml = Spyc::YAMLLoad("{$this->_cacheDirectory}/piece-orm-config.yaml");
+        $yaml = ::Spyc::YAMLLoad("{$this->_cacheDirectory}/piece-orm-config.yaml");
 
         $this->assertEquals(4, count($yaml));
 
-        Piece_ORM::configure($this->_cacheDirectory,
-                             $this->_cacheDirectory,
-                             $this->_cacheDirectory
-                             );
-        $config = Piece_ORM::getConfiguration();
+        ORM::configure($this->_cacheDirectory,
+                       $this->_cacheDirectory,
+                       $this->_cacheDirectory
+                       );
+        $config = ORM::getConfiguration();
         $config->setOptions('database1', array('debug' => 5));
         $config->setDSN('database2', 'pgsql://piece:piece@pieceorm/piece_test');
         $config->setOptions('database2', array('debug' => 0, 'result_buffering' => false));
@@ -184,81 +192,79 @@ class Piece_ORMTest extends PHPUnit_Framework_TestCase
 
     public function testShouldGetAMapper()
     {
-        Piece_ORM::configure($this->_cacheDirectory,
-                             $this->_cacheDirectory,
-                             $this->_cacheDirectory
-                             );
-        $this->assertType('Piece_ORM_Mapper_Common',
-                          Piece_ORM::getMapper('Employees')
-                          );
+        ORM::configure($this->_cacheDirectory,
+                       $this->_cacheDirectory,
+                       $this->_cacheDirectory
+                       );
+        $this->assertType('Piece::ORM::Mapper::Common', ORM::getMapper('Employees'));
     }
 
     /**
-     * @expectedException Piece_ORM_Exception
+     * @expectedException Piece::ORM::Exception
      */
     public function testShouldRaiseAnExceptionWhenGetmapperIsCalledBeforeCallingConfigure()
     {
-        Piece_ORM::getMapper('Employees');
+        ORM::getMapper('Employees');
     }
 
     /**
-     * @expectedException Piece_ORM_Exception
+     * @expectedException Piece::ORM::Exception
      */
     public function testShouldRaiseAnExceptionWhenGetconfigurationIsCalledBeforeCallingConfigure()
     {
-        Piece_ORM::getConfiguration();
+        ORM::getConfiguration();
     }
 
     public function testShouldSetADatabase()
     {
-        $cacheDirectory = dirname(__FILE__) . '/' . basename(__FILE__, '.php') . '/SetDatabase';
-        Piece_ORM::configure($cacheDirectory, $cacheDirectory, $cacheDirectory);
+        $cacheDirectory =
+            dirname(__FILE__) . '/' . basename(__FILE__, '.php') . '/SetDatabase';
+        ORM::configure($cacheDirectory, $cacheDirectory, $cacheDirectory);
 
         $this->assertEquals("$cacheDirectory/database1",
-                            $this->readAttribute('Piece_ORM_Mapper_Factory',
+                            $this->readAttribute('Piece::ORM::Mapper::MapperFactory',
                                                  '_configDirectory')
                             );
 
-        Piece_ORM_Mapper_Factory::setConfigDirectory('./foo');
-        Piece_ORM::setDatabase('database2');
+        MapperFactory::setConfigDirectory('./foo');
+        ORM::setDatabase('database2');
 
         $this->assertEquals("$cacheDirectory/database2",
-                            $this->readAttribute('Piece_ORM_Mapper_Factory',
+                            $this->readAttribute('Piece::ORM::Mapper::MapperFactory',
                                                  '_configDirectory')
                             );
 
-        $cache = new Cache_Lite(array('cacheDir' => "$cacheDirectory/",
-                                      'automaticSerialization' => true,
-                                      'errorHandlingAPIBreak' => true)
-                                );
+        $cache = new ::Cache_Lite(array('cacheDir' => "$cacheDirectory/",
+                                        'automaticSerialization' => true,
+                                        'errorHandlingAPIBreak' => true)
+                                  );
         $cache->clean();
     }
 
     public function testShouldCreateAnObjectByAGivenMapper()
     {
-        Piece_ORM::configure($this->_cacheDirectory,
-                             $this->_cacheDirectory,
-                             $this->_cacheDirectory
-                             );
+        ORM::configure($this->_cacheDirectory,
+                       $this->_cacheDirectory,
+                       $this->_cacheDirectory
+                       );
 
-        $this->assertNotNull(Piece_ORM::createObject('Employees'));
+        $this->assertNotNull(ORM::createObject('Employees'));
     }
 
     public function testShouldDressAnObject()
     {
-        Piece_ORM::configure($this->_cacheDirectory,
-                             $this->_cacheDirectory,
-                             $this->_cacheDirectory
-                             );
-        $employee = Piece_ORM::createObject('Employees');
+        ORM::configure($this->_cacheDirectory,
+                       $this->_cacheDirectory,
+                       $this->_cacheDirectory
+                       );
+        $employee = ORM::createObject('Employees');
         $employee->firstName = 'Foo';
         $employee->lastName = 'Bar';
         $employee->object = new stdClass();
-        $realEmployee =
-            Piece_ORM::dressObject($employee, new Piece_ORMTest_Employee());
+        $realEmployee = ORM::dressObject($employee, new Employee());
 
-        $this->assertType('Piece_ORMTest_Employee', $realEmployee);
-        $this->assertTrue(method_exists($realEmployee, 'generatePassword'));
+        $this->assertType('Piece::ORMTest::Employee', $realEmployee);
+        $this->assertEquals('Baz', $realEmployee->generatePassword());
         $this->assertEquals('Foo', $realEmployee->firstName);
         $this->assertObjectHasAttribute('object', $realEmployee);
         $this->assertType('stdClass', $realEmployee->object);
@@ -270,21 +276,21 @@ class Piece_ORMTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Piece_ORM_Exception
+     * @expectedException Piece::ORM::Exception
      * @since Method available since Release 0.3.0
      */
     public function testShouldRaiseAnExceptionWhenSetdatabaseIsCalledBeforeCallingConfigure()
     {
-        Piece_ORM::setDatabase('database2');
+        ORM::setDatabase('database2');
     }
 
     /**
-     * @expectedException Piece_ORM_Exception
+     * @expectedException Piece::ORM::Exception
      * @since Method available since Release 0.3.0
      */
     public function testShouldRaiseAnExceptionWhenCreateobjectIsCalledBeforeCallingConfigure()
     {
-        Piece_ORM::createObject('Employees');
+        ORM::createObject('Employees');
     }
 
     /**
@@ -292,28 +298,26 @@ class Piece_ORMTest extends PHPUnit_Framework_TestCase
      */
     public function testShouldTreatDsnByArray()
     {
-        Piece_ORM::configure($this->_cacheDirectory,
-                             $this->_cacheDirectory,
-                             $this->_cacheDirectory
-                             );
-        Piece_ORM::setDatabase('database3');
-        $count = Piece_ORM::getMapper('Employees')->findOneWithQuery('SELECT COUNT(*) FROM employees');
+        ORM::configure($this->_cacheDirectory,
+                       $this->_cacheDirectory,
+                       $this->_cacheDirectory
+                       );
+        ORM::setDatabase('database3');
 
-        $this->assertNotNull($count);
-        $this->assertEquals(0, $count);
+        $this->assertEquals(0, ORM::getMapper('Employees')->findOneWithQuery('SELECT COUNT(*) FROM employees'));
     }
 
     /**
-     * @expectedException Piece_ORM_Exception
+     * @expectedException Piece::ORM::Exception
      * @since Method available since Release 0.7.0
      */
     public function testShouldRaiseAnExceptionWhenUndefinedDatabaseIsGiven()
     {
-        Piece_ORM::configure($this->_cacheDirectory,
-                             $this->_cacheDirectory,
-                             $this->_cacheDirectory
-                             );
-        Piece_ORM::setDatabase('foo');
+        ORM::configure($this->_cacheDirectory,
+                       $this->_cacheDirectory,
+                       $this->_cacheDirectory
+                       );
+        ORM::setDatabase('foo');
     }
 
     /**
@@ -321,12 +325,12 @@ class Piece_ORMTest extends PHPUnit_Framework_TestCase
      */
     public function testShouldUseAMapperNameAsATableNameIfEnabled()
     {
-        Piece_ORM::configure($this->_cacheDirectory,
-                             $this->_cacheDirectory,
-                             $this->_cacheDirectory
-                             );
-        Piece_ORM::setDatabase('caseSensitive');
-        $mapper = Piece_ORM::getMapper('Case_Sensitive');
+        ORM::configure($this->_cacheDirectory,
+                       $this->_cacheDirectory,
+                       $this->_cacheDirectory
+                       );
+        ORM::setDatabase('caseSensitive');
+        $mapper = ORM::getMapper('Case_Sensitive');
         $mapper->findAll();
 
         $this->assertRegexp('/FROM ["\[]?Case_Sensitive["\[]?/',
@@ -341,8 +345,8 @@ class Piece_ORMTest extends PHPUnit_Framework_TestCase
     {
         $cacheDirectory =
             dirname(__FILE__) . '/' . basename(__FILE__, '.php') . '/SetDatabase';
-        Piece_ORM::configure($cacheDirectory, $cacheDirectory, $cacheDirectory);
-        $config = Piece_ORM::getConfiguration();
+        ORM::configure($cacheDirectory, $cacheDirectory, $cacheDirectory);
+        $config = ORM::getConfiguration();
 
         $this->assertEquals('database1', $config->getDirectorySuffix('database1'));
 
@@ -350,10 +354,10 @@ class Piece_ORMTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals('foo', $config->getDirectorySuffix('database1'));
 
-        $cache = new Cache_Lite(array('cacheDir' => "$cacheDirectory/",
-                                      'automaticSerialization' => true,
-                                      'errorHandlingAPIBreak' => true)
-                                );
+        $cache = new ::Cache_Lite(array('cacheDir' => "$cacheDirectory/",
+                                        'automaticSerialization' => true,
+                                        'errorHandlingAPIBreak' => true)
+                                  );
         $cache->clean();
     }
 
@@ -366,14 +370,6 @@ class Piece_ORMTest extends PHPUnit_Framework_TestCase
     /**#@-*/
 
     // }}}
-}
-
-// }}}
-// {{{ Piece_ORMTest_Employee
-
-class Piece_ORMTest_Employee
-{
-    public function generatePassword() {}
 }
 
 // }}}
