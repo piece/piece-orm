@@ -35,12 +35,15 @@
  * @since      File available since Release 0.1.0
  */
 
+namespace Piece::ORM::Config;
+use Piece::ORM::Config::ConfigFactory;
+
 require_once 'spyc.php5';
 
-// {{{ Piece_ORM_Config_FactoryTest
+// {{{ ConfigFactoryTest
 
 /**
- * Some tests for Piece_ORM_Config_Factory.
+ * Some tests for Piece::ORM::Config::ConfigFactory.
  *
  * @package    Piece_ORM
  * @copyright  2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
@@ -48,7 +51,7 @@ require_once 'spyc.php5';
  * @version    Release: @package_version@
  * @since      Class available since Release 0.1.0
  */
-class Piece_ORM_Config_FactoryTest extends PHPUnit_Framework_TestCase
+class ConfigFactoryTest extends ::PHPUnit_Framework_TestCase
 {
 
     // {{{ properties
@@ -86,50 +89,46 @@ class Piece_ORM_Config_FactoryTest extends PHPUnit_Framework_TestCase
 
     public function tearDown()
     {
-        $cache = new Cache_Lite(array('cacheDir' => "{$this->_cacheDirectory}/",
-                                      'automaticSerialization' => true,
-                                      'errorHandlingAPIBreak' => true)
-                                );
+        $cache = new ::Cache_Lite(array('cacheDir' => "{$this->_cacheDirectory}/",
+                                        'automaticSerialization' => true,
+                                        'errorHandlingAPIBreak' => true)
+                                  );
         $cache->clean();
     }
 
     public function testShouldCreateAnObjectWithoutConfigurationFile()
     {
-        $this->assertType('Piece_ORM_Config', Piece_ORM_Config_Factory::factory());
+        $this->assertType('Piece::ORM::Config', ConfigFactory::factory());
     }
 
     /**
-     * @expectedException Piece_ORM_Exception
+     * @expectedException Piece::ORM::Exception
      */
     public function testShouldRaiseAnExceptionWhenAGivenConfigurationDirectoryIsNotFound()
     {
-        Piece_ORM_Config_Factory::factory(dirname(__FILE__) . '/foo',
-                                          $this->_cacheDirectory
-                                          );
+        ConfigFactory::factory(dirname(__FILE__) . '/foo', $this->_cacheDirectory);
     }
 
     /**
-     * @expectedException Piece_ORM_Exception
+     * @expectedException Piece::ORM::Exception
      */
     public function testShouldRaiseAnExceptionWhenAGivenConfigurationFileIsNotFound()
     {
-        Piece_ORM_Config_Factory::factory(dirname(__FILE__), $this->_cacheDirectory);
+        ConfigFactory::factory(dirname(__FILE__), $this->_cacheDirectory);
     }
 
     public function testShouldCreateAnObjectEvenThoughAGivenCacheDirectoryIsNotFound()
     {
-        $this->assertType('Piece_ORM_Config',
-                          @Piece_ORM_Config_Factory::factory($this->_cacheDirectory,
-                                                             dirname(__FILE__) . '/foo')
+        $this->assertType('Piece::ORM::Config',
+                          @ConfigFactory::factory($this->_cacheDirectory,
+                                                  dirname(__FILE__) . '/foo')
                           );
     }
 
     public function testShouldCreateAnObjectByAGivenConfigurationFile()
     {
-        $yaml = Spyc::YAMLLoad("{$this->_cacheDirectory}/piece-orm-config.yaml");
-        $config = Piece_ORM_Config_Factory::factory($this->_cacheDirectory,
-                                                    $this->_cacheDirectory
-                                                    );
+        $yaml = ::Spyc::YAMLLoad("{$this->_cacheDirectory}/piece-orm-config.yaml");
+        $config = ConfigFactory::factory($this->_cacheDirectory, $this->_cacheDirectory);
 
         $this->assertEquals(2, count($yaml));
 
@@ -146,12 +145,12 @@ class Piece_ORM_Config_FactoryTest extends PHPUnit_Framework_TestCase
     {
         $oldDirectory = getcwd();
         chdir("{$this->_cacheDirectory}/CacheIDsShouldBeUniqueInOneCacheDirectory1");
-        Piece_ORM_Config_Factory::factory('.', $this->_cacheDirectory);
+        ConfigFactory::factory('.', $this->_cacheDirectory);
 
         $this->assertEquals(1, $this->_getCacheFileCount($this->_cacheDirectory));
 
         chdir("{$this->_cacheDirectory}/CacheIDsShouldBeUniqueInOneCacheDirectory2");
-        Piece_ORM_Config_Factory::factory('.', $this->_cacheDirectory);
+        ConfigFactory::factory('.', $this->_cacheDirectory);
 
         $this->assertEquals(2, $this->_getCacheFileCount($this->_cacheDirectory));
 

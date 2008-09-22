@@ -35,7 +35,9 @@
  * @since      File available since Release 0.1.0
  */
 
-// {{{ Piece_ORM_Config
+namespace Piece::ORM;
+
+// {{{ Config
 
 /**
  * The configuration container for Piece_ORM mappers.
@@ -46,7 +48,7 @@
  * @version    Release: @package_version@
  * @since      Class available since Release 0.1.0
  */
-class Piece_ORM_Config
+class Config
 {
 
     // {{{ properties
@@ -146,9 +148,9 @@ class Piece_ORM_Config
     /**
      * Merges the given configuretion into the existing configuration.
      *
-     * @param Piece_ORM_Config $config
+     * @param Piece::ORM::Config $config
      */
-    public function merge(Piece_ORM_Config $config)
+    public function merge(Config $config)
     {
         $configurations = $config->getConfigurations();
         array_walk($configurations, array($this, 'mergeConfigurations'));
@@ -165,7 +167,10 @@ class Piece_ORM_Config
      */
     public function mergeConfigurations(array $configuration, $database)
     {
-        $this->addConfiguration($database, $configuration['dsn'], $configuration['options']);
+        $this->addConfiguration($database,
+                                $configuration['dsn'],
+                                $configuration['options']
+                                );
     }
 
     // }}}
@@ -276,7 +281,8 @@ class Piece_ORM_Config
      */
     public function setUseMapperNameAsTableName($database, $useMapperNameAsTableName)
     {
-        $this->_configurations[$database]['useMapperNameAsTableName'] = $useMapperNameAsTableName;
+        $this->_configurations[$database]['useMapperNameAsTableName'] =
+            $useMapperNameAsTableName;
     }
 
     // }}}
@@ -299,7 +305,9 @@ class Piece_ORM_Config
             return;
         }
 
-        if (!array_key_exists('useMapperNameAsTableName', $this->_configurations[$database])) {
+        if (!array_key_exists('useMapperNameAsTableName',
+                              $this->_configurations[$database])
+            ) {
             return false;
         }
 

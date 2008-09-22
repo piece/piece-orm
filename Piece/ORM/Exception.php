@@ -35,7 +35,9 @@
  * @since      File available since Release 2.0.0
  */
 
-// {{{ Piece_ORM_Exception
+namespace Piece::ORM;
+
+// {{{ Exception
 
 /**
  * The base exception class for all Piece_ORM runtime exceptions.
@@ -46,7 +48,7 @@
  * @version    Release: @package_version@
  * @since      Class available since Release 2.0.0
  */
-class Piece_ORM_Exception extends Exception {}
+class Exception extends ::Exception {}
 
 // }}}
 

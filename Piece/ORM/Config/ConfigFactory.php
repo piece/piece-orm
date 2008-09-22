@@ -35,12 +35,17 @@
  * @since      File available since Release 0.1.0
  */
 
+namespace Piece::ORM::Config;
+use Piece::ORM::Config;
+use Piece::ORM::Exception;
+use Piece::ORM::Env;
+
 require_once 'spyc.php5';
 
-// {{{ Piece_ORM_Config_Factory
+// {{{ ConfigFactory
 
 /**
- * A factory class for creating Piece_ORM_Config objects.
+ * A factory class for creating Piece::ORM::Config objects.
  *
  * @package    Piece_ORM
  * @copyright  2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
@@ -48,7 +53,7 @@ require_once 'spyc.php5';
  * @version    Release: @package_version@
  * @since      Class available since Release 0.1.0
  */
-class Piece_ORM_Config_Factory
+class ConfigFactory
 {
 
     // {{{ properties
@@ -79,51 +84,51 @@ class Piece_ORM_Config_Factory
     // {{{ factory()
 
     /**
-     * Creates a Piece_ORM_Config object from a configuration file or a cache.
+     * Creates a Piece::ORM::Config object from a configuration file or a cache.
      *
      * @param string $configDirectory
      * @param string $cacheDirectory
-     * @return Piece_ORM_Config
-     * @throws Piece_ORM_Exception
+     * @return Piece::ORM::Config
+     * @throws Piece::ORM::Exception
      */
     public static function factory($configDirectory = null, $cacheDirectory = null)
     {
         if (is_null($configDirectory)) {
-            return new Piece_ORM_Config();
+            return new Config();
         }
 
         if (!file_exists($configDirectory)) {
-            throw new Piece_ORM_Exception("The configuration directory [ $configDirectory ] is not found.");
+            throw new Exception("The configuration directory [ $configDirectory ] is not found.");
         }
 
         $configFile = "$configDirectory/piece-orm-config.yaml";
         if (!file_exists($configFile)) {
-            throw new Piece_ORM_Exception("The configuration file [ $configFile ] is not found.");
+            throw new Exception("The configuration file [ $configFile ] is not found.");
         }
 
         if (!is_readable($configFile)) {
-            throw new Piece_ORM_Exception("The configuration file [ $configFile ] is not readable.");
+            throw new Exception("The configuration file [ $configFile ] is not readable.");
         }
 
         if (is_null($cacheDirectory)) {
-            return Piece_ORM_Config_Factory::_createConfigurationFromFile($configFile);
+            return self::_createConfigurationFromFile($configFile);
         }
 
         if (!file_exists($cacheDirectory)) {
             trigger_error("The cache directory [ $cacheDirectory ] is not found.",
                           E_USER_WARNING
                           );
-            return Piece_ORM_Config_Factory::_createConfigurationFromFile($configFile);
+            return self::_createConfigurationFromFile($configFile);
         }
 
         if (!is_readable($cacheDirectory) || !is_writable($cacheDirectory)) {
             trigger_error("The cache directory [ $cacheDirectory ] is not readable or writable.",
                           E_USER_WARNING
                           );
-            return Piece_ORM_Config_Factory::_createConfigurationFromFile($configFile);
+            return self::_createConfigurationFromFile($configFile);
         }
 
-        return Piece_ORM_Config_Factory::_getConfiguration($configFile, $cacheDirectory);
+        return self::_getConfiguration($configFile, $cacheDirectory);
     }
 
     /**#@-*/
@@ -142,42 +147,42 @@ class Piece_ORM_Config_Factory
     // {{{ _getConfiguration()
 
     /**
-     * Gets a Piece_ORM_Config object from a cache.
+     * Gets a Piece::ORM::Config object from a cache.
      *
      * @param string $masterFile
      * @param string $cacheDirectory
-     * @return Piece_ORM_Config
+     * @return Piece::ORM::Config
      */
     private function _getConfiguration($masterFile, $cacheDirectory)
     {
         $masterFile = realpath($masterFile);
-        $cache = new Cache_Lite_File(array('cacheDir' => "$cacheDirectory/",
-                                           'masterFile' => $masterFile,
-                                           'automaticSerialization' => true,
-                                           'errorHandlingAPIBreak' => true)
-                                     );
+        $cache = new ::Cache_Lite_File(array('cacheDir' => "$cacheDirectory/",
+                                             'masterFile' => $masterFile,
+                                             'automaticSerialization' => true,
+                                             'errorHandlingAPIBreak' => true)
+                                       );
 
-        if (!Piece_ORM_Env::isProduction()) {
+        if (!Env::isProduction()) {
             $cache->remove($masterFile);
         }
 
         /*
          * The Cache_Lite class always specifies PEAR_ERROR_RETURN when
-         * calling PEAR::raiseError in default.
+         * calling ::PEAR::raiseError in default.
          */
         $config = $cache->get($masterFile);
-        if (PEAR::isError($config)) {
+        if (::PEAR::isError($config)) {
             trigger_error("Cannot read the cache file in the directory [ $cacheDirectory ].",
                           E_USER_WARNING
                           );
-            return Piece_ORM_Config_Factory::_createConfigurationFromFile($masterFile);
+            return self::_createConfigurationFromFile($masterFile);
         }
 
         if (!$config) {
-            $config = Piece_ORM_Config_Factory::_createConfigurationFromFile($masterFile);
+            $config = self::_createConfigurationFromFile($masterFile);
             $result = $cache->save($config);
-            if (PEAR::isError($result)) {
-                trigger_error("Cannot write the Piece_ORM_Config object to the cache file in the directory [ $cacheDirectory ].",
+            if (::PEAR::isError($result)) {
+                trigger_error("Cannot write the Piece::ORM::Config object to the cache file in the directory [ $cacheDirectory ].",
                               E_USER_WARNING
                               );
             }
@@ -190,15 +195,15 @@ class Piece_ORM_Config_Factory
     // {{{ _createConfigurationFromFile()
 
     /**
-     * Parses the given file and returns a Piece_ORM_Config object.
+     * Parses the given file and returns a Piece::ORM::Config object.
      *
      * @param string $file
-     * @return Piece_ORM_Config
+     * @return Piece::ORM::Config
      */
     private function _createConfigurationFromFile($file)
     {
-        $config = new Piece_ORM_Config();
-        $yaml = Spyc::YAMLLoad($file);
+        $config = new Config();
+        $yaml = ::Spyc::YAMLLoad($file);
         foreach ($yaml as $configuration) {
             $config->setDSN($configuration['name'], $configuration['dsn']);
             $config->setOptions($configuration['name'], @$configuration['options']);

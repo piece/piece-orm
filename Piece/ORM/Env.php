@@ -35,7 +35,9 @@
  * @since      File available since Release 0.5.0
  */
 
-// {{{ Piece_ORM_Env
+namespace Piece::ORM;
+
+// {{{ Env
 
 /**
  * The state holder for an application with Piece_ORM.
@@ -46,7 +48,7 @@
  * @version    Release: @package_version@
  * @since      Class available since Release 0.5.0
  */
-class Piece_ORM_Env
+class Env
 {
 
     // {{{ properties
