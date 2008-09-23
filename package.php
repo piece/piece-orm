@@ -40,13 +40,13 @@ require_once 'PEAR.php';
 
 PEAR::staticPushErrorHandling(PEAR_ERROR_CALLBACK, create_function('$error', 'var_dump($error); exit();'));
 
-$releaseVersion = '1.2.0';
+$releaseVersion = '2.0.0';
 $releaseStability = 'stable';
-$apiVersion = '0.3.0';
+$apiVersion = '2.0.0';
 $apiStability = 'stable';
 $notes = 'A new release of Piece_ORM is now available.
 
-What\'s New in Piece_ORM 1.2.0';
+What\'s New in Piece_ORM 2.0.0';
 
 $package = new PEAR_PackageFileManager2();
 $package->setOptions(array('filelistgenerator' => 'file',
@@ -55,6 +55,10 @@ $package->setOptions(array('filelistgenerator' => 'file',
                            'baseinstalldir'    => '/',
                            'packagefile'       => 'package.xml',
                            'packagedirectory'  => '.',
+                           'dir_roles'         => array('data' => 'data',
+                                                        'doc' => 'doc',
+                                                        'src' => 'php',
+                                                        'tests' => 'test'),
                            'ignore'            => array('package.php'))
                      );
 
@@ -71,11 +75,12 @@ $package->setAPIStability($apiStability);
 $package->setReleaseVersion($releaseVersion);
 $package->setReleaseStability($releaseStability);
 $package->setNotes($notes);
-$package->setPhpDep('4.3.0');
+$package->setPhpDep('5.3.0');
 $package->setPearinstallerDep('1.4.3');
 $package->addPackageDepWithChannel('required', 'MDB2', 'pear.php.net', '2.3.0');
 $package->addPackageDepWithChannel('required', 'Cache_Lite', 'pear.php.net', '1.7.0');
 $package->addPackageDepWithChannel('required', 'PEAR', 'pear.php.net', '1.4.3');
+$package->addPackageDepWithChannel('required', 'Stagehand_AttributeHolder', 'pear.piece-framework.com', '0.1.0');
 $package->addMaintainer('lead', 'iteman', 'KUBO Atsuhiro', 'iteman@users.sourceforge.net');
 $package->addGlobalReplacement('package-info', '@package_version@', 'version');
 $package->generateContents();
