@@ -35,17 +35,14 @@
  * @since      File available since Release 0.1.0
  */
 
-namespace Piece::ORM::Metadata;
+namespace Piece::ORM::Context;
 
-use Piece::ORM::Metadata::MetadataFactory;
-use Piece::ORM::Config;
 use Piece::ORM::Context;
-use Piece::ORM::Context::Registry;
 
-// {{{ Piece::ORM::Metadata::MetadataFactoryTest
+// {{{ Piece::ORM::Context::Registry
 
 /**
- * Some tests for Piece::ORM::Metadata::MetadataFactory.
+ * A registry for Piece::ORM::Context objects.
  *
  * @package    Piece_ORM
  * @copyright  2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
@@ -53,9 +50,14 @@ use Piece::ORM::Context::Registry;
  * @version    Release: @package_version@
  * @since      Class available since Release 0.1.0
  */
-class MetadataFactoryTest extends ::PHPUnit_Framework_TestCase
+class Registry
 {
 
+    // {{{ constants
+
+    const DEFAULT_CONTEXT_ID = '_default';
+
+    // }}}
     // {{{ properties
 
     /**#@+
@@ -68,15 +70,14 @@ class MetadataFactoryTest extends ::PHPUnit_Framework_TestCase
      * @access protected
      */
 
-    protected $backupGlobals = false;
-
     /**#@-*/
 
     /**#@+
      * @access private
      */
 
-    private $_cacheDirectory;
+    private static $_contexts = array();
+    private static $_currentContextID;
 
     /**#@-*/
 
@@ -84,49 +85,55 @@ class MetadataFactoryTest extends ::PHPUnit_Framework_TestCase
      * @access public
      */
 
-    public function setUp()
+    // }}}
+    // {{{ getContext()
+
+    /**
+     * Gets a Piece::ORM::Context object from the registry.
+     *
+     * @return Piece::ORM::Context
+     */
+    public static function getContext()
     {
-        $this->_cacheDirectory = dirname(__FILE__) . '/' . basename(__FILE__, '.php');
-        $config = new Config();
-        $config->setDSN('piece', 'pgsql://piece:piece@pieceorm/piece');
-        $config->setOptions('piece',
-                            array('debug' => 2, 'result_buffering' => false)
-                            );
-        $context = new Context();
-        $context->setConfiguration($config);
-        $context->setDatabase('piece');
-        Registry::addContext($context);
-        MetadataFactory::setCacheDirectory($this->_cacheDirectory);
+        return self::$_contexts[ self::$_currentContextID ];
     }
 
-    public function tearDown()
+    // }}}
+    // {{{ addContext()
+
+    /**
+     * Adds a Piece::ORM::Context object to the registry.
+     *
+     * @param Piece::ORM::Context $context
+     */
+    public static function addContext(Context $context)
     {
-        MetadataFactory::restoreCacheDirectory();
-        MetadataFactory::clearInstances();
-        Registry::clear();
-        $cache = new ::Cache_Lite(array('cacheDir' => "{$this->_cacheDirectory}/",
-                                        'automaticSerialization' => true,
-                                        'errorHandlingAPIBreak' => true)
-                                  );
-        $cache->clean();
+        if (!$context->hasAttribute('id')) {
+            $id = self::DEFAULT_CONTEXT_ID;
+        } else {
+            $id = $context->getAttribute('id');
+        }
+
+        if (!count(array_keys(self::$_contexts))) {
+            self::$_currentContextID = $id;
+        }
+
+        self::$_contexts[$id] = $context;
     }
 
-    public function testShouldCreateAnObjectByAGivenMapper()
+    // }}}
+    // {{{ clear()
+
+    /**
+     * Clear all Piece::ORM::Context objects in the registry.
+     */
+    public static function clear()
     {
-        $metadata = MetadataFactory::factory('Employees');
+        foreach (self::$_contexts as $context) {
+            $context->clear();
+        }
 
-        $this->assertType('Piece::ORM::Metadata', $metadata);
-        $this->assertEquals('employees', $metadata->getTableName());
-    }
-
-    public function testShouldReturnTheExistingObjectIfItExists()
-    {
-        $metadata1 = MetadataFactory::factory('Employees');
-        $metadata1->foo = 'bar';
-        $metadata2 = MetadataFactory::factory('Employees');
-
-        $this->assertObjectHasAttribute('foo', $metadata2);
-        $this->assertEquals('bar', $metadata2->foo);
+        self::$_contexts = array();
     }
 
     /**#@-*/

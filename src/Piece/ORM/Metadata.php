@@ -39,6 +39,7 @@ namespace Piece::ORM;
 
 use Piece::ORM::Inflector;
 use Piece::ORM::Context;
+use Piece::ORM::Context::Registry;
 
 // {{{ Piece::ORM::Metadata
 
@@ -59,6 +60,8 @@ class Metadata
     /**#@+
      * @access public
      */
+
+    public $tableID;
 
     /**#@-*/
 
@@ -90,9 +93,10 @@ class Metadata
     /**
      * Imports information for a table.
      *
-     * @param array $tableInfo
+     * @param array   $tableInfo
+     * @param integer $tableID
      */
-    public function __construct(array $tableInfo)
+    public function __construct(array $tableInfo, $tableID)
     {
         $this->_tableName = $tableInfo[0]['table'];
         foreach ($tableInfo as $fieldInfo) {
@@ -109,6 +113,8 @@ class Metadata
                 $this->_hasID = true;
             }
         }
+
+        $this->tableID = $tableID;
     }
 
     // }}}
@@ -153,7 +159,7 @@ class Metadata
      */
     public function getTableName($notQuoteIdentifier = false)
     {
-        $context = Context::singleton();
+        $context = Registry::getContext();
         if (!$context->getUseMapperNameAsTableName() || $notQuoteIdentifier) {
             return $this->_tableName;
         } else {

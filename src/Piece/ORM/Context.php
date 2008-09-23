@@ -41,6 +41,7 @@ use Piece::ORM::Config;
 use Piece::ORM::Exception;
 use Piece::ORM::Mapper::MapperFactory;
 use Piece::ORM::Exception::PEARException;
+use Stagehand::AttributeHolder;
 
 // {{{ Piece::ORM::Context
 
@@ -53,7 +54,7 @@ use Piece::ORM::Exception::PEARException;
  * @version    Release: @package_version@
  * @since      Class available since Release 0.1.0
  */
-class Context
+class Context extends AttributeHolder
 {
 
     // {{{ properties
@@ -77,31 +78,12 @@ class Context
     private $_config;
     private $_database;
     private $_mapperConfigDirectory;
-    private static $_instance;
 
     /**#@-*/
 
     /**#@+
      * @access public
      */
-
-    // }}}
-    // {{{ singleton()
-
-    /**
-     * Returns the Piece::ORM::Context instance if exists. If not exists, a new
-     * instance of the Piece::ORM::Context class will be created and returned.
-     *
-     * @return Piece::ORM::Context
-     */
-    public static function singleton()
-    {
-        if (is_null(self::$_instance)) {
-            self::$_instance = new self();
-        }
-
-        return self::$_instance;
-    }
 
     // }}}
     // {{{ setConfiguration()
@@ -139,8 +121,6 @@ class Context
      */
     public static function clear()
     {
-        self::$_instance = null;
-
         if (!array_key_exists('_MDB2_databases', $GLOBALS)) {
             return;
         }
@@ -280,16 +260,6 @@ class Context
     /**#@+
      * @access private
      */
-
-    // }}}
-    // {{{ __construct()
-
-    /**
-     * A private constructor to prevent direct creation of objects.
-     *
-     * @since Method available since Release 2.0.0
-     */
-    private function __construct() {}
 
     /**#@-*/
 

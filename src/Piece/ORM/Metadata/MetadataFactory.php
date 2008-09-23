@@ -44,6 +44,8 @@ use Piece::ORM::Exception::PEARException;
 use Piece::ORM::Metadata::MetadataFactory::NoSuchTableException;
 use Piece::ORM::MDB2::Decorator::Reverse::Mssql;
 use Piece::ORM::Metadata;
+use Piece::ORM::Metadata::Registry;
+use Piece::ORM::Context::Registry as ContextRegistry;
 
 // {{{ Piece::ORM::Metadata::MetadataFactory
 
@@ -77,7 +79,6 @@ class MetadataFactory
      * @access private
      */
 
-    private static $_instances = array();
     private static $_cacheDirectory;
     private static $_cacheDirectoryStack = array();
 
@@ -98,18 +99,19 @@ class MetadataFactory
      */
     public static function factory($tableName)
     {
-        $context = Context::singleton();
+        $context = ContextRegistry::getContext();
         if (!$context->getUseMapperNameAsTableName()) {
             $tableName = Inflector::underscore($tableName);
         }
 
         $tableID = sha1($context->getDSN() . ".$tableName");
-        if (!array_key_exists($tableID, self::$_instances)) {
-            self::$_instances[$tableID] =
-                self::_createMetadata($tableName, $tableID);
+        $metadata = Registry::getMetadata($tableID);
+        if (is_null($metadata)) {
+            $metadata = self::_createMetadata($tableName, $tableID);
+            Registry::addMetadata($metadata);
         }
 
-        return self::$_instances[$tableID];
+        return $metadata;
     }
 
     // }}}
@@ -120,7 +122,7 @@ class MetadataFactory
      */
     public static function clearInstances()
     {
-        self::$_instances = array();
+        Registry::clear();
     }
 
     // }}}
@@ -195,11 +197,11 @@ class MetadataFactory
                           E_USER_WARNING
                           );
 
-            return self::_createMetadataFromDatabase($tableName);
+            return self::_createMetadataFromDatabase($tableName, $tableID);
         }
 
         if (!$metadata) {
-            $metadata = self::_createMetadataFromDatabase($tableName);
+            $metadata = self::_createMetadataFromDatabase($tableName, $tableID);
             $result = $cache->save($metadata);
             if (::PEAR::isError($result)) {
                 trigger_error('Cannot write a Piece::ORM::Metadata object to the cache file in the directory [ ' .
@@ -220,13 +222,14 @@ class MetadataFactory
      * Creates a Piece::ORM::Metadata object from a database.
      *
      * @param string $tableName
+     * @param string $tableID
      * @return Piece::ORM::Metadata
      * @throws Piece::ORM::Exception::PEARException
      * @throws Piece::ORM::Metadata::Factory::NoSuchTableException
      */
-    private static function _createMetadataFromDatabase($tableName)
+    private static function _createMetadataFromDatabase($tableName, $tableID)
     {
-        $context = Context::singleton();
+        $context = ContextRegistry::getContext();
         $dbh = $context->getConnection();
 
         ::PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
@@ -281,7 +284,7 @@ class MetadataFactory
             }
         }
 
-        return new Metadata($tableInfo);
+        return new Metadata($tableInfo, $tableID);
     }
 
     // }}}
@@ -302,7 +305,7 @@ class MetadataFactory
                           ' ] is not found.',
                           E_USER_WARNING
                           );
-            return self::_createMetadataFromDatabase($tableName);
+            return self::_createMetadataFromDatabase($tableName, $tableID);
         }
 
         if (!is_readable(self::$_cacheDirectory) || !is_writable(self::$_cacheDirectory)) {
@@ -311,7 +314,7 @@ class MetadataFactory
                           ' ] is not readable or writable.',
                           E_USER_WARNING
                           );
-            return self::_createMetadataFromDatabase($tableName);
+            return self::_createMetadataFromDatabase($tableName, $tableID);
         }
 
         return self::_getMetadata($tableName, $tableID);

@@ -4,7 +4,7 @@
 /**
  * PHP version 5
  *
- * Copyright (c) 2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>,
+ * Copyright (c) 2008 KUBO Atsuhiro <iteman@users.sourceforge.net>,
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,31 +29,29 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  * @package    Piece_ORM
- * @copyright  2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
+ * @copyright  2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License (revised)
  * @version    SVN: $Id$
- * @since      File available since Release 0.1.0
+ * @since      File available since Release 2.0.0
  */
 
 namespace Piece::ORM::Metadata;
 
-use Piece::ORM::Metadata::MetadataFactory;
-use Piece::ORM::Config;
-use Piece::ORM::Context;
-use Piece::ORM::Context::Registry;
+use Piece::ORM::Context::Registry as ContextRegistry;
+use Piece::ORM::Metadata;
 
-// {{{ Piece::ORM::Metadata::MetadataFactoryTest
+// {{{ Piece::ORM::Metadata::Registry
 
 /**
- * Some tests for Piece::ORM::Metadata::MetadataFactory.
+ * A registry for Piece::ORM::Metadata objects.
  *
  * @package    Piece_ORM
- * @copyright  2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
+ * @copyright  2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License (revised)
  * @version    Release: @package_version@
- * @since      Class available since Release 0.1.0
+ * @since      Class available since Release 2.0.0
  */
-class MetadataFactoryTest extends ::PHPUnit_Framework_TestCase
+class Registry
 {
 
     // {{{ properties
@@ -68,15 +66,11 @@ class MetadataFactoryTest extends ::PHPUnit_Framework_TestCase
      * @access protected
      */
 
-    protected $backupGlobals = false;
-
     /**#@-*/
 
     /**#@+
      * @access private
      */
-
-    private $_cacheDirectory;
 
     /**#@-*/
 
@@ -84,49 +78,61 @@ class MetadataFactoryTest extends ::PHPUnit_Framework_TestCase
      * @access public
      */
 
-    public function setUp()
+    // }}}
+    // {{{ getMetadata()
+
+    /**
+     * Gets a Piece::ORM::Metadata object from the registry.
+     *
+     * @param string $tableID
+     * @return Piece::ORM::Metadata
+     */
+    public static function getMetadata($tableID)
     {
-        $this->_cacheDirectory = dirname(__FILE__) . '/' . basename(__FILE__, '.php');
-        $config = new Config();
-        $config->setDSN('piece', 'pgsql://piece:piece@pieceorm/piece');
-        $config->setOptions('piece',
-                            array('debug' => 2, 'result_buffering' => false)
-                            );
-        $context = new Context();
-        $context->setConfiguration($config);
-        $context->setDatabase('piece');
-        Registry::addContext($context);
-        MetadataFactory::setCacheDirectory($this->_cacheDirectory);
+        $metadataRegistry =
+            ContextRegistry::getContext()->getAttribute('metadataRegistry');
+        if (is_null($metadataRegistry)) {
+            $metadataRegistry = array();
+        }
+
+        if (!array_key_exists($tableID, $metadataRegistry)) {
+            return;
+        }
+
+        return $metadataRegistry[$tableID];
     }
 
-    public function tearDown()
+    // }}}
+    // {{{ addMetadata()
+
+    /**
+     * Adds a Piece::ORM::Metadata object to the registry.
+     *
+     * @param Piece::ORM::Metadata $metadata
+     */
+    public static function addMetadata(Metadata $metadata)
     {
-        MetadataFactory::restoreCacheDirectory();
-        MetadataFactory::clearInstances();
-        Registry::clear();
-        $cache = new ::Cache_Lite(array('cacheDir' => "{$this->_cacheDirectory}/",
-                                        'automaticSerialization' => true,
-                                        'errorHandlingAPIBreak' => true)
-                                  );
-        $cache->clean();
+        $metadataRegistry =
+            ContextRegistry::getContext()->getAttribute('metadataRegistry');
+        if (is_null($metadataRegistry)) {
+            $metadataRegistry = array();
+        }
+
+        $metadataRegistry[ $metadata->tableID ] = $metadata;
+        ContextRegistry::getContext()->setAttribute('metadataRegistry',
+                                                    $metadataRegistry
+                                                    );
     }
 
-    public function testShouldCreateAnObjectByAGivenMapper()
+    // }}}
+    // {{{ clear()
+
+    /**
+     * Clear all Piece::ORM::Metadata objects in the registry.
+     */
+    public static function clear()
     {
-        $metadata = MetadataFactory::factory('Employees');
-
-        $this->assertType('Piece::ORM::Metadata', $metadata);
-        $this->assertEquals('employees', $metadata->getTableName());
-    }
-
-    public function testShouldReturnTheExistingObjectIfItExists()
-    {
-        $metadata1 = MetadataFactory::factory('Employees');
-        $metadata1->foo = 'bar';
-        $metadata2 = MetadataFactory::factory('Employees');
-
-        $this->assertObjectHasAttribute('foo', $metadata2);
-        $this->assertEquals('bar', $metadata2->foo);
+        ContextRegistry::getContext()->removeAttribute('metadataRegistry');
     }
 
     /**#@-*/
