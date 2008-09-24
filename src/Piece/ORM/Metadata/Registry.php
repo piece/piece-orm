@@ -89,12 +89,7 @@ class Registry
      */
     public static function getMetadata($tableID)
     {
-        $metadataRegistry =
-            ContextRegistry::getContext()->getAttribute('metadataRegistry');
-        if (is_null($metadataRegistry)) {
-            $metadataRegistry = array();
-        }
-
+        $metadataRegistry = self::_getMetadataRegistry();
         if (!array_key_exists($tableID, $metadataRegistry)) {
             return;
         }
@@ -112,16 +107,9 @@ class Registry
      */
     public static function addMetadata(Metadata $metadata)
     {
-        $metadataRegistry =
-            ContextRegistry::getContext()->getAttribute('metadataRegistry');
-        if (is_null($metadataRegistry)) {
-            $metadataRegistry = array();
-        }
-
+        $metadataRegistry = self::_getMetadataRegistry();
         $metadataRegistry[ $metadata->tableID ] = $metadata;
-        ContextRegistry::getContext()->setAttribute('metadataRegistry',
-                                                    $metadataRegistry
-                                                    );
+        self::_setMetadataRegistry($metadataRegistry);
     }
 
     // }}}
@@ -132,7 +120,7 @@ class Registry
      */
     public static function clear()
     {
-        ContextRegistry::getContext()->removeAttribute('metadataRegistry');
+        ContextRegistry::getContext()->removeAttribute(__CLASS__ . '::metadataRegistry');
     }
 
     /**#@-*/
@@ -146,6 +134,37 @@ class Registry
     /**#@+
      * @access private
      */
+
+    // }}}
+    // {{{ _getMetadataRegistry()
+
+    /**
+     * Gets the metadata registry from the current context.
+     *
+     * @return array
+     */
+    private function _getMetadataRegistry()
+    {
+        $metadataRegistry = ContextRegistry::getContext()->getAttribute(__CLASS__ . '::metadataRegistry');
+        if (is_null($metadataRegistry)) {
+            return array();
+        }
+
+        return $metadataRegistry;
+    }
+
+    // }}}
+    // {{{ _setMetadataRegistry()
+
+    /**
+     * Sets the metadata registry to the current context.
+     *
+     * @param array $metadataRegistry
+     */
+    private function _setMetadataRegistry(array $metadataRegistry)
+    {
+        ContextRegistry::getContext()->setAttribute(__CLASS__ . '::metadataRegistry', $metadataRegistry);
+    }
 
     /**#@-*/
 
