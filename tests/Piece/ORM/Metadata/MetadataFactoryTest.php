@@ -92,16 +92,15 @@ class MetadataFactoryTest extends ::PHPUnit_Framework_TestCase
         $config->setOptions('piece',
                             array('debug' => 2, 'result_buffering' => false)
                             );
-        $context = new Context();
+        Registry::setContext(new Context());
+        $context = Registry::getContext();
         $context->setConfiguration($config);
         $context->setDatabase('piece');
-        Registry::addContext($context);
         MetadataFactory::setCacheDirectory($this->_cacheDirectory);
     }
 
     public function tearDown()
     {
-        MetadataFactory::clear();
         Registry::clear();
         $cache = new ::Cache_Lite(array('cacheDir' => "{$this->_cacheDirectory}/",
                                         'automaticSerialization' => true,

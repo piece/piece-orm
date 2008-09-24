@@ -88,7 +88,7 @@ class Pgsql extends Common
      */
     public static function addMap($nativeType, $mdb2Type)
     {
-        $driverName = strtolower(substr(strrchr(__CLASS__, '_'), 1));
+        $driverName = strtolower(substr(strrchr(__CLASS__, ':'), 1));
         parent::addMapForDriver($nativeType, $mdb2Type, $driverName);
     }
 
@@ -97,6 +97,23 @@ class Pgsql extends Common
     /**#@+
      * @access protected
      */
+
+    // }}}
+    // {{{ initialize()
+
+    /**
+     * Initializes the map for the current driver.
+     */
+    protected function initialize()
+    {
+        Pgsql::addMap('timestamptz', 'timestamp');
+        Pgsql::addMap('point', 'decimal');
+        Pgsql::addMap('lseg', 'decimal');
+        Pgsql::addMap('box', 'decimal');
+        Pgsql::addMap('path', 'decimal');
+        Pgsql::addMap('polygon', 'decimal');
+        Pgsql::addMap('circle', 'decimal');
+    }
 
     /**#@-*/
 
@@ -110,14 +127,6 @@ class Pgsql extends Common
 }
 
 // }}}
-
-Pgsql::addMap('timestamptz', 'timestamp');
-Pgsql::addMap('point', 'decimal');
-Pgsql::addMap('lseg', 'decimal');
-Pgsql::addMap('box', 'decimal');
-Pgsql::addMap('path', 'decimal');
-Pgsql::addMap('polygon', 'decimal');
-Pgsql::addMap('circle', 'decimal');
 
 /*
  * Local Variables:

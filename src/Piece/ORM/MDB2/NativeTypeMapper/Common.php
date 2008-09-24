@@ -72,7 +72,6 @@ class Common
      */
 
     private $_driverName;
-    private static $_nativeTypeMap = array();
 
     /**#@-*/
 
@@ -88,7 +87,10 @@ class Common
      */
     public function __construct()
     {
-        $this->_driverName = strtolower(substr(strrchr(get_class($this), '_'), 1));
+        $this->_driverName = strtolower(substr(strrchr(get_class($this), ':'), 1));
+        if (!Registry::getContext()->hasAttribute(__CLASS__ . '::nativeTypeMap')) {
+            $this->initialize();
+        }
     }
 
     // }}}
@@ -101,12 +103,13 @@ class Common
      */
     public function mapNativeType(::MDB2_Driver_Common $dbh)
     {
-        if (!array_key_exists($this->_driverName, self::$_nativeTypeMap)) {
+        $nativeTypeMap = self::_getNativeTypeMap();
+         if (!array_key_exists($this->_driverName, $nativeTypeMap)) {
             return;
         }
 
         $callbacks = array();
-        foreach (array_keys(self::$_nativeTypeMap[ $this->_driverName ]) as $type) {
+        foreach (array_keys($nativeTypeMap[ $this->_driverName ]) as $type) {
             $callbacks[$type] = array($this, 'getMDB2TypeInfo');
         }
 
@@ -125,7 +128,8 @@ class Common
      */
     public function getMDB2TypeInfo(::MDB2_Driver_Common $dbh, array $field)
     {
-        return array(array(self::$_nativeTypeMap[ $this->_driverName ][ $field['type'] ]),
+        $nativeTypeMap = self::_getNativeTypeMap();
+        return array(array($nativeTypeMap[ $this->_driverName ][ $field['type'] ]),
                      null,
                      null,
                      null
@@ -150,14 +154,54 @@ class Common
      */
     protected static function addMapForDriver($nativeType, $mdb2Type, $driverName)
     {
-        self::$_nativeTypeMap[$driverName][$nativeType] = $mdb2Type;
+        $nativeTypeMap = self::_getNativeTypeMap();
+        $nativeTypeMap[$driverName][$nativeType] = $mdb2Type;
+        self::_setNativeTypeMap($nativeTypeMap);
     }
+
+    // }}}
+    // {{{ initialize()
+
+    /**
+     * Initializes the map for the current driver.
+     */
+    protected function initialize() {}
 
     /**#@-*/
 
     /**#@+
      * @access private
      */
+
+    // }}}
+    // {{{ _getNativeTypeMap()
+
+    /**
+     * Gets the native type map from the current context.
+     *
+     * @return array
+     */
+    private static function _getNativeTypeMap()
+    {
+        if (!Registry::getContext()->hasAttribute(__CLASS__ . '::nativeTypeMap')) {
+            return array();
+        }
+
+        return Registry::getContext()->getAttribute(__CLASS__ . '::nativeTypeMap');
+    }
+
+    // }}}
+    // {{{ _setNativeTypeMap()
+
+    /**
+     * Sets the metadata registry to the current context.
+     *
+     * @param array $nativeTypeMap
+     */
+    private static function _setNativeTypeMap(array $nativeTypeMap)
+    {
+        Registry::getContext()->setAttribute(__CLASS__ . '::nativeTypeMap', $nativeTypeMap);
+    }
 
     /**#@-*/
 

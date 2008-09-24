@@ -42,6 +42,7 @@ use Piece::ORM::Context;
 use Piece::ORM::Mapper::MapperFactory;
 use Piece::ORM::Metadata::MetadataFactory;
 use Piece::ORM::Exception;
+use Piece::ORM::Context::Registry;
 
 // {{{ Piece::ORM::Mapper::CompatibilityTests
 
@@ -110,7 +111,8 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
         $config = new Config();
         $config->setDSN('piece', $this->dsn);
         $config->setOptions('piece', array('debug' => 2, 'result_buffering' => false));
-        $context = Context::singleton();
+        Registry::setContext(new Context());
+        $context = Registry::getContext();
         $context->setConfiguration($config);
         $context->setDatabase('piece');
         MapperFactory::setConfigDirectory($this->cacheDirectory);
@@ -130,12 +132,7 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
                                         'errorHandlingAPIBreak' => true)
                                   );
         $cache->clean();
-        MetadataFactory::restoreCacheDirectory();
-        MetadataFactory::clearInstances();
-        MapperFactory::restoreCacheDirectory();
-        MapperFactory::restoreConfigDirectory();
-        MapperFactory::clearInstances();
-        Context::clear();
+        Registry::clear();
     }
 
     public function testShouldFindAnObject()
@@ -1892,9 +1889,10 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
         $config->setDSN('caseSensitive', $this->dsn);
         $config->setOptions('caseSensitive', array('debug' => 2, 'result_buffering' => false));
         $config->setUseMapperNameAsTableName('caseSensitive', true);
-        $context = Context::singleton();
+        $context = new Context();
         $context->setConfiguration($config);
         $context->setDatabase('caseSensitive');
+        Registry::setContext($context);
         MapperFactory::setConfigDirectory($this->cacheDirectory);
         MapperFactory::setCacheDirectory($this->cacheDirectory);
         MetadataFactory::setCacheDirectory($this->cacheDirectory);
@@ -2224,8 +2222,7 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
 
     public function _clearTableRecords()
     {
-        $context = Context::singleton();
-        $dbh = $context->getConnection();
+        $dbh = Registry::getContext()->getConnection();
         foreach ($this->tables as $table) {
             $dbh->exec("TRUNCATE TABLE $table");
         }
@@ -2236,7 +2233,7 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
         $config = new Config();
         $config->setDSN('caseSensitive', $this->dsn);
         $config->setUseMapperNameAsTableName('caseSensitive', true);
-        $context = Context::singleton();
+        $context = Registry::getContext();
         $context->setConfiguration($config);
         $context->setDatabase('caseSensitive');
         MapperFactory::setConfigDirectory("{$this->cacheDirectory}/CaseSensitive");

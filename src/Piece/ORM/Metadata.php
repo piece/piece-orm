@@ -38,7 +38,6 @@
 namespace Piece::ORM;
 
 use Piece::ORM::Inflector;
-use Piece::ORM::Context;
 use Piece::ORM::Context::Registry;
 
 // {{{ Piece::ORM::Metadata
@@ -93,8 +92,8 @@ class Metadata
     /**
      * Imports information for a table.
      *
-     * @param array   $tableInfo
-     * @param integer $tableID
+     * @param array  $tableInfo
+     * @param string $tableID
      */
     public function __construct(array $tableInfo, $tableID)
     {

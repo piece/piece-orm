@@ -88,7 +88,7 @@ class ConfigFactoryTest extends ::PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->_cacheDirectory = dirname(__FILE__) . '/' . basename(__FILE__, '.php');
-        Registry::addContext(new Context());
+        Registry::setContext(new Context());
     }
 
     public function tearDown()

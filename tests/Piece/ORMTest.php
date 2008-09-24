@@ -40,8 +40,8 @@ namespace Piece;
 use Piece::ORM;
 use Piece::ORM::Metadata::MetadataFactory;
 use Piece::ORM::Mapper::MapperFactory;
-use Piece::ORM::Context;
 use Piece::ORMTest::Employee;
+use Piece::ORM::Context::Registry;
 
 require_once 'spyc.php5';
 
@@ -94,10 +94,7 @@ class ORMTest extends ::PHPUnit_Framework_TestCase
 
     public function tearDown()
     {
-        ORM::$configured = false;
-        MetadataFactory::clearInstances();
-        MapperFactory::clearInstances();
-        Context::clear();
+        Registry::clear();
         $cache = new ::Cache_Lite(array('cacheDir' => "{$this->_cacheDirectory}/",
                                         'automaticSerialization' => true,
                                         'errorHandlingAPIBreak' => true)
@@ -115,8 +112,7 @@ class ORMTest extends ::PHPUnit_Framework_TestCase
                        $this->_cacheDirectory,
                        $this->_cacheDirectory
                        );
-        $context = Context::singleton();
-        $config = $context->getConfiguration();
+        $config = Registry::getContext()->getConfiguration();
 
         foreach ($yaml as $configuration) {
             $this->assertEquals($configuration['dsn'], $config->getDSN($configuration['name']));
@@ -124,34 +120,22 @@ class ORMTest extends ::PHPUnit_Framework_TestCase
         }
 
         $this->assertEquals($this->_cacheDirectory,
-                            $this->readAttribute('Piece::ORM::Mapper::MapperFactory',
-                                                 '_configDirectory')
+                            MapperFactory::getConfigDirectory()
                             );
         $this->assertEquals($this->_cacheDirectory,
-                            $this->readAttribute('Piece::ORM::Mapper::MapperFactory',
-                                                 '_cacheDirectory')
+                            MapperFactory::getCacheDirectory()
                             );
         $this->assertEquals($this->_cacheDirectory,
-                            $this->readAttribute('Piece::ORM::Metadata::MetadataFactory',
-                                                 '_cacheDirectory')
+                            MetadataFactory::getCacheDirectory()
                             );
 
         MapperFactory::setConfigDirectory('./foo');
         MapperFactory::setCacheDirectory('./bar');
         MetadataFactory::setCacheDirectory('./baz');
 
-        $this->assertEquals('./foo',
-                            $this->readAttribute('Piece::ORM::Mapper::MapperFactory',
-                                                 '_configDirectory')
-                            );
-        $this->assertEquals('./bar',
-                            $this->readAttribute('Piece::ORM::Mapper::MapperFactory',
-                                                 '_cacheDirectory')
-                            );
-        $this->assertEquals('./baz',
-                            $this->readAttribute('Piece::ORM::Metadata::MetadataFactory',
-                                                 '_cacheDirectory')
-                            );
+        $this->assertEquals('./foo', MapperFactory::getConfigDirectory());
+        $this->assertEquals('./bar', MapperFactory::getCacheDirectory());
+        $this->assertEquals('./baz', MetadataFactory::getCacheDirectory());
     }
 
     public function testShouldConfigureDynamicallyWithAGivenConfigurationFile()
@@ -222,16 +206,14 @@ class ORMTest extends ::PHPUnit_Framework_TestCase
         ORM::configure($cacheDirectory, $cacheDirectory, $cacheDirectory);
 
         $this->assertEquals("$cacheDirectory/database1",
-                            $this->readAttribute('Piece::ORM::Mapper::MapperFactory',
-                                                 '_configDirectory')
+                            MapperFactory::getConfigDirectory()
                             );
 
         MapperFactory::setConfigDirectory('./foo');
         ORM::setDatabase('database2');
 
         $this->assertEquals("$cacheDirectory/database2",
-                            $this->readAttribute('Piece::ORM::Mapper::MapperFactory',
-                                                 '_configDirectory')
+                            MapperFactory::getConfigDirectory()
                             );
 
         $cache = new ::Cache_Lite(array('cacheDir' => "$cacheDirectory/",

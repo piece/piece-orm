@@ -42,6 +42,7 @@ use Piece::ORM::Context;
 use Piece::ORM::Mapper::MapperFactory;
 use Piece::ORM::Metadata::MetadataFactory;
 use Piece::ORM::Exception;
+use Piece::ORM::Context::Registry;
 
 // {{{ Piece::ORM::Mapper::MapperFactoryTest
 
@@ -91,10 +92,12 @@ class MapperFactoryTest extends ::PHPUnit_Framework_TestCase
         $config = new Config();
         $config->setDSN('piece', 'pgsql://piece:piece@pieceorm/piece');
         $config->setOptions('piece', array('debug' => 2, 'result_buffering' => false));
-        $context = Context::singleton();
+        Registry::setContext(new Context());
+        $context = Registry::getContext();
         $context->setConfiguration($config);
         $context->setMapperConfigDirectory($this->_cacheDirectory);
         $context->setDatabase('piece');
+        Registry::setContext($context);
         MapperFactory::setConfigDirectory($this->_cacheDirectory);
         MapperFactory::setCacheDirectory($this->_cacheDirectory);
         MetadataFactory::setCacheDirectory($this->_cacheDirectory);
@@ -102,12 +105,7 @@ class MapperFactoryTest extends ::PHPUnit_Framework_TestCase
 
     public function tearDown()
     {
-        MetadataFactory::restoreCacheDirectory();
-        MetadataFactory::clearInstances();
-        MapperFactory::restoreCacheDirectory();
-        MapperFactory::restoreConfigDirectory();
-        MapperFactory::clearInstances();
-        Context::clear();
+        Registry::clear();
         $cache = new ::Cache_Lite(array('cacheDir' => "{$this->_cacheDirectory}/",
                                         'automaticSerialization' => true,
                                         'errorHandlingAPIBreak' => true)
@@ -122,7 +120,6 @@ class MapperFactoryTest extends ::PHPUnit_Framework_TestCase
         try {
             MapperFactory::factory('Employees');
         } catch (Exception $e) {
-            MapperFactory::restoreConfigDirectory();
             return;
         }
 
@@ -136,7 +133,6 @@ class MapperFactoryTest extends ::PHPUnit_Framework_TestCase
         try {
             MapperFactory::factory('Employees');
         } catch (Exception $e) {
-            MapperFactory::restoreConfigDirectory();
             return;
         }
 
@@ -150,7 +146,6 @@ class MapperFactoryTest extends ::PHPUnit_Framework_TestCase
         try {
             MapperFactory::factory('Employees');
         } catch (Exception $e) {
-            MapperFactory::restoreCacheDirectory();
             return;
         }
 
@@ -164,7 +159,6 @@ class MapperFactoryTest extends ::PHPUnit_Framework_TestCase
         try {
             MapperFactory::factory('Employees');
         } catch (Exception $e) {
-            MapperFactory::restoreCacheDirectory();
             return;
         }
 
@@ -201,7 +195,7 @@ class MapperFactoryTest extends ::PHPUnit_Framework_TestCase
 
     public function testShouldSwitchDatabase()
     {
-        $context = Context::singleton();
+        $context = Registry::getContext();
         $config = $context->getConfiguration();
         $config->setDSN('piece1', 'pgsql://piece:piece@pieceorm/piece');
         $config->setOptions('piece1',

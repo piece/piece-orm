@@ -37,7 +37,6 @@
 
 namespace Piece::ORM::Mapper;
 
-use Piece::ORM::Context;
 use Piece::ORM::Inflector;
 use Piece::ORM::Metadata::MetadataFactory;
 use Piece::ORM::Exception;
@@ -45,6 +44,7 @@ use Piece::ORM::Env;
 use Piece::ORM::Exception::PEARException;
 use Piece::ORM::Mapper::Generator;
 use Piece::ORM::Mapper::Common;
+use Piece::ORM::Context::Registry;
 
 require_once 'spyc.php5';
 
@@ -80,12 +80,6 @@ class MapperFactory
      * @access private
      */
 
-    private static $_instances = array();
-    private static $_configDirectory;
-    private static $_cacheDirectory;
-    private static $_configDirectoryStack = array();
-    private static $_cacheDirectoryStack = array();
-
     /**#@-*/
 
     /**#@+
@@ -104,39 +98,27 @@ class MapperFactory
      */
     public static function factory($mapperName)
     {
-        $context = Context::singleton();
+        $context = Registry::getContext();
         if (!$context->getUseMapperNameAsTableName()) {
             $mapperName = Inflector::camelize($mapperName);
         }
 
-        $mapperID = "{$mapperName}_" . sha1($context->getDSN() . ".$mapperName." . realpath(self::$_configDirectory));
-        if (!array_key_exists($mapperID, self::$_instances)) {
+        $mapperID = "{$mapperName}_" . sha1($context->getDSN() . ".$mapperName." . realpath(self::getConfigDirectory()));
+        $mapper = self::_getMapper($mapperID);
+        if (is_null($mapper)) {
             self::_load($mapperID, $mapperName);
             $metadata = MetadataFactory::factory($mapperName);
             $mapperClass = __NAMESPACE__ . "::$mapperID";
-            $mapper = new $mapperClass($metadata);
+            $mapper = new $mapperClass($metadata, $mapperID);
             if (!$mapper instanceof Common) {
                 throw new Exception("The mapper class for [ $mapperName ] is invalid.");
             }
 
-            self::$_instances[$mapperID] = $mapper;
+            self::_addMapper($mapper);
         }
 
-        $dbh = $context->getConnection();
-
-        self::$_instances[$mapperID]->setConnection($dbh);
-        return self::$_instances[$mapperID];
-    }
-
-    // }}}
-    // {{{ clearInstances()
-
-    /**
-     * Clears the mapper instances.
-     */
-    public static function clearInstances()
-    {
-        self::$_instances = array();
+        $mapper->setConnection($context->getConnection());
+        return $mapper;
     }
 
     // }}}
@@ -149,8 +131,9 @@ class MapperFactory
      */
     public static function setConfigDirectory($configDirectory)
     {
-        array_push(self::$_configDirectoryStack, self::$_configDirectory);
-        self::$_configDirectory = $configDirectory;
+        $configDirectoryStack = self::_getConfigDirectoryStack();
+        array_push($configDirectoryStack, $configDirectory);
+        self::_setConfigDirectoryStack($configDirectoryStack);
     }
 
     // }}}
@@ -163,8 +146,9 @@ class MapperFactory
      */
     public static function setCacheDirectory($cacheDirectory)
     {
-        array_push(self::$_cacheDirectoryStack, self::$_cacheDirectory);
-        self::$_cacheDirectory = $cacheDirectory;
+        $cacheDirectoryStack = self::_getCacheDirectoryStack();
+        array_push($cacheDirectoryStack, $cacheDirectory);
+        self::_setCacheDirectoryStack($cacheDirectoryStack);
     }
 
     // }}}
@@ -177,7 +161,9 @@ class MapperFactory
      */
     public static function restoreConfigDirectory()
     {
-        self::$_configDirectory = array_pop(self::$_configDirectoryStack);
+        $configDirectoryStack = self::_getConfigDirectoryStack();
+        array_pop($configDirectoryStack);
+        self::_setConfigDirectoryStack($configDirectoryStack);
     }
 
     // }}}
@@ -190,7 +176,45 @@ class MapperFactory
      */
     public static function restoreCacheDirectory()
     {
-        self::$_cacheDirectory = array_pop(self::$_cacheDirectoryStack);
+        $cacheDirectoryStack = self::_getCacheDirectoryStack();
+        array_pop($cacheDirectoryStack);
+        self::_setCacheDirectoryStack($cacheDirectoryStack);
+    }
+
+    // }}}
+    // {{{ getConfigDirectory()
+
+    /**
+     * Gets the config directory for the current context.
+     *
+     * @return array
+     */
+    public function getConfigDirectory()
+    {
+        $configDirectoryStack = self::_getConfigDirectoryStack();
+        if (!count($configDirectoryStack)) {
+            return;
+        }
+
+        return $configDirectoryStack[ count($configDirectoryStack) - 1 ];
+    }
+
+    // }}}
+    // {{{ getCacheDirectory()
+
+    /**
+     * Gets the cache directory for the current context.
+     *
+     * @return array
+     */
+    public function getCacheDirectory()
+    {
+        $cacheDirectoryStack = self::_getCacheDirectoryStack();
+        if (!count($cacheDirectoryStack)) {
+            return;
+        }
+
+        return $cacheDirectoryStack[ count($cacheDirectoryStack) - 1 ];
     }
 
     /**#@-*/
@@ -209,8 +233,8 @@ class MapperFactory
     // {{{ _getMapperSource()
 
     /**
-     * Gets a mapper source by either generating from a configuration file or
-     * getting from a cache.
+     * Gets a mapper source by either generating from a configuration file or getting
+     * from a cache.
      *
      * @param string $mapperID
      * @param string $mapperName
@@ -221,7 +245,7 @@ class MapperFactory
      */
     private function _getMapperSource($mapperID, $mapperName, $configFile)
     {
-        $cache = new ::Cache_Lite_File(array('cacheDir' => self::$_cacheDirectory . '/',
+        $cache = new ::Cache_Lite_File(array('cacheDir' => self::getCacheDirectory() . '/',
                                              'masterFile' => $configFile,
                                              'automaticSerialization' => true,
                                              'errorHandlingAPIBreak' => true)
@@ -238,7 +262,7 @@ class MapperFactory
         $mapperSource = $cache->get($mapperID);
         if (::PEAR::isError($mapperSource)) {
             throw new Exception('Cannot read the mapper source file in the directory [ ' .
-                                self::$_cacheDirectory . 
+                                self::getCacheDirectory() . 
                                 ' ].'
                                 );
         }
@@ -307,38 +331,38 @@ class MapperFactory
             return;
         }
 
-        if (is_null(self::$_configDirectory)) {
+        if (is_null(self::getConfigDirectory())) {
             throw new Exception('The configuration directory must be specified.');
         }
 
-        if (!file_exists(self::$_configDirectory)) {
+        if (!file_exists(self::getConfigDirectory())) {
             throw new Exception('The configuration directory [ ' .
-                                self::$_configDirectory .
+                                self::getConfigDirectory() .
                                 ' ] is not found.'
                                 );
         }
 
-        if (is_null(self::$_cacheDirectory)) {
+        if (is_null(self::getCacheDirectory())) {
             throw new Exception('The cache directory must be specified.');
         }
 
-        if (!file_exists(self::$_cacheDirectory)) {
+        if (!file_exists(self::getCacheDirectory())) {
             throw new Exception('The cache directory [ ' .
-                                self::$_cacheDirectory .
+                                self::getCacheDirectory() .
                                 'is not found.'
                                 );
         }
 
-        if (!is_readable(self::$_cacheDirectory)
-            || !is_writable(self::$_cacheDirectory)
+        if (!is_readable(self::getCacheDirectory())
+            || !is_writable(self::getCacheDirectory())
             ) {
             throw new Exception('The cache directory [ ' .
-                                self::$_cacheDirectory .
+                                self::getCacheDirectory() .
                                 ' ] is not readable or writable.'
                                 );
         }
 
-        $configFile = self::$_configDirectory . "/$mapperName.yaml";
+        $configFile = self::getConfigDirectory() . "/$mapperName.yaml";
         if (!file_exists($configFile)) {
             throw new Exception("The configuration file [ $configFile ] is not found.");
         }
@@ -353,6 +377,130 @@ class MapperFactory
         if (!self::_loaded($mapperID)) {
             throw new Exception("The mapper [ $mapperName ] not found.");
         }
+    }
+
+    // }}}
+    // {{{ _getMapper()
+
+    /**
+     * Gets a Piece::ORM::Mapper::Common object from the current context.
+     *
+     * @param string $mapperID
+     * @return Piece::ORM::Mapper::Common
+     */
+    private static function _getMapper($mapperID)
+    {
+        $mapperRegistry = self::_getMapperRegistry();
+        if (!array_key_exists($mapperID, $mapperRegistry)) {
+            return;
+        }
+
+        return $mapperRegistry[$mapperID];
+    }
+
+    // }}}
+    // {{{ _addMapper()
+
+    /**
+     * Adds a Piece::ORM::Mapper object to the current context.
+     *
+     * @param Piece::ORM::Mapper::Common $mapper
+     */
+    private static function _addMapper(Common $mapper)
+    {
+        $mapperRegistry = self::_getMapperRegistry();
+        $mapperRegistry[ $mapper->mapperID ] = $mapper;
+        self::_setMapperRegistry($mapperRegistry);
+    }
+
+    // }}}
+    // {{{ _getMapperRegistry()
+
+    /**
+     * Gets the mapper registry from the current context.
+     *
+     * @return array
+     */
+    private function _getMapperRegistry()
+    {
+        if (!Registry::getContext()->hasAttribute(__CLASS__ . '::mapperRegistry')) {
+            return array();
+        }
+
+        return Registry::getContext()->getAttribute(__CLASS__ . '::mapperRegistry');
+    }
+
+    // }}}
+    // {{{ _setMapperRegistry()
+
+    /**
+     * Sets the mapper registry to the current context.
+     *
+     * @param array $mapperRegistry
+     */
+    private function _setMapperRegistry(array $mapperRegistry)
+    {
+        Registry::getContext()->setAttribute(__CLASS__ . '::mapperRegistry', $mapperRegistry);
+    }
+
+    // }}}
+    // {{{ _getConfigDirectoryStack()
+
+    /**
+     * Gets the config directory stack from the current context.
+     *
+     * @return array
+     */
+    private function _getConfigDirectoryStack()
+    {
+        if (!Registry::getContext()->hasAttribute(__CLASS__ . '::configDirectoryStack')) {
+            return array();
+        }
+
+        return Registry::getContext()->getAttribute(__CLASS__ . '::configDirectoryStack');
+    }
+
+    // }}}
+    // {{{ _setConfigDirectoryStack()
+
+    /**
+     * Sets the config directory stack to the current context.
+     *
+     * @param array $configDirectoryStack
+     */
+    private function _setConfigDirectoryStack(array $configDirectoryStack)
+    {
+        Registry::getContext()->setAttribute(__CLASS__ . '::configDirectoryStack', $configDirectoryStack);
+    }
+
+    // }}}
+    // {{{ _getCacheDirectoryStack()
+
+    /**
+     * Gets the cache directory stack from the current context.
+     *
+     * @return array
+     */
+    private function _getCacheDirectoryStack()
+    {
+        if (!Registry::getContext()->hasAttribute(__CLASS__ . '::cacheDirectoryStack')) {
+            return array();
+        }
+
+        return Registry::getContext()->getAttribute(__CLASS__ . '::cacheDirectoryStack');
+    }
+
+    // }}}
+    // {{{ _setCacheDirectoryStack()
+
+    /**
+     * Sets the cache directory stack to the current context.
+     *
+     * @param array $cacheDirectoryStack
+     */
+    private function _setCacheDirectoryStack(array $cacheDirectoryStack)
+    {
+        Registry::getContext()->setAttribute(__CLASS__ . '::cacheDirectoryStack', $cacheDirectoryStack);
     }
 
     /**#@-*/

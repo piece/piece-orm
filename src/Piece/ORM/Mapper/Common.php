@@ -67,6 +67,8 @@ class Common
      * @access public
      */
 
+    public $mapperID;
+
     /**#@-*/
 
     /**#@+
@@ -100,10 +102,12 @@ class Common
      * Sets the Piece::ORM::Metadata object for this mapper.
      *
      * @param Piece::ORM::Metadata $metadata
+     * @param string               $mapperID
      */
-    public function __construct(Metadata $metadata)
+    public function __construct(Metadata $metadata, $mapperID)
     {
         $this->_metadata = $metadata;
+        $this->mapperID = $mapperID;
     }
 
     // }}}

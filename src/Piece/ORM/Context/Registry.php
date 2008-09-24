@@ -53,11 +53,6 @@ use Piece::ORM::Context;
 class Registry
 {
 
-    // {{{ constants
-
-    const DEFAULT_CONTEXT_ID = '_default';
-
-    // }}}
     // {{{ properties
 
     /**#@+
@@ -76,8 +71,7 @@ class Registry
      * @access private
      */
 
-    private static $_contexts = array();
-    private static $_currentContextID;
+    private static $_contextStack = array();
 
     /**#@-*/
 
@@ -89,36 +83,17 @@ class Registry
     // {{{ getContext()
 
     /**
-     * Gets a Piece::ORM::Context object from the registry.
+     * Gets the current context.
      *
      * @return Piece::ORM::Context
      */
     public static function getContext()
     {
-        return self::$_contexts[ self::$_currentContextID ];
-    }
-
-    // }}}
-    // {{{ addContext()
-
-    /**
-     * Adds a Piece::ORM::Context object to the registry.
-     *
-     * @param Piece::ORM::Context $context
-     */
-    public static function addContext(Context $context)
-    {
-        if (!$context->hasAttribute('id')) {
-            $id = self::DEFAULT_CONTEXT_ID;
-        } else {
-            $id = $context->getAttribute('id');
+        if (!count(self::$_contextStack)) {
+            return;
         }
 
-        if (!count(array_keys(self::$_contexts))) {
-            self::$_currentContextID = $id;
-        }
-
-        self::$_contexts[$id] = $context;
+        return self::$_contextStack[ count(self::$_contextStack) - 1 ];
     }
 
     // }}}
@@ -129,11 +104,35 @@ class Registry
      */
     public static function clear()
     {
-        foreach (self::$_contexts as $context) {
+        foreach (self::$_contextStack as $context) {
             $context->clear();
         }
 
-        self::$_contexts = array();
+        self::$_contextStack = array();
+    }
+
+    // }}}
+    // {{{ setContext()
+
+    /**
+     * Sets a Piece::ORM::Context object as the current context.
+     *
+     * @param Piece::ORM::Context $context
+     */
+    public static function setContext(Context $context)
+    {
+        array_push(self::$_contextStack, $context);
+    }
+
+    // }}}
+    // {{{ restoreCacheDirectory()
+
+    /**
+     * Restores the previous context.
+     */
+    public static function restoreContext()
+    {
+        array_pop(self::$_contextStack);
     }
 
     /**#@-*/

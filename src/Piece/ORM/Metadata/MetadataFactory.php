@@ -37,7 +37,6 @@
 
 namespace Piece::ORM::Metadata;
 
-use Piece::ORM::Context;
 use Piece::ORM::Inflector;
 use Piece::ORM::Env;
 use Piece::ORM::Exception::PEARException;
@@ -141,15 +140,21 @@ class MetadataFactory
     }
 
     // }}}
-    // {{{ clear()
+    // {{{ getCacheDirectory()
 
     /**
-     * Clear all attributes from the current context.
+     * Gets the cache directory for the current context.
+     *
+     * @return array
      */
-    public static function clear()
+    public function getCacheDirectory()
     {
-        Registry::getContext()->removeAttribute(__CLASS__ . '::cacheDirectoryStack');
-        Registry::getContext()->removeAttribute(__CLASS__ . '::metadataRegistry');
+        $cacheDirectoryStack = self::_getCacheDirectoryStack();
+        if (!count($cacheDirectoryStack)) {
+            return;
+        }
+
+        return $cacheDirectoryStack[ count($cacheDirectoryStack) - 1 ];
     }
 
     /**#@-*/
@@ -176,7 +181,7 @@ class MetadataFactory
      */
     private static function _getMetadataFromCache($tableName, $tableID)
     {
-        $cache = new ::Cache_Lite(array('cacheDir' => self::_getCacheDirectory() . '/',
+        $cache = new ::Cache_Lite(array('cacheDir' => self::getCacheDirectory() . '/',
                                         'automaticSerialization' => true,
                                         'errorHandlingAPIBreak' => true)
                                   );
@@ -192,7 +197,7 @@ class MetadataFactory
         $metadata = $cache->get($tableID);
         if (::PEAR::isError($metadata)) {
             trigger_error('Cannot read the cache file in the directory [ ' .
-                          self::_getCacheDirectory() .
+                          self::getCacheDirectory() .
                           ' ].',
                           E_USER_WARNING
                           );
@@ -205,7 +210,7 @@ class MetadataFactory
             $result = $cache->save($metadata);
             if (::PEAR::isError($result)) {
                 trigger_error('Cannot write a Piece::ORM::Metadata object to the cache file in the directory [ ' .
-                              self::_getCacheDirectory() .
+                              self::getCacheDirectory() .
                               ' ].',
                               E_USER_WARNING
                               );
@@ -299,18 +304,20 @@ class MetadataFactory
      */
     private static function _createMetadata($tableName, $tableID)
     {
-        if (!file_exists(self::_getCacheDirectory())) {
+        if (!file_exists(self::getCacheDirectory())) {
             trigger_error('The cache directory [ ' .
-                          self::_getCacheDirectory() .
+                          self::getCacheDirectory() .
                           ' ] is not found.',
                           E_USER_WARNING
                           );
             return self::_createMetadataFromDatabase($tableName, $tableID);
         }
 
-        if (!is_readable(self::_getCacheDirectory()) || !is_writable(self::_getCacheDirectory())) {
+        if (!is_readable(self::getCacheDirectory())
+            || !is_writable(self::getCacheDirectory())
+            ) {
             trigger_error('The cache directory [ ' .
-                          self::_getCacheDirectory() .
+                          self::getCacheDirectory() .
                           ' ] is not readable or writable.',
                           E_USER_WARNING
                           );
@@ -348,24 +355,6 @@ class MetadataFactory
     private function _setCacheDirectoryStack(array $cacheDirectoryStack)
     {
         Registry::getContext()->setAttribute(__CLASS__ . '::cacheDirectoryStack', $cacheDirectoryStack);
-    }
-
-    // }}}
-    // {{{ _getCacheDirectory()
-
-    /**
-     * Gets the cache directory for the current context.
-     *
-     * @return array
-     */
-    private function _getCacheDirectory()
-    {
-        $cacheDirectoryStack = self::_getCacheDirectoryStack();
-        if (!count($cacheDirectoryStack)) {
-            return;
-        }
-
-        return $cacheDirectoryStack[ count($cacheDirectoryStack) - 1 ];
     }
 
     // }}}

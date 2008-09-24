@@ -42,6 +42,7 @@ use Piece::ORM::Context;
 use Piece::ORM::Mapper::MapperFactory;
 use Piece::ORM::Metadata::MetadataFactory;
 use Piece::ORM::Exception;
+use Piece::ORM::Context::Registry;
 
 // {{{ Piece::ORM
 
@@ -107,8 +108,9 @@ class ORM
                                      $mapperConfigDirectory
                                      )
     {
+        Registry::setContext(new Context());
+        $context = Registry::getContext();
         $config = ConfigFactory::factory($configDirectory, $cacheDirectory);
-        $context = Context::singleton();
         $context->setConfiguration($config);
         $context->setMapperConfigDirectory($mapperConfigDirectory);
         $defaultDatabase = $config->getDefaultDatabase();
@@ -118,8 +120,6 @@ class ORM
 
         MapperFactory::setCacheDirectory($cacheDirectory);
         MetadataFactory::setCacheDirectory($cacheDirectory);
-
-        self::$configured = true;
     }
 
     // }}}
@@ -134,7 +134,7 @@ class ORM
      */
     public static function getMapper($mapperName)
     {
-        if (!self::$configured) {
+        if (is_null(Registry::getContext())) {
             throw new Exception(__METHOD__ . ' method must be called after calling configure().');
         }
 
@@ -152,12 +152,11 @@ class ORM
      */
     public static function getConfiguration()
     {
-        if (!self::$configured) {
+        if (is_null(Registry::getContext())) {
             throw new Exception(__METHOD__ . ' method must be called after calling configure().');
         }
 
-        $context = Context::singleton();
-        return $context->getConfiguration();
+        return Registry::getContext()->getConfiguration();
     }
 
     // }}}
@@ -171,12 +170,11 @@ class ORM
      */
     public static function setDatabase($database)
     {
-        if (!self::$configured) {
+        if (is_null(Registry::getContext())) {
             throw new Exception(__METHOD__ . ' method must be called after calling configure().');
         }
 
-        $context = Context::singleton();
-        $context->setDatabase($database);
+        Registry::getContext()->setDatabase($database);
     }
 
     // }}}
@@ -191,7 +189,7 @@ class ORM
      */
     public static function createObject($mapperName)
     {
-        if (!self::$configured) {
+        if (is_null(Registry::getContext())) {
             throw new Exception(__METHOD__ . ' method must be called after calling configure().');
         }
 
