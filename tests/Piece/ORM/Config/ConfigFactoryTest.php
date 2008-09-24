@@ -38,6 +38,8 @@
 namespace Piece::ORM::Config;
 
 use Piece::ORM::Config::ConfigFactory;
+use Piece::ORM::Context;
+use Piece::ORM::Context::Registry;
 
 require_once 'spyc.php5';
 
@@ -86,10 +88,12 @@ class ConfigFactoryTest extends ::PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->_cacheDirectory = dirname(__FILE__) . '/' . basename(__FILE__, '.php');
+        Registry::addContext(new Context());
     }
 
     public function tearDown()
     {
+        Registry::clear();
         $cache = new ::Cache_Lite(array('cacheDir' => "{$this->_cacheDirectory}/",
                                         'automaticSerialization' => true,
                                         'errorHandlingAPIBreak' => true)
