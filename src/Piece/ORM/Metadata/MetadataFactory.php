@@ -44,7 +44,7 @@ use Piece::ORM::Exception::PEARException;
 use Piece::ORM::Metadata::MetadataFactory::NoSuchTableException;
 use Piece::ORM::MDB2::Decorator::Reverse::Mssql;
 use Piece::ORM::Metadata;
-use Piece::ORM::Context::Registry as ContextRegistry;
+use Piece::ORM::Context::Registry;
 
 // {{{ Piece::ORM::Metadata::MetadataFactory
 
@@ -95,7 +95,7 @@ class MetadataFactory
      */
     public static function factory($tableName)
     {
-        $context = ContextRegistry::getContext();
+        $context = Registry::getContext();
         if (!$context->getUseMapperNameAsTableName()) {
             $tableName = Inflector::underscore($tableName);
         }
@@ -148,8 +148,8 @@ class MetadataFactory
      */
     public static function clear()
     {
-        ContextRegistry::getContext()->removeAttribute(__CLASS__ . '::cacheDirectoryStack');
-        ContextRegistry::getContext()->removeAttribute(__CLASS__ . '::metadataRegistry');
+        Registry::getContext()->removeAttribute(__CLASS__ . '::cacheDirectoryStack');
+        Registry::getContext()->removeAttribute(__CLASS__ . '::metadataRegistry');
     }
 
     /**#@-*/
@@ -229,7 +229,7 @@ class MetadataFactory
      */
     private static function _createMetadataFromDatabase($tableName, $tableID)
     {
-        $context = ContextRegistry::getContext();
+        $context = Registry::getContext();
         $dbh = $context->getConnection();
 
         ::PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
@@ -330,7 +330,7 @@ class MetadataFactory
      */
     private function _getCacheDirectoryStack()
     {
-        $cacheDirectoryStack = ContextRegistry::getContext()->getAttribute(__CLASS__ . '::cacheDirectoryStack');
+        $cacheDirectoryStack = Registry::getContext()->getAttribute(__CLASS__ . '::cacheDirectoryStack');
         if (is_null($cacheDirectoryStack)) {
             return array();
         }
@@ -348,7 +348,7 @@ class MetadataFactory
      */
     private function _setCacheDirectoryStack(array $cacheDirectoryStack)
     {
-        ContextRegistry::getContext()->setAttribute(__CLASS__ . '::cacheDirectoryStack', $cacheDirectoryStack);
+        Registry::getContext()->setAttribute(__CLASS__ . '::cacheDirectoryStack', $cacheDirectoryStack);
     }
 
     // }}}
@@ -413,7 +413,7 @@ class MetadataFactory
      */
     private function _getMetadataRegistry()
     {
-        $metadataRegistry = ContextRegistry::getContext()->getAttribute(__CLASS__ . '::metadataRegistry');
+        $metadataRegistry = Registry::getContext()->getAttribute(__CLASS__ . '::metadataRegistry');
         if (is_null($metadataRegistry)) {
             return array();
         }
@@ -431,7 +431,7 @@ class MetadataFactory
      */
     private function _setMetadataRegistry(array $metadataRegistry)
     {
-        ContextRegistry::getContext()->setAttribute(__CLASS__ . '::metadataRegistry', $metadataRegistry);
+        Registry::getContext()->setAttribute(__CLASS__ . '::metadataRegistry', $metadataRegistry);
     }
 
     /**#@-*/
