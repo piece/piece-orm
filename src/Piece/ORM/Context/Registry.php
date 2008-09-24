@@ -132,6 +132,12 @@ class Registry
      */
     public static function restoreContext()
     {
+        $context = self::getContext();
+        if (is_null($context)) {
+            return;
+        }
+
+        $context->clear();
         array_pop(self::$_contextStack);
     }
 
