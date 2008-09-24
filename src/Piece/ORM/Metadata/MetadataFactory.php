@@ -44,7 +44,6 @@ use Piece::ORM::Exception::PEARException;
 use Piece::ORM::Metadata::MetadataFactory::NoSuchTableException;
 use Piece::ORM::MDB2::Decorator::Reverse::Mssql;
 use Piece::ORM::Metadata;
-use Piece::ORM::Metadata::Registry;
 use Piece::ORM::Context::Registry as ContextRegistry;
 
 // {{{ Piece::ORM::Metadata::MetadataFactory
@@ -102,24 +101,13 @@ class MetadataFactory
         }
 
         $tableID = sha1($context->getDSN() . ".$tableName");
-        $metadata = Registry::getMetadata($tableID);
+        $metadata = self::_getMetadata($tableID);
         if (is_null($metadata)) {
             $metadata = self::_createMetadata($tableName, $tableID);
-            Registry::addMetadata($metadata);
+            self::_addMetadata($metadata);
         }
 
         return $metadata;
-    }
-
-    // }}}
-    // {{{ clearInstances()
-
-    /**
-     * Clears the Piece::ORM::Metadata instances.
-     */
-    public static function clearInstances()
-    {
-        Registry::clear();
     }
 
     // }}}
@@ -152,6 +140,18 @@ class MetadataFactory
         self::_setCacheDirectoryStack($cacheDirectoryStack);
     }
 
+    // }}}
+    // {{{ clear()
+
+    /**
+     * Clear all attributes from the current context.
+     */
+    public static function clear()
+    {
+        ContextRegistry::getContext()->removeAttribute(__CLASS__ . '::cacheDirectoryStack');
+        ContextRegistry::getContext()->removeAttribute(__CLASS__ . '::metadataRegistry');
+    }
+
     /**#@-*/
 
     /**#@+
@@ -165,7 +165,7 @@ class MetadataFactory
      */
 
     // }}}
-    // {{{ _getMetadata()
+    // {{{ _getMetadataFromCache()
 
     /**
      * Gets a Piece::ORM::Metadata object from a cache.
@@ -174,7 +174,7 @@ class MetadataFactory
      * @param string $tableID
      * @return Piece::ORM::Metadata
      */
-    private static function _getMetadata($tableName, $tableID)
+    private static function _getMetadataFromCache($tableName, $tableID)
     {
         $cache = new ::Cache_Lite(array('cacheDir' => self::_getCacheDirectory() . '/',
                                         'automaticSerialization' => true,
@@ -317,7 +317,7 @@ class MetadataFactory
             return self::_createMetadataFromDatabase($tableName, $tableID);
         }
 
-        return self::_getMetadata($tableName, $tableID);
+        return self::_getMetadataFromCache($tableName, $tableID);
     }
 
     // }}}
@@ -367,6 +367,71 @@ class MetadataFactory
         }
 
         return $cacheDirectoryStack[ count($cacheDirectoryStack) - 1 ];
+    }
+
+    // }}}
+    // {{{ _getMetadata()
+
+    /**
+     * Gets a Piece::ORM::Metadata object from the current context.
+     *
+     * @param string $tableID
+     * @return Piece::ORM::Metadata
+     */
+    private static function _getMetadata($tableID)
+    {
+        $metadataRegistry = self::_getMetadataRegistry();
+        if (!array_key_exists($tableID, $metadataRegistry)) {
+            return;
+        }
+
+        return $metadataRegistry[$tableID];
+    }
+
+    // }}}
+    // {{{ _addMetadata()
+
+    /**
+     * Adds a Piece::ORM::Metadata object to the current context.
+     *
+     * @param Piece::ORM::Metadata $metadata
+     */
+    private static function _addMetadata(Metadata $metadata)
+    {
+        $metadataRegistry = self::_getMetadataRegistry();
+        $metadataRegistry[ $metadata->tableID ] = $metadata;
+        self::_setMetadataRegistry($metadataRegistry);
+    }
+
+    // }}}
+    // {{{ _getMetadataRegistry()
+
+    /**
+     * Gets the metadata registry from the current context.
+     *
+     * @return array
+     */
+    private function _getMetadataRegistry()
+    {
+        $metadataRegistry = ContextRegistry::getContext()->getAttribute(__CLASS__ . '::metadataRegistry');
+        if (is_null($metadataRegistry)) {
+            return array();
+        }
+
+        return $metadataRegistry;
+    }
+
+    // }}}
+    // {{{ _setMetadataRegistry()
+
+    /**
+     * Sets the metadata registry to the current context.
+     *
+     * @param array $metadataRegistry
+     */
+    private function _setMetadataRegistry(array $metadataRegistry)
+    {
+        ContextRegistry::getContext()->setAttribute(__CLASS__ . '::metadataRegistry', $metadataRegistry);
     }
 
     /**#@-*/

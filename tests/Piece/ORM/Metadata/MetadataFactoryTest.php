@@ -101,8 +101,7 @@ class MetadataFactoryTest extends ::PHPUnit_Framework_TestCase
 
     public function tearDown()
     {
-        MetadataFactory::restoreCacheDirectory();
-        MetadataFactory::clearInstances();
+        MetadataFactory::clear();
         Registry::clear();
         $cache = new ::Cache_Lite(array('cacheDir' => "{$this->_cacheDirectory}/",
                                         'automaticSerialization' => true,
@@ -114,7 +113,7 @@ class MetadataFactoryTest extends ::PHPUnit_Framework_TestCase
     public function testShouldCreateAnObjectByAGivenMapper()
     {
         $metadata = MetadataFactory::factory('Employees');
-
+  
         $this->assertType('Piece::ORM::Metadata', $metadata);
         $this->assertEquals('employees', $metadata->getTableName());
     }
