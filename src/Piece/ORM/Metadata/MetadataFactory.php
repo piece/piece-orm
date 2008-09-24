@@ -79,9 +79,6 @@ class MetadataFactory
      * @access private
      */
 
-    private static $_cacheDirectory;
-    private static $_cacheDirectoryStack = array();
-
     /**#@-*/
 
     /**#@+
@@ -135,8 +132,9 @@ class MetadataFactory
      */
     public static function setCacheDirectory($cacheDirectory)
     {
-        array_push(self::$_cacheDirectoryStack, self::$_cacheDirectory);
-        self::$_cacheDirectory = $cacheDirectory;
+        $cacheDirectoryStack = self::_getCacheDirectoryStack();
+        array_push($cacheDirectoryStack, $cacheDirectory);
+        self::_setCacheDirectoryStack($cacheDirectoryStack);
     }
 
     // }}}
@@ -149,7 +147,9 @@ class MetadataFactory
      */
     public static function restoreCacheDirectory()
     {
-        self::$_cacheDirectory = array_pop(self::$_cacheDirectoryStack);
+        $cacheDirectoryStack = self::_getCacheDirectoryStack();
+        array_pop($cacheDirectoryStack);
+        self::_setCacheDirectoryStack($cacheDirectoryStack);
     }
 
     /**#@-*/
@@ -176,7 +176,7 @@ class MetadataFactory
      */
     private static function _getMetadata($tableName, $tableID)
     {
-        $cache = new ::Cache_Lite(array('cacheDir' => self::$_cacheDirectory . '/',
+        $cache = new ::Cache_Lite(array('cacheDir' => self::_getCacheDirectory() . '/',
                                         'automaticSerialization' => true,
                                         'errorHandlingAPIBreak' => true)
                                   );
@@ -192,7 +192,7 @@ class MetadataFactory
         $metadata = $cache->get($tableID);
         if (::PEAR::isError($metadata)) {
             trigger_error('Cannot read the cache file in the directory [ ' .
-                          self::$_cacheDirectory .
+                          self::_getCacheDirectory() .
                           ' ].',
                           E_USER_WARNING
                           );
@@ -205,7 +205,7 @@ class MetadataFactory
             $result = $cache->save($metadata);
             if (::PEAR::isError($result)) {
                 trigger_error('Cannot write a Piece::ORM::Metadata object to the cache file in the directory [ ' .
-                              self::$_cacheDirectory .
+                              self::_getCacheDirectory() .
                               ' ].',
                               E_USER_WARNING
                               );
@@ -299,18 +299,18 @@ class MetadataFactory
      */
     private static function _createMetadata($tableName, $tableID)
     {
-        if (!file_exists(self::$_cacheDirectory)) {
+        if (!file_exists(self::_getCacheDirectory())) {
             trigger_error('The cache directory [ ' .
-                          self::$_cacheDirectory .
+                          self::_getCacheDirectory() .
                           ' ] is not found.',
                           E_USER_WARNING
                           );
             return self::_createMetadataFromDatabase($tableName, $tableID);
         }
 
-        if (!is_readable(self::$_cacheDirectory) || !is_writable(self::$_cacheDirectory)) {
+        if (!is_readable(self::_getCacheDirectory()) || !is_writable(self::_getCacheDirectory())) {
             trigger_error('The cache directory [ ' .
-                          self::$_cacheDirectory .
+                          self::_getCacheDirectory() .
                           ' ] is not readable or writable.',
                           E_USER_WARNING
                           );
@@ -318,6 +318,55 @@ class MetadataFactory
         }
 
         return self::_getMetadata($tableName, $tableID);
+    }
+
+    // }}}
+    // {{{ _getCacheDirectoryStack()
+
+    /**
+     * Gets the cache directory stack from the current context.
+     *
+     * @return array
+     */
+    private function _getCacheDirectoryStack()
+    {
+        $cacheDirectoryStack = ContextRegistry::getContext()->getAttribute(__CLASS__ . '::cacheDirectoryStack');
+        if (is_null($cacheDirectoryStack)) {
+            return array();
+        }
+
+        return $cacheDirectoryStack;
+    }
+
+    // }}}
+    // {{{ _setCacheDirectoryStack()
+
+    /**
+     * Sets the cache directory stack to the current context.
+     *
+     * @param array $cacheDirectoryStack
+     */
+    private function _setCacheDirectoryStack(array $cacheDirectoryStack)
+    {
+        ContextRegistry::getContext()->setAttribute(__CLASS__ . '::cacheDirectoryStack', $cacheDirectoryStack);
+    }
+
+    // }}}
+    // {{{ _getCacheDirectory()
+
+    /**
+     * Gets the cache directory for the current context.
+     *
+     * @return array
+     */
+    private function _getCacheDirectory()
+    {
+        $cacheDirectoryStack = self::_getCacheDirectoryStack();
+        if (!count($cacheDirectoryStack)) {
+            return;
+        }
+
+        return $cacheDirectoryStack[ count($cacheDirectoryStack) - 1 ];
     }
 
     /**#@-*/
