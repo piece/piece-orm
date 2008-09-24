@@ -330,12 +330,11 @@ class MetadataFactory
      */
     private function _getCacheDirectoryStack()
     {
-        $cacheDirectoryStack = Registry::getContext()->getAttribute(__CLASS__ . '::cacheDirectoryStack');
-        if (is_null($cacheDirectoryStack)) {
+        if (!Registry::getContext()->hasAttribute(__CLASS__ . '::cacheDirectoryStack')) {
             return array();
         }
 
-        return $cacheDirectoryStack;
+        return Registry::getContext()->getAttribute(__CLASS__ . '::cacheDirectoryStack');
     }
 
     // }}}
@@ -413,12 +412,11 @@ class MetadataFactory
      */
     private function _getMetadataRegistry()
     {
-        $metadataRegistry = Registry::getContext()->getAttribute(__CLASS__ . '::metadataRegistry');
-        if (is_null($metadataRegistry)) {
+        if (!Registry::getContext()->hasAttribute(__CLASS__ . '::metadataRegistry')) {
             return array();
         }
 
-        return $metadataRegistry;
+        return Registry::getContext()->getAttribute(__CLASS__ . '::metadataRegistry');
     }
 
     // }}}

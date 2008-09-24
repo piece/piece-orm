@@ -37,6 +37,8 @@
 
 namespace Piece::ORM::MDB2::NativeTypeMapper;
 
+use Piece::ORM::Context::Registry;
+
 // {{{ Piece::ORM::MDB2::NativeTypeMapper::Common
 
 /**
