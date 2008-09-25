@@ -187,7 +187,7 @@ class Context extends AttributeHolder
     /**
      * Gets the database handle for the current database.
      *
-     * @return MDB2_Driver_Common
+     * @return ::MDB2_Driver_Common
      * @throws Piece::ORM::Exception::PEARException
      */
     public function getConnection()

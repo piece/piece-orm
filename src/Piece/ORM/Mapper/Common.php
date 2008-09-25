@@ -283,13 +283,10 @@ class Common
      *
      * @param string                $query
      * @param boolean               $isManip
-     * @param MDB2_Statement_Common $sth
-     * @return MDB2_Result_Common|integer
+     * @param ::MDB2_Statement_Common $sth
+     * @return ::MDB2_Result_Common|integer
      */
-    public function executeQuery($query,
-                                 $isManip = false,
-                                 MDB2_Statement_Common $sth = null
-                                 )
+    public function executeQuery($query, $isManip = false, $sth = null)
     {
         $queryExecutor = new QueryExecutor($this, $isManip);
         return $queryExecutor->execute($query, $sth);
@@ -323,7 +320,7 @@ class Common
      * @param string   $methodName
      * @param stdClass $criteria
      * @param boolean  $isManip
-     * @return MDB2_Result_Common|integer
+     * @return ::MDB2_Result_Common|integer
      */
     public function executeQueryWithCriteria($methodName, $criteria, $isManip = false)
     {
@@ -416,7 +413,7 @@ class Common
     /**
      * Gets the database handle for this mapper.
      *
-     * @return MDB2_Driver_Common
+     * @return ::MDB2_Driver_Common
      * @since Method available since Release 1.1.0
      */
     public function getConnection()
