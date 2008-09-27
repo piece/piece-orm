@@ -78,6 +78,7 @@ class Context extends AttributeHolder
     private $_config;
     private $_database;
     private $_mapperConfigDirectory;
+    private $_databaseStack = array();
 
     /**#@-*/
 
@@ -126,9 +127,9 @@ class Context extends AttributeHolder
             throw new Exception("The given database [ $database ] not found in the current configuration.");
         }
 
-        $this->_database = $database;
+        array_push($this->_databaseStack, $database);
 
-        $directorySuffix = $this->_config->getDirectorySuffix($this->_database);
+        $directorySuffix = $this->_config->getDirectorySuffix($this->getDatabase());
         if (is_null($directorySuffix) || !strlen($directorySuffix)) {
             MapperFactory::setConfigDirectory($this->_mapperConfigDirectory);
         } else {
@@ -146,7 +147,7 @@ class Context extends AttributeHolder
      */
     public function getDSN()
     {
-        return $this->_config->getDSN($this->_database);
+        return $this->_config->getDSN($this->getDatabase());
     }
 
     // }}}
@@ -159,7 +160,7 @@ class Context extends AttributeHolder
      */
     public function getOptions()
     {
-        return $this->_config->getOptions($this->_database);
+        return $this->_config->getOptions($this->getDatabase());
     }
 
     // }}}
@@ -227,7 +228,7 @@ class Context extends AttributeHolder
      */
     public function getUseMapperNameAsTableName()
     {
-        return $this->_config->getUseMapperNameAsTableName($this->_database);
+        return $this->_config->getUseMapperNameAsTableName($this->getDatabase());
     }
 
     // }}}
@@ -297,6 +298,20 @@ class Context extends AttributeHolder
         $cache->clean();
     }
 
+    // }}}
+    // {{{ restoreDatabase()
+
+    /**
+     * Restores the previous database as the current database.
+     *
+     * @since Method available since Release 2.0.0
+     */
+    public function restoreDatabase()
+    {
+        MapperFactory::restoreConfigDirectory();
+        array_pop($this->_databaseStack);
+    }
+
     /**#@-*/
 
     /**#@+
@@ -341,6 +356,24 @@ class Context extends AttributeHolder
         }
 
         return $this->getAttribute(__CLASS__ . '::cacheDirectoryStack');
+    }
+
+    // }}}
+    // {{{ getDatabase()
+
+    /**
+     * Gets the current database.
+     *
+     * @return string
+     * @since Method available since Release 2.0.0
+     */
+    public function getDatabase()
+    {
+        if (!count($this->_databaseStack)) {
+            return;
+        }
+
+        return $this->_databaseStack[ count($this->_databaseStack) - 1 ];
     }
 
     /**#@-*/

@@ -223,6 +223,7 @@ class ORM
     /**
      * Clears all cache files in the cache directory.
      *
+     * @throws Piece::ORM::Exception
      * @since Method available since Release 2.0.0
      */
     public static function clearCache()
@@ -232,6 +233,24 @@ class ORM
         }
 
         Registry::getContext()->clearCache();
+    }
+
+    // }}}
+    // {{{ restoreDatabase()
+
+    /**
+     * Restores the previous database as the current database.
+     *
+     * @throws Piece::ORM::Exception
+     * @since Method available since Release 2.0.0
+     */
+    public static function restoreDatabase()
+    {
+        if (is_null(Registry::getContext())) {
+            throw new Exception(__METHOD__ . ' method must be called after calling configure().');
+        }
+
+        Registry::getContext()->restoreDatabase();
     }
 
     /**#@-*/

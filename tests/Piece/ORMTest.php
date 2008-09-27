@@ -329,6 +329,35 @@ class ORMTest extends ::PHPUnit_Framework_TestCase
         $this->assertEquals('foo', $config->getDirectorySuffix('database1'));
     }
 
+    /**
+     * @since Method available since Release 2.0.0
+     */
+    public function testShouldRestoreThePreviousDatabaseSettings()
+    {
+        $cacheDirectory =
+            dirname(__FILE__) . '/' . basename(__FILE__, '.php') . '/SetDatabase';
+        ORM::configure($cacheDirectory, $cacheDirectory, $cacheDirectory);
+
+        $this->assertEquals('database1', Registry::getContext()->getDatabase());
+        $this->assertEquals("$cacheDirectory/database1",
+                            MapperFactory::getConfigDirectory()
+                            );
+
+        ORM::setDatabase('database2');
+
+        $this->assertEquals('database2', Registry::getContext()->getDatabase());
+        $this->assertEquals("$cacheDirectory/database2",
+                            MapperFactory::getConfigDirectory()
+                            );
+
+        ORM::restoreDatabase();
+
+        $this->assertEquals('database1', Registry::getContext()->getDatabase());
+        $this->assertEquals("$cacheDirectory/database1",
+                            MapperFactory::getConfigDirectory()
+                            );
+    }
+
     /**#@-*/
 
     /**#@+
