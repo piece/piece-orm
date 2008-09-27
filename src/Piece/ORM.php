@@ -113,13 +113,11 @@ class ORM
         $config = ConfigFactory::factory($configDirectory, $cacheDirectory);
         $context->setConfiguration($config);
         $context->setMapperConfigDirectory($mapperConfigDirectory);
+        $context->setCacheDirectory($cacheDirectory);
         $defaultDatabase = $config->getDefaultDatabase();
         if (!is_null($defaultDatabase)) {
             $context->setDatabase($defaultDatabase);
         }
-
-        MapperFactory::setCacheDirectory($cacheDirectory);
-        MetadataFactory::setCacheDirectory($cacheDirectory);
     }
 
     // }}}

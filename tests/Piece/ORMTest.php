@@ -123,19 +123,14 @@ class ORMTest extends ::PHPUnit_Framework_TestCase
                             MapperFactory::getConfigDirectory()
                             );
         $this->assertEquals($this->_cacheDirectory,
-                            MapperFactory::getCacheDirectory()
-                            );
-        $this->assertEquals($this->_cacheDirectory,
-                            MetadataFactory::getCacheDirectory()
+                            Registry::getContext()->getCacheDirectory()
                             );
 
         MapperFactory::setConfigDirectory('./foo');
-        MapperFactory::setCacheDirectory('./bar');
-        MetadataFactory::setCacheDirectory('./baz');
+        Registry::getContext()->setCacheDirectory('./bar');
 
         $this->assertEquals('./foo', MapperFactory::getConfigDirectory());
-        $this->assertEquals('./bar', MapperFactory::getCacheDirectory());
-        $this->assertEquals('./baz', MetadataFactory::getCacheDirectory());
+        $this->assertEquals('./bar', Registry::getContext()->getCacheDirectory());
     }
 
     public function testShouldConfigureDynamicallyWithAGivenConfigurationFile()

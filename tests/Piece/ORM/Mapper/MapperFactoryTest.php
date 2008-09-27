@@ -97,10 +97,8 @@ class MapperFactoryTest extends ::PHPUnit_Framework_TestCase
         $context->setConfiguration($config);
         $context->setMapperConfigDirectory($this->_cacheDirectory);
         $context->setDatabase('piece');
-        Registry::setContext($context);
+        $context->setCacheDirectory($this->_cacheDirectory);
         MapperFactory::setConfigDirectory($this->_cacheDirectory);
-        MapperFactory::setCacheDirectory($this->_cacheDirectory);
-        MetadataFactory::setCacheDirectory($this->_cacheDirectory);
     }
 
     public function tearDown()
@@ -141,7 +139,7 @@ class MapperFactoryTest extends ::PHPUnit_Framework_TestCase
 
     public function testShouldRaiseAnExceptionIfTheCacheDirectoryIsNotSpecified()
     {
-        MapperFactory::setCacheDirectory(null);
+        Registry::getContext()->setCacheDirectory(null);
 
         try {
             MapperFactory::factory('Employees');
@@ -154,7 +152,7 @@ class MapperFactoryTest extends ::PHPUnit_Framework_TestCase
 
     public function testShouldRaiseAnExceptionIfAGivenCacheDirectoryIsNotFound()
     {
-        MapperFactory::setCacheDirectory(dirname(__FILE__) . '/foo');
+        Registry::getContext()->setCacheDirectory(dirname(__FILE__) . '/foo');
 
         try {
             MapperFactory::factory('Employees');

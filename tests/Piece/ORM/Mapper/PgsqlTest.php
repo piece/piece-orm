@@ -91,8 +91,7 @@ class PgsqlTest extends CompatibilityTests
         $this->tables[] = 'geometric_types';
         $this->cacheDirectory = dirname(__FILE__) . '/' . basename(__FILE__, '.php');
         MapperFactory::setConfigDirectory($this->cacheDirectory);
-        MapperFactory::setCacheDirectory($this->cacheDirectory);
-        MetadataFactory::setCacheDirectory($this->cacheDirectory);
+        Registry::getContext()->setCacheDirectory($this->cacheDirectory);
         $mapper = MapperFactory::factory('GeometricTypes');
         $geometricTypes = $mapper->createObject();
         $geometricTypes->pointField = '(1,1)';

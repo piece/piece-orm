@@ -115,9 +115,8 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
         $context = Registry::getContext();
         $context->setConfiguration($config);
         $context->setDatabase('piece');
+        $context->setCacheDirectory($this->cacheDirectory);
         MapperFactory::setConfigDirectory($this->cacheDirectory);
-        MapperFactory::setCacheDirectory($this->cacheDirectory);
-        MetadataFactory::setCacheDirectory($this->cacheDirectory);
         if (!$this->_initialized) {
             $this->_clearTableRecords();
             $this->_initialized = true;
@@ -1892,10 +1891,9 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
         $context = new Context();
         $context->setConfiguration($config);
         $context->setDatabase('caseSensitive');
+        $context->setCacheDirectory($this->cacheDirectory);
         Registry::setContext($context);
         MapperFactory::setConfigDirectory($this->cacheDirectory);
-        MapperFactory::setCacheDirectory($this->cacheDirectory);
-        MetadataFactory::setCacheDirectory($this->cacheDirectory);
 
         try {
             $mapper = MapperFactory::factory('Case_Sensitive');
@@ -2216,8 +2214,7 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
     {
         $this->cacheDirectory = "{$this->cacheDirectory}/$cacheDirectory";
         MapperFactory::setConfigDirectory($this->cacheDirectory);
-        MapperFactory::setCacheDirectory($this->cacheDirectory);
-        MetadataFactory::setCacheDirectory($this->cacheDirectory);
+        Registry::getContext()->setCacheDirectory($this->cacheDirectory);
     }
 
     public function _clearTableRecords()
@@ -2236,9 +2233,8 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
         $context = Registry::getContext();
         $context->setConfiguration($config);
         $context->setDatabase('caseSensitive');
+        $context->setCacheDirectory($this->cacheDirectory);
         MapperFactory::setConfigDirectory("{$this->cacheDirectory}/CaseSensitive");
-        MapperFactory::setCacheDirectory("{$this->cacheDirectory}/CaseSensitive");
-        MetadataFactory::setCacheDirectory("{$this->cacheDirectory}/CaseSensitive");
     }
 
     public function _clearCaseSensitiveContext()

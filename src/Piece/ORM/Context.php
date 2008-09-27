@@ -250,6 +250,56 @@ class Context extends AttributeHolder implements IContext
         return $this->_config->getUseMapperNameAsTableName($this->_database);
     }
 
+    // }}}
+    // {{{ setCacheDirectory()
+
+    /**
+     * Sets a cache directory.
+     *
+     * @param string $cacheDirectory
+     * @since Method available since Release 2.0.0
+     */
+    public function setCacheDirectory($cacheDirectory)
+    {
+        $cacheDirectoryStack = $this->_getCacheDirectoryStack();
+        array_push($cacheDirectoryStack, $cacheDirectory);
+        $this->_setCacheDirectoryStack($cacheDirectoryStack);
+    }
+
+    // }}}
+    // {{{ getCacheDirectory()
+
+    /**
+     * Gets the cache directory.
+     *
+     * @return array
+     * @since Method available since Release 2.0.0
+     */
+    public function getCacheDirectory()
+    {
+        $cacheDirectoryStack = $this->_getCacheDirectoryStack();
+        if (!count($cacheDirectoryStack)) {
+            return;
+        }
+
+        return $cacheDirectoryStack[ count($cacheDirectoryStack) - 1 ];
+    }
+
+    // }}}
+    // {{{ restoreCacheDirectory()
+
+    /**
+     * Restores the previous cache directory.
+     *
+     * @since Method available since Release 2.0.0
+     */
+    public function restoreCacheDirectory()
+    {
+        $cacheDirectoryStack = $this->_getCacheDirectoryStack();
+        array_pop($cacheDirectoryStack);
+        $this->_setCacheDirectoryStack($cacheDirectoryStack);
+    }
+
     /**#@-*/
 
     /**#@+
@@ -261,6 +311,40 @@ class Context extends AttributeHolder implements IContext
     /**#@+
      * @access private
      */
+
+    // }}}
+    // {{{ _setCacheDirectoryStack()
+
+    /**
+     * Sets the cache directory stack to the context.
+     *
+     * @param array $cacheDirectoryStack
+     * @since Method available since Release 2.0.0
+     */
+    private function _setCacheDirectoryStack(array $cacheDirectoryStack)
+    {
+        $this->setAttribute(__CLASS__ . '::cacheDirectoryStack',
+                            $cacheDirectoryStack
+                            );
+    }
+
+    // }}}
+    // {{{ _getCacheDirectoryStack()
+
+    /**
+     * Gets the cache directory stack from the context.
+     *
+     * @return array
+     * @since Method available since Release 2.0.0
+     */
+    private function _getCacheDirectoryStack()
+    {
+        if (!$this->hasAttribute(__CLASS__ . '::cacheDirectoryStack')) {
+            return array();
+        }
+
+        return $this->getAttribute(__CLASS__ . '::cacheDirectoryStack');
+    }
 
     /**#@-*/
 

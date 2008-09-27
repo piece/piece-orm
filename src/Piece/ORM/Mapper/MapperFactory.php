@@ -137,21 +137,6 @@ class MapperFactory
     }
 
     // }}}
-    // {{{ setCacheDirectory()
-
-    /**
-     * Sets a cache directory.
-     *
-     * @param string $cacheDirectory
-     */
-    public static function setCacheDirectory($cacheDirectory)
-    {
-        $cacheDirectoryStack = self::_getCacheDirectoryStack();
-        array_push($cacheDirectoryStack, $cacheDirectory);
-        self::_setCacheDirectoryStack($cacheDirectoryStack);
-    }
-
-    // }}}
     // {{{ restoreConfigDirectory()
 
     /**
@@ -167,27 +152,13 @@ class MapperFactory
     }
 
     // }}}
-    // {{{ restoreCacheDirectory()
-
-    /**
-     * Restores the previous cache directory.
-     *
-     * @since Method available since Release 2.0.0
-     */
-    public static function restoreCacheDirectory()
-    {
-        $cacheDirectoryStack = self::_getCacheDirectoryStack();
-        array_pop($cacheDirectoryStack);
-        self::_setCacheDirectoryStack($cacheDirectoryStack);
-    }
-
-    // }}}
     // {{{ getConfigDirectory()
 
     /**
      * Gets the config directory for the current context.
      *
      * @return array
+     * @since Method available since Release 2.0.0
      */
     public function getConfigDirectory()
     {
@@ -197,24 +168,6 @@ class MapperFactory
         }
 
         return $configDirectoryStack[ count($configDirectoryStack) - 1 ];
-    }
-
-    // }}}
-    // {{{ getCacheDirectory()
-
-    /**
-     * Gets the cache directory for the current context.
-     *
-     * @return array
-     */
-    public function getCacheDirectory()
-    {
-        $cacheDirectoryStack = self::_getCacheDirectoryStack();
-        if (!count($cacheDirectoryStack)) {
-            return;
-        }
-
-        return $cacheDirectoryStack[ count($cacheDirectoryStack) - 1 ];
     }
 
     /**#@-*/
@@ -245,7 +198,7 @@ class MapperFactory
      */
     private function _getMapperSource($mapperID, $mapperName, $configFile)
     {
-        $cache = new ::Cache_Lite_File(array('cacheDir' => self::getCacheDirectory() . '/',
+        $cache = new ::Cache_Lite_File(array('cacheDir' => Registry::getContext()->getCacheDirectory() . '/',
                                              'masterFile' => $configFile,
                                              'automaticSerialization' => true,
                                              'errorHandlingAPIBreak' => true)
@@ -262,7 +215,7 @@ class MapperFactory
         $mapperSource = $cache->get($mapperID);
         if (::PEAR::isError($mapperSource)) {
             throw new Exception('Cannot read the mapper source file in the directory [ ' .
-                                self::getCacheDirectory() . 
+                                Registry::getContext()->getCacheDirectory() . 
                                 ' ].'
                                 );
         }
@@ -342,22 +295,22 @@ class MapperFactory
                                 );
         }
 
-        if (is_null(self::getCacheDirectory())) {
+        if (is_null(Registry::getContext()->getCacheDirectory())) {
             throw new Exception('The cache directory must be specified.');
         }
 
-        if (!file_exists(self::getCacheDirectory())) {
+        if (!file_exists(Registry::getContext()->getCacheDirectory())) {
             throw new Exception('The cache directory [ ' .
-                                self::getCacheDirectory() .
+                                Registry::getContext()->getCacheDirectory() .
                                 'is not found.'
                                 );
         }
 
-        if (!is_readable(self::getCacheDirectory())
-            || !is_writable(self::getCacheDirectory())
+        if (!is_readable(Registry::getContext()->getCacheDirectory())
+            || !is_writable(Registry::getContext()->getCacheDirectory())
             ) {
             throw new Exception('The cache directory [ ' .
-                                self::getCacheDirectory() .
+                                Registry::getContext()->getCacheDirectory() .
                                 ' ] is not readable or writable.'
                                 );
         }
@@ -387,6 +340,7 @@ class MapperFactory
      *
      * @param string $mapperID
      * @return Piece::ORM::Mapper::Common
+     * @since Method available since Release 2.0.0
      */
     private static function _getMapper($mapperID)
     {
@@ -405,6 +359,7 @@ class MapperFactory
      * Adds a Piece::ORM::Mapper object to the current context.
      *
      * @param Piece::ORM::Mapper::Common $mapper
+     * @since Method available since Release 2.0.0
      */
     private static function _addMapper(Common $mapper)
     {
@@ -420,6 +375,7 @@ class MapperFactory
      * Gets the mapper registry from the current context.
      *
      * @return array
+     * @since Method available since Release 2.0.0
      */
     private function _getMapperRegistry()
     {
@@ -437,6 +393,7 @@ class MapperFactory
      * Sets the mapper registry to the current context.
      *
      * @param array $mapperRegistry
+     * @since Method available since Release 2.0.0
      */
     private function _setMapperRegistry(array $mapperRegistry)
     {
@@ -450,6 +407,7 @@ class MapperFactory
      * Gets the config directory stack from the current context.
      *
      * @return array
+     * @since Method available since Release 2.0.0
      */
     private function _getConfigDirectoryStack()
     {
@@ -467,40 +425,11 @@ class MapperFactory
      * Sets the config directory stack to the current context.
      *
      * @param array $configDirectoryStack
+     * @since Method available since Release 2.0.0
      */
     private function _setConfigDirectoryStack(array $configDirectoryStack)
     {
         Registry::getContext()->setAttribute(__CLASS__ . '::configDirectoryStack', $configDirectoryStack);
-    }
-
-    // }}}
-    // {{{ _getCacheDirectoryStack()
-
-    /**
-     * Gets the cache directory stack from the current context.
-     *
-     * @return array
-     */
-    private function _getCacheDirectoryStack()
-    {
-        if (!Registry::getContext()->hasAttribute(__CLASS__ . '::cacheDirectoryStack')) {
-            return array();
-        }
-
-        return Registry::getContext()->getAttribute(__CLASS__ . '::cacheDirectoryStack');
-    }
-
-    // }}}
-    // {{{ _setCacheDirectoryStack()
-
-    /**
-     * Sets the cache directory stack to the current context.
-     *
-     * @param array $cacheDirectoryStack
-     */
-    private function _setCacheDirectoryStack(array $cacheDirectoryStack)
-    {
-        Registry::getContext()->setAttribute(__CLASS__ . '::cacheDirectoryStack', $cacheDirectoryStack);
     }
 
     /**#@-*/

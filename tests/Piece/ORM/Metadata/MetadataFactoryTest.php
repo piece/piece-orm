@@ -96,7 +96,7 @@ class MetadataFactoryTest extends ::PHPUnit_Framework_TestCase
         $context = Registry::getContext();
         $context->setConfiguration($config);
         $context->setDatabase('piece');
-        MetadataFactory::setCacheDirectory($this->_cacheDirectory);
+        $context->setCacheDirectory($this->_cacheDirectory);
     }
 
     public function tearDown()
