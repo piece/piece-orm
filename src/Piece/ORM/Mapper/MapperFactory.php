@@ -246,7 +246,7 @@ class MapperFactory
     {
         $generator = new Generator($mapperID,
                                    $mapperName,
-                                   ::Spyc::YAMLLoad($configFile),
+                                   $configFile,
                                    MetadataFactory::factory($mapperName),
                                    get_class_methods('Piece::ORM::Mapper::Common')
                                    );

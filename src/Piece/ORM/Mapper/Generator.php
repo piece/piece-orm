@@ -78,7 +78,7 @@ class Generator
 
     private $_mapperClass;
     private $_mapperName;
-    private $_config;
+    private $_dslFile;
     private $_metadata;
     private $_methodDefinitions = array();
     private $_propertyDefinitions = array('query' => array(),
@@ -101,20 +101,20 @@ class Generator
      *
      * @param string               $mapperClass
      * @param string               $mapperName
-     * @param array                $config
+     * @param string               $dslFile
      * @param Piece::ORM::Metadata $metadata
      * @param array                $baseMapperMethods
      */
     public function __construct($mapperClass,
                                 $mapperName,
-                                array $config,
+                                $dslFile,
                                 Metadata $metadata,
                                 $baseMapperMethods
                                 )
     {
         $this->_mapperClass = $mapperClass;
         $this->_mapperName  = $mapperName;
-        $this->_config      = $config;
+        $this->_dslFile     = $dslFile;
         $this->_metadata    = $metadata;
         $this->_baseMapperMethods = $baseMapperMethods;
     }
@@ -330,15 +330,16 @@ class {$this->_mapperClass} extends Common
      */
     private function _generateFromConfiguration()
     {
-        if (!is_array($this->_config)) {
+        $dsl = ::Spyc::YAMLLoad($this->_dslFile);
+        if (!is_array($dsl)) {
             return;
         }
 
-        if (!array_key_exists('methods', $this->_config)) {
+        if (!array_key_exists('methods', $dsl)) {
             return;
         }
 
-        foreach ($this->_config['methods'] as $method => $definition) {
+        foreach ($dsl['methods'] as $method => $definition) {
             if (QueryType::isFindAll($method)) {
                 $this->_addFindAll($method,
                                    @$definition['query'],
