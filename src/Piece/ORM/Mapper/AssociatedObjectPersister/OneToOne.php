@@ -85,22 +85,23 @@ class OneToOne extends Common
     /**
      * Inserts associated objects to a table.
      *
-     * @param array $relationship
+     * @param array  $relationship
+     * @param string $mappedAs
      */
-    public function insert(array $relationship)
+    public function insert(array $relationship, $mappedAs)
     {
-        if (!property_exists($this->subject, $relationship['mappedAs'])) {
+        if (!property_exists($this->subject, $mappedAs)) {
             return;
         }
 
-        if (!is_object($this->subject->$relationship['mappedAs'])) {
+        if (!is_object($this->subject->$mappedAs)) {
             return;
         }
 
         $mapper = MapperFactory::factory($relationship['table']);
 
-        $this->subject->{ $relationship['mappedAs'] }->{ Inflector::camelize($relationship['column'], true) } = $this->subject->{ Inflector::camelize($relationship['referencedColumn'], true) };
-        $mapper->insert($this->subject->{ $relationship['mappedAs'] });
+        $this->subject->{ $mappedAs }->{ Inflector::camelize($relationship['column'], true) } = $this->subject->{ Inflector::camelize($relationship['referencedColumn'], true) };
+        $mapper->insert($this->subject->{ $mappedAs });
     }
 
     // }}}
@@ -109,15 +110,16 @@ class OneToOne extends Common
     /**
      * Updates associated objects in a table.
      *
-     * @param array $relationship
+     * @param array  $relationship
+     * @param string $mappedAs
      */
-    public function update(array $relationship)
+    public function update(array $relationship, $mappedAs)
     {
-        if (!property_exists($this->subject, $relationship['mappedAs'])) {
+        if (!property_exists($this->subject, $mappedAs)) {
             return;
         }
 
-        if (!is_null($this->subject->$relationship['mappedAs']) && !is_object($this->subject->$relationship['mappedAs'])) {
+        if (!is_null($this->subject->$mappedAs) && !is_object($this->subject->$mappedAs)) {
             return;
         }
 
@@ -127,13 +129,13 @@ class OneToOne extends Common
         $oldObject = $mapper->findWithQuery("SELECT * FROM {$relationship['table']} WHERE {$relationship['column']} = " . $mapper->quote($referencedColumnValue, $relationship['column']));
 
         if (is_null($oldObject)) {
-            if (!is_null($this->subject->$relationship['mappedAs'])) {
-                $this->subject->$relationship['mappedAs']->{ Inflector::camelize($relationship['column'], true) } = $referencedColumnValue;
-                $mapper->insert($this->subject->$relationship['mappedAs']);
+            if (!is_null($this->subject->$mappedAs)) {
+                $this->subject->$mappedAs->{ Inflector::camelize($relationship['column'], true) } = $referencedColumnValue;
+                $mapper->insert($this->subject->$mappedAs);
             }
         } else {
-            if (!is_null($this->subject->$relationship['mappedAs'])) {
-                $mapper->update($this->subject->$relationship['mappedAs']);
+            if (!is_null($this->subject->$mappedAs)) {
+                $mapper->update($this->subject->$mappedAs);
             } else {
                 $mapper->delete($oldObject);
             }
@@ -146,20 +148,21 @@ class OneToOne extends Common
     /**
      * Removes associated objects from a table.
      *
-     * @param array $relationship
+     * @param array  $relationship
+     * @param string $mappedAs
      */
-    public function delete(array $relationship)
+    public function delete(array $relationship, $mappedAs)
     {
-        if (!property_exists($this->subject, $relationship['mappedAs'])) {
+        if (!property_exists($this->subject, $mappedAs)) {
             return;
         }
 
-        if (!is_null($this->subject->$relationship['mappedAs']) && !is_object($this->subject->$relationship['mappedAs'])) {
+        if (!is_null($this->subject->$mappedAs) && !is_object($this->subject->$mappedAs)) {
             return;
         }
 
         $mapper = MapperFactory::factory($relationship['table']);
-        $mapper->delete($this->subject->$relationship['mappedAs']);
+        $mapper->delete($this->subject->$mappedAs);
     }
 
     /**#@-*/

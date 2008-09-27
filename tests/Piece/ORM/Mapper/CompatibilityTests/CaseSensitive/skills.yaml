@@ -1,10 +1,12 @@
 # $Id$
 
-- name: findAllWithEmployees
-  relationship:
-    - type: manyToMany
-      table: employees
-      mappedAs: employees
+methods:
+
+  findAllWithEmployees:
+    relationships:
+      employees:
+        table: employees
+        type: manyToMany
 
 # Local Variables:
 # mode: conf-colon

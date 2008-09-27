@@ -1,16 +1,18 @@
 # $Id$
 
-- name: findAll
-  relationship:
-    - type: manyToMany
-      table: unusualname_12
-      mappedAs: baz
+methods:
 
-- name: insert
-  relationship:
-    - type: manyToMany
-      table: unusualname_12
-      mappedAs: baz
+  findAll:
+    relationships:
+      baz:
+        table: unusualname_12
+        type: manyToMany
+
+  insert:
+    relationships:
+      baz:
+        table: unusualname_12
+        type: manyToMany
 
 # Local Variables:
 # mode: conf-colon

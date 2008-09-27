@@ -92,12 +92,12 @@ class OneToMany extends Common
     /**
      * Builds a query to get associated objects.
      *
-     * @param integer $relationshipIndex
+     * @param string $mappedAs
      * @return string
      */
-    protected function buildQuery($relationshipIndex)
+    protected function buildQuery($mappedAs)
     {
-        return "SELECT * FROM {$this->relationships[$relationshipIndex]['table']} WHERE {$this->relationships[$relationshipIndex]['column']} IN (" . implode(',', $this->relationshipKeys[$relationshipIndex]) . ')';
+        return "SELECT * FROM {$this->relationships[$mappedAs]['table']} WHERE {$this->relationships[$mappedAs]['column']} IN (" . implode(',', $this->relationshipKeys[$mappedAs]) . ')';
     }
 
     // }}}
@@ -138,15 +138,15 @@ class OneToMany extends Common
      * @param stdClass                   $associatedObject
      * @param Piece::ORM::Mapper::Common $mapper
      * @param string                     $relationshipKeyPropertyName
-     * @param integer                    $relationshipIndex
+     * @param string                     $mappedAs
      */
     protected function associateObject($associatedObject,
                                        MapperCommon $mapper,
                                        $relationshipKeyPropertyName,
-                                       $relationshipIndex
+                                       $mappedAs
                                        )
     {
-        $this->objects[ $this->objectIndexes[$relationshipIndex][ $associatedObject->$relationshipKeyPropertyName ] ]->{ $this->relationships[$relationshipIndex]['mappedAs'] }[] = $associatedObject;
+        $this->objects[ $this->objectIndexes[$mappedAs][ $associatedObject->$relationshipKeyPropertyName ] ]->{$mappedAs}[] = $associatedObject;
     }
 
     /**#@-*/

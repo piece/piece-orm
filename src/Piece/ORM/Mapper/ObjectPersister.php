@@ -113,7 +113,7 @@ class ObjectPersister
             }
         }
 
-        if (count($relationships)) {
+        if (count(array_keys($relationships))) {
             foreach (RelationshipType::getRelationshipTypes() as $relationshipType) {
                 $associatedObjectsPersisterClass =
                     __NAMESPACE__ .
@@ -157,8 +157,8 @@ class ObjectPersister
         }
 
         if ($primaryKey) {
-            foreach ($this->_relationships as $relationship) {
-                $this->_associatedObjectPersisters[ $relationship['type'] ]->insert($relationship);
+            foreach ($this->_relationships as $mappedAs => $definition) {
+                $this->_associatedObjectPersisters[ $definition['type'] ]->insert($definition, $mappedAs);
             }
 
             return $this->_subject->$primaryKeyProperty;
@@ -187,8 +187,8 @@ class ObjectPersister
 
         $affectedRows = $this->_mapper->executeQueryWithCriteria($methodName, $this->_subject, true);
 
-        foreach ($this->_relationships as $relationship) {
-            $this->_associatedObjectPersisters[ $relationship['type'] ]->update($relationship);
+        foreach ($this->_relationships as $mappedAs => $definition) {
+            $this->_associatedObjectPersisters[ $definition['type'] ]->update($definition, $mappedAs);
         }
 
         return $affectedRows;
@@ -214,8 +214,8 @@ class ObjectPersister
             throw new Exception("An unexpected value detected. Correct values are required for the primary keys to invoke $methodName().");
         }
 
-        foreach ($this->_relationships as $relationship) {
-            $this->_associatedObjectPersisters[ $relationship['type'] ]->delete($relationship);
+        foreach ($this->_relationships as $mappedAs => $definition) {
+            $this->_associatedObjectPersisters[ $definition['type'] ]->delete($definition, $mappedAs);
         }
 
         return $this->_mapper->executeQueryWithCriteria($methodName, $this->_subject, true);

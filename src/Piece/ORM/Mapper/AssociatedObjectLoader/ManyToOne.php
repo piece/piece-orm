@@ -92,12 +92,12 @@ class ManyToOne extends Common
     /**
      * Builds a query to get associated objects.
      *
-     * @param integer $relationshipIndex
+     * @param string $mappedAs
      * @return string
      */
-    protected function buildQuery($relationshipIndex)
+    protected function buildQuery($mappedAs)
     {
-        return "SELECT * FROM {$this->relationships[$relationshipIndex]['table']} WHERE {$this->relationships[$relationshipIndex]['column']} IN (" . implode(',', $this->relationshipKeys[$relationshipIndex]) . ')';
+        return "SELECT * FROM {$this->relationships[$mappedAs]['table']} WHERE {$this->relationships[$mappedAs]['column']} IN (" . implode(',', $this->relationshipKeys[$mappedAs]) . ')';
     }
 
     // }}}
@@ -138,16 +138,16 @@ class ManyToOne extends Common
      * @param stdClass                   $associatedObject
      * @param Piece::ORM::Mapper::Common $mapper
      * @param string                     $relationshipKeyPropertyName
-     * @param integer                    $relationshipIndex
+     * @param string                     $mappedAs
      */
     protected function associateObject($associatedObject,
                                        MapperCommon $mapper,
                                        $relationshipKeyPropertyName,
-                                       $relationshipIndex
+                                       $mappedAs
                                        )
     {
-        for ($i = 0, $count = count($this->objectIndexes[$relationshipIndex][ $associatedObject->$relationshipKeyPropertyName ]); $i < $count; ++$i) {
-            $this->objects[ $this->objectIndexes[$relationshipIndex][ $associatedObject->$relationshipKeyPropertyName ][$i] ]->{ $this->relationships[$relationshipIndex]['mappedAs'] } = $associatedObject;
+        for ($i = 0, $count = count($this->objectIndexes[$mappedAs][ $associatedObject->$relationshipKeyPropertyName ]); $i < $count; ++$i) {
+            $this->objects[ $this->objectIndexes[$mappedAs][ $associatedObject->$relationshipKeyPropertyName ][$i] ]->$mappedAs = $associatedObject;
         }
     }
 

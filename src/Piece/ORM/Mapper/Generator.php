@@ -151,23 +151,23 @@ class {$this->_mapperClass} extends Common
     /**
      * Normalizes a relationship definition.
      *
-     * @param array $relationship
+     * @param array $relationships
      * @return array
      * @throws Piece::ORM::Exception
      */
-    public function normalizeRelationshipDefinition(array $relationship)
+    public function normalizeRelationshipDefinition(array $relationships)
     {
-        if (!array_key_exists('type', $relationship)) {
+        if (!array_key_exists('type', $relationships)) {
             throw new Exception('The element [ type ] is required to generate a relationship property declaration.');
         }
 
-        if (!RelationshipType::isValid($relationship['type'])) {
+        if (!RelationshipType::isValid($relationships['type'])) {
             throw new Exception('The value of the element [ type ] must be one of ' . implode(', ', RelationshipType::getRelationshipTypes()));
         }
 
-        $relationshipNormalizerClass = 'Piece::ORM::Mapper::RelationshipNormalizer::' . ucwords($relationship['type']);
+        $relationshipNormalizerClass = 'Piece::ORM::Mapper::RelationshipNormalizer::' . ucwords($relationships['type']);
         $relationshipNormalizer =
-            new $relationshipNormalizerClass($relationship, $this->_metadata);
+            new $relationshipNormalizerClass($relationships, $this->_metadata);
         return $relationshipNormalizer->normalize();
     }
 
@@ -334,58 +334,62 @@ class {$this->_mapperClass} extends Common
             return;
         }
 
-        foreach ($this->_config as $method) {
-            if (QueryType::isFindAll($method['name'])) {
-                $this->_addFindAll($method['name'],
-                                   @$method['query'],
-                                   (array)@$method['relationship'],
-                                   @$method['orderBy']
+        if (!array_key_exists('methods', $this->_config)) {
+            return;
+        }
+
+        foreach ($this->_config['methods'] as $method => $definition) {
+            if (QueryType::isFindAll($method)) {
+                $this->_addFindAll($method,
+                                   @$definition['query'],
+                                   (array)@$definition['relationships'],
+                                   @$definition['orderBy']
                                    );
                 continue;
             }
 
-            if (QueryType::isFindOne($method['name'])) {
-                $this->_addFindOne($method['name'],
-                                   @$method['query'],
-                                   @$method['orderBy']
+            if (QueryType::isFindOne($method)) {
+                $this->_addFindOne($method,
+                                   @$definition['query'],
+                                   @$definition['orderBy']
                                    );
                 continue;
             }
 
-            if (QueryType::isFind($method['name'])) {
-                $this->_addFind($method['name'],
-                                @$method['query'],
-                                (array)@$method['relationship'],
-                                @$method['orderBy']
+            if (QueryType::isFind($method)) {
+                $this->_addFind($method,
+                                @$definition['query'],
+                                (array)@$definition['relationships'],
+                                @$definition['orderBy']
                                 );
                 continue;
             }
 
-            if (QueryType::isInsert($method['name'])) {
-                $this->_addInsert($method['name'],
-                                  @$method['query'],
-                                  (array)@$method['relationship']
+            if (QueryType::isInsert($method)) {
+                $this->_addInsert($method,
+                                  @$definition['query'],
+                                  (array)@$definition['relationships']
                                   );
                 continue;
             }
 
-            if (QueryType::isUpdate($method['name'])) {
-                $this->_addUpdate($method['name'],
-                                  @$method['query'],
-                                  (array)@$method['relationship']
+            if (QueryType::isUpdate($method)) {
+                $this->_addUpdate($method,
+                                  @$definition['query'],
+                                  (array)@$definition['relationships']
                                   );
                 continue;
             }
 
-            if (QueryType::isDelete($method['name'])) {
-                $this->_addDelete($method['name'],
-                                  @$method['query'],
-                                  (array)@$method['relationship']
+            if (QueryType::isDelete($method)) {
+                $this->_addDelete($method,
+                                  @$definition['query'],
+                                  (array)@$definition['relationships']
                                   );
                 continue;
             }
 
-            throw new Exception("Invalid method name [ {$method['name']} ] detected.");
+            throw new Exception("Invalid method name [ $method ] detected.");
         }
     }
 
@@ -534,13 +538,14 @@ class {$this->_mapperClass} extends Common
                                                               array $relationships
                                                               )
     {
-        if (is_array($relationships)) {
-            return "    public \$__relationship__{$propertyName} = " .
-                var_export(array_map(array($this, 'normalizeRelationshipDefinition'), $relationships), true) .
-                ';';
-        } else {
-            return "    public \$__relationship__{$propertyName} = array();";
+        $normalizedRelationships = array();
+        foreach ($relationships as $mappedAs => $definition) {
+            $normalizedRelationships[$mappedAs] = $this->normalizeRelationshipDefinition($definition);
         }
+
+        return "    public \$__relationship__{$propertyName} = " .
+            var_export($normalizedRelationships, true) .
+            ';';
     }
 
     // }}}

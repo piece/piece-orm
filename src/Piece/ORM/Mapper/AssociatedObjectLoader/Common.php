@@ -121,19 +121,19 @@ abstract class Common
      *
      * @param array   $row
      * @param integer $objectIndex
-     * @param integer $relationshipIndex
+     * @param string  $mappedAs
      */
-    public function prepareLoading(array $row, $objectIndex, $relationshipIndex)
+    public function prepareLoading(array $row, $objectIndex, $mappedAs)
     {
-        $relationshipKeyFieldName = $this->getRelationshipKeyFieldNameInPrimaryQuery($this->relationships[$relationshipIndex]);
-        $this->objects[$objectIndex]->{ $this->relationships[$relationshipIndex]['mappedAs'] } = $this->defaultValueOfMappedAs;
+        $relationshipKeyFieldName = $this->getRelationshipKeyFieldNameInPrimaryQuery($this->relationships[$mappedAs]);
+        $this->objects[$objectIndex]->$mappedAs = $this->defaultValueOfMappedAs;
 
-        $this->relationshipKeys[$relationshipIndex][] = $this->_mapper->quote($row[$relationshipKeyFieldName], $relationshipKeyFieldName);
+        $this->relationshipKeys[$mappedAs][] = $this->_mapper->quote($row[$relationshipKeyFieldName], $relationshipKeyFieldName);
 
         if (!$this->useMultipleIndexes) {
-            $this->objectIndexes[$relationshipIndex][ $row[$relationshipKeyFieldName] ] = $objectIndex;
+            $this->objectIndexes[$mappedAs][ $row[$relationshipKeyFieldName] ] = $objectIndex;
         } else {
-            $this->objectIndexes[$relationshipIndex][ $row[$relationshipKeyFieldName] ][] = $objectIndex;
+            $this->objectIndexes[$mappedAs][ $row[$relationshipKeyFieldName] ][] = $objectIndex;
         }
     }
 
@@ -144,20 +144,20 @@ abstract class Common
      * Loads all associated objects into appropriate objects.
      *
      * @param Piece::ORM::Mapper::Common $mapper
-     * @param integer                    $relationshipIndex
+     * @param string                     $mappedAs
      */
-    public function loadAll(MapperCommon $mapper, $relationshipIndex)
+    public function loadAll(MapperCommon $mapper, $mappedAs)
     {
         $mapper->setPreloadCallback($this->getPreloadCallback());
-        $mapper->setPreloadCallbackArgs(array($relationshipIndex));
-        $associatedObjects = $mapper->findAllWithQuery($this->buildQuery($relationshipIndex) . (is_null($this->relationships[$relationshipIndex]['orderBy']) ? '' : " ORDER BY {$this->relationships[$relationshipIndex]['orderBy']}"));
+        $mapper->setPreloadCallbackArgs(array($mappedAs));
+        $associatedObjects = $mapper->findAllWithQuery($this->buildQuery($mappedAs) . (is_null($this->relationships[$mappedAs]['orderBy']) ? '' : " ORDER BY {$this->relationships[$mappedAs]['orderBy']}"));
         $mapper->setPreloadCallback(null);
         $mapper->setPreloadCallbackArgs(null);
 
-        $relationshipKeyPropertyName = Inflector::camelize($this->getRelationshipKeyFieldNameInSecondaryQuery($this->relationships[$relationshipIndex]), true);
+        $relationshipKeyPropertyName = Inflector::camelize($this->getRelationshipKeyFieldNameInSecondaryQuery($this->relationships[$mappedAs]), true);
 
         for ($j = 0, $count = count($associatedObjects); $j < $count; ++$j) {
-            $this->associateObject($associatedObjects[$j], $mapper, $relationshipKeyPropertyName, $relationshipIndex);
+            $this->associateObject($associatedObjects[$j], $mapper, $relationshipKeyPropertyName, $mappedAs);
         }
     }
 
@@ -173,10 +173,10 @@ abstract class Common
     /**
      * Builds a query to get associated objects.
      *
-     * @param integer $relationshipIndex
+     * @param string $mappedAs
      * @return string
      */
-    abstract protected function buildQuery($relationshipIndex);
+    abstract protected function buildQuery($mappedAs);
 
     // }}}
     // {{{ getRelationshipKeyFieldNameInPrimaryQuery()
@@ -208,12 +208,12 @@ abstract class Common
      * @param stdClass                   $associatedObject
      * @param Piece::ORM::Mapper::Common $mapper
      * @param string                     $relationshipKeyPropertyName
-     * @param integer                    $relationshipIndex
+     * @param string                     $mappedAs
      */
     abstract protected function associateObject($associatedObject,
                                                 MapperCommon $mapper,
                                                 $relationshipKeyPropertyName,
-                                                $relationshipIndex
+                                                $mappedAs
                                                 );
 
     // }}}

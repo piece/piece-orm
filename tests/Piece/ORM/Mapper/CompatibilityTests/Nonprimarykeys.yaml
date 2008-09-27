@@ -1,30 +1,32 @@
 # $Id$
 
-- name: findByMemberIdAndServiceId
-  query: |
-    SELECT
-      *
-    FROM
-      $__table
-    WHERE
-      member_id = $memberId
-      AND service_id = $serviceId
+methods:
 
-- name: updateByMemberIdAndServiceId
-  query: |
-    UPDATE $__table
-    SET
-      point = $point
-    WHERE
-      member_id = $memberId
-      AND service_id = $serviceId
+  findByMemberIdAndServiceId:
+    query: |
+      SELECT
+        *
+      FROM
+        $__table
+      WHERE
+        member_id = $memberId
+        AND service_id = $serviceId
 
-- name: deleteByMemberIdAndServiceId
-  query: |
-    DELETE FROM $__table
-    WHERE
-      member_id = $memberId
-      AND service_id = $serviceId
+  updateByMemberIdAndServiceId:
+    query: |
+      UPDATE $__table
+      SET
+        point = $point
+      WHERE
+        member_id = $memberId
+        AND service_id = $serviceId
+
+  deleteByMemberIdAndServiceId:
+    query: |
+      DELETE FROM $__table
+      WHERE
+        member_id = $memberId
+        AND service_id = $serviceId
 
 # Local Variables:
 # mode: conf-colon

@@ -87,24 +87,25 @@ class OneToMany extends Common
     /**
      * Inserts associated objects to a table.
      *
-     * @param array $relationship
+     * @param array  $relationship
+     * @param string $mappedAs
      */
-    public function insert(array $relationship)
+    public function insert(array $relationship, $mappedAs)
     {
-        if (!property_exists($this->subject, $relationship['mappedAs'])) {
+        if (!property_exists($this->subject, $mappedAs)) {
             return;
         }
 
-        if (!is_array($this->subject->$relationship['mappedAs'])) {
+        if (!is_array($this->subject->$mappedAs)) {
             return;
         }
 
         $mapper = MapperFactory::factory($relationship['table']);
 
         $referencedColumnValue = $this->subject->{ Inflector::camelize($relationship['referencedColumn'], true) };
-        for ($i = 0, $count = count($this->subject->$relationship['mappedAs']); $i < $count; ++$i) {
-            $this->subject->{ $relationship['mappedAs'] }[$i]->{ Inflector::camelize($relationship['column'], true) } = $referencedColumnValue;
-            $mapper->insert($this->subject->{ $relationship['mappedAs'] }[$i]);
+        for ($i = 0, $count = count($this->subject->$mappedAs); $i < $count; ++$i) {
+            $this->subject->{ $mappedAs }[$i]->{ Inflector::camelize($relationship['column'], true) } = $referencedColumnValue;
+            $mapper->insert($this->subject->{ $mappedAs }[$i]);
         }
     }
 
@@ -114,15 +115,16 @@ class OneToMany extends Common
     /**
      * Updates associated objects in a table.
      *
-     * @param array $relationship
+     * @param array  $relationship
+     * @param string $mappedAs
      */
-    public function update(array $relationship)
+    public function update(array $relationship, $mappedAs)
     {
-        if (!property_exists($this->subject, $relationship['mappedAs'])) {
+        if (!property_exists($this->subject, $mappedAs)) {
             return;
         }
 
-        if (!is_array($this->subject->$relationship['mappedAs'])) {
+        if (!is_array($this->subject->$mappedAs)) {
             return;
         }
 
@@ -136,18 +138,18 @@ class OneToMany extends Common
         $targetsForInsert = array();
         $targetsForUpdate = array();
         $targetsForDelete = array();
-        for ($i = 0, $count = count($this->subject->$relationship['mappedAs']); $i < $count; ++$i) {
-            if (!property_exists($this->subject->{ $relationship['mappedAs'] }[$i], $this->_primaryKeyProperty)) {
-                $targetsForInsert[] = $this->subject->{ $relationship['mappedAs'] }[$i];
+        for ($i = 0, $count = count($this->subject->$mappedAs); $i < $count; ++$i) {
+            if (!property_exists($this->subject->{ $mappedAs }[$i], $this->_primaryKeyProperty)) {
+                $targetsForInsert[] = $this->subject->{ $mappedAs }[$i];
                 continue;
             }
 
-            if (is_null($this->subject->{ $relationship['mappedAs'] }[$i]->{ $this->_primaryKeyProperty })) {
-                $targetsForInsert[] = $this->subject->{ $relationship['mappedAs'] }[$i];
+            if (is_null($this->subject->{ $mappedAs }[$i]->{ $this->_primaryKeyProperty })) {
+                $targetsForInsert[] = $this->subject->{ $mappedAs }[$i];
                 continue;
             }
 
-            $targetsForUpdate[] = $this->subject->{ $relationship['mappedAs']}[$i];
+            $targetsForUpdate[] = $this->subject->{ $mappedAs}[$i];
         }
 
         usort($oldObjects, array($this, 'sortByPrimaryKey'));
@@ -185,9 +187,10 @@ class OneToMany extends Common
     /**
      * Removes associated objects from a table.
      *
-     * @param array $relationship
+     * @param array  $relationship
+     * @param string $mappedAs
      */
-    public function delete(array $relationship)
+    public function delete(array $relationship, $mappedAs)
     {
         $property = Inflector::camelize($relationship['referencedColumn'], true);
         if (!property_exists($this->subject, $property)) {

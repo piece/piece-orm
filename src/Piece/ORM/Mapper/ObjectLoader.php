@@ -107,7 +107,7 @@ class ObjectLoader
     {
         $this->_result = $result;
 
-        if (count($relationships)) {
+        if (count(array_keys($relationships))) {
             foreach (RelationshipType::getRelationshipTypes() as $relationshipType) {
                 $associatedObjectsLoaderClass =
                     __NAMESPACE__ .
@@ -220,8 +220,8 @@ class ObjectLoader
                 $this->_objects[] = $this->_load($row);
             }
 
-            for ($j = 0, $count = count($this->_relationships); $j < $count; ++$j) {
-                $this->_associatedObjectLoaders[ $this->_relationships[$j]['type'] ]->prepareLoading($row, $i, $j);
+            foreach ($this->_relationships as $mappedAs => $definition) {
+                $this->_associatedObjectLoaders[ $definition['type'] ]->prepareLoading($row, $i, $mappedAs);
             }
         }
         ::PEAR::staticPopErrorHandling();
@@ -235,9 +235,9 @@ class ObjectLoader
      */
     private function _loadAssociatedObjects()
     {
-        for ($i = 0, $count = count($this->_relationships); $i < $count; ++$i) {
-            $mapper = MapperFactory::factory($this->_relationships[$i]['table']);
-            $this->_associatedObjectLoaders[ $this->_relationships[$i]['type'] ]->loadAll($mapper, $i);
+        foreach ($this->_relationships as $mappedAs => $definition) {
+            $mapper = MapperFactory::factory($definition['table']);
+            $this->_associatedObjectLoaders[ $definition['type'] ]->loadAll($mapper, $mappedAs);
         }
     }
 

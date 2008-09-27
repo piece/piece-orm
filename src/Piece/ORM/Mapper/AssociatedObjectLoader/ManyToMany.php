@@ -93,23 +93,23 @@ class ManyToMany extends Common
      *
      * @param array                      $row
      * @param Piece::ORM::Mapper::Common $mapper
-     * @param integer                    $relationshipIndex
+     * @param string                     $mappedAs
      * @return boolean
      */
     public function addAssociation(array $row,
                                    MapperCommon $mapper,
-                                   $relationshipIndex
+                                   $mappedAs
                                    )
     {
         $metadata = $mapper->getMetadata();
         $primaryKey = $metadata->getPrimaryKey();
-        $this->_associations[$relationshipIndex][ $row[$primaryKey] ][] = $row[ $this->getRelationshipKeyFieldNameInSecondaryQuery($this->relationships[$relationshipIndex]) ];
+        $this->_associations[$mappedAs][ $row[$primaryKey] ][] = $row[ $this->getRelationshipKeyFieldNameInSecondaryQuery($this->relationships[$mappedAs]) ];
 
-        if (@array_key_exists($row[$primaryKey], $this->_loadedRows[$relationshipIndex])) {
+        if (@array_key_exists($row[$primaryKey], $this->_loadedRows[$mappedAs])) {
             return false;
         } else {
-            @$this->_loadedRows[$relationshipIndex][ $row[$primaryKey] ] = true;
-            unset($row[ $this->getRelationshipKeyFieldNameInSecondaryQuery($this->relationships[$relationshipIndex]) ]);
+            @$this->_loadedRows[$mappedAs][ $row[$primaryKey] ] = true;
+            unset($row[ $this->getRelationshipKeyFieldNameInSecondaryQuery($this->relationships[$mappedAs]) ]);
             return true;
         }
     }
@@ -132,12 +132,12 @@ class ManyToMany extends Common
     /**
      * Builds a query to get associated objects.
      *
-     * @param integer $relationshipIndex
+     * @param string $mappedAs
      * @return string
      */
-    protected function buildQuery($relationshipIndex)
+    protected function buildQuery($mappedAs)
     {
-        return "SELECT {$this->relationships[$relationshipIndex]['through']['table']}.{$this->relationships[$relationshipIndex]['through']['column']} AS " . $this->getRelationshipKeyFieldNameInSecondaryQuery($this->relationships[$relationshipIndex]) . ", {$this->relationships[$relationshipIndex]['table']}.* FROM {$this->relationships[$relationshipIndex]['table']}, {$this->relationships[$relationshipIndex]['through']['table']} WHERE {$this->relationships[$relationshipIndex]['through']['table']}.{$this->relationships[$relationshipIndex]['through']['column']} IN (" . implode(',', $this->relationshipKeys[$relationshipIndex]) . ") AND {$this->relationships[$relationshipIndex]['table']}.{$this->relationships[$relationshipIndex]['column']} = {$this->relationships[$relationshipIndex]['through']['table']}.{$this->relationships[$relationshipIndex]['through']['inverseColumn']}";
+        return "SELECT {$this->relationships[$mappedAs]['through']['table']}.{$this->relationships[$mappedAs]['through']['column']} AS " . $this->getRelationshipKeyFieldNameInSecondaryQuery($this->relationships[$mappedAs]) . ", {$this->relationships[$mappedAs]['table']}.* FROM {$this->relationships[$mappedAs]['table']}, {$this->relationships[$mappedAs]['through']['table']} WHERE {$this->relationships[$mappedAs]['through']['table']}.{$this->relationships[$mappedAs]['through']['column']} IN (" . implode(',', $this->relationshipKeys[$mappedAs]) . ") AND {$this->relationships[$mappedAs]['table']}.{$this->relationships[$mappedAs]['column']} = {$this->relationships[$mappedAs]['through']['table']}.{$this->relationships[$mappedAs]['through']['inverseColumn']}";
     }
 
     // }}}
@@ -178,19 +178,19 @@ class ManyToMany extends Common
      * @param stdClass                   $associatedObject
      * @param Piece::ORM::Mapper::Common $mapper
      * @param string                     $relationshipKeyPropertyName
-     * @param integer                    $relationshipIndex
+     * @param string                     $mappedAs
      */
     protected function associateObject($associatedObject,
                                        MapperCommon $mapper,
                                        $relationshipKeyPropertyName,
-                                       $relationshipIndex
+                                       $mappedAs
                                        )
     {
         $metadata = $mapper->getMetadata();
         $primaryKey = Inflector::camelize($metadata->getPrimaryKey(), true);
 
-        for ($j = 0, $count = count($this->_associations[$relationshipIndex][ $associatedObject->$primaryKey ]); $j < $count; ++$j) {
-            $this->objects[ $this->objectIndexes[$relationshipIndex][ $this->_associations[$relationshipIndex][ $associatedObject->$primaryKey ][$j] ] ]->{ $this->relationships[$relationshipIndex]['mappedAs'] }[] = $associatedObject;
+        for ($j = 0, $count = count($this->_associations[$mappedAs][ $associatedObject->$primaryKey ]); $j < $count; ++$j) {
+            $this->objects[ $this->objectIndexes[$mappedAs][ $this->_associations[$mappedAs][ $associatedObject->$primaryKey ][$j] ] ]->{$mappedAs}[] = $associatedObject;
         }
     }
 

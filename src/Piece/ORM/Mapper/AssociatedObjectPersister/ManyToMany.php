@@ -85,15 +85,16 @@ class ManyToMany extends Common
     /**
      * Inserts associated objects to a table.
      *
-     * @param array $relationship
+     * @param array  $relationship
+     * @param string $mappedAs
      */
-    public function insert(array $relationship)
+    public function insert(array $relationship, $mappedAs)
     {
-        if (!property_exists($this->subject, $relationship['mappedAs'])) {
+        if (!property_exists($this->subject, $mappedAs)) {
             return;
         }
 
-        if (!is_array($this->subject->$relationship['mappedAs'])) {
+        if (!is_array($this->subject->$mappedAs)) {
             return;
         }
 
@@ -101,7 +102,7 @@ class ManyToMany extends Common
 
         $referencedColumnValue = $this->subject->{ Inflector::camelize($relationship['through']['referencedColumn'], true) };
         $object = $mapper->createObject();
-        foreach ($this->subject->$relationship['mappedAs'] as $associatedObject) {
+        foreach ($this->subject->$mappedAs as $associatedObject) {
             $object->{ Inflector::camelize($relationship['through']['column'], true) } = $referencedColumnValue;
             $object->{ Inflector::camelize($relationship['through']['inverseColumn'], true) } = $associatedObject->{ Inflector::camelize($relationship['column'], true) };
             $mapper->insert($object);
@@ -114,15 +115,16 @@ class ManyToMany extends Common
     /**
      * Updates associated objects in a table.
      *
-     * @param array $relationship
+     * @param array  $relationship
+     * @param string $mappedAs
      */
-    public function update(array $relationship)
+    public function update(array $relationship, $mappedAs)
     {
-        if (!property_exists($this->subject, $relationship['mappedAs'])) {
+        if (!property_exists($this->subject, $mappedAs)) {
             return;
         }
 
-        if (!is_array($this->subject->$relationship['mappedAs'])) {
+        if (!is_array($this->subject->$mappedAs)) {
             return;
         }
 
@@ -132,7 +134,7 @@ class ManyToMany extends Common
         $mapper->executeQuery("DELETE FROM {$relationship['through']['table']} WHERE {$relationship['through']['column']} = " . $mapper->quote($referencedColumnValue, $relationship['through']['column']), true);
 
         $object = $mapper->createObject();
-        foreach ($this->subject->$relationship['mappedAs'] as $associatedObject) {
+        foreach ($this->subject->$mappedAs as $associatedObject) {
             $object->{ Inflector::camelize($relationship['through']['column'], true) } = $referencedColumnValue;
             $object->{ Inflector::camelize($relationship['through']['inverseColumn'], true) } = $associatedObject->{ Inflector::camelize($relationship['column'], true) };
             $mapper->insert($object);
@@ -145,9 +147,10 @@ class ManyToMany extends Common
     /**
      * Removes associated objects from a table.
      *
-     * @param array $relationship
+     * @param array  $relationship
+     * @param string $mappedAs
      */
-    public function delete(array $relationship)
+    public function delete(array $relationship, $mappedAs)
     {
         $property = Inflector::camelize($relationship['through']['referencedColumn'], true);
         if (!property_exists($this->subject, $property)) {

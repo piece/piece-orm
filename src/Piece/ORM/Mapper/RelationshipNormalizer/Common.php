@@ -114,10 +114,6 @@ abstract class Common
             throw new Exception('The element [ table ] is required to generate a relationship property declaration.');
         }
 
-        if (!array_key_exists('mappedAs', $this->relationship)) {
-            throw new Exception('The element [ mappedAs ] is required to generate a relationship property declaration.');
-        }
-
         $this->relationshipMetadata = MetadataFactory::factory($this->relationship['table']);
 
         if ($this->checkHavingSinglePrimaryKey()) {

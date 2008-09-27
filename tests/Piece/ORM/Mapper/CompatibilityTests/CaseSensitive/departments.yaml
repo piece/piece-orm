@@ -1,51 +1,53 @@
 # $Id$
 
-- name: findAllWithEmployees1
-  relationship:
-    - type: oneToMany
-      table: employees
-      mappedAs: employees
+methods:
 
-- name: findAllWithEmployees2
-  relationship:
-    - type: oneToMany
-      table: employees
-      mappedAs: employees
-      column: departments_id
-      referencedColumn: id
+  findAllWithEmployees1:
+    relationships:
+      employees:
+        table: employees
+        type: oneToMany
 
-- name: findAllWithOrderedEmployees
-  relationship:
-    - type: oneToMany
-      table: employees
-      mappedAs: employees
-      orderBy: id DESC
+  findAllWithEmployees2:
+    relationships:
+      employees:
+        table: employees
+        type: oneToMany
+        column: departments_id
+        referencedColumn: id
 
-- name: findWithEmployeesByName
-  query: |
-    SELECT
-      *
-    FROM
-      $__table
-    WHERE
-      name = $name
-  relationship:
-    - type: oneToMany
-      table: employees
-      mappedAs: employees
-      orderBy: id DESC
+  findAllWithOrderedEmployees:
+    relationships:
+      employees:
+        table: employees
+        type: oneToMany
+        orderBy: id DESC
 
-- name: update
-  relationship:
-    - type: oneToMany
-      table: employees
-      mappedAs: employees
+  findWithEmployeesByName:
+    query: |
+      SELECT
+        *
+      FROM
+        $__table
+      WHERE
+        name = $name
+    relationships:
+      employees:
+        table: employees
+        type: oneToMany
+        orderBy: id DESC
 
-- name: delete
-  relationship:
-    - type: oneToMany
-      table: employees
-      mappedAs: employees
+  update:
+    relationships:
+      employees:
+        table: employees
+        type: oneToMany
+
+  delete:
+    relationships:
+      employees:
+        table: employees
+        type: oneToMany
 
 # Local Variables:
 # mode: conf-colon
