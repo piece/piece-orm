@@ -37,7 +37,7 @@
 
 namespace Piece::ORM::Context;
 
-use Piece::ORM::Context;
+use Stagehand::ContextRegistry;
 
 // {{{ Piece::ORM::Context::Registry
 
@@ -50,7 +50,7 @@ use Piece::ORM::Context;
  * @version    Release: @package_version@
  * @since      Class available since Release 0.1.0
  */
-class Registry
+class Registry extends ContextRegistry
 {
 
     // {{{ properties
@@ -65,81 +65,19 @@ class Registry
      * @access protected
      */
 
+    protected static $contextStack = array();
+
     /**#@-*/
 
     /**#@+
      * @access private
      */
 
-    private static $_contextStack = array();
-
     /**#@-*/
 
     /**#@+
      * @access public
      */
-
-    // }}}
-    // {{{ getContext()
-
-    /**
-     * Gets the current context.
-     *
-     * @return Piece::ORM::Context
-     */
-    public static function getContext()
-    {
-        if (!count(self::$_contextStack)) {
-            return;
-        }
-
-        return self::$_contextStack[ count(self::$_contextStack) - 1 ];
-    }
-
-    // }}}
-    // {{{ clear()
-
-    /**
-     * Clear all Piece::ORM::Context objects in the registry.
-     */
-    public static function clear()
-    {
-        foreach (self::$_contextStack as $context) {
-            $context->clear();
-        }
-
-        self::$_contextStack = array();
-    }
-
-    // }}}
-    // {{{ setContext()
-
-    /**
-     * Sets a Piece::ORM::Context object as the current context.
-     *
-     * @param Piece::ORM::Context $context
-     */
-    public static function setContext(Context $context)
-    {
-        array_push(self::$_contextStack, $context);
-    }
-
-    // }}}
-    // {{{ restoreCacheDirectory()
-
-    /**
-     * Restores the previous context.
-     */
-    public static function restoreContext()
-    {
-        $context = self::getContext();
-        if (is_null($context)) {
-            return;
-        }
-
-        $context->clear();
-        array_pop(self::$_contextStack);
-    }
 
     /**#@-*/
 
