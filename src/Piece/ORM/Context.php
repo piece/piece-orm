@@ -42,6 +42,7 @@ use Piece::ORM::Exception;
 use Piece::ORM::Mapper::MapperFactory;
 use Piece::ORM::Exception::PEARException;
 use Stagehand::AttributeHolder;
+use Stagehand::IContext;
 
 // {{{ Piece::ORM::Context
 
@@ -54,7 +55,7 @@ use Stagehand::AttributeHolder;
  * @version    Release: @package_version@
  * @since      Class available since Release 0.1.0
  */
-class Context extends AttributeHolder
+class Context extends AttributeHolder implements IContext
 {
 
     // {{{ properties
