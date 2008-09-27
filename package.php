@@ -81,6 +81,7 @@ $package->addPackageDepWithChannel('required', 'MDB2', 'pear.php.net', '2.3.0');
 $package->addPackageDepWithChannel('required', 'Cache_Lite', 'pear.php.net', '1.7.0');
 $package->addPackageDepWithChannel('required', 'PEAR', 'pear.php.net', '1.4.3');
 $package->addPackageDepWithChannel('required', 'Stagehand_AttributeHolder', 'pear.piece-framework.com', '0.1.0');
+$package->addPackageDepWithChannel('required', 'Stagehand_ContextRegistry', 'pear.piece-framework.com', '0.1.0');
 $package->addMaintainer('lead', 'iteman', 'KUBO Atsuhiro', 'iteman@users.sourceforge.net');
 $package->addGlobalReplacement('package-info', '@package_version@', 'version');
 $package->generateContents();
