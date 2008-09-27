@@ -101,12 +101,8 @@ class MetadataFactoryTest extends ::PHPUnit_Framework_TestCase
 
     public function tearDown()
     {
+        Registry::getContext()->clearCache();
         Registry::clear();
-        $cache = new ::Cache_Lite(array('cacheDir' => "{$this->_cacheDirectory}/",
-                                        'automaticSerialization' => true,
-                                        'errorHandlingAPIBreak' => true)
-                                  );
-        $cache->clean();
     }
 
     public function testShouldCreateAnObjectByAGivenMapper()

@@ -103,12 +103,8 @@ class MapperFactoryTest extends ::PHPUnit_Framework_TestCase
 
     public function tearDown()
     {
+        Registry::getContext()->clearCache();
         Registry::clear();
-        $cache = new ::Cache_Lite(array('cacheDir' => "{$this->_cacheDirectory}/",
-                                        'automaticSerialization' => true,
-                                        'errorHandlingAPIBreak' => true)
-                                  );
-        $cache->clean();
     }
 
     public function testShouldRaiseAnExceptionIfTheConfigurationDirectoryIsNotSpecified()
@@ -143,7 +139,9 @@ class MapperFactoryTest extends ::PHPUnit_Framework_TestCase
 
         try {
             MapperFactory::factory('Employees');
+            Registry::getContext()->restoreCacheDirectory();
         } catch (Exception $e) {
+            Registry::getContext()->restoreCacheDirectory();
             return;
         }
 
@@ -156,7 +154,9 @@ class MapperFactoryTest extends ::PHPUnit_Framework_TestCase
 
         try {
             MapperFactory::factory('Employees');
+            Registry::getContext()->restoreCacheDirectory();
         } catch (Exception $e) {
+            Registry::getContext()->restoreCacheDirectory();
             return;
         }
 

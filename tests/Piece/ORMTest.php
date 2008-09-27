@@ -213,12 +213,6 @@ class ORMTest extends ::PHPUnit_Framework_TestCase
         $this->assertEquals("$cacheDirectory/database2",
                             MapperFactory::getConfigDirectory()
                             );
-
-        $cache = new ::Cache_Lite(array('cacheDir' => "$cacheDirectory/",
-                                        'automaticSerialization' => true,
-                                        'errorHandlingAPIBreak' => true)
-                                  );
-        $cache->clean();
     }
 
     public function testShouldCreateAnObjectByAGivenMapper()
@@ -333,12 +327,6 @@ class ORMTest extends ::PHPUnit_Framework_TestCase
         $config->setDirectorySuffix('database1', 'foo');
 
         $this->assertEquals('foo', $config->getDirectorySuffix('database1'));
-
-        $cache = new ::Cache_Lite(array('cacheDir' => "$cacheDirectory/",
-                                        'automaticSerialization' => true,
-                                        'errorHandlingAPIBreak' => true)
-                                  );
-        $cache->clean();
     }
 
     /**#@-*/
