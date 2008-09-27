@@ -212,7 +212,7 @@ class OneToMany extends Common
      */
     public function sortByPrimaryKey($a, $b)
     {
-        if ($a->{ $this->_primaryKeyProperty } == $b->{ $this->_primaryKeyProperty }) {
+        if ($a->{ $this->_primaryKeyProperty } === $b->{ $this->_primaryKeyProperty }) {
             return 0;
         }
 
