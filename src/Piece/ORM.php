@@ -217,6 +217,23 @@ class ORM
         return $newObject;
     }
 
+    // }}}
+    // {{{ clearCache()
+
+    /**
+     * Clears all cache files in the cache directory.
+     *
+     * @since Method available since Release 2.0.0
+     */
+    public static function clearCache()
+    {
+        if (is_null(Registry::getContext())) {
+            throw new Exception(__METHOD__ . ' method must be called after calling configure().');
+        }
+
+        Registry::getContext()->clearCache();
+    }
+
     /**#@-*/
 
     /**#@+

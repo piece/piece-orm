@@ -94,12 +94,12 @@ class ORMTest extends ::PHPUnit_Framework_TestCase
 
     public function tearDown()
     {
+        try {
+            ORM::clearCache();
+        } catch (Exception $e) {
+        }
+
         Registry::clear();
-        $cache = new ::Cache_Lite(array('cacheDir' => "{$this->_cacheDirectory}/",
-                                        'automaticSerialization' => true,
-                                        'errorHandlingAPIBreak' => true)
-                                  );
-        $cache->clean();
     }
 
     public function testShouldConfigureWithAGivenConfigurationFile()
@@ -131,6 +131,8 @@ class ORMTest extends ::PHPUnit_Framework_TestCase
 
         $this->assertEquals('./foo', MapperFactory::getConfigDirectory());
         $this->assertEquals('./bar', Registry::getContext()->getCacheDirectory());
+
+        Registry::getContext()->restoreCacheDirectory();
     }
 
     public function testShouldConfigureDynamicallyWithAGivenConfigurationFile()
@@ -175,6 +177,7 @@ class ORMTest extends ::PHPUnit_Framework_TestCase
                        $this->_cacheDirectory,
                        $this->_cacheDirectory
                        );
+
         $this->assertType('Piece::ORM::Mapper::Common', ORM::getMapper('Employees'));
     }
 
@@ -337,6 +340,12 @@ class ORMTest extends ::PHPUnit_Framework_TestCase
                                   );
         $cache->clean();
     }
+
+    /**#@-*/
+
+    /**#@+
+     * @access protected
+     */
 
     /**#@-*/
 

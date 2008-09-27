@@ -300,6 +300,23 @@ class Context extends AttributeHolder implements IContext
         $this->_setCacheDirectoryStack($cacheDirectoryStack);
     }
 
+    // }}}
+    // {{{ clearCache()
+
+    /**
+     * Clears all cache files in the cache directory.
+     *
+     * @since Method available since Release 2.0.0
+     */
+    public function clearCache()
+    {
+        $cache = new ::Cache_Lite(array('cacheDir' => $this->getCacheDirectory() . '/',
+                                        'automaticSerialization' => true,
+                                        'errorHandlingAPIBreak' => true)
+                                  );
+        $cache->clean();
+    }
+
     /**#@-*/
 
     /**#@+
