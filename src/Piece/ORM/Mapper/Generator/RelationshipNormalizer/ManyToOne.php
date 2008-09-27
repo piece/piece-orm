@@ -35,14 +35,14 @@
  * @since      File available since Release 0.2.0
  */
 
-namespace Piece::ORM::Mapper::RelationshipNormalizer;
+namespace Piece::ORM::Mapper::Generator::RelationshipNormalizer;
 
-use Piece::ORM::Mapper::RelationshipNormalizer::Common;
+use Piece::ORM::Mapper::Generator::RelationshipNormalizer::Common;
 
-// {{{ Piece::ORM::Mapper::RelationshipNormalizer::OneToMany
+// {{{ Piece::ORM::Mapper::Generator::RelationshipNormalizer::ManyToOne
 
 /**
- * An relationship normalizer for One-to-Many relationships.
+ * An relationship normalizer for Many-to-One relationships.
  *
  * @package    Piece_ORM
  * @copyright  2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
@@ -50,7 +50,7 @@ use Piece::ORM::Mapper::RelationshipNormalizer::Common;
  * @version    Release: @package_version@
  * @since      Class available since Release 0.2.0
  */
-class OneToMany extends Common
+class ManyToOne extends Common
 {
 
     // {{{ properties
@@ -93,13 +93,12 @@ class OneToMany extends Common
      */
     protected function normalizeColumn()
     {
-        $primaryKey = $this->metadata->getPrimaryKey();
+        $primaryKey = $this->relationshipMetadata->getPrimaryKey();
         if (is_null($primaryKey)) {
             return false;
         }
 
-        $this->relationship['column'] =
-            $this->metadata->getTableName(true) . "_$primaryKey";
+        $this->relationship['column'] = $primaryKey;
         return true;
     }
 
@@ -113,13 +112,25 @@ class OneToMany extends Common
      */
     protected function normalizeReferencedColumn()
     {
-        $primaryKey = $this->metadata->getPrimaryKey();
+        $primaryKey = $this->relationshipMetadata->getPrimaryKey();
         if (is_null($primaryKey)) {
             return false;
         }
 
-        $this->relationship['referencedColumn'] = $primaryKey;
+        $this->relationship['referencedColumn'] =
+            $this->relationshipMetadata->getTableName(true) . "_$primaryKey";
         return true;
+    }
+
+    // }}}
+    // {{{ normalizeOrderBy()
+
+    /**
+     * Normalizes "orderBy" definition.
+     */
+    protected function normalizeOrderBy()
+    {
+        $this->relationship['orderBy'] = null;
     }
 
     // }}}
@@ -131,9 +142,9 @@ class OneToMany extends Common
      *
      * @return boolean
      */
-    protected function checkHavingSinglePrimaryKey()
+    function checkHavingSinglePrimaryKey()
     {
-        return true;
+        return false;
     }
 
     /**#@-*/

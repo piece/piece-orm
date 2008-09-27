@@ -35,14 +35,14 @@
  * @since      File available since Release 0.2.0
  */
 
-namespace Piece::ORM::Mapper::RelationshipNormalizer;
+namespace Piece::ORM::Mapper::Generator::RelationshipNormalizer;
 
-use Piece::ORM::Mapper::RelationshipNormalizer::Common;
+use Piece::ORM::Mapper::Generator::RelationshipNormalizer::Common;
 use Piece::ORM::Metadata::MetadataFactory;
 use Piece::ORM::Metadata::MetadataFactory::NoSuchTableException;
 use Piece::ORM::Exception;
 
-// {{{ Piece::ORM::Mapper::RelationshipNormalizer::ManyToMany
+// {{{ Piece::ORM::Mapper::Generator::RelationshipNormalizer::ManyToMany
 
 /**
  * An relationship normalizer for Many-to-Many relationships.

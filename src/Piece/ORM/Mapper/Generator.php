@@ -165,7 +165,7 @@ class {$this->_mapperClass} extends Common
             throw new Exception('The value of the element [ type ] must be one of ' . implode(', ', RelationshipType::getRelationshipTypes()));
         }
 
-        $relationshipNormalizerClass = 'Piece::ORM::Mapper::RelationshipNormalizer::' . ucwords($relationships['type']);
+        $relationshipNormalizerClass = 'Piece::ORM::Mapper::Generator::RelationshipNormalizer::' . ucwords($relationships['type']);
         $relationshipNormalizer =
             new $relationshipNormalizerClass($relationships, $this->_metadata);
         return $relationshipNormalizer->normalize();

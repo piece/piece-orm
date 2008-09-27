@@ -35,11 +35,11 @@
  * @since      File available since Release 0.2.0
  */
 
-namespace Piece::ORM::Mapper::RelationshipNormalizer;
+namespace Piece::ORM::Mapper::Generator::RelationshipNormalizer;
 
-use Piece::ORM::Mapper::RelationshipNormalizer::Common;
+use Piece::ORM::Mapper::Generator::RelationshipNormalizer::Common;
 
-// {{{ Piece::ORM::Mapper::RelationshipNormalizer::OneToOne
+// {{{ Piece::ORM::Mapper::Generator::RelationshipNormalizer::OneToOne
 
 /**
  * An relationship normalizer for One-to-One relationships.

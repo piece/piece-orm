@@ -35,13 +35,13 @@
  * @since      File available since Release 0.2.0
  */
 
-namespace Piece::ORM::Mapper::RelationshipNormalizer;
+namespace Piece::ORM::Mapper::Generator::RelationshipNormalizer;
 
 use Piece::ORM::Metadata;
 use Piece::ORM::Exception;
 use Piece::ORM::Metadata::MetadataFactory;
 
-// {{{ Piece::ORM::Mapper::RelationshipNormalizer::Common
+// {{{ Piece::ORM::Mapper::Generator::RelationshipNormalizer::Common
 
 /**
  * The base class for relationship normalizers.
