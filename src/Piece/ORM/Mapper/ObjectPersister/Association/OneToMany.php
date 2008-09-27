@@ -35,13 +35,13 @@
  * @since      File available since Release 0.2.0
  */
 
-namespace Piece::ORM::Mapper::AssociatedObjectPersister;
+namespace Piece::ORM::Mapper::ObjectPersister::Association;
 
-use Piece::ORM::Mapper::AssociatedObjectPersister::Common;
+use Piece::ORM::Mapper::ObjectPersister::Association::Common;
 use Piece::ORM::Mapper::MapperFactory;
 use Piece::ORM::Inflector;
 
-// {{{ Piece::ORM::Mapper::AssociatedObjectPersister::OneToMany
+// {{{ Piece::ORM::Mapper::ObjectPersister::Association::OneToMany
 
 /**
  * An associated object persister for One-to-Many relationships.

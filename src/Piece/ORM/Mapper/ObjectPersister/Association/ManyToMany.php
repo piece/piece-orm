@@ -35,12 +35,16 @@
  * @since      File available since Release 0.2.0
  */
 
-namespace Piece::ORM::Mapper::AssociatedObjectPersister;
+namespace Piece::ORM::Mapper::ObjectPersister::Association;
 
-// {{{ Piece::ORM::Mapper::AssociatedObjectPersister::Common
+use Piece::ORM::Mapper::ObjectPersister::Association::Common;
+use Piece::ORM::Mapper::MapperFactory;
+use Piece::ORM::Inflector;
+
+// {{{ Piece::ORM::Mapper::ObjectPersister::Association::ManyToMany
 
 /**
- * The base class for associated object persisters.
+ * An associated object persister for Many-to-Many relationships.
  *
  * @package    Piece_ORM
  * @copyright  2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
@@ -48,7 +52,7 @@ namespace Piece::ORM::Mapper::AssociatedObjectPersister;
  * @version    Release: @package_version@
  * @since      Class available since Release 0.2.0
  */
-abstract class Common
+class ManyToMany extends Common
 {
 
     // {{{ properties
@@ -63,8 +67,6 @@ abstract class Common
      * @access protected
      */
 
-    protected $subject;
-
     /**#@-*/
 
     /**#@+
@@ -78,19 +80,6 @@ abstract class Common
      */
 
     // }}}
-    // {{{ __construct()
-
-    /**
-     * Sets a Piece::ORM::Mapper::ObjectPersister object as a property.
-     *
-     * @param mixed $subject
-     */
-    function __construct($subject)
-    {
-        $this->subject = $subject;
-    }
-
-    // }}}
     // {{{ insert()
 
     /**
@@ -99,7 +88,26 @@ abstract class Common
      * @param array  $relationship
      * @param string $mappedAs
      */
-    abstract public function insert(array $relationship, $mappedAs);
+    public function insert(array $relationship, $mappedAs)
+    {
+        if (!property_exists($this->subject, $mappedAs)) {
+            return;
+        }
+
+        if (!is_array($this->subject->$mappedAs)) {
+            return;
+        }
+
+        $mapper = MapperFactory::factory($relationship['through']['table']);
+
+        $referencedColumnValue = $this->subject->{ Inflector::camelize($relationship['through']['referencedColumn'], true) };
+        $object = $mapper->createObject();
+        foreach ($this->subject->$mappedAs as $associatedObject) {
+            $object->{ Inflector::camelize($relationship['through']['column'], true) } = $referencedColumnValue;
+            $object->{ Inflector::camelize($relationship['through']['inverseColumn'], true) } = $associatedObject->{ Inflector::camelize($relationship['column'], true) };
+            $mapper->insert($object);
+        }
+    }
 
     // }}}
     // {{{ update()
@@ -110,7 +118,28 @@ abstract class Common
      * @param array  $relationship
      * @param string $mappedAs
      */
-    abstract public function update(array $relationship, $mappedAs);
+    public function update(array $relationship, $mappedAs)
+    {
+        if (!property_exists($this->subject, $mappedAs)) {
+            return;
+        }
+
+        if (!is_array($this->subject->$mappedAs)) {
+            return;
+        }
+
+        $mapper = MapperFactory::factory($relationship['through']['table']);
+
+        $referencedColumnValue = $this->subject->{ Inflector::camelize($relationship['through']['referencedColumn'], true) };
+        $mapper->executeQuery("DELETE FROM {$relationship['through']['table']} WHERE {$relationship['through']['column']} = " . $mapper->quote($referencedColumnValue, $relationship['through']['column']), true);
+
+        $object = $mapper->createObject();
+        foreach ($this->subject->$mappedAs as $associatedObject) {
+            $object->{ Inflector::camelize($relationship['through']['column'], true) } = $referencedColumnValue;
+            $object->{ Inflector::camelize($relationship['through']['inverseColumn'], true) } = $associatedObject->{ Inflector::camelize($relationship['column'], true) };
+            $mapper->insert($object);
+        }
+    }
 
     // }}}
     // {{{ delete()
@@ -121,7 +150,19 @@ abstract class Common
      * @param array  $relationship
      * @param string $mappedAs
      */
-    abstract public function delete(array $relationship, $mappedAs);
+    public function delete(array $relationship, $mappedAs)
+    {
+        $property = Inflector::camelize($relationship['through']['referencedColumn'], true);
+        if (!property_exists($this->subject, $property)) {
+            return;
+        }
+
+        $mapper = MapperFactory::factory($relationship['through']['table']);
+        $mapper->executeQuery("DELETE FROM {$relationship['through']['table']} WHERE {$relationship['through']['column']} = " .
+                              $mapper->quote($this->subject->$property, $relationship['through']['column']),
+                              true
+                              );
+    }
 
     /**#@-*/
 

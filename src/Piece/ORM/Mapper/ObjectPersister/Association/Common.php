@@ -35,15 +35,12 @@
  * @since      File available since Release 0.2.0
  */
 
-namespace Piece::ORM::Mapper::AssociatedObjectLoader;
+namespace Piece::ORM::Mapper::ObjectPersister::Association;
 
-use Piece::ORM::Mapper::AssociatedObjectLoader::Common;
-use Piece::ORM::Mapper::Common as MapperCommon;
-
-// {{{ Piece::ORM::Mapper::AssociatedObjectLoader::ManyToOne
+// {{{ Piece::ORM::Mapper::ObjectPersister::Association::Common
 
 /**
- * An associated object loader for Many-to-One relationships.
+ * The base class for associated object persisters.
  *
  * @package    Piece_ORM
  * @copyright  2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
@@ -51,7 +48,7 @@ use Piece::ORM::Mapper::Common as MapperCommon;
  * @version    Release: @package_version@
  * @since      Class available since Release 0.2.0
  */
-class ManyToOne extends Common
+abstract class Common
 {
 
     // {{{ properties
@@ -66,7 +63,7 @@ class ManyToOne extends Common
      * @access protected
      */
 
-    protected $useMultipleIndexes = true;
+    protected $subject;
 
     /**#@-*/
 
@@ -80,76 +77,57 @@ class ManyToOne extends Common
      * @access public
      */
 
+    // }}}
+    // {{{ __construct()
+
+    /**
+     * Sets a Piece::ORM::Mapper::ObjectPersister object as a property.
+     *
+     * @param mixed $subject
+     */
+    function __construct($subject)
+    {
+        $this->subject = $subject;
+    }
+
+    // }}}
+    // {{{ insert()
+
+    /**
+     * Inserts associated objects to a table.
+     *
+     * @param array  $relationship
+     * @param string $mappedAs
+     */
+    abstract public function insert(array $relationship, $mappedAs);
+
+    // }}}
+    // {{{ update()
+
+    /**
+     * Updates associated objects in a table.
+     *
+     * @param array  $relationship
+     * @param string $mappedAs
+     */
+    abstract public function update(array $relationship, $mappedAs);
+
+    // }}}
+    // {{{ delete()
+
+    /**
+     * Removes associated objects from a table.
+     *
+     * @param array  $relationship
+     * @param string $mappedAs
+     */
+    abstract public function delete(array $relationship, $mappedAs);
+
     /**#@-*/
 
     /**#@+
      * @access protected
      */
-
-    // }}}
-    // {{{ buildQuery()
-
-    /**
-     * Builds a query to get associated objects.
-     *
-     * @param string $mappedAs
-     * @return string
-     */
-    protected function buildQuery($mappedAs)
-    {
-        return "SELECT * FROM {$this->relationships[$mappedAs]['table']} WHERE {$this->relationships[$mappedAs]['column']} IN (" . implode(',', $this->relationshipKeys[$mappedAs]) . ')';
-    }
-
-    // }}}
-    // {{{ getRelationshipKeyFieldNameInPrimaryQuery()
-
-    /**
-     * Gets the name of the relationship key field in the primary query.
-     *
-     * @param array $relationship
-     * @return string
-     */
-    protected function getRelationshipKeyFieldNameInPrimaryQuery(array $relationship)
-    {
-        return $relationship['referencedColumn'];
-    }
-
-    // }}}
-    // {{{ getRelationshipKeyFieldNameInSecondaryQuery()
-
-    /**
-     * Gets the name of the relationship key field in the secondary query.
-     *
-     * @param array $relationship
-     * @return string
-     */
-    protected function getRelationshipKeyFieldNameInSecondaryQuery(array $relationship)
-    {
-        return $relationship['column'];
-    }
-
-    // }}}
-    // {{{ associateObject()
-
-    /**
-     * Associates an object which are loaded by the secondary query into objects which
-     * are loaded by the primary query.
-     *
-     * @param stdClass                   $associatedObject
-     * @param Piece::ORM::Mapper::Common $mapper
-     * @param string                     $relationshipKeyPropertyName
-     * @param string                     $mappedAs
-     */
-    protected function associateObject($associatedObject,
-                                       MapperCommon $mapper,
-                                       $relationshipKeyPropertyName,
-                                       $mappedAs
-                                       )
-    {
-        for ($i = 0, $count = count($this->objectIndexes[$mappedAs][ $associatedObject->$relationshipKeyPropertyName ]); $i < $count; ++$i) {
-            $this->objects[ $this->objectIndexes[$mappedAs][ $associatedObject->$relationshipKeyPropertyName ][$i] ]->$mappedAs = $associatedObject;
-        }
-    }
 
     /**#@-*/
 

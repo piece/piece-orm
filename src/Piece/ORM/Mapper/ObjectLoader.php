@@ -110,9 +110,7 @@ class ObjectLoader
         if (count(array_keys($relationships))) {
             foreach (RelationshipType::getRelationshipTypes() as $relationshipType) {
                 $associatedObjectsLoaderClass =
-                    __NAMESPACE__ .
-                    '::AssociatedObjectLoader::' .
-                    ucwords($relationshipType);
+                    __CLASS__ . '::Association::' . ucwords($relationshipType);
                 $this->_associatedObjectLoaders[$relationshipType] =
                     new $associatedObjectsLoaderClass($relationships,
                                                       $this->_relationshipKeys,

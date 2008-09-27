@@ -35,15 +35,15 @@
  * @since      File available since Release 0.2.0
  */
 
-namespace Piece::ORM::Mapper::AssociatedObjectLoader;
+namespace Piece::ORM::Mapper::ObjectLoader::Association;
 
-use Piece::ORM::Mapper::AssociatedObjectLoader::Common;
+use Piece::ORM::Mapper::ObjectLoader::Association::Common;
 use Piece::ORM::Mapper::Common as MapperCommon;
 
-// {{{ Piece::ORM::Mapper::AssociatedObjectLoader::OneToOne
+// {{{ Piece::ORM::Mapper::ObjectLoader::Association::OneToMany
 
 /**
- * An associated object loader for One-to-One relationships.
+ * An associated object loader for One-to-Many relationships.
  *
  * @package    Piece_ORM
  * @copyright  2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
@@ -51,7 +51,7 @@ use Piece::ORM::Mapper::Common as MapperCommon;
  * @version    Release: @package_version@
  * @since      Class available since Release 0.2.0
  */
-class OneToOne extends Common
+class OneToMany extends Common
 {
 
     // {{{ properties
@@ -65,6 +65,8 @@ class OneToOne extends Common
     /**#@+
      * @access protected
      */
+
+    protected $defaultValueOfMappedAs = array();
 
     /**#@-*/
 
@@ -144,7 +146,7 @@ class OneToOne extends Common
                                        $mappedAs
                                        )
     {
-        $this->objects[ $this->objectIndexes[$mappedAs][ $associatedObject->$relationshipKeyPropertyName ] ]->$mappedAs = $associatedObject;
+        $this->objects[ $this->objectIndexes[$mappedAs][ $associatedObject->$relationshipKeyPropertyName ] ]->{$mappedAs}[] = $associatedObject;
     }
 
     /**#@-*/

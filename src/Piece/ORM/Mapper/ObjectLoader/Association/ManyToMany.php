@@ -35,15 +35,16 @@
  * @since      File available since Release 0.2.0
  */
 
-namespace Piece::ORM::Mapper::AssociatedObjectLoader;
+namespace Piece::ORM::Mapper::ObjectLoader::Association;
 
+use Piece::ORM::Mapper::ObjectLoader::Association::Common;
 use Piece::ORM::Mapper::Common as MapperCommon;
 use Piece::ORM::Inflector;
 
-// {{{ Piece::ORM::Mapper::AssociatedObjectLoader::Common
+// {{{ Piece::ORM::Mapper::ObjectLoader::Association::ManyToMany
 
 /**
- * The base class for associated object loaders.
+ * An associated object loader for Many-to-Many relationships.
  *
  * @package    Piece_ORM
  * @copyright  2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
@@ -51,7 +52,7 @@ use Piece::ORM::Inflector;
  * @version    Release: @package_version@
  * @since      Class available since Release 0.2.0
  */
-abstract class Common
+class ManyToMany extends Common
 {
 
     // {{{ properties
@@ -66,12 +67,7 @@ abstract class Common
      * @access protected
      */
 
-    protected $useMultipleIndexes = false;
-    protected $defaultValueOfMappedAs;
-    protected $relationships;
-    protected $relationshipKeys;
-    protected $objects;
-    protected $objectIndexes;
+    protected $defaultValueOfMappedAs = array();
 
     /**#@-*/
 
@@ -79,7 +75,8 @@ abstract class Common
      * @access private
      */
 
-    private $_mapper;
+    private $_associations = array();
+    private $_loadedRows = array();
 
     /**#@-*/
 
@@ -88,76 +85,32 @@ abstract class Common
      */
 
     // }}}
-    // {{{ __construct()
+    // {{{ addAssociation()
 
     /**
-     * Initializes properties with the given value.
+     * Adds an association about what an inverse side record is associated with
+     * an owning side record.
      *
-     * @param array                      $relationships
-     * @param array                      &$relationshipKeys
-     * @param array                      &$objects
-     * @param array                      &$objectIndexes
-     * @param Piece::ORM::Mapper::Common $mapper
-     */
-    public function __construct(array $relationships,
-                                array &$relationshipKeys,
-                                array &$objects,
-                                array &$objectIndexes,
-                                MapperCommon $mapper
-                                )
-    {
-        $this->relationships = $relationships;
-        $this->relationshipKeys = &$relationshipKeys;
-        $this->objects = &$objects;
-        $this->objectIndexes = &$objectIndexes;
-        $this->_mapper = $mapper;
-    }
-
-    // }}}
-    // {{{ prepareLoading()
-
-    /**
-     * Prepares loading associated objects.
-     *
-     * @param array   $row
-     * @param integer $objectIndex
-     * @param string  $mappedAs
-     */
-    public function prepareLoading(array $row, $objectIndex, $mappedAs)
-    {
-        $relationshipKeyFieldName = $this->getRelationshipKeyFieldNameInPrimaryQuery($this->relationships[$mappedAs]);
-        $this->objects[$objectIndex]->$mappedAs = $this->defaultValueOfMappedAs;
-
-        $this->relationshipKeys[$mappedAs][] = $this->_mapper->quote($row[$relationshipKeyFieldName], $relationshipKeyFieldName);
-
-        if (!$this->useMultipleIndexes) {
-            $this->objectIndexes[$mappedAs][ $row[$relationshipKeyFieldName] ] = $objectIndex;
-        } else {
-            $this->objectIndexes[$mappedAs][ $row[$relationshipKeyFieldName] ][] = $objectIndex;
-        }
-    }
-
-    // }}}
-    // {{{ loadAll()
-
-    /**
-     * Loads all associated objects into appropriate objects.
-     *
+     * @param array                      $row
      * @param Piece::ORM::Mapper::Common $mapper
      * @param string                     $mappedAs
+     * @return boolean
      */
-    public function loadAll(MapperCommon $mapper, $mappedAs)
+    public function addAssociation(array $row,
+                                   MapperCommon $mapper,
+                                   $mappedAs
+                                   )
     {
-        $mapper->setPreloadCallback($this->getPreloadCallback());
-        $mapper->setPreloadCallbackArgs(array($mappedAs));
-        $associatedObjects = $mapper->findAllWithQuery($this->buildQuery($mappedAs) . (is_null($this->relationships[$mappedAs]['orderBy']) ? '' : " ORDER BY {$this->relationships[$mappedAs]['orderBy']}"));
-        $mapper->setPreloadCallback(null);
-        $mapper->setPreloadCallbackArgs(null);
+        $metadata = $mapper->getMetadata();
+        $primaryKey = $metadata->getPrimaryKey();
+        $this->_associations[$mappedAs][ $row[$primaryKey] ][] = $row[ $this->getRelationshipKeyFieldNameInSecondaryQuery($this->relationships[$mappedAs]) ];
 
-        $relationshipKeyPropertyName = Inflector::camelize($this->getRelationshipKeyFieldNameInSecondaryQuery($this->relationships[$mappedAs]), true);
-
-        for ($j = 0, $count = count($associatedObjects); $j < $count; ++$j) {
-            $this->associateObject($associatedObjects[$j], $mapper, $relationshipKeyPropertyName, $mappedAs);
+        if (@array_key_exists($row[$primaryKey], $this->_loadedRows[$mappedAs])) {
+            return false;
+        } else {
+            @$this->_loadedRows[$mappedAs][ $row[$primaryKey] ] = true;
+            unset($row[ $this->getRelationshipKeyFieldNameInSecondaryQuery($this->relationships[$mappedAs]) ]);
+            return true;
         }
     }
 
@@ -165,6 +118,12 @@ abstract class Common
 
     /**#@+
      * @access protected
+     */
+
+    /**#@-*/
+
+    /**#@+
+     * @access private
      */
 
     // }}}
@@ -176,7 +135,10 @@ abstract class Common
      * @param string $mappedAs
      * @return string
      */
-    abstract protected function buildQuery($mappedAs);
+    protected function buildQuery($mappedAs)
+    {
+        return "SELECT {$this->relationships[$mappedAs]['through']['table']}.{$this->relationships[$mappedAs]['through']['column']} AS " . $this->getRelationshipKeyFieldNameInSecondaryQuery($this->relationships[$mappedAs]) . ", {$this->relationships[$mappedAs]['table']}.* FROM {$this->relationships[$mappedAs]['table']}, {$this->relationships[$mappedAs]['through']['table']} WHERE {$this->relationships[$mappedAs]['through']['table']}.{$this->relationships[$mappedAs]['through']['column']} IN (" . implode(',', $this->relationshipKeys[$mappedAs]) . ") AND {$this->relationships[$mappedAs]['table']}.{$this->relationships[$mappedAs]['column']} = {$this->relationships[$mappedAs]['through']['table']}.{$this->relationships[$mappedAs]['through']['inverseColumn']}";
+    }
 
     // }}}
     // {{{ getRelationshipKeyFieldNameInPrimaryQuery()
@@ -185,8 +147,12 @@ abstract class Common
      * Gets the name of the relationship key field in the primary query.
      *
      * @param array $relationship
+     * @return string
      */
-    abstract protected function getRelationshipKeyFieldNameInPrimaryQuery(array $relationship);
+    protected function getRelationshipKeyFieldNameInPrimaryQuery(array $relationship)
+    {
+        return $relationship['through']['referencedColumn'];
+    }
 
     // }}}
     // {{{ getRelationshipKeyFieldNameInSecondaryQuery()
@@ -195,8 +161,12 @@ abstract class Common
      * Gets the name of the relationship key field in the secondary query.
      *
      * @param array $relationship
+     * @return string
      */
-    abstract protected function getRelationshipKeyFieldNameInSecondaryQuery(array $relationship);
+    protected function getRelationshipKeyFieldNameInSecondaryQuery(array $relationship)
+    {
+        return "__relationship_key_field";
+    }
 
     // }}}
     // {{{ associateObject()
@@ -210,11 +180,19 @@ abstract class Common
      * @param string                     $relationshipKeyPropertyName
      * @param string                     $mappedAs
      */
-    abstract protected function associateObject($associatedObject,
-                                                MapperCommon $mapper,
-                                                $relationshipKeyPropertyName,
-                                                $mappedAs
-                                                );
+    protected function associateObject($associatedObject,
+                                       MapperCommon $mapper,
+                                       $relationshipKeyPropertyName,
+                                       $mappedAs
+                                       )
+    {
+        $metadata = $mapper->getMetadata();
+        $primaryKey = Inflector::camelize($metadata->getPrimaryKey(), true);
+
+        for ($j = 0, $count = count($this->_associations[$mappedAs][ $associatedObject->$primaryKey ]); $j < $count; ++$j) {
+            $this->objects[ $this->objectIndexes[$mappedAs][ $this->_associations[$mappedAs][ $associatedObject->$primaryKey ][$j] ] ]->{$mappedAs}[] = $associatedObject;
+        }
+    }
 
     // }}}
     // {{{ getPreloadCallback()
@@ -226,14 +204,8 @@ abstract class Common
      */
     protected function getPreloadCallback()
     {
-        return null;
+        return array($this, 'addAssociation');
     }
-
-    /**#@-*/
-
-    /**#@+
-     * @access private
-     */
 
     /**#@-*/
 

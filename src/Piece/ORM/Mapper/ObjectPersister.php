@@ -116,9 +116,7 @@ class ObjectPersister
         if (count(array_keys($relationships))) {
             foreach (RelationshipType::getRelationshipTypes() as $relationshipType) {
                 $associatedObjectsPersisterClass =
-                    __NAMESPACE__ .
-                    '::AssociatedObjectPersister::' .
-                    ucwords($relationshipType);
+                    __CLASS__ . '::Association::' . ucwords($relationshipType);
                 $this->_associatedObjectPersisters[$relationshipType] = new $associatedObjectsPersisterClass($subject);
             }
         }

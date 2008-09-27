@@ -35,12 +35,12 @@
  * @since      File available since Release 0.2.0
  */
 
-namespace Piece::ORM::Mapper::AssociatedObjectPersister;
+namespace Piece::ORM::Mapper::ObjectPersister::Association;
 
-use Piece::ORM::Mapper::AssociatedObjectPersister::Common;
+use Piece::ORM::Mapper::ObjectPersister::Association::Common;
 use Piece::ORM::Exception;
 
-// {{{ Piece::ORM::Mapper::AssociatedObjectPersister::ManyToOne
+// {{{ Piece::ORM::Mapper::ObjectPersister::Association::ManyToOne
 
 /**
  * An associated object persister for Many-to-One relationships.
