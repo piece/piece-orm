@@ -42,12 +42,11 @@ use Piece::ORM::Exception;
 use Piece::ORM::Mapper::MapperFactory;
 use Piece::ORM::Exception::PEARException;
 use Stagehand::AttributeHolder;
-use Stagehand::IContext;
 
 // {{{ Piece::ORM::Context
 
 /**
- * The mapper context holder for Piece_ORM mappers.
+ * The class which holds any attributes in a context.
  *
  * @package    Piece_ORM
  * @copyright  2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
@@ -55,7 +54,7 @@ use Stagehand::IContext;
  * @version    Release: @package_version@
  * @since      Class available since Release 0.1.0
  */
-class Context extends AttributeHolder implements IContext
+class Context extends AttributeHolder
 {
 
     // {{{ properties
@@ -110,25 +109,6 @@ class Context extends AttributeHolder implements IContext
     public function getConfiguration()
     {
         return $this->_config;
-    }
-
-    // }}}
-    // {{{ clear()
-
-    /**
-     * Removed a single instance safely and clears all database handles.
-     *
-     * @see $GLOBALS['_MDB2_databases']
-     */
-    public static function clear()
-    {
-        if (!array_key_exists('_MDB2_databases', $GLOBALS)) {
-            return;
-        }
-
-        foreach (array_keys($GLOBALS['_MDB2_databases']) as $dbIndex) {
-            unset($GLOBALS['_MDB2_databases'][$dbIndex]);
-        }
     }
 
     // }}}
