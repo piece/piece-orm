@@ -76,7 +76,6 @@ class Context extends AttributeHolder
      */
 
     private $_config;
-    private $_database;
     private $_mapperConfigDirectory;
     private $_databaseStack = array();
 
@@ -312,6 +311,24 @@ class Context extends AttributeHolder
         array_pop($this->_databaseStack);
     }
 
+    // }}}
+    // {{{ getDatabase()
+
+    /**
+     * Gets the current database.
+     *
+     * @return string
+     * @since Method available since Release 2.0.0
+     */
+    public function getDatabase()
+    {
+        if (!count($this->_databaseStack)) {
+            return;
+        }
+
+        return $this->_databaseStack[ count($this->_databaseStack) - 1 ];
+    }
+
     /**#@-*/
 
     /**#@+
@@ -356,24 +373,6 @@ class Context extends AttributeHolder
         }
 
         return $this->getAttribute(__CLASS__ . '::cacheDirectoryStack');
-    }
-
-    // }}}
-    // {{{ getDatabase()
-
-    /**
-     * Gets the current database.
-     *
-     * @return string
-     * @since Method available since Release 2.0.0
-     */
-    public function getDatabase()
-    {
-        if (!count($this->_databaseStack)) {
-            return;
-        }
-
-        return $this->_databaseStack[ count($this->_databaseStack) - 1 ];
     }
 
     /**#@-*/
