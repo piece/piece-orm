@@ -35,14 +35,14 @@
  * @since      File available since Release 0.2.0
  */
 
-namespace Piece::ORM::Mapper::Generator::RelationshipNormalizer;
+namespace Piece::ORM::Mapper::Generator::Association;
 
-use Piece::ORM::Mapper::Generator::RelationshipNormalizer::Common;
+use Piece::ORM::Mapper::Generator::Association::Common;
 
-// {{{ Piece::ORM::Mapper::Generator::RelationshipNormalizer::OneToOne
+// {{{ Piece::ORM::Mapper::Generator::Association::ManyToOne
 
 /**
- * An relationship normalizer for One-to-One relationships.
+ * A generator for Many-to-One associations.
  *
  * @package    Piece_ORM
  * @copyright  2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
@@ -50,7 +50,7 @@ use Piece::ORM::Mapper::Generator::RelationshipNormalizer::Common;
  * @version    Release: @package_version@
  * @since      Class available since Release 0.2.0
  */
-class OneToOne extends Common
+class ManyToOne extends Common
 {
 
     // {{{ properties
@@ -93,13 +93,12 @@ class OneToOne extends Common
      */
     protected function normalizeColumn()
     {
-        $primaryKey = $this->metadata->getPrimaryKey();
+        $primaryKey = $this->relationshipMetadata->getPrimaryKey();
         if (is_null($primaryKey)) {
             return false;
         }
 
-        $this->relationship['column'] =
-            $this->metadata->getTableName(true) . "_$primaryKey";
+        $this->relationship['column'] = $primaryKey;
         return true;
     }
 
@@ -113,12 +112,13 @@ class OneToOne extends Common
      */
     protected function normalizeReferencedColumn()
     {
-        $primaryKey = $this->metadata->getPrimaryKey();
+        $primaryKey = $this->relationshipMetadata->getPrimaryKey();
         if (is_null($primaryKey)) {
             return false;
         }
 
-        $this->relationship['referencedColumn'] = $primaryKey;
+        $this->relationship['referencedColumn'] =
+            $this->relationshipMetadata->getTableName(true) . "_$primaryKey";
         return true;
     }
 
@@ -142,7 +142,7 @@ class OneToOne extends Common
      *
      * @return boolean
      */
-    protected function checkHavingSinglePrimaryKey()
+    function checkHavingSinglePrimaryKey()
     {
         return false;
     }

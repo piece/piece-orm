@@ -35,14 +35,14 @@
  * @since      File available since Release 0.2.0
  */
 
-namespace Piece::ORM::Mapper::Generator::RelationshipNormalizer;
+namespace Piece::ORM::Mapper::Generator::Association;
 
-use Piece::ORM::Mapper::Generator::RelationshipNormalizer::Common;
+use Piece::ORM::Mapper::Generator::Association::Common;
 
-// {{{ Piece::ORM::Mapper::Generator::RelationshipNormalizer::ManyToOne
+// {{{ Piece::ORM::Mapper::Generator::Association::OneToOne
 
 /**
- * An relationship normalizer for Many-to-One relationships.
+ * A generator for One-to-One associations.
  *
  * @package    Piece_ORM
  * @copyright  2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
@@ -50,7 +50,7 @@ use Piece::ORM::Mapper::Generator::RelationshipNormalizer::Common;
  * @version    Release: @package_version@
  * @since      Class available since Release 0.2.0
  */
-class ManyToOne extends Common
+class OneToOne extends Common
 {
 
     // {{{ properties
@@ -93,12 +93,13 @@ class ManyToOne extends Common
      */
     protected function normalizeColumn()
     {
-        $primaryKey = $this->relationshipMetadata->getPrimaryKey();
+        $primaryKey = $this->metadata->getPrimaryKey();
         if (is_null($primaryKey)) {
             return false;
         }
 
-        $this->relationship['column'] = $primaryKey;
+        $this->relationship['column'] =
+            $this->metadata->getTableName(true) . "_$primaryKey";
         return true;
     }
 
@@ -112,13 +113,12 @@ class ManyToOne extends Common
      */
     protected function normalizeReferencedColumn()
     {
-        $primaryKey = $this->relationshipMetadata->getPrimaryKey();
+        $primaryKey = $this->metadata->getPrimaryKey();
         if (is_null($primaryKey)) {
             return false;
         }
 
-        $this->relationship['referencedColumn'] =
-            $this->relationshipMetadata->getTableName(true) . "_$primaryKey";
+        $this->relationship['referencedColumn'] = $primaryKey;
         return true;
     }
 
@@ -142,7 +142,7 @@ class ManyToOne extends Common
      *
      * @return boolean
      */
-    function checkHavingSinglePrimaryKey()
+    protected function checkHavingSinglePrimaryKey()
     {
         return false;
     }

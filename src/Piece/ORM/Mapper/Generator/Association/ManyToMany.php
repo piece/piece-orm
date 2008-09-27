@@ -35,17 +35,17 @@
  * @since      File available since Release 0.2.0
  */
 
-namespace Piece::ORM::Mapper::Generator::RelationshipNormalizer;
+namespace Piece::ORM::Mapper::Generator::Association;
 
-use Piece::ORM::Mapper::Generator::RelationshipNormalizer::Common;
+use Piece::ORM::Mapper::Generator::Association::Common;
 use Piece::ORM::Metadata::MetadataFactory;
 use Piece::ORM::Metadata::MetadataFactory::NoSuchTableException;
 use Piece::ORM::Exception;
 
-// {{{ Piece::ORM::Mapper::Generator::RelationshipNormalizer::ManyToMany
+// {{{ Piece::ORM::Mapper::Generator::Association::ManyToMany
 
 /**
- * An relationship normalizer for Many-to-Many relationships.
+ * A generator for Many-to-Many associations.
  *
  * @package    Piece_ORM
  * @copyright  2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>

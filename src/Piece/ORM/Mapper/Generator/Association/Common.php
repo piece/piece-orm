@@ -35,16 +35,16 @@
  * @since      File available since Release 0.2.0
  */
 
-namespace Piece::ORM::Mapper::Generator::RelationshipNormalizer;
+namespace Piece::ORM::Mapper::Generator::Association;
 
 use Piece::ORM::Metadata;
 use Piece::ORM::Exception;
 use Piece::ORM::Metadata::MetadataFactory;
 
-// {{{ Piece::ORM::Mapper::Generator::RelationshipNormalizer::Common
+// {{{ Piece::ORM::Mapper::Generator::Association::Common
 
 /**
- * The base class for relationship normalizers.
+ * The base class for association generators.
  *
  * @package    Piece_ORM
  * @copyright  2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
