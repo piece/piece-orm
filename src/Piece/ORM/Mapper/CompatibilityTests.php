@@ -126,11 +126,7 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
     public function tearDown()
     {
         $this->_clearTableRecords();
-        $cache = new ::Cache_Lite(array('cacheDir' => "{$this->cacheDirectory}/",
-                                        'automaticSerialization' => true,
-                                        'errorHandlingAPIBreak' => true)
-                                  );
-        $cache->clean();
+        Registry::getContext()->clearCache();
         Registry::clear();
     }
 

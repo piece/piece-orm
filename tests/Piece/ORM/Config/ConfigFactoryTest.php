@@ -89,16 +89,14 @@ class ConfigFactoryTest extends ::PHPUnit_Framework_TestCase
     {
         $this->_cacheDirectory = dirname(__FILE__) . '/' . basename(__FILE__, '.php');
         Registry::setContext(new Context());
+        $context = Registry::getContext();
+        $context->setCacheDirectory($this->_cacheDirectory);
     }
 
     public function tearDown()
     {
+        Registry::getContext()->clearCache();
         Registry::clear();
-        $cache = new ::Cache_Lite(array('cacheDir' => "{$this->_cacheDirectory}/",
-                                        'automaticSerialization' => true,
-                                        'errorHandlingAPIBreak' => true)
-                                  );
-        $cache->clean();
     }
 
     public function testShouldCreateAnObjectWithoutConfigurationFile()

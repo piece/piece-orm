@@ -40,6 +40,7 @@ namespace Piece::ORM::Config;
 use Piece::ORM::Config;
 use Piece::ORM::Exception;
 use Piece::ORM::Env;
+use Piece::ORM::Context::Registry;
 
 require_once 'spyc.php5';
 
@@ -88,11 +89,10 @@ class ConfigFactory
      * Creates a Piece::ORM::Config object from a configuration file or a cache.
      *
      * @param string $configDirectory
-     * @param string $cacheDirectory
      * @return Piece::ORM::Config
      * @throws Piece::ORM::Exception
      */
-    public static function factory($configDirectory = null, $cacheDirectory = null)
+    public static function factory($configDirectory = null)
     {
         if (is_null($configDirectory)) {
             return new Config();
@@ -111,25 +111,30 @@ class ConfigFactory
             throw new Exception("The configuration file [ $configFile ] is not readable.");
         }
 
-        if (is_null($cacheDirectory)) {
+        if (is_null(Registry::getContext()->getCacheDirectory())) {
             return self::_createConfigurationFromFile($configFile);
         }
 
-        if (!file_exists($cacheDirectory)) {
-            trigger_error("The cache directory [ $cacheDirectory ] is not found.",
+        if (!file_exists(Registry::getContext()->getCacheDirectory())) {
+            trigger_error('The cache directory [ ' .
+                          Registry::getContext()->getCacheDirectory() .
+                          ' ] is not found.',
                           E_USER_WARNING
                           );
             return self::_createConfigurationFromFile($configFile);
         }
 
-        if (!is_readable($cacheDirectory) || !is_writable($cacheDirectory)) {
-            trigger_error("The cache directory [ $cacheDirectory ] is not readable or writable.",
+        if (!is_readable(Registry::getContext()->getCacheDirectory())
+            || !is_writable(Registry::getContext()->getCacheDirectory())) {
+            trigger_error('The cache directory [ ' .
+                          Registry::getContext()->getCacheDirectory() .
+                          ' ] is not readable or writable.',
                           E_USER_WARNING
                           );
             return self::_createConfigurationFromFile($configFile);
         }
 
-        return self::_getConfiguration($configFile, $cacheDirectory);
+        return self::_getConfiguration($configFile);
     }
 
     /**#@-*/
@@ -151,13 +156,12 @@ class ConfigFactory
      * Gets a Piece::ORM::Config object from a cache.
      *
      * @param string $masterFile
-     * @param string $cacheDirectory
      * @return Piece::ORM::Config
      */
-    private function _getConfiguration($masterFile, $cacheDirectory)
+    private function _getConfiguration($masterFile)
     {
         $masterFile = realpath($masterFile);
-        $cache = new ::Cache_Lite_File(array('cacheDir' => "$cacheDirectory/",
+        $cache = new ::Cache_Lite_File(array('cacheDir' => Registry::getContext()->getCacheDirectory() . '/',
                                              'masterFile' => $masterFile,
                                              'automaticSerialization' => true,
                                              'errorHandlingAPIBreak' => true)
@@ -173,7 +177,9 @@ class ConfigFactory
          */
         $config = $cache->get($masterFile);
         if (::PEAR::isError($config)) {
-            trigger_error("Cannot read the cache file in the directory [ $cacheDirectory ].",
+            trigger_error('Cannot read the cache file in the directory [ ' .
+                          Registry::getContext()->getCacheDirectory() .
+                          ' ].',
                           E_USER_WARNING
                           );
             return self::_createConfigurationFromFile($masterFile);
@@ -183,7 +189,9 @@ class ConfigFactory
             $config = self::_createConfigurationFromFile($masterFile);
             $result = $cache->save($config);
             if (::PEAR::isError($result)) {
-                trigger_error("Cannot write the Piece::ORM::Config object to the cache file in the directory [ $cacheDirectory ].",
+                trigger_error('Cannot write the Piece::ORM::Config object to the cache file in the directory [ ',
+                              Registry::getContext()->getCacheDirectory() .
+                              ' ].',
                               E_USER_WARNING
                               );
             }
