@@ -178,7 +178,7 @@ ORDER BY
         while (is_array($row = $result->fetchRow(MDB2_FETCHMODE_ASSOC))) {
             $column_name = $row['field_name'];
             if ($db->options['portability'] & MDB2_PORTABILITY_FIX_CASE) {
-                if ($db->options['field_case'] == CASE_LOWER) {
+                if ($db->options['field_case'] === CASE_LOWER) {
                     $column_name = strtolower($column_name);
                 } else {
                     $column_name = strtoupper($column_name);
@@ -400,7 +400,7 @@ ORDER BY
             $columnInfo = array_change_key_case($columnInfo);
             if (strpos($columnInfo['type_name'], 'identity') !== false) {
                 for ($i = 0, $count = count($tableInfo); $i < $count; ++$i) {
-                    if ($tableInfo[$i]['name'] == $columnInfo['column_name']) {
+                    if ($tableInfo[$i]['name'] === $columnInfo['column_name']) {
                         $tableInfo[$i]['autoincrement'] = true;
                         break 2;
                     }
