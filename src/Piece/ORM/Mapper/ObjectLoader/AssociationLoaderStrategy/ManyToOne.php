@@ -35,12 +35,12 @@
  * @since      File available since Release 0.2.0
  */
 
-namespace Piece::ORM::Mapper::ObjectLoader::Association;
+namespace Piece::ORM::Mapper::ObjectLoader::AssociationLoaderStrategy;
 
-use Piece::ORM::Mapper::ObjectLoader::Association::AbstractAssociationLoader;
+use Piece::ORM::Mapper::ObjectLoader::AssociationLoaderStrategy::AbstractAssociationLoader;
 use Piece::ORM::Mapper::AbstractMapper;
 
-// {{{ Piece::ORM::Mapper::ObjectLoader::Association::ManyToOne
+// {{{ Piece::ORM::Mapper::ObjectLoader::AssociationLoaderStrategy::ManyToOne
 
 /**
  * An associated object loader for Many-to-One associations.

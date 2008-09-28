@@ -35,12 +35,12 @@
  * @since      File available since Release 0.2.0
  */
 
-namespace Piece::ORM::Mapper::ObjectLoader::Association;
+namespace Piece::ORM::Mapper::ObjectLoader::AssociationLoaderStrategy;
 
 use Piece::ORM::Mapper::AbstractMapper;
 use Piece::ORM::Inflector;
 
-// {{{ Piece::ORM::Mapper::ObjectLoader::Association::AbstractAssociationLoader
+// {{{ Piece::ORM::Mapper::ObjectLoader::AssociationLoaderStrategy::AbstractAssociationLoader
 
 /**
  * The base class for associated object loaders.

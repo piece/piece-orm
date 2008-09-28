@@ -110,7 +110,9 @@ class ObjectLoader
         if (count(array_keys($associations))) {
             foreach (AssociationType::getAssociationTypes() as $associationType) {
                 $associatedObjectsLoaderClass =
-                    __CLASS__ . '::Association::' . ucwords($associationType);
+                    __CLASS__ .
+                    '::AssociationLoaderStrategy::' .
+                    ucwords($associationType);
                 $this->_associatedObjectLoaders[$associationType] =
                     new $associatedObjectsLoaderClass($associations,
                                                       $this->_associationKeys,
