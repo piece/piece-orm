@@ -41,7 +41,7 @@ use Piece::ORM::Metadata;
 use Piece::ORM::Exception;
 use Piece::ORM::Inflector;
 use Piece::ORM::Mapper::QueryType;
-use Piece::ORM::Mapper::Generator::Association;
+use Piece::ORM::Mapper::Generator::AssociationGenerator;
 
 // {{{ Piece::ORM::Mapper::Generator
 
@@ -513,9 +513,9 @@ class {$this->_mapperClass} extends AbstractMapper
                                                               array $associations
                                                               )
     {
-        $association =
-            new Association($propertyName, $associations, $this->_metadata);
-        return $association->generate($associations);
+        $generator =
+            new AssociationGenerator($propertyName, $associations, $this->_metadata);
+        return $generator->generate();
     }
 
     // }}}

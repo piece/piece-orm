@@ -40,7 +40,7 @@ namespace Piece::ORM::Mapper::Generator;
 use Piece::ORM::Mapper::AssociationType;
 use Piece::ORM::Exception;
 
-// {{{ Piece::ORM::Mapper::Generator::Association
+// {{{ Piece::ORM::Mapper::Generator::AssociationGenerator
 
 /**
  * @package    Piece_ORM
@@ -49,7 +49,7 @@ use Piece::ORM::Exception;
  * @version    Release: @package_version@
  * @since      Class available since Release 2.0.0
  */
-class Association
+class AssociationGenerator
 {
 
     // {{{ properties
