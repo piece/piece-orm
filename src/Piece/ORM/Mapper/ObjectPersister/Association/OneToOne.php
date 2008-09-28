@@ -44,7 +44,7 @@ use Piece::ORM::Inflector;
 // {{{ Piece::ORM::Mapper::ObjectPersister::Association::OneToOne
 
 /**
- * An associated object persister for One-to-One relationships.
+ * An associated object persister for One-to-One associations.
  *
  * @package    Piece_ORM
  * @copyright  2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
@@ -85,10 +85,10 @@ class OneToOne extends Common
     /**
      * Inserts associated objects to a table.
      *
-     * @param array  $relationship
+     * @param array  $association
      * @param string $mappedAs
      */
-    public function insert(array $relationship, $mappedAs)
+    public function insert(array $association, $mappedAs)
     {
         if (!property_exists($this->subject, $mappedAs)) {
             return;
@@ -98,9 +98,9 @@ class OneToOne extends Common
             return;
         }
 
-        $mapper = MapperFactory::factory($relationship['table']);
+        $mapper = MapperFactory::factory($association['table']);
 
-        $this->subject->{ $mappedAs }->{ Inflector::camelize($relationship['column'], true) } = $this->subject->{ Inflector::camelize($relationship['referencedColumn'], true) };
+        $this->subject->{ $mappedAs }->{ Inflector::camelize($association['column'], true) } = $this->subject->{ Inflector::camelize($association['referencedColumn'], true) };
         $mapper->insert($this->subject->{ $mappedAs });
     }
 
@@ -110,10 +110,10 @@ class OneToOne extends Common
     /**
      * Updates associated objects in a table.
      *
-     * @param array  $relationship
+     * @param array  $association
      * @param string $mappedAs
      */
-    public function update(array $relationship, $mappedAs)
+    public function update(array $association, $mappedAs)
     {
         if (!property_exists($this->subject, $mappedAs)) {
             return;
@@ -123,14 +123,14 @@ class OneToOne extends Common
             return;
         }
 
-        $mapper = MapperFactory::factory($relationship['table']);
+        $mapper = MapperFactory::factory($association['table']);
 
-        $referencedColumnValue = $this->subject->{ Inflector::camelize($relationship['referencedColumn'], true) };
-        $oldObject = $mapper->findWithQuery("SELECT * FROM {$relationship['table']} WHERE {$relationship['column']} = " . $mapper->quote($referencedColumnValue, $relationship['column']));
+        $referencedColumnValue = $this->subject->{ Inflector::camelize($association['referencedColumn'], true) };
+        $oldObject = $mapper->findWithQuery("SELECT * FROM {$association['table']} WHERE {$association['column']} = " . $mapper->quote($referencedColumnValue, $association['column']));
 
         if (is_null($oldObject)) {
             if (!is_null($this->subject->$mappedAs)) {
-                $this->subject->$mappedAs->{ Inflector::camelize($relationship['column'], true) } = $referencedColumnValue;
+                $this->subject->$mappedAs->{ Inflector::camelize($association['column'], true) } = $referencedColumnValue;
                 $mapper->insert($this->subject->$mappedAs);
             }
         } else {
@@ -148,10 +148,10 @@ class OneToOne extends Common
     /**
      * Removes associated objects from a table.
      *
-     * @param array  $relationship
+     * @param array  $association
      * @param string $mappedAs
      */
-    public function delete(array $relationship, $mappedAs)
+    public function delete(array $association, $mappedAs)
     {
         if (!property_exists($this->subject, $mappedAs)) {
             return;
@@ -161,7 +161,7 @@ class OneToOne extends Common
             return;
         }
 
-        $mapper = MapperFactory::factory($relationship['table']);
+        $mapper = MapperFactory::factory($association['table']);
         $mapper->delete($this->subject->$mappedAs);
     }
 

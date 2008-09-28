@@ -44,7 +44,7 @@ use Piece::ORM::Inflector;
 // {{{ Piece::ORM::Mapper::ObjectPersister::Association::ManyToMany
 
 /**
- * An associated object persister for Many-to-Many relationships.
+ * An associated object persister for Many-to-Many associations.
  *
  * @package    Piece_ORM
  * @copyright  2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
@@ -85,10 +85,10 @@ class ManyToMany extends Common
     /**
      * Inserts associated objects to a table.
      *
-     * @param array  $relationship
+     * @param array  $association
      * @param string $mappedAs
      */
-    public function insert(array $relationship, $mappedAs)
+    public function insert(array $association, $mappedAs)
     {
         if (!property_exists($this->subject, $mappedAs)) {
             return;
@@ -98,13 +98,13 @@ class ManyToMany extends Common
             return;
         }
 
-        $mapper = MapperFactory::factory($relationship['through']['table']);
+        $mapper = MapperFactory::factory($association['through']['table']);
 
-        $referencedColumnValue = $this->subject->{ Inflector::camelize($relationship['through']['referencedColumn'], true) };
+        $referencedColumnValue = $this->subject->{ Inflector::camelize($association['through']['referencedColumn'], true) };
         $object = $mapper->createObject();
         foreach ($this->subject->$mappedAs as $associatedObject) {
-            $object->{ Inflector::camelize($relationship['through']['column'], true) } = $referencedColumnValue;
-            $object->{ Inflector::camelize($relationship['through']['inverseColumn'], true) } = $associatedObject->{ Inflector::camelize($relationship['column'], true) };
+            $object->{ Inflector::camelize($association['through']['column'], true) } = $referencedColumnValue;
+            $object->{ Inflector::camelize($association['through']['inverseColumn'], true) } = $associatedObject->{ Inflector::camelize($association['column'], true) };
             $mapper->insert($object);
         }
     }
@@ -115,10 +115,10 @@ class ManyToMany extends Common
     /**
      * Updates associated objects in a table.
      *
-     * @param array  $relationship
+     * @param array  $association
      * @param string $mappedAs
      */
-    public function update(array $relationship, $mappedAs)
+    public function update(array $association, $mappedAs)
     {
         if (!property_exists($this->subject, $mappedAs)) {
             return;
@@ -128,15 +128,15 @@ class ManyToMany extends Common
             return;
         }
 
-        $mapper = MapperFactory::factory($relationship['through']['table']);
+        $mapper = MapperFactory::factory($association['through']['table']);
 
-        $referencedColumnValue = $this->subject->{ Inflector::camelize($relationship['through']['referencedColumn'], true) };
-        $mapper->executeQuery("DELETE FROM {$relationship['through']['table']} WHERE {$relationship['through']['column']} = " . $mapper->quote($referencedColumnValue, $relationship['through']['column']), true);
+        $referencedColumnValue = $this->subject->{ Inflector::camelize($association['through']['referencedColumn'], true) };
+        $mapper->executeQuery("DELETE FROM {$association['through']['table']} WHERE {$association['through']['column']} = " . $mapper->quote($referencedColumnValue, $association['through']['column']), true);
 
         $object = $mapper->createObject();
         foreach ($this->subject->$mappedAs as $associatedObject) {
-            $object->{ Inflector::camelize($relationship['through']['column'], true) } = $referencedColumnValue;
-            $object->{ Inflector::camelize($relationship['through']['inverseColumn'], true) } = $associatedObject->{ Inflector::camelize($relationship['column'], true) };
+            $object->{ Inflector::camelize($association['through']['column'], true) } = $referencedColumnValue;
+            $object->{ Inflector::camelize($association['through']['inverseColumn'], true) } = $associatedObject->{ Inflector::camelize($association['column'], true) };
             $mapper->insert($object);
         }
     }
@@ -147,19 +147,19 @@ class ManyToMany extends Common
     /**
      * Removes associated objects from a table.
      *
-     * @param array  $relationship
+     * @param array  $association
      * @param string $mappedAs
      */
-    public function delete(array $relationship, $mappedAs)
+    public function delete(array $association, $mappedAs)
     {
-        $property = Inflector::camelize($relationship['through']['referencedColumn'], true);
+        $property = Inflector::camelize($association['through']['referencedColumn'], true);
         if (!property_exists($this->subject, $property)) {
             return;
         }
 
-        $mapper = MapperFactory::factory($relationship['through']['table']);
-        $mapper->executeQuery("DELETE FROM {$relationship['through']['table']} WHERE {$relationship['through']['column']} = " .
-                              $mapper->quote($this->subject->$property, $relationship['through']['column']),
+        $mapper = MapperFactory::factory($association['through']['table']);
+        $mapper->executeQuery("DELETE FROM {$association['through']['table']} WHERE {$association['through']['column']} = " .
+                              $mapper->quote($this->subject->$property, $association['through']['column']),
                               true
                               );
     }

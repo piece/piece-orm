@@ -98,13 +98,13 @@ class ManyToMany extends Common
      */
     protected function normalizeThrough()
     {
-        if (!array_key_exists('through', $this->relationship)) {
-            $this->relationship['through'] = array();
+        if (!array_key_exists('through', $this->association)) {
+            $this->association['through'] = array();
         }
 
-        if (!array_key_exists('table', $this->relationship['through'])) {
-            $throughTableName1 = $this->metadata->getTableName(true) . "_{$this->relationship['table']}";
-            $throughTableName2 = "{$this->relationship['table']}_" . $this->metadata->getTableName(true);
+        if (!array_key_exists('table', $this->association['through'])) {
+            $throughTableName1 = $this->metadata->getTableName(true) . "_{$this->association['table']}";
+            $throughTableName2 = "{$this->association['table']}_" . $this->metadata->getTableName(true);
             foreach (array($throughTableName1, $throughTableName2) as $throughTableName) {
                 try {
                     $throughMetadata = MetadataFactory::factory($throughTableName);
@@ -114,7 +114,7 @@ class ManyToMany extends Common
                     throw $e;
                 }
 
-                $this->relationship['through']['table'] = $throughTableName;
+                $this->association['through']['table'] = $throughTableName;
                 break;
             }
 
@@ -123,45 +123,45 @@ class ManyToMany extends Common
             }
         }
 
-        $throughMetadata = MetadataFactory::factory($this->relationship['through']['table']);
+        $throughMetadata = MetadataFactory::factory($this->association['through']['table']);
 
-        if (!array_key_exists('column', $this->relationship['through'])) {
+        if (!array_key_exists('column', $this->association['through'])) {
             $primaryKey = $this->metadata->getPrimaryKey();
             if (is_null($primaryKey)) {
                 throw new Exception('A single primary key field is required, if the element [ column ] in the element [ through ] omit.');
             }
                 
-            $this->relationship['through']['column'] = $this->metadata->getTableName(true) . "_$primaryKey";
+            $this->association['through']['column'] = $this->metadata->getTableName(true) . "_$primaryKey";
         } 
 
-        if (!$throughMetadata->hasField($this->relationship['through']['column'])) {
-            throw new Exception("The field [ {$this->relationship['through']['column']} ] not found in the table [ " . $throughMetadata->getTableName(true) . ' ].');
+        if (!$throughMetadata->hasField($this->association['through']['column'])) {
+            throw new Exception("The field [ {$this->association['through']['column']} ] not found in the table [ " . $throughMetadata->getTableName(true) . ' ].');
         }
 
-        if (!array_key_exists('referencedColumn', $this->relationship['through'])) {
+        if (!array_key_exists('referencedColumn', $this->association['through'])) {
             $primaryKey = $this->metadata->getPrimaryKey();
             if (is_null($primaryKey)) {
                 throw new Exception('A single primary key field is required, if the element [ referencedColumn ] in the element [ through ] omit.');
             }
 
-            $this->relationship['through']['referencedColumn'] = $primaryKey;
+            $this->association['through']['referencedColumn'] = $primaryKey;
         } 
 
-        if (!$this->metadata->hasField($this->relationship['through']['referencedColumn'])) {
-            throw new Exception("The field [ {$this->relationship['through']['referencedColumn']} ] not found in the table [ " . $this->metadata->getTableName(true) . ' ].');
+        if (!$this->metadata->hasField($this->association['through']['referencedColumn'])) {
+            throw new Exception("The field [ {$this->association['through']['referencedColumn']} ] not found in the table [ " . $this->metadata->getTableName(true) . ' ].');
         }
 
-        if (!array_key_exists('inverseColumn', $this->relationship['through'])) {
-            $primaryKey = $this->relationshipMetadata->getPrimaryKey();
+        if (!array_key_exists('inverseColumn', $this->association['through'])) {
+            $primaryKey = $this->associationMetadata->getPrimaryKey();
             if (is_null($primaryKey)) {
                 throw new Exception('A single primary key field is required, if the element [ column ] in the element [ through ] omit.');
             }
 
-            $this->relationship['through']['inverseColumn'] = $this->relationshipMetadata->getTableName(true) . "_$primaryKey";
+            $this->association['through']['inverseColumn'] = $this->associationMetadata->getTableName(true) . "_$primaryKey";
         } 
 
-        if (!$throughMetadata->hasField($this->relationship['through']['inverseColumn'])) {
-            throw new Exception("The field [ {$this->relationship['through']['inverseColumn']} ] not found in the table [ " . $throughMetadata->getTableName(true) . ' ].');
+        if (!$throughMetadata->hasField($this->association['through']['inverseColumn'])) {
+            throw new Exception("The field [ {$this->association['through']['inverseColumn']} ] not found in the table [ " . $throughMetadata->getTableName(true) . ' ].');
         }
     }
 
@@ -175,12 +175,12 @@ class ManyToMany extends Common
      */
     protected function normalizeColumn()
     {
-        $primaryKey = $this->relationshipMetadata->getPrimaryKey();
+        $primaryKey = $this->associationMetadata->getPrimaryKey();
         if (is_null($primaryKey)) {
             return false;
         }
 
-        $this->relationship['column'] = $primaryKey;
+        $this->association['column'] = $primaryKey;
         return true;
     }
 
@@ -194,7 +194,7 @@ class ManyToMany extends Common
      */
     protected function normalizeReferencedColumn()
     {
-        $this->relationship['referencedColumn'] = null;
+        $this->association['referencedColumn'] = null;
         return true;
     }
 

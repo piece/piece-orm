@@ -3,7 +3,7 @@
 methods:
 
   findAllWithEmployees:
-    relationships:
+    associations:
       employees:
         table: employees
         type: manyToMany

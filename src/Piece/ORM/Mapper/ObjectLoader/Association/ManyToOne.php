@@ -43,7 +43,7 @@ use Piece::ORM::Mapper::Common as MapperCommon;
 // {{{ Piece::ORM::Mapper::ObjectLoader::Association::ManyToOne
 
 /**
- * An associated object loader for Many-to-One relationships.
+ * An associated object loader for Many-to-One associations.
  *
  * @package    Piece_ORM
  * @copyright  2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
@@ -97,35 +97,35 @@ class ManyToOne extends Common
      */
     protected function buildQuery($mappedAs)
     {
-        return "SELECT * FROM {$this->relationships[$mappedAs]['table']} WHERE {$this->relationships[$mappedAs]['column']} IN (" . implode(',', $this->relationshipKeys[$mappedAs]) . ')';
+        return "SELECT * FROM {$this->associations[$mappedAs]['table']} WHERE {$this->associations[$mappedAs]['column']} IN (" . implode(',', $this->associationKeys[$mappedAs]) . ')';
     }
 
     // }}}
-    // {{{ getRelationshipKeyFieldNameInPrimaryQuery()
+    // {{{ getAssociationKeyFieldNameInPrimaryQuery()
 
     /**
-     * Gets the name of the relationship key field in the primary query.
+     * Gets the name of the association key field in the primary query.
      *
-     * @param array $relationship
+     * @param array $association
      * @return string
      */
-    protected function getRelationshipKeyFieldNameInPrimaryQuery(array $relationship)
+    protected function getAssociationKeyFieldNameInPrimaryQuery(array $association)
     {
-        return $relationship['referencedColumn'];
+        return $association['referencedColumn'];
     }
 
     // }}}
-    // {{{ getRelationshipKeyFieldNameInSecondaryQuery()
+    // {{{ getAssociationKeyFieldNameInSecondaryQuery()
 
     /**
-     * Gets the name of the relationship key field in the secondary query.
+     * Gets the name of the association key field in the secondary query.
      *
-     * @param array $relationship
+     * @param array $association
      * @return string
      */
-    protected function getRelationshipKeyFieldNameInSecondaryQuery(array $relationship)
+    protected function getAssociationKeyFieldNameInSecondaryQuery(array $association)
     {
-        return $relationship['column'];
+        return $association['column'];
     }
 
     // }}}
@@ -137,17 +137,17 @@ class ManyToOne extends Common
      *
      * @param stdClass                   $associatedObject
      * @param Piece::ORM::Mapper::Common $mapper
-     * @param string                     $relationshipKeyPropertyName
+     * @param string                     $associationKeyPropertyName
      * @param string                     $mappedAs
      */
     protected function associateObject($associatedObject,
                                        MapperCommon $mapper,
-                                       $relationshipKeyPropertyName,
+                                       $associationKeyPropertyName,
                                        $mappedAs
                                        )
     {
-        for ($i = 0, $count = count($this->objectIndexes[$mappedAs][ $associatedObject->$relationshipKeyPropertyName ]); $i < $count; ++$i) {
-            $this->objects[ $this->objectIndexes[$mappedAs][ $associatedObject->$relationshipKeyPropertyName ][$i] ]->$mappedAs = $associatedObject;
+        for ($i = 0, $count = count($this->objectIndexes[$mappedAs][ $associatedObject->$associationKeyPropertyName ]); $i < $count; ++$i) {
+            $this->objects[ $this->objectIndexes[$mappedAs][ $associatedObject->$associationKeyPropertyName ][$i] ]->$mappedAs = $associatedObject;
         }
     }
 

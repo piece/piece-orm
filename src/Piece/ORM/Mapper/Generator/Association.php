@@ -37,7 +37,7 @@
 
 namespace Piece::ORM::Mapper::Generator;
 
-use Piece::ORM::Mapper::RelationshipType;
+use Piece::ORM::Mapper::AssociationType;
 use Piece::ORM::Exception;
 
 // {{{ Piece::ORM::Mapper::Generator::Association
@@ -109,8 +109,8 @@ class Association
                 throw new Exception('The element [ type ] is required to generate an association property declaration.');
             }
 
-            if (!RelationshipType::isValid($definition['type'])) {
-                throw new Exception('The value of the element [ type ] must be one of ' . implode(', ', RelationshipType::getRelationshipTypes()));
+            if (!AssociationType::isValid($definition['type'])) {
+                throw new Exception('The value of the element [ type ] must be one of ' . implode(', ', AssociationType::getAssociationTypes()));
             }
 
             $class =  __CLASS__ . '::' . ucwords($definition['type']);
@@ -118,7 +118,7 @@ class Association
             $normalizedAssociations[$mappedAs] = $normalizer->normalize();
         }
 
-        return "    public \$__relationship__{$this->_propertyName} = " .
+        return "    public \$__association__{$this->_propertyName} = " .
             var_export($normalizedAssociations, true) .
             ';';
     }

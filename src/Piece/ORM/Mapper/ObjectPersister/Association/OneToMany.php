@@ -44,7 +44,7 @@ use Piece::ORM::Inflector;
 // {{{ Piece::ORM::Mapper::ObjectPersister::Association::OneToMany
 
 /**
- * An associated object persister for One-to-Many relationships.
+ * An associated object persister for One-to-Many associations.
  *
  * @package    Piece_ORM
  * @copyright  2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
@@ -87,10 +87,10 @@ class OneToMany extends Common
     /**
      * Inserts associated objects to a table.
      *
-     * @param array  $relationship
+     * @param array  $association
      * @param string $mappedAs
      */
-    public function insert(array $relationship, $mappedAs)
+    public function insert(array $association, $mappedAs)
     {
         if (!property_exists($this->subject, $mappedAs)) {
             return;
@@ -100,11 +100,11 @@ class OneToMany extends Common
             return;
         }
 
-        $mapper = MapperFactory::factory($relationship['table']);
+        $mapper = MapperFactory::factory($association['table']);
 
-        $referencedColumnValue = $this->subject->{ Inflector::camelize($relationship['referencedColumn'], true) };
+        $referencedColumnValue = $this->subject->{ Inflector::camelize($association['referencedColumn'], true) };
         for ($i = 0, $count = count($this->subject->$mappedAs); $i < $count; ++$i) {
-            $this->subject->{ $mappedAs }[$i]->{ Inflector::camelize($relationship['column'], true) } = $referencedColumnValue;
+            $this->subject->{ $mappedAs }[$i]->{ Inflector::camelize($association['column'], true) } = $referencedColumnValue;
             $mapper->insert($this->subject->{ $mappedAs }[$i]);
         }
     }
@@ -115,10 +115,10 @@ class OneToMany extends Common
     /**
      * Updates associated objects in a table.
      *
-     * @param array  $relationship
+     * @param array  $association
      * @param string $mappedAs
      */
-    public function update(array $relationship, $mappedAs)
+    public function update(array $association, $mappedAs)
     {
         if (!property_exists($this->subject, $mappedAs)) {
             return;
@@ -128,10 +128,10 @@ class OneToMany extends Common
             return;
         }
 
-        $mapper = MapperFactory::factory($relationship['table']);
+        $mapper = MapperFactory::factory($association['table']);
 
-        $referencedColumnValue = $this->subject->{ Inflector::camelize($relationship['referencedColumn'], true) };
-        $oldObjects = $mapper->findAllWithQuery("SELECT * FROM {$relationship['table']} WHERE {$relationship['column']} = " . $mapper->quote($referencedColumnValue, $relationship['column']));
+        $referencedColumnValue = $this->subject->{ Inflector::camelize($association['referencedColumn'], true) };
+        $oldObjects = $mapper->findAllWithQuery("SELECT * FROM {$association['table']} WHERE {$association['column']} = " . $mapper->quote($referencedColumnValue, $association['column']));
 
         $metadata = $mapper->getMetadata();
         $this->_primaryKeyProperty = Inflector::camelize($metadata->getPrimaryKey(), true);
@@ -171,12 +171,12 @@ class OneToMany extends Common
         }
 
         foreach (array_keys($targetsForInsert) as $i) {
-            $targetsForInsert[$i]->{ Inflector::camelize($relationship['column'], true) } = $referencedColumnValue;
+            $targetsForInsert[$i]->{ Inflector::camelize($association['column'], true) } = $referencedColumnValue;
             $mapper->insert($targetsForInsert[$i]);
         }
 
         foreach (array_keys($targetsForUpdate) as $i) {
-            $targetsForUpdate[$i]->{ Inflector::camelize($relationship['column'], true) } = $referencedColumnValue;
+            $targetsForUpdate[$i]->{ Inflector::camelize($association['column'], true) } = $referencedColumnValue;
             $mapper->update($targetsForUpdate[$i]);
         }
     }
@@ -187,19 +187,19 @@ class OneToMany extends Common
     /**
      * Removes associated objects from a table.
      *
-     * @param array  $relationship
+     * @param array  $association
      * @param string $mappedAs
      */
-    public function delete(array $relationship, $mappedAs)
+    public function delete(array $association, $mappedAs)
     {
-        $property = Inflector::camelize($relationship['referencedColumn'], true);
+        $property = Inflector::camelize($association['referencedColumn'], true);
         if (!property_exists($this->subject, $property)) {
             return;
         }
 
-        $mapper = MapperFactory::factory($relationship['table']);
-        $mapper->executeQuery("DELETE FROM {$relationship['table']} WHERE {$relationship['column']} = " .
-                              $mapper->quote($this->subject->$property, $relationship['column']),
+        $mapper = MapperFactory::factory($association['table']);
+        $mapper->executeQuery("DELETE FROM {$association['table']} WHERE {$association['column']} = " .
+                              $mapper->quote($this->subject->$property, $association['column']),
                               true
                               );
     }

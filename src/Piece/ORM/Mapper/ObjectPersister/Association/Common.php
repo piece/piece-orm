@@ -96,10 +96,10 @@ abstract class Common
     /**
      * Inserts associated objects to a table.
      *
-     * @param array  $relationship
+     * @param array  $association
      * @param string $mappedAs
      */
-    abstract public function insert(array $relationship, $mappedAs);
+    abstract public function insert(array $association, $mappedAs);
 
     // }}}
     // {{{ update()
@@ -107,10 +107,10 @@ abstract class Common
     /**
      * Updates associated objects in a table.
      *
-     * @param array  $relationship
+     * @param array  $association
      * @param string $mappedAs
      */
-    abstract public function update(array $relationship, $mappedAs);
+    abstract public function update(array $association, $mappedAs);
 
     // }}}
     // {{{ delete()
@@ -118,10 +118,10 @@ abstract class Common
     /**
      * Removes associated objects from a table.
      *
-     * @param array  $relationship
+     * @param array  $association
      * @param string $mappedAs
      */
-    abstract public function delete(array $relationship, $mappedAs);
+    abstract public function delete(array $association, $mappedAs);
 
     /**#@-*/
 

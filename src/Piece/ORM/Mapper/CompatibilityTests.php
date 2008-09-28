@@ -451,7 +451,7 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
         $mapper->update($employee);
     }
 
-    public function testShouldSupportManyToManyRelationships()
+    public function testShouldSupportManyToManyAssociations()
     {
         foreach (array(false, true) as $useMapperNameAsTableName) {
             if ($useMapperNameAsTableName) {
@@ -510,7 +510,7 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
         }
     }
 
-    public function testShouldSupportManyToManyRelationshipsWithBuiltinMethod()
+    public function testShouldSupportManyToManyAssociationsWithBuiltinMethod()
     {
         foreach (array(false, true) as $useMapperNameAsTableName) {
             if ($useMapperNameAsTableName) {
@@ -534,7 +534,7 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
         }
     }
 
-    public function testShouldSupportOneToManyRelationships()
+    public function testShouldSupportOneToManyAssociations()
     {
         foreach (array(false, true) as $useMapperNameAsTableName) {
             if ($useMapperNameAsTableName) {
@@ -582,7 +582,7 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
         }
     }
 
-    public function testShouldSupportManyToOneRelationships()
+    public function testShouldSupportManyToOneAssociations()
     {
         foreach (array(false, true) as $useMapperNameAsTableName) {
             if ($useMapperNameAsTableName) {
@@ -639,7 +639,7 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
         }
     }
 
-    public function testShouldSupportOneToOneRelationships()
+    public function testShouldSupportOneToOneAssociations()
     {
         foreach (array(false, true) as $useMapperNameAsTableName) {
             if ($useMapperNameAsTableName) {
@@ -840,7 +840,7 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
         }
     }
 
-    public function testShouldSupportOrderWithManyToManyRelationships()
+    public function testShouldSupportOrderWithManyToManyAssociations()
     {
         foreach (array(false, true) as $useMapperNameAsTableName) {
             if ($useMapperNameAsTableName) {
@@ -866,7 +866,7 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
         }
     }
 
-    public function testShouldSupportOrderWithOneToManyRelationships()
+    public function testShouldSupportOrderWithOneToManyAssociations()
     {
         foreach (array(false, true) as $useMapperNameAsTableName) {
             if ($useMapperNameAsTableName) {
@@ -922,7 +922,7 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
         $this->assertTrue(property_exists($subject, 'updatedAt'));
     }
 
-    public function testShouldSupportCascadeUpdateWithManyToManyRelationships()
+    public function testShouldSupportCascadeUpdateWithManyToManyAssociations()
     {
         foreach (array(false, true) as $useMapperNameAsTableName) {
             if ($useMapperNameAsTableName) {
@@ -968,7 +968,7 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
         }
     }
 
-    public function testShouldSupportCascadeUpdateWithOneToManyRelationships()
+    public function testShouldSupportCascadeUpdateWithOneToManyAssociations()
     {
         foreach (array(false, true) as $useMapperNameAsTableName) {
             if ($useMapperNameAsTableName) {
@@ -1029,7 +1029,7 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
         }
     }
 
-    public function testShouldSupportCascadeUpdateWithOneToOneRelationships()
+    public function testShouldSupportCascadeUpdateWithOneToOneAssociations()
     {
         foreach (array(false, true) as $useMapperNameAsTableName) {
             if ($useMapperNameAsTableName) {
@@ -1121,7 +1121,7 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
         }
     }
 
-    public function testShouldSupportCascadeDeleteWithManyToManyRelationships()
+    public function testShouldSupportCascadeDeleteWithManyToManyAssociations()
     {
         foreach (array(false, true) as $useMapperNameAsTableName) {
             if ($useMapperNameAsTableName) {
@@ -1148,7 +1148,7 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
         }
     }
 
-    public function testShouldSupportCascadeDeleteWithOneToManyRelationships()
+    public function testShouldSupportCascadeDeleteWithOneToManyAssociations()
     {
         foreach (array(false, true) as $useMapperNameAsTableName) {
             if ($useMapperNameAsTableName) {
@@ -1176,7 +1176,7 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
         }
     }
 
-    public function testShouldSupportCascadeDeleteWithOneToOneRelationships()
+    public function testShouldSupportCascadeDeleteWithOneToOneAssociations()
     {
         foreach (array(false, true) as $useMapperNameAsTableName) {
             if ($useMapperNameAsTableName) {
@@ -1572,7 +1572,7 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
     /**
      * @since Method available since Release 0.6.0
      */
-    public function testShouldTreatManyToManyRelationshipsWithUnderscoreTheSeparatedPrimaryKey()
+    public function testShouldTreatManyToManyAssociationsWithUnderscoreTheSeparatedPrimaryKey()
     {
         foreach (array(false, true) as $useMapperNameAsTableName) {
             if ($useMapperNameAsTableName) {
@@ -1822,7 +1822,7 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
     /**
      * @since Method available since Release 0.8.1
      */
-    public function testShouldWorkWithAnyFinderMethodCallsForAMapperWhichHasAlreadyUsedInRelationships()
+    public function testShouldWorkWithAnyFinderMethodCallsForAMapperWhichHasAlreadyUsedInAssociations()
     {
         foreach (array(false, true) as $useMapperNameAsTableName) {
             if ($useMapperNameAsTableName) {
@@ -2060,7 +2060,7 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
     /**
      * @since Method available since Release 1.2.0
      */
-    public function testShouldTreatInverseThroughTablesOnManyToManyRelationships()
+    public function testShouldTreatInverseThroughTablesOnManyToManyAssociations()
     {
         foreach (array(false, true) as $useMapperNameAsTableName) {
             if ($useMapperNameAsTableName) {

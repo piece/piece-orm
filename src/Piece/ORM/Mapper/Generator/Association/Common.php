@@ -67,9 +67,9 @@ abstract class Common
      * @access protected
      */
 
-    protected $relationship;
+    protected $association;
     protected $metadata;
-    protected $relationshipMetadata;
+    protected $associationMetadata;
     protected $referencedColumnRequired = true;
 
     /**#@-*/
@@ -90,12 +90,12 @@ abstract class Common
     /**
      * Initializes properties with the given values.
      *
-     * @param array                $relationship
+     * @param array                $association
      * @param Piece::ORM::Metadata $metadata
      */
-    public function __construct($relationship, Metadata $metadata)
+    public function __construct($association, Metadata $metadata)
     {
-        $this->relationship = $relationship;
+        $this->association = $association;
         $this->metadata = $metadata;
     }
 
@@ -103,53 +103,53 @@ abstract class Common
     // {{{ normalize()
 
     /**
-     * Normalizes a relationship definition.
+     * Normalizes a association definition.
      *
      * @return array
      * @throws Piece::ORM::Exception
      */
     public function normalize()
     {
-        if (!array_key_exists('table', $this->relationship)) {
-            throw new Exception('The element [ table ] is required to generate a relationship property declaration.');
+        if (!array_key_exists('table', $this->association)) {
+            throw new Exception('The element [ table ] is required to generate a association property declaration.');
         }
 
-        $this->relationshipMetadata = MetadataFactory::factory($this->relationship['table']);
+        $this->associationMetadata = MetadataFactory::factory($this->association['table']);
 
         if ($this->checkHavingSinglePrimaryKey()) {
-            if (!$this->relationshipMetadata->getPrimaryKey()) {
-                throw new Exception('A single primary key field is required in the table [ ' . $this->relationshipMetadata->getTableName(true) . ' ].');
+            if (!$this->associationMetadata->getPrimaryKey()) {
+                throw new Exception('A single primary key field is required in the table [ ' . $this->associationMetadata->getTableName(true) . ' ].');
             }
         }
 
-        if (!array_key_exists('column', $this->relationship)) {
+        if (!array_key_exists('column', $this->association)) {
             if (!$this->normalizeColumn()) {
-                throw new Exception('A single primary key field is required, if the element [ column ] in the element [ relationship ] omit.');
+                throw new Exception('A single primary key field is required, if the element [ column ] in the element [ association ] omit.');
             }
         } 
 
-        if (!$this->relationshipMetadata->hasField($this->relationship['column'])) {
-            throw new Exception("The field [ {$this->relationship['column']} ] not found in the table [ " . $this->relationshipMetadata->getTableName(true) . ' ].');
+        if (!$this->associationMetadata->hasField($this->association['column'])) {
+            throw new Exception("The field [ {$this->association['column']} ] not found in the table [ " . $this->associationMetadata->getTableName(true) . ' ].');
         }
 
-        if (!array_key_exists('referencedColumn', $this->relationship)) {
+        if (!array_key_exists('referencedColumn', $this->association)) {
             if (!$this->normalizeReferencedColumn()) {
-                throw new Exception('A single primary key field is required, if the element [ referencedColumn ] in the element [ relationship ] omit.');
+                throw new Exception('A single primary key field is required, if the element [ referencedColumn ] in the element [ association ] omit.');
             }
         } 
 
-        if ($this->referencedColumnRequired && !$this->metadata->hasField($this->relationship['referencedColumn'])) {
-            throw new Exception("The field [ {$this->relationship['referencedColumn']} ] not found in the table [ " . $this->metadata->getTableName(true) . ' ].');
+        if ($this->referencedColumnRequired && !$this->metadata->hasField($this->association['referencedColumn'])) {
+            throw new Exception("The field [ {$this->association['referencedColumn']} ] not found in the table [ " . $this->metadata->getTableName(true) . ' ].');
         }
 
-        if (!array_key_exists('orderBy', $this->relationship)) {
-            $this->relationship['orderBy'] = null;
+        if (!array_key_exists('orderBy', $this->association)) {
+            $this->association['orderBy'] = null;
         }
 
         $this->normalizeOrderBy();
         $this->normalizeThrough();
 
-        return $this->relationship;
+        return $this->association;
     }
 
     /**#@-*/

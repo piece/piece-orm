@@ -38,7 +38,7 @@
 namespace Piece::ORM::Mapper;
 
 use Piece::ORM::Mapper::Common;
-use Piece::ORM::Mapper::RelationshipType;
+use Piece::ORM::Mapper::AssociationType;
 use Piece::ORM::Inflector;
 use Piece::ORM::Exception::PEARException;
 use Piece::ORM::Mapper::MapperFactory;
@@ -77,8 +77,8 @@ class ObjectLoader
 
     private $_mapper;
     private $_result;
-    private $_relationships;
-    private $_relationshipKeys = array();
+    private $_associations;
+    private $_associationKeys = array();
     private $_objects = array();
     private $_objectIndexes = array();
     private $_associatedObjectLoaders = array();
@@ -98,22 +98,22 @@ class ObjectLoader
      *
      * @param Piece::ORM::Mapper::Common $mapper
      * @param ::MDB2_Result              $result
-     * @param array                      $relationships
+     * @param array                      $associations
      */
     public function __construct(Common $mapper,
                                 ::MDB2_Result $result,
-                                array $relationships
+                                array $associations
                                 )
     {
         $this->_result = $result;
 
-        if (count(array_keys($relationships))) {
-            foreach (RelationshipType::getRelationshipTypes() as $relationshipType) {
+        if (count(array_keys($associations))) {
+            foreach (AssociationType::getAssociationTypes() as $associationType) {
                 $associatedObjectsLoaderClass =
-                    __CLASS__ . '::Association::' . ucwords($relationshipType);
-                $this->_associatedObjectLoaders[$relationshipType] =
-                    new $associatedObjectsLoaderClass($relationships,
-                                                      $this->_relationshipKeys,
+                    __CLASS__ . '::Association::' . ucwords($associationType);
+                $this->_associatedObjectLoaders[$associationType] =
+                    new $associatedObjectsLoaderClass($associations,
+                                                      $this->_associationKeys,
                                                       $this->_objects,
                                                       $this->_objectIndexes,
                                                       $mapper
@@ -123,7 +123,7 @@ class ObjectLoader
 
         $this->_metadata = $mapper->getMetadata();
         $this->_mapper = $mapper;
-        $this->_relationships = $relationships;
+        $this->_associations = $associations;
     }
 
     // }}}
@@ -218,7 +218,7 @@ class ObjectLoader
                 $this->_objects[] = $this->_load($row);
             }
 
-            foreach ($this->_relationships as $mappedAs => $definition) {
+            foreach ($this->_associations as $mappedAs => $definition) {
                 $this->_associatedObjectLoaders[ $definition['type'] ]->prepareLoading($row, $i, $mappedAs);
             }
         }
@@ -233,7 +233,7 @@ class ObjectLoader
      */
     private function _loadAssociatedObjects()
     {
-        foreach ($this->_relationships as $mappedAs => $definition) {
+        foreach ($this->_associations as $mappedAs => $definition) {
             $mapper = MapperFactory::factory($definition['table']);
             $this->_associatedObjectLoaders[ $definition['type'] ]->loadAll($mapper, $mappedAs);
         }

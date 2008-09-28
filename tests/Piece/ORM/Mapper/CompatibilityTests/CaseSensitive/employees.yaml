@@ -13,13 +13,13 @@ methods:
         AND note = $note
 
   findAllWithSkills1:
-    relationships:
+    associations:
       skills:
         table: skills
         type: manyToMany
 
   findAllWithSkills2:
-    relationships:
+    associations:
       skills:
         table: skills
         type: manyToMany
@@ -31,7 +31,7 @@ methods:
           inverseColumn: skills_id
 
   insert:
-    relationships:
+    associations:
       skills:
         table: skills
         type: manyToMany
@@ -40,19 +40,19 @@ methods:
         type: oneToOne
 
   findAllByFirstName:
-    relationships:
+    associations:
       skills:
         table: skills
         type: manyToMany
 
   findAllWithDepartment1:
-    relationships:
+    associations:
       department:
         table: departments
         type: manyToOne
 
   findAllWithDepartment2:
-    relationships:
+    associations:
       department:
         table: departments
         type: manyToOne
@@ -60,13 +60,13 @@ methods:
         referencedColumn: departments_id
 
   findAllWithComputer1:
-    relationships:
+    associations:
       computer:
         table: computers
         type: oneToOne
 
   findAllWithComputer2:
-    relationships:
+    associations:
       computer:
         table: computers
         type: oneToOne
@@ -81,20 +81,20 @@ methods:
         $__table
       WHERE
         first_name = $firstName
-    relationships:
+    associations:
       department:
         table: departments
         type: manyToOne
 
   findAllWithOrderedSkills:
-    relationships:
+    associations:
       skills:
         table: skills
         type: manyToMany
         orderBy: skills.id DESC
 
   findWithOrderedSkills:
-    relationships:
+    associations:
       skills:
         table: skills
         type: manyToMany
@@ -108,13 +108,13 @@ methods:
         $__table
       WHERE
         first_name = $firstName
-    relationships:
+    associations:
       skills:
         table: skills
         type: manyToMany
 
   update:
-    relationships:
+    associations:
       skills:
         table: skills
         type: manyToMany
@@ -130,13 +130,13 @@ methods:
         $__table
       WHERE
         first_name = $firstName
-    relationships:
+    associations:
       computer:
         table: computers
         type: oneToOne
 
   delete:
-    relationships:
+    associations:
       skills:
         table: skills
         type: manyToMany
@@ -246,7 +246,7 @@ methods:
   deleteWithNoQuery:
 
   insertWithEmails:
-    relationships:
+    associations:
       emails:
         table: emails
         type: manyToMany
@@ -255,7 +255,7 @@ methods:
           inverseColumn: emails_id
 
   findAllWithEmails:
-    relationships:
+    associations:
       emails:
         table: emails
         type: manyToMany

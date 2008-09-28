@@ -41,7 +41,7 @@ mapping:
         mapping:
           "query": { type: str, required: no }
           "orderBy": { type: str, required: no }
-          "relationships":
+          "associations":
             type: map
             required: no
             mapping:

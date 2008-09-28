@@ -43,7 +43,7 @@ use Piece::ORM::Exception;
 // {{{ Piece::ORM::Mapper::ObjectPersister::Association::ManyToOne
 
 /**
- * An associated object persister for Many-to-One relationships.
+ * An associated object persister for Many-to-One associations.
  *
  * @package    Piece_ORM
  * @copyright  2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
@@ -84,13 +84,13 @@ class ManyToOne extends Common
     /**
      * Inserts associated objects to a table.
      *
-     * @param array $relationship
+     * @param array $association
      * @param string $mappedAs
      * @throws Piece::ORM::Exception
      */
-    public function insert(array $relationship, $mappedAs)
+    public function insert(array $association, $mappedAs)
     {
-        throw new Exception("This operation does not supported for the relationship type [ {$relationship['type']} ]. Please check your configuration.");
+        throw new Exception("This operation does not supported for the association type [ {$association['type']} ]. Please check your configuration.");
     }
 
     // }}}
@@ -99,13 +99,13 @@ class ManyToOne extends Common
     /**
      * Updates associated objects in a table.
      *
-     * @param array  $relationship
+     * @param array  $association
      * @param string $mappedAs
      * @throws Piece::ORM::Exception
      */
-    public function update(array $relationship, $mappedAs)
+    public function update(array $association, $mappedAs)
     {
-        throw new Exception("This operation does not supported for the relationship type [ {$relationship['type']} ]. Please check your configuration.");
+        throw new Exception("This operation does not supported for the association type [ {$association['type']} ]. Please check your configuration.");
     }
 
     // }}}
@@ -114,13 +114,13 @@ class ManyToOne extends Common
     /**
      * Removes associated objects from a table.
      *
-     * @param array  $relationship
+     * @param array  $association
      * @param string $mappedAs
      * @throws Piece::ORM::Exception
      */
-    public function delete(array $relationship, $mappedAs)
+    public function delete(array $association, $mappedAs)
     {
-        throw new Exception("This operation does not supported for the relationship type [ {$relationship['type']} ]. Please check your configuration.");
+        throw new Exception("This operation does not supported for the association type [ {$association['type']} ]. Please check your configuration.");
     }
 
     /**#@-*/

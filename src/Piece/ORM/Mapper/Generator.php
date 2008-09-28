@@ -39,7 +39,6 @@ namespace Piece::ORM::Mapper;
 
 use Piece::ORM::Metadata;
 use Piece::ORM::Exception;
-use Piece::ORM::Mapper::RelationshipType;
 use Piece::ORM::Inflector;
 use Piece::ORM::Mapper::QueryType;
 use Piece::ORM::Mapper::Generator::Association;
@@ -83,7 +82,7 @@ class Generator
     private $_metadata;
     private $_methodDefinitions = array();
     private $_propertyDefinitions = array('query' => array(),
-                                          'relationship' => array(),
+                                          'association' => array(),
                                           'orderBy' => array()
                                           );
     private $_baseMapperMethods;
@@ -141,7 +140,7 @@ use Piece::ORM::Mapper::Common;
 class {$this->_mapperClass} extends Common
 {\n" .
             implode("\n", $this->_propertyDefinitions['query']) . "\n" .
-            implode("\n", $this->_propertyDefinitions['relationship']) . "\n" .
+            implode("\n", $this->_propertyDefinitions['association']) . "\n" .
             implode("\n", $this->_propertyDefinitions['orderBy']) . "\n" .
             implode("\n", $this->_methodDefinitions) . "\n}";
     }
@@ -215,13 +214,13 @@ class {$this->_mapperClass} extends Common
      *
      * @param string $methodName
      * @param string $query
-     * @param array  $relationships
+     * @param array  $associations
      * @param string $orderBy
      * @throws Piece::ORM::Exception
      */
     private function _addFind($methodName,
                               $query,
-                              array $relationships = array(),
+                              array $associations = array(),
                               $orderBy = null
                               )
     {
@@ -229,7 +228,7 @@ class {$this->_mapperClass} extends Common
             throw new Exception("Cannot use the method name [ $methodName ] since it is a reserved for internal use only.");
         }
 
-        $this->_addPropertyDefinitions($methodName, $query, $relationships, $orderBy);
+        $this->_addPropertyDefinitions($methodName, $query, $associations, $orderBy);
 
         $this->_methodDefinitions[ strtolower($methodName) ] = "
     public function $methodName(\$criteria = null)
@@ -246,16 +245,16 @@ class {$this->_mapperClass} extends Common
      *
      * @param string $methodName
      * @param string $query
-     * @param array  $relationships
+     * @param array  $associations
      * @throws Piece::ORM::Exception
      */
-    private function _addInsert($methodName, $query, array $relationships = array())
+    private function _addInsert($methodName, $query, array $associations = array())
     {
         if (!$this->_validateMethodName($methodName)) {
             throw new Exception("Cannot use the method name [ $methodName ] since it is a reserved for internal use only.");
         }
 
-        $this->_addPropertyDefinitions($methodName, $query, $relationships);
+        $this->_addPropertyDefinitions($methodName, $query, $associations);
 
         $this->_methodDefinitions[ strtolower($methodName) ] = "
     public function $methodName(\$subject)
@@ -272,13 +271,13 @@ class {$this->_mapperClass} extends Common
      *
      * @param string $methodName
      * @param string $query
-     * @param array  $relationships
+     * @param array  $associations
      * @param string $orderBy
      * @throws Piece::ORM::Exception
      */
     private function _addFindAll($methodName,
                                  $query = null,
-                                 array $relationships = array(),
+                                 array $associations = array(),
                                  $orderBy = null
                                  )
     {
@@ -286,7 +285,7 @@ class {$this->_mapperClass} extends Common
             throw new Exception("Cannot use the method name [ $methodName ] since it is a reserved for internal use only.");
         }
 
-        $this->_addPropertyDefinitions($methodName, $query, $relationships, $orderBy);
+        $this->_addPropertyDefinitions($methodName, $query, $associations, $orderBy);
 
         $this->_methodDefinitions[ strtolower($methodName) ] = "
     public function $methodName(\$criteria = null)
@@ -318,7 +317,7 @@ class {$this->_mapperClass} extends Common
             if (QueryType::isFindAll($method)) {
                 $this->_addFindAll($method,
                                    @$definition['query'],
-                                   (array)@$definition['relationships'],
+                                   (array)@$definition['associations'],
                                    @$definition['orderBy']
                                    );
                 continue;
@@ -335,7 +334,7 @@ class {$this->_mapperClass} extends Common
             if (QueryType::isFind($method)) {
                 $this->_addFind($method,
                                 @$definition['query'],
-                                (array)@$definition['relationships'],
+                                (array)@$definition['associations'],
                                 @$definition['orderBy']
                                 );
                 continue;
@@ -344,7 +343,7 @@ class {$this->_mapperClass} extends Common
             if (QueryType::isInsert($method)) {
                 $this->_addInsert($method,
                                   @$definition['query'],
-                                  (array)@$definition['relationships']
+                                  (array)@$definition['associations']
                                   );
                 continue;
             }
@@ -352,7 +351,7 @@ class {$this->_mapperClass} extends Common
             if (QueryType::isUpdate($method)) {
                 $this->_addUpdate($method,
                                   @$definition['query'],
-                                  (array)@$definition['relationships']
+                                  (array)@$definition['associations']
                                   );
                 continue;
             }
@@ -360,7 +359,7 @@ class {$this->_mapperClass} extends Common
             if (QueryType::isDelete($method)) {
                 $this->_addDelete($method,
                                   @$definition['query'],
-                                  (array)@$definition['relationships']
+                                  (array)@$definition['associations']
                                   );
                 continue;
             }
@@ -423,16 +422,16 @@ class {$this->_mapperClass} extends Common
      *
      * @param string $methodName
      * @param string $query
-     * @param array  $relationships
+     * @param array  $associations
      * @throws Piece::ORM::Exception
      */
-    private function _addDelete($methodName, $query, array $relationships = array())
+    private function _addDelete($methodName, $query, array $associations = array())
     {
         if (!$this->_validateMethodName($methodName)) {
             throw new Exception("Cannot use the method name [ $methodName ] since it is a reserved for internal use only.");
         }
 
-        $this->_addPropertyDefinitions($methodName, $query, $relationships);
+        $this->_addPropertyDefinitions($methodName, $query, $associations);
 
         $this->_methodDefinitions[ strtolower($methodName) ] = "
     public function $methodName(\$subject)
@@ -463,16 +462,16 @@ class {$this->_mapperClass} extends Common
      *
      * @param string $methodName
      * @param string $query
-     * @param array  $relationships
+     * @param array  $associations
      * @throws Piece::ORM::Exception
      */
-    private function _addUpdate($methodName, $query, array $relationships = array())
+    private function _addUpdate($methodName, $query, array $associations = array())
     {
         if (!$this->_validateMethodName($methodName)) {
             throw new Exception("Cannot use the method name [ $methodName ] since it is a reserved for internal use only.");
         }
 
-        $this->_addPropertyDefinitions($methodName, $query, $relationships);
+        $this->_addPropertyDefinitions($methodName, $query, $associations);
 
         $this->_methodDefinitions[ strtolower($methodName) ] = "
     public function $methodName(\$subject)
@@ -507,16 +506,16 @@ class {$this->_mapperClass} extends Common
      * information for a method.
      *
      * @param string $propertyName
-     * @param array  $relationships
+     * @param array  $associations
      * @return string
      */
     private function _generateAssociationPropertyDeclaration($propertyName,
-                                                              array $relationships
+                                                              array $associations
                                                               )
     {
         $association =
-            new Association($propertyName, $relationships, $this->_metadata);
-        return $association->generate($relationships);
+            new Association($propertyName, $associations, $this->_metadata);
+        return $association->generate($associations);
     }
 
     // }}}
@@ -527,13 +526,13 @@ class {$this->_mapperClass} extends Common
      *
      * @param string $methodName
      * @param string $query
-     * @param array  $relationships
+     * @param array  $associations
      * @param string $orderBy
      * @throws Piece::ORM::Exception
      */
     private function _addPropertyDefinitions($methodName,
                                              $query,
-                                             array $relationships,
+                                             array $associations,
                                              $orderBy = null
                                              )
     {
@@ -581,7 +580,7 @@ class {$this->_mapperClass} extends Common
             $this->_propertyDefinitions['query'][$propertyName] = $this->_generateQueryPropertyDeclaration($propertyName, $query);
         }
 
-        $this->_propertyDefinitions['relationship'][$propertyName] = $this->_generateAssociationPropertyDeclaration($propertyName, $relationships);
+        $this->_propertyDefinitions['association'][$propertyName] = $this->_generateAssociationPropertyDeclaration($propertyName, $associations);
         $this->_propertyDefinitions['orderBy'][$propertyName] = $this->_generateOrderByPropertyDeclaration($propertyName, $orderBy);
     }
 

@@ -550,7 +550,7 @@ class Common
 
         $result = $this->executeQueryWithCriteria($methodName, $criteria);
         return $this->_loadAllObjects($result,
-                                      $this->{ '__relationship__' . strtolower($methodName) }
+                                      $this->{ '__association__' . strtolower($methodName) }
                                       );
     }
 
@@ -594,7 +594,7 @@ class Common
     {
         $persister = new ObjectPersister($this,
                                          $subject,
-                                         $this->{ '__relationship__' . strtolower($methodName) }
+                                         $this->{ '__association__' . strtolower($methodName) }
                                          );
         return $persister->insert($methodName);
     }
@@ -613,7 +613,7 @@ class Common
     {
         $persister = new ObjectPersister($this,
                                          $subject,
-                                         $this->{ '__relationship__' . strtolower($methodName) }
+                                         $this->{ '__association__' . strtolower($methodName) }
                                          );
         return $persister->delete($methodName);
     }
@@ -632,7 +632,7 @@ class Common
     {
         $persister = new ObjectPersister($this,
                                          $subject,
-                                         $this->{ '__relationship__' . strtolower($methodName) }
+                                         $this->{ '__association__' . strtolower($methodName) }
                                          );
         return $persister->update($methodName);
     }
@@ -650,12 +650,12 @@ class Common
      * Loads all objects with a result object.
      *
      * @param ::MDB2_Result $result
-     * @param array         $relationships
+     * @param array         $associations
      * @return array
      */
-    private function _loadAllObjects(::MDB2_Result $result, $relationships = array())
+    private function _loadAllObjects(::MDB2_Result $result, $associations = array())
     {
-        $loader = new ObjectLoader($this, $result, $relationships);
+        $loader = new ObjectLoader($this, $result, $associations);
         $objects = $loader->loadAll();
         $this->_loadCallback = null;
         return $objects;

@@ -93,12 +93,12 @@ class ManyToOne extends Common
      */
     protected function normalizeColumn()
     {
-        $primaryKey = $this->relationshipMetadata->getPrimaryKey();
+        $primaryKey = $this->associationMetadata->getPrimaryKey();
         if (is_null($primaryKey)) {
             return false;
         }
 
-        $this->relationship['column'] = $primaryKey;
+        $this->association['column'] = $primaryKey;
         return true;
     }
 
@@ -112,13 +112,13 @@ class ManyToOne extends Common
      */
     protected function normalizeReferencedColumn()
     {
-        $primaryKey = $this->relationshipMetadata->getPrimaryKey();
+        $primaryKey = $this->associationMetadata->getPrimaryKey();
         if (is_null($primaryKey)) {
             return false;
         }
 
-        $this->relationship['referencedColumn'] =
-            $this->relationshipMetadata->getTableName(true) . "_$primaryKey";
+        $this->association['referencedColumn'] =
+            $this->associationMetadata->getTableName(true) . "_$primaryKey";
         return true;
     }
 
@@ -130,7 +130,7 @@ class ManyToOne extends Common
      */
     protected function normalizeOrderBy()
     {
-        $this->relationship['orderBy'] = null;
+        $this->association['orderBy'] = null;
     }
 
     // }}}

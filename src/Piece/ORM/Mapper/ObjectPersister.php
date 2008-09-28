@@ -38,7 +38,7 @@
 namespace Piece::ORM::Mapper;
 
 use Piece::ORM::Mapper::Common;
-use Piece::ORM::Mapper::RelationshipType;
+use Piece::ORM::Mapper::AssociationType;
 use Piece::ORM::Exception;
 use Piece::ORM::Inflector;
 use Piece::ORM::Exception::PEARException;
@@ -77,7 +77,7 @@ class ObjectPersister
 
     private $_mapper;
     private $_subject;
-    private $_relationships;
+    private $_associations;
     private $_metadata;
     private $_associatedObjectPersisters = array();
 
@@ -95,9 +95,9 @@ class ObjectPersister
      *
      * @param Piece::ORM::Mapper::Common $mapper
      * @param mixed                      $subject
-     * @param array                      $relationships
+     * @param array                      $associations
      */
-    public function __construct(Common $mapper, $subject, array $relationships)
+    public function __construct(Common $mapper, $subject, array $associations)
     {
         $metadata = $mapper->getMetadata();
 
@@ -113,17 +113,17 @@ class ObjectPersister
             }
         }
 
-        if (count(array_keys($relationships))) {
-            foreach (RelationshipType::getRelationshipTypes() as $relationshipType) {
+        if (count(array_keys($associations))) {
+            foreach (AssociationType::getAssociationTypes() as $associationType) {
                 $associatedObjectsPersisterClass =
-                    __CLASS__ . '::Association::' . ucwords($relationshipType);
-                $this->_associatedObjectPersisters[$relationshipType] = new $associatedObjectsPersisterClass($subject);
+                    __CLASS__ . '::Association::' . ucwords($associationType);
+                $this->_associatedObjectPersisters[$associationType] = new $associatedObjectsPersisterClass($subject);
             }
         }
 
         $this->_mapper = $mapper;
         $this->_subject = $subject;
-        $this->_relationships = $relationships;
+        $this->_associations = $associations;
         $this->_metadata = $metadata;
     }
 
@@ -155,7 +155,7 @@ class ObjectPersister
         }
 
         if ($primaryKey) {
-            foreach ($this->_relationships as $mappedAs => $definition) {
+            foreach ($this->_associations as $mappedAs => $definition) {
                 $this->_associatedObjectPersisters[ $definition['type'] ]->insert($definition, $mappedAs);
             }
 
@@ -185,7 +185,7 @@ class ObjectPersister
 
         $affectedRows = $this->_mapper->executeQueryWithCriteria($methodName, $this->_subject, true);
 
-        foreach ($this->_relationships as $mappedAs => $definition) {
+        foreach ($this->_associations as $mappedAs => $definition) {
             $this->_associatedObjectPersisters[ $definition['type'] ]->update($definition, $mappedAs);
         }
 
@@ -212,7 +212,7 @@ class ObjectPersister
             throw new Exception("An unexpected value detected. Correct values are required for the primary keys to invoke $methodName().");
         }
 
-        foreach ($this->_relationships as $mappedAs => $definition) {
+        foreach ($this->_associations as $mappedAs => $definition) {
             $this->_associatedObjectPersisters[ $definition['type'] ]->delete($definition, $mappedAs);
         }
 

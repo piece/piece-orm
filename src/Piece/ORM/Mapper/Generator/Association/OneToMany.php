@@ -98,7 +98,7 @@ class OneToMany extends Common
             return false;
         }
 
-        $this->relationship['column'] =
+        $this->association['column'] =
             $this->metadata->getTableName(true) . "_$primaryKey";
         return true;
     }
@@ -118,7 +118,7 @@ class OneToMany extends Common
             return false;
         }
 
-        $this->relationship['referencedColumn'] = $primaryKey;
+        $this->association['referencedColumn'] = $primaryKey;
         return true;
     }
 

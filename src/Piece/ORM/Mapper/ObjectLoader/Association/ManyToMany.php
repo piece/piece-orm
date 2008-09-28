@@ -44,7 +44,7 @@ use Piece::ORM::Inflector;
 // {{{ Piece::ORM::Mapper::ObjectLoader::Association::ManyToMany
 
 /**
- * An associated object loader for Many-to-Many relationships.
+ * An associated object loader for Many-to-Many associations.
  *
  * @package    Piece_ORM
  * @copyright  2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
@@ -103,13 +103,13 @@ class ManyToMany extends Common
     {
         $metadata = $mapper->getMetadata();
         $primaryKey = $metadata->getPrimaryKey();
-        $this->_associations[$mappedAs][ $row[$primaryKey] ][] = $row[ $this->getRelationshipKeyFieldNameInSecondaryQuery($this->relationships[$mappedAs]) ];
+        $this->_associations[$mappedAs][ $row[$primaryKey] ][] = $row[ $this->getAssociationKeyFieldNameInSecondaryQuery($this->associations[$mappedAs]) ];
 
         if (@array_key_exists($row[$primaryKey], $this->_loadedRows[$mappedAs])) {
             return false;
         } else {
             @$this->_loadedRows[$mappedAs][ $row[$primaryKey] ] = true;
-            unset($row[ $this->getRelationshipKeyFieldNameInSecondaryQuery($this->relationships[$mappedAs]) ]);
+            unset($row[ $this->getAssociationKeyFieldNameInSecondaryQuery($this->associations[$mappedAs]) ]);
             return true;
         }
     }
@@ -137,35 +137,35 @@ class ManyToMany extends Common
      */
     protected function buildQuery($mappedAs)
     {
-        return "SELECT {$this->relationships[$mappedAs]['through']['table']}.{$this->relationships[$mappedAs]['through']['column']} AS " . $this->getRelationshipKeyFieldNameInSecondaryQuery($this->relationships[$mappedAs]) . ", {$this->relationships[$mappedAs]['table']}.* FROM {$this->relationships[$mappedAs]['table']}, {$this->relationships[$mappedAs]['through']['table']} WHERE {$this->relationships[$mappedAs]['through']['table']}.{$this->relationships[$mappedAs]['through']['column']} IN (" . implode(',', $this->relationshipKeys[$mappedAs]) . ") AND {$this->relationships[$mappedAs]['table']}.{$this->relationships[$mappedAs]['column']} = {$this->relationships[$mappedAs]['through']['table']}.{$this->relationships[$mappedAs]['through']['inverseColumn']}";
+        return "SELECT {$this->associations[$mappedAs]['through']['table']}.{$this->associations[$mappedAs]['through']['column']} AS " . $this->getAssociationKeyFieldNameInSecondaryQuery($this->associations[$mappedAs]) . ", {$this->associations[$mappedAs]['table']}.* FROM {$this->associations[$mappedAs]['table']}, {$this->associations[$mappedAs]['through']['table']} WHERE {$this->associations[$mappedAs]['through']['table']}.{$this->associations[$mappedAs]['through']['column']} IN (" . implode(',', $this->associationKeys[$mappedAs]) . ") AND {$this->associations[$mappedAs]['table']}.{$this->associations[$mappedAs]['column']} = {$this->associations[$mappedAs]['through']['table']}.{$this->associations[$mappedAs]['through']['inverseColumn']}";
     }
 
     // }}}
-    // {{{ getRelationshipKeyFieldNameInPrimaryQuery()
+    // {{{ getAssociationKeyFieldNameInPrimaryQuery()
 
     /**
-     * Gets the name of the relationship key field in the primary query.
+     * Gets the name of the association key field in the primary query.
      *
-     * @param array $relationship
+     * @param array $association
      * @return string
      */
-    protected function getRelationshipKeyFieldNameInPrimaryQuery(array $relationship)
+    protected function getAssociationKeyFieldNameInPrimaryQuery(array $association)
     {
-        return $relationship['through']['referencedColumn'];
+        return $association['through']['referencedColumn'];
     }
 
     // }}}
-    // {{{ getRelationshipKeyFieldNameInSecondaryQuery()
+    // {{{ getAssociationKeyFieldNameInSecondaryQuery()
 
     /**
-     * Gets the name of the relationship key field in the secondary query.
+     * Gets the name of the association key field in the secondary query.
      *
-     * @param array $relationship
+     * @param array $association
      * @return string
      */
-    protected function getRelationshipKeyFieldNameInSecondaryQuery(array $relationship)
+    protected function getAssociationKeyFieldNameInSecondaryQuery(array $association)
     {
-        return "__relationship_key_field";
+        return "__association_key_field";
     }
 
     // }}}
@@ -177,12 +177,12 @@ class ManyToMany extends Common
      *
      * @param stdClass                   $associatedObject
      * @param Piece::ORM::Mapper::Common $mapper
-     * @param string                     $relationshipKeyPropertyName
+     * @param string                     $associationKeyPropertyName
      * @param string                     $mappedAs
      */
     protected function associateObject($associatedObject,
                                        MapperCommon $mapper,
-                                       $relationshipKeyPropertyName,
+                                       $associationKeyPropertyName,
                                        $mappedAs
                                        )
     {

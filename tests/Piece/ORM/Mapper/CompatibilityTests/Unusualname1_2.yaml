@@ -3,13 +3,13 @@
 methods:
 
   findAll:
-    relationships:
+    associations:
       baz:
         table: unusualname_12
         type: manyToMany
 
   insert:
-    relationships:
+    associations:
       baz:
         table: unusualname_12
         type: manyToMany

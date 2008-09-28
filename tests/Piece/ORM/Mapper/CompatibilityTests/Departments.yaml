@@ -3,13 +3,13 @@
 methods:
 
   findAllWithEmployees1:
-    relationships:
+    associations:
       employees:
         table: employees
         type: oneToMany
 
   findAllWithEmployees2:
-    relationships:
+    associations:
       employees:
         table: employees
         type: oneToMany
@@ -17,7 +17,7 @@ methods:
         referencedColumn: id
 
   findAllWithOrderedEmployees:
-    relationships:
+    associations:
       employees:
         table: employees
         type: oneToMany
@@ -31,20 +31,20 @@ methods:
         $__table
       WHERE
         name = $name
-    relationships:
+    associations:
       employees:
         table: employees
         type: oneToMany
         orderBy: id DESC
 
   update:
-    relationships:
+    associations:
       employees:
         table: employees
         type: oneToMany
 
   delete:
-    relationships:
+    associations:
       employees:
         table: employees
         type: oneToMany

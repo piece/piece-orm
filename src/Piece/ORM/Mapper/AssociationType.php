@@ -37,10 +37,10 @@
 
 namespace Piece::ORM::Mapper;
 
-// {{{ Piece::ORM::Mapper::RelationshipType
+// {{{ Piece::ORM::Mapper::AssociationType
 
 /**
- * A class to handle relationship types itself.
+ * A class to handle association types itself.
  *
  * @package    Piece_ORM
  * @copyright  2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
@@ -48,7 +48,7 @@ namespace Piece::ORM::Mapper;
  * @version    Release: @package_version@
  * @since      Class available since Release 0.2.0
  */
-class RelationshipType
+class AssociationType
 {
 
     // {{{ properties
@@ -69,11 +69,11 @@ class RelationshipType
      * @access private
      */
 
-    private static $_relationshipTypes = array('manyToMany',
-                                               'oneToMany',
-                                               'manyToOne',
-                                               'oneToOne'
-                                               );
+    private static $_associationTypes = array('manyToMany',
+                                              'oneToMany',
+                                              'manyToOne',
+                                              'oneToOne'
+                                              );
 
     /**#@-*/
 
@@ -85,27 +85,27 @@ class RelationshipType
     // {{{ isValid()
 
     /**
-     * Returns whether the given value is a valid relationship type.
+     * Returns whether the given value is a valid association type.
      *
      * @param string $type
      * @return boolean
      */
     public static function isValid($type)
     {
-        return in_array($type, self::$_relationshipTypes);
+        return in_array($type, self::$_associationTypes);
     }
 
     // }}}
-    // {{{ getRelationshipType()
+    // {{{ getAssociationType()
 
     /**
-     * Gets the relationship types.
+     * Gets the association types.
      *
      * @return array
      */
-    public static function getRelationshipTypes()
+    public static function getAssociationTypes()
     {
-        return self::$_relationshipTypes;
+        return self::$_associationTypes;
     }
 
     /**#@-*/
