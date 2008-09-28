@@ -37,7 +37,7 @@
 
 namespace Piece::ORM::Mapper::Generator::AssociationNormalizerStrategy;
 
-use Piece::ORM::Mapper::Generator::AssociationNormalizerStrategy::AbstractAssociationGenerator;
+use Piece::ORM::Mapper::Generator::AssociationNormalizerStrategy::AbstractAssociationNormalizerStrategy;
 
 // {{{ Piece::ORM::Mapper::Generator::AssociationNormalizerStrategy::OneToMany
 
@@ -50,7 +50,7 @@ use Piece::ORM::Mapper::Generator::AssociationNormalizerStrategy::AbstractAssoci
  * @version    Release: @package_version@
  * @since      Class available since Release 0.2.0
  */
-class OneToMany extends AbstractAssociationGenerator
+class OneToMany extends AbstractAssociationNormalizerStrategy
 {
 
     // {{{ properties

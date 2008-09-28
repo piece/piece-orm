@@ -37,7 +37,7 @@
 
 namespace Piece::ORM::Mapper::Generator::AssociationNormalizerStrategy;
 
-use Piece::ORM::Mapper::Generator::AssociationNormalizerStrategy::AbstractAssociationGenerator;
+use Piece::ORM::Mapper::Generator::AssociationNormalizerStrategy::AbstractAssociationNormalizerStrategy;
 use Piece::ORM::Metadata::MetadataFactory;
 use Piece::ORM::Metadata::MetadataFactory::NoSuchTableException;
 use Piece::ORM::Exception;
@@ -53,7 +53,7 @@ use Piece::ORM::Exception;
  * @version    Release: @package_version@
  * @since      Class available since Release 0.2.0
  */
-class ManyToMany extends AbstractAssociationGenerator
+class ManyToMany extends AbstractAssociationNormalizerStrategy
 {
 
     // {{{ properties
