@@ -37,7 +37,7 @@
 
 namespace Piece::ORM::MDB2::NativeTypeMapperStrategy;
 
-use Piece::ORM::MDB2::NativeTypeMapperStrategy::AbstractNativeTypeMapper;
+use Piece::ORM::MDB2::NativeTypeMapperStrategy::AbstractNativeTypeMapperStrategy;
 
 // {{{ Piece::ORM::MDB2::NativeTypeMapperStrategy::Mssql
 
@@ -50,7 +50,7 @@ use Piece::ORM::MDB2::NativeTypeMapperStrategy::AbstractNativeTypeMapper;
  * @version    Release: @package_version@
  * @since      Class available since Release 0.7.0
  */
-class Mssql extends AbstractNativeTypeMapper
+class Mssql extends AbstractNativeTypeMapperStrategy
 {
 
     // {{{ properties

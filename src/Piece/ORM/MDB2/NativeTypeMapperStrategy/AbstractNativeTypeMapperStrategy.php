@@ -39,7 +39,7 @@ namespace Piece::ORM::MDB2::NativeTypeMapperStrategy;
 
 use Piece::ORM::Context::Registry;
 
-// {{{ Piece::ORM::MDB2::NativeTypeMapperStrategy::AbstractNativeTypeMapper
+// {{{ Piece::ORM::MDB2::NativeTypeMapperStrategy::AbstractNativeTypeMapperStrategy
 
 /**
  * A helper class to map native datatypes of the DBMS to MDB2 datatypes.
@@ -50,7 +50,7 @@ use Piece::ORM::Context::Registry;
  * @version    Release: @package_version@
  * @since      Class available since Release 0.7.0
  */
-abstract class AbstractNativeTypeMapper
+abstract class AbstractNativeTypeMapperStrategy
 {
 
     // {{{ properties
