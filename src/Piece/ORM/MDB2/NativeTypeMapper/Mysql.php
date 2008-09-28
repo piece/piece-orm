@@ -37,7 +37,7 @@
 
 namespace Piece::ORM::MDB2::NativeTypeMapper;
 
-use Piece::ORM::MDB2::NativeTypeMapper::Common;
+use Piece::ORM::MDB2::NativeTypeMapper::AbstractNativeTypeMapper;
 
 // {{{ Piece::ORM::MDB2::NativeTypeMapper::Mysql
 
@@ -50,7 +50,7 @@ use Piece::ORM::MDB2::NativeTypeMapper::Common;
  * @version    Release: @package_version@
  * @since      Class available since Release 0.7.0
  */
-class Mysql extends Common
+class Mysql extends AbstractNativeTypeMapper
 {
 
     // {{{ properties

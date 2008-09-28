@@ -175,7 +175,7 @@ class MapperFactoryTest extends ::PHPUnit_Framework_TestCase
     {
         $mapper = MapperFactory::factory('Employees');
 
-        $this->assertType(__NAMESPACE__ . '::Common', $mapper);
+        $this->assertType(__NAMESPACE__ . '::AbstractMapper', $mapper);
     }
 
     public function testShouldReturnTheExistingObjectIfItExists()

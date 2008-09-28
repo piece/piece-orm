@@ -37,7 +37,7 @@
 
 namespace Piece::ORM::Mapper;
 
-use Piece::ORM::Mapper::Common;
+use Piece::ORM::Mapper::AbstractMapper;
 use Piece::ORM::Exception;
 use Piece::ORM::Mapper::QueryExecutor::ConstraintException;
 use Piece::ORM::Exception::PEARException;
@@ -90,10 +90,10 @@ class QueryExecutor
     /**
      * Sets whether a query is for data manipulation.
      *
-     * @param Piece::ORM::Mapper::Common $mapper
+     * @param Piece::ORM::Mapper::AbstractMapper $mapper
      * @param boolean                    $isManip
      */
-    public function __construct(Common $mapper, $isManip)
+    public function __construct(AbstractMapper $mapper, $isManip)
     {
         $this->_mapper = $mapper;
         $this->_isManip = $isManip;

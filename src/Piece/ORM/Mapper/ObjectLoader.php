@@ -37,7 +37,7 @@
 
 namespace Piece::ORM::Mapper;
 
-use Piece::ORM::Mapper::Common;
+use Piece::ORM::Mapper::AbstractMapper;
 use Piece::ORM::Mapper::AssociationType;
 use Piece::ORM::Inflector;
 use Piece::ORM::Exception::PEARException;
@@ -96,11 +96,11 @@ class ObjectLoader
     /**
      * Initializes properties with the given values.
      *
-     * @param Piece::ORM::Mapper::Common $mapper
-     * @param ::MDB2_Result              $result
-     * @param array                      $associations
+     * @param Piece::ORM::Mapper::AbstractMapper $mapper
+     * @param ::MDB2_Result                      $result
+     * @param array                              $associations
      */
-    public function __construct(Common $mapper,
+    public function __construct(AbstractMapper $mapper,
                                 ::MDB2_Result $result,
                                 array $associations
                                 )

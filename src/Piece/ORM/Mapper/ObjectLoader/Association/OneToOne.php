@@ -37,8 +37,8 @@
 
 namespace Piece::ORM::Mapper::ObjectLoader::Association;
 
-use Piece::ORM::Mapper::ObjectLoader::Association::Common;
-use Piece::ORM::Mapper::Common as MapperCommon;
+use Piece::ORM::Mapper::ObjectLoader::Association::AbstractAssociationLoader;
+use Piece::ORM::Mapper::AbstractMapper;
 
 // {{{ Piece::ORM::Mapper::ObjectLoader::Association::OneToOne
 
@@ -51,7 +51,7 @@ use Piece::ORM::Mapper::Common as MapperCommon;
  * @version    Release: @package_version@
  * @since      Class available since Release 0.2.0
  */
-class OneToOne extends Common
+class OneToOne extends AbstractAssociationLoader
 {
 
     // {{{ properties
@@ -133,13 +133,13 @@ class OneToOne extends Common
      * Associates an object which are loaded by the secondary query into objects which
      * are loaded by the primary query.
      *
-     * @param stdClass                   $associatedObject
-     * @param Piece::ORM::Mapper::Common $mapper
-     * @param string                     $associationKeyPropertyName
-     * @param string                     $mappedAs
+     * @param stdClass                           $associatedObject
+     * @param Piece::ORM::Mapper::AbstractMapper $mapper
+     * @param string                             $associationKeyPropertyName
+     * @param string                             $mappedAs
      */
     protected function associateObject($associatedObject,
-                                       MapperCommon $mapper,
+                                       AbstractMapper $mapper,
                                        $associationKeyPropertyName,
                                        $mappedAs
                                        )

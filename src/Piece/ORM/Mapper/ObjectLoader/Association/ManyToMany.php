@@ -37,8 +37,8 @@
 
 namespace Piece::ORM::Mapper::ObjectLoader::Association;
 
-use Piece::ORM::Mapper::ObjectLoader::Association::Common;
-use Piece::ORM::Mapper::Common as MapperCommon;
+use Piece::ORM::Mapper::ObjectLoader::Association::AbstractAssociationLoader;
+use Piece::ORM::Mapper::AbstractMapper;
 use Piece::ORM::Inflector;
 
 // {{{ Piece::ORM::Mapper::ObjectLoader::Association::ManyToMany
@@ -52,7 +52,7 @@ use Piece::ORM::Inflector;
  * @version    Release: @package_version@
  * @since      Class available since Release 0.2.0
  */
-class ManyToMany extends Common
+class ManyToMany extends AbstractAssociationLoader
 {
 
     // {{{ properties
@@ -91,15 +91,12 @@ class ManyToMany extends Common
      * Adds an association about what an inverse side record is associated with
      * an owning side record.
      *
-     * @param array                      $row
-     * @param Piece::ORM::Mapper::Common $mapper
-     * @param string                     $mappedAs
+     * @param array                              $row
+     * @param Piece::ORM::Mapper::AbstractMapper $mapper
+     * @param string                             $mappedAs
      * @return boolean
      */
-    public function addAssociation(array $row,
-                                   MapperCommon $mapper,
-                                   $mappedAs
-                                   )
+    public function addAssociation(array $row, AbstractMapper $mapper, $mappedAs)
     {
         $metadata = $mapper->getMetadata();
         $primaryKey = $metadata->getPrimaryKey();
@@ -175,13 +172,13 @@ class ManyToMany extends Common
      * Associates an object which are loaded by the secondary query into objects which
      * are loaded by the primary query.
      *
-     * @param stdClass                   $associatedObject
-     * @param Piece::ORM::Mapper::Common $mapper
-     * @param string                     $associationKeyPropertyName
-     * @param string                     $mappedAs
+     * @param stdClass                           $associatedObject
+     * @param Piece::ORM::Mapper::AbstractMapper $mapper
+     * @param string                             $associationKeyPropertyName
+     * @param string                             $mappedAs
      */
     protected function associateObject($associatedObject,
-                                       MapperCommon $mapper,
+                                       AbstractMapper $mapper,
                                        $associationKeyPropertyName,
                                        $mappedAs
                                        )

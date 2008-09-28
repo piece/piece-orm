@@ -37,10 +37,10 @@
 
 namespace Piece::ORM::Mapper::ObjectLoader::Association;
 
-use Piece::ORM::Mapper::Common as MapperCommon;
+use Piece::ORM::Mapper::AbstractMapper;
 use Piece::ORM::Inflector;
 
-// {{{ Piece::ORM::Mapper::ObjectLoader::Association::Common
+// {{{ Piece::ORM::Mapper::ObjectLoader::Association::AbstractAssociationLoader
 
 /**
  * The base class for associated object loaders.
@@ -51,7 +51,7 @@ use Piece::ORM::Inflector;
  * @version    Release: @package_version@
  * @since      Class available since Release 0.2.0
  */
-abstract class Common
+abstract class AbstractAssociationLoader
 {
 
     // {{{ properties
@@ -93,17 +93,17 @@ abstract class Common
     /**
      * Initializes properties with the given value.
      *
-     * @param array                      $associations
-     * @param array                      &$associationKeys
-     * @param array                      &$objects
-     * @param array                      &$objectIndexes
-     * @param Piece::ORM::Mapper::Common $mapper
+     * @param array                              $associations
+     * @param array                              &$associationKeys
+     * @param array                              &$objects
+     * @param array                              &$objectIndexes
+     * @param Piece::ORM::Mapper::AbstractMapper $mapper
      */
     public function __construct(array $associations,
                                 array &$associationKeys,
                                 array &$objects,
                                 array &$objectIndexes,
-                                MapperCommon $mapper
+                                AbstractMapper $mapper
                                 )
     {
         $this->associations = $associations;
@@ -143,10 +143,10 @@ abstract class Common
     /**
      * Loads all associated objects into appropriate objects.
      *
-     * @param Piece::ORM::Mapper::Common $mapper
-     * @param string                     $mappedAs
+     * @param Piece::ORM::Mapper::AbstractMapper $mapper
+     * @param string                             $mappedAs
      */
-    public function loadAll(MapperCommon $mapper, $mappedAs)
+    public function loadAll(AbstractMapper $mapper, $mappedAs)
     {
         $mapper->setPreloadCallback($this->getPreloadCallback());
         $mapper->setPreloadCallbackArgs(array($mappedAs));
@@ -205,13 +205,13 @@ abstract class Common
      * Associates an object which are loaded by the secondary query into objects which
      * are loaded by the primary query.
      *
-     * @param stdClass                   $associatedObject
-     * @param Piece::ORM::Mapper::Common $mapper
-     * @param string                     $associationKeyPropertyName
-     * @param string                     $mappedAs
+     * @param stdClass                           $associatedObject
+     * @param Piece::ORM::Mapper::AbstractMapper $mapper
+     * @param string                             $associationKeyPropertyName
+     * @param string                             $mappedAs
      */
     abstract protected function associateObject($associatedObject,
-                                                MapperCommon $mapper,
+                                                AbstractMapper $mapper,
                                                 $associationKeyPropertyName,
                                                 $mappedAs
                                                 );

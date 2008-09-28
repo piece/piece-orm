@@ -47,7 +47,7 @@ use Piece::ORM::Mapper::LOB;
 use Piece::ORM::Exception;
 use Piece::ORM::Mapper::ObjectLoader;
 
-// {{{ Piece::ORM::Mapper::Common
+// {{{ Piece::ORM::Mapper::AbstractMapper
 
 /**
  * The base class for mappers.
@@ -58,7 +58,7 @@ use Piece::ORM::Mapper::ObjectLoader;
  * @version    Release: @package_version@
  * @since      Class available since Release 0.1.0
  */
-class Common
+abstract class AbstractMapper
 {
 
     // {{{ properties

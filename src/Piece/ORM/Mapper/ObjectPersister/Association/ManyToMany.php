@@ -37,7 +37,7 @@
 
 namespace Piece::ORM::Mapper::ObjectPersister::Association;
 
-use Piece::ORM::Mapper::ObjectPersister::Association::Common;
+use Piece::ORM::Mapper::ObjectPersister::Association::AbstractAssociationPersister;
 use Piece::ORM::Mapper::MapperFactory;
 use Piece::ORM::Inflector;
 
@@ -52,7 +52,7 @@ use Piece::ORM::Inflector;
  * @version    Release: @package_version@
  * @since      Class available since Release 0.2.0
  */
-class ManyToMany extends Common
+class ManyToMany extends AbstractAssociationPersister
 {
 
     // {{{ properties

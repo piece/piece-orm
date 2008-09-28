@@ -136,8 +136,8 @@ class Generator
         $this->_generateFromConfiguration();
 
         return "namespace Piece::ORM::Mapper;
-use Piece::ORM::Mapper::Common;
-class {$this->_mapperClass} extends Common
+use Piece::ORM::Mapper::AbstractMapper;
+class {$this->_mapperClass} extends AbstractMapper
 {\n" .
             implode("\n", $this->_propertyDefinitions['query']) . "\n" .
             implode("\n", $this->_propertyDefinitions['association']) . "\n" .

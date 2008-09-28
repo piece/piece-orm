@@ -178,7 +178,9 @@ class ORMTest extends ::PHPUnit_Framework_TestCase
                        $this->_cacheDirectory
                        );
 
-        $this->assertType('Piece::ORM::Mapper::Common', ORM::getMapper('Employees'));
+        $this->assertType('Piece::ORM::Mapper::AbstractMapper',
+                          ORM::getMapper('Employees')
+                          );
     }
 
     /**

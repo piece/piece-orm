@@ -43,7 +43,7 @@ use Piece::ORM::Exception;
 use Piece::ORM::Env;
 use Piece::ORM::Exception::PEARException;
 use Piece::ORM::Mapper::Generator;
-use Piece::ORM::Mapper::Common;
+use Piece::ORM::Mapper::AbstractMapper;
 use Piece::ORM::Context::Registry;
 
 require_once 'spyc.php5';
@@ -93,7 +93,7 @@ class MapperFactory
      * Creates a mapper object for a given mapper name.
      *
      * @param string $mapperName
-     * @return Piece::ORM::Mapper::Common
+     * @return Piece::ORM::Mapper::AbstractMapper
      * @throws Piece::ORM::Exception
      */
     public static function factory($mapperName)
@@ -110,7 +110,7 @@ class MapperFactory
             $metadata = MetadataFactory::factory($mapperName);
             $mapperClass = __NAMESPACE__ . "::$mapperID";
             $mapper = new $mapperClass($metadata, $mapperID);
-            if (!$mapper instanceof Common) {
+            if (!$mapper instanceof AbstractMapper) {
                 throw new Exception("The mapper class for [ $mapperName ] is invalid.");
             }
 
@@ -248,7 +248,7 @@ class MapperFactory
                                    $mapperName,
                                    $configFile,
                                    MetadataFactory::factory($mapperName),
-                                   get_class_methods('Piece::ORM::Mapper::Common')
+                                   get_class_methods('Piece::ORM::Mapper::AbstractMapper')
                                    );
         return $generator->generate();
     }
@@ -336,10 +336,10 @@ class MapperFactory
     // {{{ _getMapper()
 
     /**
-     * Gets a Piece::ORM::Mapper::Common object from the current context.
+     * Gets a Piece::ORM::Mapper::AbstractMapper object from the current context.
      *
      * @param string $mapperID
-     * @return Piece::ORM::Mapper::Common
+     * @return Piece::ORM::Mapper::AbstractMapper
      * @since Method available since Release 2.0.0
      */
     private static function _getMapper($mapperID)
@@ -358,10 +358,10 @@ class MapperFactory
     /**
      * Adds a Piece::ORM::Mapper object to the current context.
      *
-     * @param Piece::ORM::Mapper::Common $mapper
+     * @param Piece::ORM::Mapper::AbstractMapper $mapper
      * @since Method available since Release 2.0.0
      */
-    private static function _addMapper(Common $mapper)
+    private static function _addMapper(AbstractMapper $mapper)
     {
         $mapperRegistry = self::_getMapperRegistry();
         $mapperRegistry[ $mapper->mapperID ] = $mapper;

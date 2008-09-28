@@ -127,7 +127,7 @@ class ORM
      * Gets a mapper object for a given mapper name.
      *
      * @param string $mapperName
-     * @return Piece::ORM::Mapper::Common
+     * @return Piece::ORM::Mapper::AbstractMapper
      * @throws Piece::ORM::Exception
      */
     public static function getMapper($mapperName)

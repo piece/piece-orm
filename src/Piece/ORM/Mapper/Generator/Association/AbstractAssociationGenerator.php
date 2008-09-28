@@ -41,7 +41,7 @@ use Piece::ORM::Metadata;
 use Piece::ORM::Exception;
 use Piece::ORM::Metadata::MetadataFactory;
 
-// {{{ Piece::ORM::Mapper::Generator::Association::Common
+// {{{ Piece::ORM::Mapper::Generator::Association::AbstractAssociationGenerator
 
 /**
  * The base class for association generators.
@@ -52,7 +52,7 @@ use Piece::ORM::Metadata::MetadataFactory;
  * @version    Release: @package_version@
  * @since      Class available since Release 0.2.0
  */
-abstract class Common
+abstract class AbstractAssociationGenerator
 {
 
     // {{{ properties

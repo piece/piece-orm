@@ -37,7 +37,7 @@
 
 namespace Piece::ORM::Mapper;
 
-use Piece::ORM::Mapper::Common;
+use Piece::ORM::Mapper::AbstractMapper;
 use Piece::ORM::Exception;
 use Piece::ORM::Mapper::QueryType;
 use Piece::ORM::Inflector;
@@ -95,12 +95,16 @@ class QueryBuilder
     /**
      * Initializes properties with the given values.
      *
-     * @param Piece::ORM::Mapper::Common $mapper
-     * @param string                     $methodName
-     * @param stdClass                   $criteria
-     * @param boolean                    $isManip
+     * @param Piece::ORM::Mapper::AbstractMapper $mapper
+     * @param string                             $methodName
+     * @param stdClass                           $criteria
+     * @param boolean                            $isManip
      */
-    public function __construct(Common $mapper, $methodName, $criteria, $isManip)
+    public function __construct(AbstractMapper $mapper,
+                                $methodName,
+                                $criteria,
+                                $isManip
+                                )
     {
         $this->_metadata = $mapper->getMetadata();
         $this->_mapper = $mapper;
