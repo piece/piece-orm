@@ -123,7 +123,7 @@ abstract class AbstractNativeTypeMapperStrategy
      * Gets the MDB2 datatype information of a native array description of a field.
      *
      * @param ::MDB2_Driver_Common $dbh
-     * @param array              $field
+     * @param array                $field
      * @return array
      */
     public function getMDB2TypeInfo(::MDB2_Driver_Common $dbh, array $field)
