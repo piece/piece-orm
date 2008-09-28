@@ -43,6 +43,8 @@ use Piece::ORM::Exception;
 // {{{ Piece::ORM::Mapper::Generator::AssociationGenerator
 
 /**
+ * A generator which generates an association property dceclaration.
+ *
  * @package    Piece_ORM
  * @copyright  2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License (revised)
@@ -84,6 +86,8 @@ class AssociationGenerator
     // {{{ __construct()
 
     /**
+     * Initializes the properties with the arguments.
+     *
      * @param string               $propertyName
      * @param array                $associations
      * @param Piece::ORM::Metadata $metadata
@@ -99,6 +103,8 @@ class AssociationGenerator
     // {{{ generate()
 
     /**
+     * Generates an association property dceclaration.
+     *
      * @return string
      */
     public function generate()
@@ -116,8 +122,8 @@ class AssociationGenerator
             $class = __NAMESPACE__ .
                 '::AssociationNormalizerStrategy::' .
                 ucwords($definition['type']);
-            $normalizer = new $class($definition, $this->_metadata);
-            $normalizedAssociations[$mappedAs] = $normalizer->normalize();
+            $associationNormalizer = new $class($definition, $this->_metadata);
+            $normalizedAssociations[$mappedAs] = $associationNormalizer->normalize();
         }
 
         return "    public \$__association__{$this->_propertyName} = " .
