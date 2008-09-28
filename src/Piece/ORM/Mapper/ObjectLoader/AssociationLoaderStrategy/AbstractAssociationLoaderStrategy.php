@@ -40,7 +40,7 @@ namespace Piece::ORM::Mapper::ObjectLoader::AssociationLoaderStrategy;
 use Piece::ORM::Mapper::AbstractMapper;
 use Piece::ORM::Inflector;
 
-// {{{ Piece::ORM::Mapper::ObjectLoader::AssociationLoaderStrategy::AbstractAssociationLoader
+// {{{ Piece::ORM::Mapper::ObjectLoader::AssociationLoaderStrategy::AbstractAssociationLoaderStrategy
 
 /**
  * The base class for associated object loaders.
@@ -51,7 +51,7 @@ use Piece::ORM::Inflector;
  * @version    Release: @package_version@
  * @since      Class available since Release 0.2.0
  */
-abstract class AbstractAssociationLoader
+abstract class AbstractAssociationLoaderStrategy
 {
 
     // {{{ properties

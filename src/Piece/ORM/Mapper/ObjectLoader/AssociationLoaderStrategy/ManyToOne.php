@@ -37,7 +37,7 @@
 
 namespace Piece::ORM::Mapper::ObjectLoader::AssociationLoaderStrategy;
 
-use Piece::ORM::Mapper::ObjectLoader::AssociationLoaderStrategy::AbstractAssociationLoader;
+use Piece::ORM::Mapper::ObjectLoader::AssociationLoaderStrategy::AbstractAssociationLoaderStrategy;
 use Piece::ORM::Mapper::AbstractMapper;
 
 // {{{ Piece::ORM::Mapper::ObjectLoader::AssociationLoaderStrategy::ManyToOne
@@ -51,7 +51,7 @@ use Piece::ORM::Mapper::AbstractMapper;
  * @version    Release: @package_version@
  * @since      Class available since Release 0.2.0
  */
-class ManyToOne extends AbstractAssociationLoader
+class ManyToOne extends AbstractAssociationLoaderStrategy
 {
 
     // {{{ properties
