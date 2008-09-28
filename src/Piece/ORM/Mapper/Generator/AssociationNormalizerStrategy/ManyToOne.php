@@ -35,11 +35,11 @@
  * @since      File available since Release 0.2.0
  */
 
-namespace Piece::ORM::Mapper::Generator::AssociationGeneratorStrategy;
+namespace Piece::ORM::Mapper::Generator::AssociationNormalizerStrategy;
 
-use Piece::ORM::Mapper::Generator::AssociationGeneratorStrategy::AbstractAssociationGenerator;
+use Piece::ORM::Mapper::Generator::AssociationNormalizerStrategy::AbstractAssociationGenerator;
 
-// {{{ Piece::ORM::Mapper::Generator::AssociationGeneratorStrategy::ManyToOne
+// {{{ Piece::ORM::Mapper::Generator::AssociationNormalizerStrategy::ManyToOne
 
 /**
  * A generator for Many-to-One associations.

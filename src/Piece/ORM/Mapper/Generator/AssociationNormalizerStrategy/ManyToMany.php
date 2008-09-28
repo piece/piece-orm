@@ -35,14 +35,14 @@
  * @since      File available since Release 0.2.0
  */
 
-namespace Piece::ORM::Mapper::Generator::AssociationGeneratorStrategy;
+namespace Piece::ORM::Mapper::Generator::AssociationNormalizerStrategy;
 
-use Piece::ORM::Mapper::Generator::AssociationGeneratorStrategy::AbstractAssociationGenerator;
+use Piece::ORM::Mapper::Generator::AssociationNormalizerStrategy::AbstractAssociationGenerator;
 use Piece::ORM::Metadata::MetadataFactory;
 use Piece::ORM::Metadata::MetadataFactory::NoSuchTableException;
 use Piece::ORM::Exception;
 
-// {{{ Piece::ORM::Mapper::Generator::AssociationGeneratorStrategy::ManyToMany
+// {{{ Piece::ORM::Mapper::Generator::AssociationNormalizerStrategy::ManyToMany
 
 /**
  * A generator for Many-to-Many associations.

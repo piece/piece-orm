@@ -114,7 +114,7 @@ class AssociationGenerator
             }
 
             $class = __NAMESPACE__ .
-                '::AssociationGeneratorStrategy::' .
+                '::AssociationNormalizerStrategy::' .
                 ucwords($definition['type']);
             $normalizer = new $class($definition, $this->_metadata);
             $normalizedAssociations[$mappedAs] = $normalizer->normalize();

@@ -35,14 +35,14 @@
  * @since      File available since Release 0.2.0
  */
 
-namespace Piece::ORM::Mapper::Generator::AssociationGeneratorStrategy;
+namespace Piece::ORM::Mapper::Generator::AssociationNormalizerStrategy;
 
-use Piece::ORM::Mapper::Generator::AssociationGeneratorStrategy::AbstractAssociationGenerator;
+use Piece::ORM::Mapper::Generator::AssociationNormalizerStrategy::AbstractAssociationGenerator;
 
-// {{{ Piece::ORM::Mapper::Generator::AssociationGeneratorStrategy::OneToOne
+// {{{ Piece::ORM::Mapper::Generator::AssociationNormalizerStrategy::OneToMany
 
 /**
- * A generator for One-to-One associations.
+ * A generator for One-to-Many associations.
  *
  * @package    Piece_ORM
  * @copyright  2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
@@ -50,7 +50,7 @@ use Piece::ORM::Mapper::Generator::AssociationGeneratorStrategy::AbstractAssocia
  * @version    Release: @package_version@
  * @since      Class available since Release 0.2.0
  */
-class OneToOne extends AbstractAssociationGenerator
+class OneToMany extends AbstractAssociationGenerator
 {
 
     // {{{ properties
@@ -123,17 +123,6 @@ class OneToOne extends AbstractAssociationGenerator
     }
 
     // }}}
-    // {{{ normalizeOrderBy()
-
-    /**
-     * Normalizes "orderBy" definition.
-     */
-    protected function normalizeOrderBy()
-    {
-        $this->association['orderBy'] = null;
-    }
-
-    // }}}
     // {{{ checkHavingSinglePrimaryKey()
 
     /**
@@ -144,7 +133,7 @@ class OneToOne extends AbstractAssociationGenerator
      */
     protected function checkHavingSinglePrimaryKey()
     {
-        return false;
+        return true;
     }
 
     /**#@-*/
