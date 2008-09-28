@@ -37,7 +37,7 @@
 
 namespace Piece::ORM::Mapper::ObjectPersister::AssociationPersisterStrategy;
 
-// {{{ Piece::ORM::Mapper::ObjectPersister::AssociationPersisterStrategy::AbstractAssociationPersister
+// {{{ Piece::ORM::Mapper::ObjectPersister::AssociationPersisterStrategy::AbstractAssociationPersisterStrategy
 
 /**
  * The base class for associated object persisters.
@@ -48,7 +48,7 @@ namespace Piece::ORM::Mapper::ObjectPersister::AssociationPersisterStrategy;
  * @version    Release: @package_version@
  * @since      Class available since Release 0.2.0
  */
-abstract class AbstractAssociationPersister
+abstract class AbstractAssociationPersisterStrategy
 {
 
     // {{{ properties

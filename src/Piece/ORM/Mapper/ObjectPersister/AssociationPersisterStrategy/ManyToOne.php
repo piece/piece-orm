@@ -37,7 +37,7 @@
 
 namespace Piece::ORM::Mapper::ObjectPersister::AssociationPersisterStrategy;
 
-use Piece::ORM::Mapper::ObjectPersister::AssociationPersisterStrategy::AbstractAssociationPersister;
+use Piece::ORM::Mapper::ObjectPersister::AssociationPersisterStrategy::AbstractAssociationPersisterStrategy;
 use Piece::ORM::Exception;
 
 // {{{ Piece::ORM::Mapper::ObjectPersister::AssociationPersisterStrategy::ManyToOne
@@ -51,7 +51,7 @@ use Piece::ORM::Exception;
  * @version    Release: @package_version@
  * @since      Class available since Release 0.2.0
  */
-class ManyToOne extends AbstractAssociationPersister
+class ManyToOne extends AbstractAssociationPersisterStrategy
 {
 
     // {{{ properties
