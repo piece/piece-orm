@@ -104,7 +104,7 @@ abstract class AbstractNativeTypeMapperStrategy
     public function mapNativeType(::MDB2_Driver_Common $dbh)
     {
         $nativeTypeMap = self::_getNativeTypeMap();
-         if (!array_key_exists($this->_driverName, $nativeTypeMap)) {
+        if (!array_key_exists($this->_driverName, $nativeTypeMap)) {
             return;
         }
 
