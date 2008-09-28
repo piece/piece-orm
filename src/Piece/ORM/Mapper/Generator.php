@@ -42,6 +42,7 @@ use Piece::ORM::Exception;
 use Piece::ORM::Mapper::RelationshipType;
 use Piece::ORM::Inflector;
 use Piece::ORM::Mapper::QueryType;
+use Piece::ORM::Mapper::Generator::Association;
 
 // {{{ Piece::ORM::Mapper::Generator
 
@@ -143,33 +144,6 @@ class {$this->_mapperClass} extends Common
             implode("\n", $this->_propertyDefinitions['relationship']) . "\n" .
             implode("\n", $this->_propertyDefinitions['orderBy']) . "\n" .
             implode("\n", $this->_methodDefinitions) . "\n}";
-    }
-
-    // }}}
-    // {{{ normalizeRelationshipDefinition()
-
-    /**
-     * Normalizes a relationship definition.
-     *
-     * @param array $relationships
-     * @return array
-     * @throws Piece::ORM::Exception
-     */
-    public function normalizeRelationshipDefinition(array $relationships)
-    {
-        if (!array_key_exists('type', $relationships)) {
-            throw new Exception('The element [ type ] is required to generate a relationship property declaration.');
-        }
-
-        if (!RelationshipType::isValid($relationships['type'])) {
-            throw new Exception('The value of the element [ type ] must be one of ' . implode(', ', RelationshipType::getRelationshipTypes()));
-        }
-
-        $relationshipNormalizerClass =
-            __CLASS__ . '::Association::' . ucwords($relationships['type']);
-        $relationshipNormalizer =
-            new $relationshipNormalizerClass($relationships, $this->_metadata);
-        return $relationshipNormalizer->normalize();
     }
 
     // }}}
@@ -526,28 +500,23 @@ class {$this->_mapperClass} extends Common
     }
 
     // }}}
-    // {{{ _generateRelationshipPropertyDeclaration()
+    // {{{ _generateAssociationPropertyDeclaration()
 
     /**
-     * Generates a property declaration that will be used as the relationship
+     * Generates a property declaration that will be used as the association
      * information for a method.
      *
      * @param string $propertyName
      * @param array  $relationships
      * @return string
      */
-    private function _generateRelationshipPropertyDeclaration($propertyName,
+    private function _generateAssociationPropertyDeclaration($propertyName,
                                                               array $relationships
                                                               )
     {
-        $normalizedRelationships = array();
-        foreach ($relationships as $mappedAs => $definition) {
-            $normalizedRelationships[$mappedAs] = $this->normalizeRelationshipDefinition($definition);
-        }
-
-        return "    public \$__relationship__{$propertyName} = " .
-            var_export($normalizedRelationships, true) .
-            ';';
+        $association =
+            new Association($propertyName, $relationships, $this->_metadata);
+        return $association->generate($relationships);
     }
 
     // }}}
@@ -612,7 +581,7 @@ class {$this->_mapperClass} extends Common
             $this->_propertyDefinitions['query'][$propertyName] = $this->_generateQueryPropertyDeclaration($propertyName, $query);
         }
 
-        $this->_propertyDefinitions['relationship'][$propertyName] = $this->_generateRelationshipPropertyDeclaration($propertyName, $relationships);
+        $this->_propertyDefinitions['relationship'][$propertyName] = $this->_generateAssociationPropertyDeclaration($propertyName, $relationships);
         $this->_propertyDefinitions['orderBy'][$propertyName] = $this->_generateOrderByPropertyDeclaration($propertyName, $orderBy);
     }
 
