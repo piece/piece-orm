@@ -183,7 +183,7 @@ class Context extends AttributeHolder
 
         $dbh->setFetchMode(MDB2_FETCHMODE_ASSOC);
 
-        $nativeTypeMapperClass = 'Piece::ORM::MDB2::NativeTypeMapper::' .
+        $nativeTypeMapperClass = 'Piece::ORM::MDB2::NativeTypeMapperStrategy::' .
             ucwords(strtolower(substr(strrchr(get_class($dbh), '_'), 1)));
         $nativeTypeMapper = new $nativeTypeMapperClass();
         $nativeTypeMapper->mapNativeType($dbh);

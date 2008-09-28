@@ -35,11 +35,11 @@
  * @since      File available since Release 0.7.0
  */
 
-namespace Piece::ORM::MDB2::NativeTypeMapper;
+namespace Piece::ORM::MDB2::NativeTypeMapperStrategy;
 
-use Piece::ORM::MDB2::NativeTypeMapper::AbstractNativeTypeMapper;
+use Piece::ORM::MDB2::NativeTypeMapperStrategy::AbstractNativeTypeMapper;
 
-// {{{ Piece::ORM::MDB2::NativeTypeMapper::Mysql
+// {{{ Piece::ORM::MDB2::NativeTypeMapperStrategy::Mysql
 
 /**
  * A helper class to map native datatypes of MySQL to MDB2 datatypes.

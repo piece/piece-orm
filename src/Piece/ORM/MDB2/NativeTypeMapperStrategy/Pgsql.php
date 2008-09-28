@@ -35,14 +35,14 @@
  * @since      File available since Release 0.7.0
  */
 
-namespace Piece::ORM::MDB2::NativeTypeMapper;
+namespace Piece::ORM::MDB2::NativeTypeMapperStrategy;
 
-use Piece::ORM::MDB2::NativeTypeMapper::AbstractNativeTypeMapper;
+use Piece::ORM::MDB2::NativeTypeMapperStrategy::AbstractNativeTypeMapper;
 
-// {{{ Piece::ORM::MDB2::NativeTypeMapper::Mssql
+// {{{ Piece::ORM::MDB2::NativeTypeMapperStrategy::Pgsql
 
 /**
- * A helper class to map native datatypes of Microsoft SQL Server to MDB2 datatypes.
+ * A helper class to map native datatypes of PostgreSQL to MDB2 datatypes.
  *
  * @package    Piece_ORM
  * @copyright  2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
@@ -50,7 +50,7 @@ use Piece::ORM::MDB2::NativeTypeMapper::AbstractNativeTypeMapper;
  * @version    Release: @package_version@
  * @since      Class available since Release 0.7.0
  */
-class Mssql extends AbstractNativeTypeMapper
+class Pgsql extends AbstractNativeTypeMapper
 {
 
     // {{{ properties
@@ -88,7 +88,7 @@ class Mssql extends AbstractNativeTypeMapper
      */
     public static function addMap($nativeType, $mdb2Type)
     {
-        $driverName = strtolower(substr(strrchr(__CLASS__, '_'), 1));
+        $driverName = strtolower(substr(strrchr(__CLASS__, ':'), 1));
         parent::addMapForDriver($nativeType, $mdb2Type, $driverName);
     }
 
@@ -97,6 +97,23 @@ class Mssql extends AbstractNativeTypeMapper
     /**#@+
      * @access protected
      */
+
+    // }}}
+    // {{{ initialize()
+
+    /**
+     * Initializes the map for the current driver.
+     */
+    protected function initialize()
+    {
+        Pgsql::addMap('timestamptz', 'timestamp');
+        Pgsql::addMap('point', 'decimal');
+        Pgsql::addMap('lseg', 'decimal');
+        Pgsql::addMap('box', 'decimal');
+        Pgsql::addMap('path', 'decimal');
+        Pgsql::addMap('polygon', 'decimal');
+        Pgsql::addMap('circle', 'decimal');
+    }
 
     /**#@-*/
 
