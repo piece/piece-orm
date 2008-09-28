@@ -113,7 +113,9 @@ class Association
                 throw new Exception('The value of the element [ type ] must be one of ' . implode(', ', AssociationType::getAssociationTypes()));
             }
 
-            $class =  __CLASS__ . '::' . ucwords($definition['type']);
+            $class = __NAMESPACE__ .
+                '::AssociationGeneratorStrategy::' .
+                ucwords($definition['type']);
             $normalizer = new $class($definition, $this->_metadata);
             $normalizedAssociations[$mappedAs] = $normalizer->normalize();
         }

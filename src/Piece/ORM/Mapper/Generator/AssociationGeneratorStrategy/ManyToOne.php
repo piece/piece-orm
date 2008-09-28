@@ -35,14 +35,14 @@
  * @since      File available since Release 0.2.0
  */
 
-namespace Piece::ORM::Mapper::Generator::Association;
+namespace Piece::ORM::Mapper::Generator::AssociationGeneratorStrategy;
 
-use Piece::ORM::Mapper::Generator::Association::AbstractAssociationGenerator;
+use Piece::ORM::Mapper::Generator::AssociationGeneratorStrategy::AbstractAssociationGenerator;
 
-// {{{ Piece::ORM::Mapper::Generator::Association::OneToOne
+// {{{ Piece::ORM::Mapper::Generator::AssociationGeneratorStrategy::ManyToOne
 
 /**
- * A generator for One-to-One associations.
+ * A generator for Many-to-One associations.
  *
  * @package    Piece_ORM
  * @copyright  2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
@@ -50,7 +50,7 @@ use Piece::ORM::Mapper::Generator::Association::AbstractAssociationGenerator;
  * @version    Release: @package_version@
  * @since      Class available since Release 0.2.0
  */
-class OneToOne extends AbstractAssociationGenerator
+class ManyToOne extends AbstractAssociationGenerator
 {
 
     // {{{ properties
@@ -93,13 +93,12 @@ class OneToOne extends AbstractAssociationGenerator
      */
     protected function normalizeColumn()
     {
-        $primaryKey = $this->metadata->getPrimaryKey();
+        $primaryKey = $this->associationMetadata->getPrimaryKey();
         if (is_null($primaryKey)) {
             return false;
         }
 
-        $this->association['column'] =
-            $this->metadata->getTableName(true) . "_$primaryKey";
+        $this->association['column'] = $primaryKey;
         return true;
     }
 
@@ -113,12 +112,13 @@ class OneToOne extends AbstractAssociationGenerator
      */
     protected function normalizeReferencedColumn()
     {
-        $primaryKey = $this->metadata->getPrimaryKey();
+        $primaryKey = $this->associationMetadata->getPrimaryKey();
         if (is_null($primaryKey)) {
             return false;
         }
 
-        $this->association['referencedColumn'] = $primaryKey;
+        $this->association['referencedColumn'] =
+            $this->associationMetadata->getTableName(true) . "_$primaryKey";
         return true;
     }
 
@@ -142,7 +142,7 @@ class OneToOne extends AbstractAssociationGenerator
      *
      * @return boolean
      */
-    protected function checkHavingSinglePrimaryKey()
+    function checkHavingSinglePrimaryKey()
     {
         return false;
     }

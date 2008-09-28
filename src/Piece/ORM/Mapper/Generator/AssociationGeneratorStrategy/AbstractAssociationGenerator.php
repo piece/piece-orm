@@ -35,13 +35,13 @@
  * @since      File available since Release 0.2.0
  */
 
-namespace Piece::ORM::Mapper::Generator::Association;
+namespace Piece::ORM::Mapper::Generator::AssociationGeneratorStrategy;
 
 use Piece::ORM::Metadata;
 use Piece::ORM::Exception;
 use Piece::ORM::Metadata::MetadataFactory;
 
-// {{{ Piece::ORM::Mapper::Generator::Association::AbstractAssociationGenerator
+// {{{ Piece::ORM::Mapper::Generator::AssociationGeneratorStrategy::AbstractAssociationGenerator
 
 /**
  * The base class for association generators.

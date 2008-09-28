@@ -35,14 +35,14 @@
  * @since      File available since Release 0.2.0
  */
 
-namespace Piece::ORM::Mapper::Generator::Association;
+namespace Piece::ORM::Mapper::Generator::AssociationGeneratorStrategy;
 
-use Piece::ORM::Mapper::Generator::Association::AbstractAssociationGenerator;
+use Piece::ORM::Mapper::Generator::AssociationGeneratorStrategy::AbstractAssociationGenerator;
 
-// {{{ Piece::ORM::Mapper::Generator::Association::ManyToOne
+// {{{ Piece::ORM::Mapper::Generator::AssociationGeneratorStrategy::OneToMany
 
 /**
- * A generator for Many-to-One associations.
+ * A generator for One-to-Many associations.
  *
  * @package    Piece_ORM
  * @copyright  2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
@@ -50,7 +50,7 @@ use Piece::ORM::Mapper::Generator::Association::AbstractAssociationGenerator;
  * @version    Release: @package_version@
  * @since      Class available since Release 0.2.0
  */
-class ManyToOne extends AbstractAssociationGenerator
+class OneToMany extends AbstractAssociationGenerator
 {
 
     // {{{ properties
@@ -93,12 +93,13 @@ class ManyToOne extends AbstractAssociationGenerator
      */
     protected function normalizeColumn()
     {
-        $primaryKey = $this->associationMetadata->getPrimaryKey();
+        $primaryKey = $this->metadata->getPrimaryKey();
         if (is_null($primaryKey)) {
             return false;
         }
 
-        $this->association['column'] = $primaryKey;
+        $this->association['column'] =
+            $this->metadata->getTableName(true) . "_$primaryKey";
         return true;
     }
 
@@ -112,25 +113,13 @@ class ManyToOne extends AbstractAssociationGenerator
      */
     protected function normalizeReferencedColumn()
     {
-        $primaryKey = $this->associationMetadata->getPrimaryKey();
+        $primaryKey = $this->metadata->getPrimaryKey();
         if (is_null($primaryKey)) {
             return false;
         }
 
-        $this->association['referencedColumn'] =
-            $this->associationMetadata->getTableName(true) . "_$primaryKey";
+        $this->association['referencedColumn'] = $primaryKey;
         return true;
-    }
-
-    // }}}
-    // {{{ normalizeOrderBy()
-
-    /**
-     * Normalizes "orderBy" definition.
-     */
-    protected function normalizeOrderBy()
-    {
-        $this->association['orderBy'] = null;
     }
 
     // }}}
@@ -142,9 +131,9 @@ class ManyToOne extends AbstractAssociationGenerator
      *
      * @return boolean
      */
-    function checkHavingSinglePrimaryKey()
+    protected function checkHavingSinglePrimaryKey()
     {
-        return false;
+        return true;
     }
 
     /**#@-*/
