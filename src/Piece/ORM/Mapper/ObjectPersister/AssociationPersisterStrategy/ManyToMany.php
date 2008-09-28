@@ -35,12 +35,16 @@
  * @since      File available since Release 0.2.0
  */
 
-namespace Piece::ORM::Mapper::ObjectPersister::Association;
+namespace Piece::ORM::Mapper::ObjectPersister::AssociationPersisterStrategy;
 
-// {{{ Piece::ORM::Mapper::ObjectPersister::Association::AbstractAssociationPersister
+use Piece::ORM::Mapper::ObjectPersister::AssociationPersisterStrategy::AbstractAssociationPersister;
+use Piece::ORM::Mapper::MapperFactory;
+use Piece::ORM::Inflector;
+
+// {{{ Piece::ORM::Mapper::ObjectPersister::AssociationPersisterStrategy::ManyToMany
 
 /**
- * The base class for associated object persisters.
+ * An associated object persister for Many-to-Many associations.
  *
  * @package    Piece_ORM
  * @copyright  2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
@@ -48,7 +52,7 @@ namespace Piece::ORM::Mapper::ObjectPersister::Association;
  * @version    Release: @package_version@
  * @since      Class available since Release 0.2.0
  */
-abstract class AbstractAssociationPersister
+class ManyToMany extends AbstractAssociationPersister
 {
 
     // {{{ properties
@@ -63,8 +67,6 @@ abstract class AbstractAssociationPersister
      * @access protected
      */
 
-    protected $subject;
-
     /**#@-*/
 
     /**#@+
@@ -78,19 +80,6 @@ abstract class AbstractAssociationPersister
      */
 
     // }}}
-    // {{{ __construct()
-
-    /**
-     * Sets a Piece::ORM::Mapper::ObjectPersister object as a property.
-     *
-     * @param mixed $subject
-     */
-    function __construct($subject)
-    {
-        $this->subject = $subject;
-    }
-
-    // }}}
     // {{{ insert()
 
     /**
@@ -99,7 +88,26 @@ abstract class AbstractAssociationPersister
      * @param array  $association
      * @param string $mappedAs
      */
-    abstract public function insert(array $association, $mappedAs);
+    public function insert(array $association, $mappedAs)
+    {
+        if (!property_exists($this->subject, $mappedAs)) {
+            return;
+        }
+
+        if (!is_array($this->subject->$mappedAs)) {
+            return;
+        }
+
+        $mapper = MapperFactory::factory($association['through']['table']);
+
+        $referencedColumnValue = $this->subject->{ Inflector::camelize($association['through']['referencedColumn'], true) };
+        $object = $mapper->createObject();
+        foreach ($this->subject->$mappedAs as $associatedObject) {
+            $object->{ Inflector::camelize($association['through']['column'], true) } = $referencedColumnValue;
+            $object->{ Inflector::camelize($association['through']['inverseColumn'], true) } = $associatedObject->{ Inflector::camelize($association['column'], true) };
+            $mapper->insert($object);
+        }
+    }
 
     // }}}
     // {{{ update()
@@ -110,7 +118,28 @@ abstract class AbstractAssociationPersister
      * @param array  $association
      * @param string $mappedAs
      */
-    abstract public function update(array $association, $mappedAs);
+    public function update(array $association, $mappedAs)
+    {
+        if (!property_exists($this->subject, $mappedAs)) {
+            return;
+        }
+
+        if (!is_array($this->subject->$mappedAs)) {
+            return;
+        }
+
+        $mapper = MapperFactory::factory($association['through']['table']);
+
+        $referencedColumnValue = $this->subject->{ Inflector::camelize($association['through']['referencedColumn'], true) };
+        $mapper->executeQuery("DELETE FROM {$association['through']['table']} WHERE {$association['through']['column']} = " . $mapper->quote($referencedColumnValue, $association['through']['column']), true);
+
+        $object = $mapper->createObject();
+        foreach ($this->subject->$mappedAs as $associatedObject) {
+            $object->{ Inflector::camelize($association['through']['column'], true) } = $referencedColumnValue;
+            $object->{ Inflector::camelize($association['through']['inverseColumn'], true) } = $associatedObject->{ Inflector::camelize($association['column'], true) };
+            $mapper->insert($object);
+        }
+    }
 
     // }}}
     // {{{ delete()
@@ -121,7 +150,19 @@ abstract class AbstractAssociationPersister
      * @param array  $association
      * @param string $mappedAs
      */
-    abstract public function delete(array $association, $mappedAs);
+    public function delete(array $association, $mappedAs)
+    {
+        $property = Inflector::camelize($association['through']['referencedColumn'], true);
+        if (!property_exists($this->subject, $property)) {
+            return;
+        }
+
+        $mapper = MapperFactory::factory($association['through']['table']);
+        $mapper->executeQuery("DELETE FROM {$association['through']['table']} WHERE {$association['through']['column']} = " .
+                              $mapper->quote($this->subject->$property, $association['through']['column']),
+                              true
+                              );
+    }
 
     /**#@-*/
 

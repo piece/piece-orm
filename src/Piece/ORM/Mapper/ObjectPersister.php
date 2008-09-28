@@ -116,7 +116,9 @@ class ObjectPersister
         if (count(array_keys($associations))) {
             foreach (AssociationType::getAssociationTypes() as $associationType) {
                 $associatedObjectsPersisterClass =
-                    __CLASS__ . '::Association::' . ucwords($associationType);
+                    __CLASS__ .
+                    '::AssociationPersisterStrategy::' .
+                    ucwords($associationType);
                 $this->_associatedObjectPersisters[$associationType] = new $associatedObjectsPersisterClass($subject);
             }
         }

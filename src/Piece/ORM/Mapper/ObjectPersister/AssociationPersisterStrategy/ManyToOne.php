@@ -35,16 +35,15 @@
  * @since      File available since Release 0.2.0
  */
 
-namespace Piece::ORM::Mapper::ObjectPersister::Association;
+namespace Piece::ORM::Mapper::ObjectPersister::AssociationPersisterStrategy;
 
-use Piece::ORM::Mapper::ObjectPersister::Association::AbstractAssociationPersister;
-use Piece::ORM::Mapper::MapperFactory;
-use Piece::ORM::Inflector;
+use Piece::ORM::Mapper::ObjectPersister::AssociationPersisterStrategy::AbstractAssociationPersister;
+use Piece::ORM::Exception;
 
-// {{{ Piece::ORM::Mapper::ObjectPersister::Association::OneToOne
+// {{{ Piece::ORM::Mapper::ObjectPersister::AssociationPersisterStrategy::ManyToOne
 
 /**
- * An associated object persister for One-to-One associations.
+ * An associated object persister for Many-to-One associations.
  *
  * @package    Piece_ORM
  * @copyright  2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
@@ -52,7 +51,7 @@ use Piece::ORM::Inflector;
  * @version    Release: @package_version@
  * @since      Class available since Release 0.2.0
  */
-class OneToOne extends AbstractAssociationPersister
+class ManyToOne extends AbstractAssociationPersister
 {
 
     // {{{ properties
@@ -85,23 +84,13 @@ class OneToOne extends AbstractAssociationPersister
     /**
      * Inserts associated objects to a table.
      *
-     * @param array  $association
+     * @param array $association
      * @param string $mappedAs
+     * @throws Piece::ORM::Exception
      */
     public function insert(array $association, $mappedAs)
     {
-        if (!property_exists($this->subject, $mappedAs)) {
-            return;
-        }
-
-        if (!is_object($this->subject->$mappedAs)) {
-            return;
-        }
-
-        $mapper = MapperFactory::factory($association['table']);
-
-        $this->subject->{ $mappedAs }->{ Inflector::camelize($association['column'], true) } = $this->subject->{ Inflector::camelize($association['referencedColumn'], true) };
-        $mapper->insert($this->subject->{ $mappedAs });
+        throw new Exception("This operation does not supported for the association type [ {$association['type']} ]. Please check your configuration.");
     }
 
     // }}}
@@ -112,34 +101,11 @@ class OneToOne extends AbstractAssociationPersister
      *
      * @param array  $association
      * @param string $mappedAs
+     * @throws Piece::ORM::Exception
      */
     public function update(array $association, $mappedAs)
     {
-        if (!property_exists($this->subject, $mappedAs)) {
-            return;
-        }
-
-        if (!is_null($this->subject->$mappedAs) && !is_object($this->subject->$mappedAs)) {
-            return;
-        }
-
-        $mapper = MapperFactory::factory($association['table']);
-
-        $referencedColumnValue = $this->subject->{ Inflector::camelize($association['referencedColumn'], true) };
-        $oldObject = $mapper->findWithQuery("SELECT * FROM {$association['table']} WHERE {$association['column']} = " . $mapper->quote($referencedColumnValue, $association['column']));
-
-        if (is_null($oldObject)) {
-            if (!is_null($this->subject->$mappedAs)) {
-                $this->subject->$mappedAs->{ Inflector::camelize($association['column'], true) } = $referencedColumnValue;
-                $mapper->insert($this->subject->$mappedAs);
-            }
-        } else {
-            if (!is_null($this->subject->$mappedAs)) {
-                $mapper->update($this->subject->$mappedAs);
-            } else {
-                $mapper->delete($oldObject);
-            }
-        }
+        throw new Exception("This operation does not supported for the association type [ {$association['type']} ]. Please check your configuration.");
     }
 
     // }}}
@@ -150,19 +116,11 @@ class OneToOne extends AbstractAssociationPersister
      *
      * @param array  $association
      * @param string $mappedAs
+     * @throws Piece::ORM::Exception
      */
     public function delete(array $association, $mappedAs)
     {
-        if (!property_exists($this->subject, $mappedAs)) {
-            return;
-        }
-
-        if (!is_null($this->subject->$mappedAs) && !is_object($this->subject->$mappedAs)) {
-            return;
-        }
-
-        $mapper = MapperFactory::factory($association['table']);
-        $mapper->delete($this->subject->$mappedAs);
+        throw new Exception("This operation does not supported for the association type [ {$association['type']} ]. Please check your configuration.");
     }
 
     /**#@-*/
