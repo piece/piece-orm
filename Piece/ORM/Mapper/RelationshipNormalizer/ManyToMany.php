@@ -101,7 +101,17 @@ class Piece_ORM_Mapper_RelationshipNormalizer_ManyToMany extends Piece_ORM_Mappe
                 $throughMetadata = &Piece_ORM_Metadata_Factory::factory($throughTableName);
                 Piece_ORM_Error::enableCallback();
                 if (Piece_ORM_Error::hasErrors()) {
-                    Piece_ORM_Error::pop();
+                    $error = Piece_ORM_Error::pop();
+                    if ($error['code'] != PIECE_ORM_ERROR_NOT_FOUND) {
+                        Piece_ORM_Error::push($error['code'],
+                                              $error['message'],
+                                              'exception',
+                                              array(),
+                                              $error
+                                              );
+                        return; 
+                    }
+
                     continue;
                 }
 

@@ -49,7 +49,7 @@ require_once 'PEAR.php';
  * @package    Piece_ORM
  * @copyright  2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License (revised)
- * @version    Release: 1.2.0
+ * @version    Release: @package_version@
  * @since      Class available since Release 1.1.0
  */
 class Piece_ORM_Mapper_QueryBuilder
@@ -200,11 +200,6 @@ class Piece_ORM_Mapper_QueryBuilder
             }
 
             if (is_array($value)) {
-                if (!count($value)) {
-                    $this->_quotedCriteria->$key = $this->_mapper->quote(null);
-                    continue;
-                }
-
                 $this->_quotedCriteria->$key =
                     implode(', ',
                             array_map(array(&$this->_mapper, 'quote'),
