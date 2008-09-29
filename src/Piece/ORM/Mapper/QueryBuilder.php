@@ -82,6 +82,7 @@ class QueryBuilder
     private $_metadata;
     private $_isManip;
     private $_criteria;
+    private $_query;
 
     /**#@-*/
 
@@ -130,11 +131,11 @@ class QueryBuilder
     public function build()
     {
         extract((array)$this->_quotedCriteria);
-        $query = $this->_mapper->getQuery($this->_methodName);
+        $this->_query = $this->_mapper->getQuery($this->_methodName);
 
         $oldLevel = error_reporting(0);
         ini_set('track_errors', true);
-        $message = eval("\$evaluatedQuery = \"$query\"; return \$php_errormsg;");
+        $message = eval("\$evaluatedQuery = \"{$this->_query}\"; return \$php_errormsg;");
         ini_restore('track_errors');
         error_reporting($oldLevel);
         if (!is_null($message)) {
