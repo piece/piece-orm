@@ -281,6 +281,15 @@
     WHERE
       id IN ($ids)
 
+- name: findByQueryVariable
+  query: |
+    SELECT
+      *
+    FROM
+      $__table
+    WHERE
+      id = $query
+
 # Local Variables:
 # mode: conf-colon
 # coding: iso-8859-1

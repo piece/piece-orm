@@ -74,6 +74,8 @@ class Piece_ORM_Mapper_QueryBuilder
     var $_metadata;
     var $_isManip;
     var $_criteria;
+    var $_query;
+    var $_builtQuery;
 
     /**#@-*/
 
@@ -122,10 +124,10 @@ class Piece_ORM_Mapper_QueryBuilder
     function build()
     {
         extract((array)$this->_quotedCriteria);
-        $query = $this->_mapper->getQuery($this->_methodName);
+        $this->_query = $this->_mapper->getQuery($this->_methodName);
 
         set_error_handler(array(&$this, 'handleErrorInEval'));
-        eval("\$query = \"$query\";");
+        eval("\$this->_builtQuery = \"{$this->_query}\";");
         restore_error_handler();
         if (count($this->_errorsInEval)) {
             $message = implode("\n", $this->_errorsInEval);
@@ -137,17 +139,17 @@ class Piece_ORM_Mapper_QueryBuilder
         }
 
         if (Piece_ORM_Mapper_QueryType::isFindAll($this->_methodName)) {
-            $this->_mapper->setLastQueryForGetCount($query);
+            $this->_mapper->setLastQueryForGetCount($this->_builtQuery);
         } else {
             $this->_mapper->setLastQueryForGetCount(null);
         }
 
         if (!$this->_isManip) {
-            $query .= $this->_mapper->getOrderBy($this->_methodName);
+            $this->_builtQuery .= $this->_mapper->getOrderBy($this->_methodName);
             $this->_mapper->clearOrders();
         }
 
-        return array($query, $this->_createPreparedStatement($query));
+        return array($this->_builtQuery, $this->_createPreparedStatement($this->_builtQuery));
     }
 
     // }}}
