@@ -26,23 +26,27 @@
 # POSSIBILITY OF SUCH DAMAGE.
 ######################################################################
 
-name: piece-orm
-desc: The Piece_ORM 1.0.0 Configuration DSL Definition
-type: seq
+name: piece-orm-config.dsl
+desc: The Piece_ORM Configuration DSL Schema 2.0.0.
+type: map
 required: yes
-sequence:
-  - type: map
-    required: yes
+mapping:
+  "databases":
+    type: map
+    required: no
     mapping:
-      "name": { type: str, required: yes }
-      "dsn": { type: any, required: yes }
-      "options":
+      =:
         type: map
-        required: no
+        required: yes
         mapping:
-          =: { type: any, required: yes }
-      "directorySuffix": { type: str, required: no }
-      "useMapperNameAsTableName": { type: bool, required: no }
+          "dsn": { type: any, required: yes }
+          "options":
+            type: map
+            required: no
+            mapping:
+              =: { type: any, required: yes }
+          "directorySuffix": { type: str, required: no }
+          "useMapperNameAsTableName": { type: bool, required: no }
 
 # Local Variables:
 # mode: conf-colon

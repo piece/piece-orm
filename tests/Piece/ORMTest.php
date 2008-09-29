@@ -104,9 +104,9 @@ class ORMTest extends ::PHPUnit_Framework_TestCase
 
     public function testShouldConfigureWithAGivenConfigurationFile()
     {
-        $yaml = ::Spyc::YAMLLoad("{$this->_cacheDirectory}/piece-orm-config.yaml");
+        $dsl = ::Spyc::YAMLLoad("{$this->_cacheDirectory}/piece-orm-config.yaml");
 
-        $this->assertEquals(4, count($yaml));
+        $this->assertEquals(4, count($dsl['databases']));
 
         ORM::configure($this->_cacheDirectory,
                        $this->_cacheDirectory,
@@ -114,9 +114,11 @@ class ORMTest extends ::PHPUnit_Framework_TestCase
                        );
         $config = Registry::getContext()->getConfiguration();
 
-        foreach ($yaml as $configuration) {
-            $this->assertEquals($configuration['dsn'], $config->getDSN($configuration['name']));
-            $this->assertEquals($configuration['options'], $config->getOptions($configuration['name']));
+        foreach ($dsl['databases'] as $database => $configuration) {
+            $this->assertEquals($configuration['dsn'], $config->getDSN($database));
+            $this->assertEquals($configuration['options'],
+                                $config->getOptions($database)
+                                );
         }
 
         $this->assertEquals($this->_cacheDirectory,
@@ -137,9 +139,9 @@ class ORMTest extends ::PHPUnit_Framework_TestCase
 
     public function testShouldConfigureDynamicallyWithAGivenConfigurationFile()
     {
-        $yaml = ::Spyc::YAMLLoad("{$this->_cacheDirectory}/piece-orm-config.yaml");
+        $dsl = ::Spyc::YAMLLoad("{$this->_cacheDirectory}/piece-orm-config.yaml");
 
-        $this->assertEquals(4, count($yaml));
+        $this->assertEquals(4, count($dsl['databases']));
 
         ORM::configure($this->_cacheDirectory,
                        $this->_cacheDirectory,
@@ -157,15 +159,31 @@ class ORMTest extends ::PHPUnit_Framework_TestCase
         $config->setUseMapperNameAsTableName('caseSensitive', false);
         $config->setDirectorySuffix('caseSensitive', 'foo');
 
-        $this->assertEquals($yaml[0]['dsn'], $config->getDSN('database1'));
-        $this->assertTrue($yaml[0]['options'] != $config->getOptions('database1'));
+        $this->assertEquals($dsl['databases']['database1']['dsn'],
+                            $config->getDSN('database1')
+                            );
+        $this->assertNotEquals($dsl['databases']['database1']['options'],
+                               $config->getOptions('database1')
+                               );
         $this->assertEquals(array('debug' => 5), $config->getOptions('database1'));
-        $this->assertTrue($yaml[1]['dsn'] != $config->getDSN('database2'));
-        $this->assertEquals('pgsql://piece:piece@pieceorm/piece_test', $config->getDSN('database2'));
-        $this->assertEquals($yaml[1]['options'], $config->getOptions('database2'));
-        $this->assertEquals('pgsql://piece:piece@pieceorm/piece', $config->getDSN('piece'));
-        $this->assertEquals(array('debug' => 0, 'result_buffering' => false), $config->getOptions('piece'));
-        $this->assertEquals('pgsql://piece:piece@pieceorm/piece', $config->getDSN('database3'));
+        $this->assertNotEquals($dsl['databases']['database2']['dsn'],
+                               $config->getDSN('database2')
+                               );
+        $this->assertEquals('pgsql://piece:piece@pieceorm/piece_test',
+                            $config->getDSN('database2')
+                            );
+        $this->assertEquals($dsl['databases']['database2']['options'],
+                            $config->getOptions('database2')
+                            );
+        $this->assertEquals('pgsql://piece:piece@pieceorm/piece',
+                            $config->getDSN('piece')
+                            );
+        $this->assertEquals(array('debug' => 0, 'result_buffering' => false),
+                            $config->getOptions('piece')
+                            );
+        $this->assertEquals('pgsql://piece:piece@pieceorm/piece',
+                            $config->getDSN('database3')
+                            );
         $this->assertTrue($config->getUseMapperNameAsTableName('database3'));
         $this->assertFalse($config->getUseMapperNameAsTableName('caseSensitive'));
         $this->assertEquals('foo', $config->getDirectorySuffix('caseSensitive'));

@@ -1,18 +1,20 @@
 # $Id$
 
-- name: database1
-  dsn: pgsql://piece:piece@pieceorm/piece
-  options:
-    debug: 2
-    result_buffering: false
-  directorySuffix: database1
+databases:
 
-- name: database2
-  dsn: pgsql://piece:piece@pieceorm/piece
-  options:
-    debug: 0
-    result_buffering: false
-  directorySuffix: database2
+  database1:
+    dsn: pgsql://piece:piece@pieceorm/piece
+    options:
+      debug: 2
+      result_buffering: false
+    directorySuffix: database1
+
+  database2:
+    dsn: pgsql://piece:piece@pieceorm/piece
+    options:
+      debug: 0
+      result_buffering: false
+    directorySuffix: database2
 
 # Local Variables:
 # mode: conf-colon

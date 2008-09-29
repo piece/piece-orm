@@ -1,34 +1,36 @@
 # $Id$
 
-- name: database1
-  dsn: pgsql://piece:piece@pieceorm/piece
-  options:
-    debug: 2
-    result_buffering: false
+databases:
 
-- name: database2
-  dsn: pgsql://piece:piece@pieceorm/piece
-  options:
-    debug: 0
-    result_buffering: false
+  database1:
+    dsn: pgsql://piece:piece@pieceorm/piece
+    options:
+      debug: 2
+      result_buffering: false
 
-- name: database3
-  dsn:
-    phptype: pgsql
-    hostspec: pieceorm
-    database: piece
-    username: piece
-    password: piece
-  options:
-    debug: 0
-    result_buffering: false
+  database2:
+    dsn: pgsql://piece:piece@pieceorm/piece
+    options:
+      debug: 0
+      result_buffering: false
 
-- name: caseSensitive
-  dsn: pgsql://piece:piece@pieceorm/piece
-  options:
-    debug: 0
-    result_buffering: false
-  useMapperNameAsTableName: true
+  database3:
+    dsn:
+      phptype: pgsql
+      hostspec: pieceorm
+      database: piece
+      username: piece
+      password: piece
+    options:
+      debug: 0
+      result_buffering: false
+
+  caseSensitive:
+    dsn: pgsql://piece:piece@pieceorm/piece
+    options:
+      debug: 0
+      result_buffering: false
+    useMapperNameAsTableName: true
 
 # Local Variables:
 # mode: conf-colon

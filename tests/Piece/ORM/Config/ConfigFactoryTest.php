@@ -130,14 +130,16 @@ class ConfigFactoryTest extends ::PHPUnit_Framework_TestCase
 
     public function testShouldCreateAnObjectByAGivenConfigurationFile()
     {
-        $yaml = ::Spyc::YAMLLoad("{$this->_cacheDirectory}/piece-orm-config.yaml");
+        $dsl = ::Spyc::YAMLLoad("{$this->_cacheDirectory}/piece-orm-config.yaml");
         $config = ConfigFactory::factory($this->_cacheDirectory, $this->_cacheDirectory);
 
-        $this->assertEquals(2, count($yaml));
+        $this->assertEquals(2, count($dsl['databases']));
 
-        foreach ($yaml as $configuration) {
-            $this->assertEquals($configuration['dsn'], $config->getDSN($configuration['name']));
-            $this->assertEquals($configuration['options'], $config->getOptions($configuration['name']));
+        foreach ($dsl['databases'] as $database => $configuration) {
+            $this->assertEquals($configuration['dsn'], $config->getDSN($database));
+            $this->assertEquals($configuration['options'],
+                                $config->getOptions($database)
+                                );
         }
     }
 
