@@ -26,8 +26,8 @@
 # POSSIBILITY OF SUCH DAMAGE.
 ######################################################################
 
-name: piece-orm-mapper
-desc: Piece_ORM Mapper DSL syntax 2.0.0
+name: piece-orm-mapper.dsl
+desc: The Piece_ORM Mapper DSL Schema 2.0.0.
 type: map
 required: no
 mapping:
