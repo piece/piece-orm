@@ -135,7 +135,7 @@ class QueryBuilder
 
         $oldLevel = error_reporting(0);
         ini_set('track_errors', true);
-        $message = eval("\$evaluatedQuery = \"{$this->_query}\"; return \$php_errormsg;");
+        $message = eval("\$builtQuery = \"{$this->_query}\"; return \$php_errormsg;");
         ini_restore('track_errors');
         error_reporting($oldLevel);
         if (!is_null($message)) {
@@ -144,17 +144,17 @@ class QueryBuilder
         }
 
         if (QueryType::isFindAll($this->_methodName)) {
-            $this->_mapper->setLastQueryForGetCount($evaluatedQuery);
+            $this->_mapper->setLastQueryForGetCount($builtQuery);
         } else {
             $this->_mapper->setLastQueryForGetCount(null);
         }
 
         if (!$this->_isManip) {
-            $evaluatedQuery .= $this->_mapper->getOrderBy($this->_methodName);
+            $builtQuery .= $this->_mapper->getOrderBy($this->_methodName);
             $this->_mapper->clearOrders();
         }
 
-        return array($evaluatedQuery, $this->_createPreparedStatement($evaluatedQuery));
+        return array($builtQuery, $this->_createPreparedStatement($builtQuery));
     }
 
     // }}}
