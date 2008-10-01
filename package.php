@@ -46,7 +46,10 @@ $apiVersion = '0.3.0';
 $apiStability = 'stable';
 $notes = 'A new release of Piece_ORM is now available.
 
-What\'s New in Piece_ORM 1.2.0';
+What\'s New in Piece_ORM 1.2.0
+
+ * getDefault(): getDefault() to get the default value of a given field has been added to the Mapper API.
+ * Two defect fixes: A defect has been fixed so that an exception to be raised if an assumed through table is not found. And also a defect has been fixed that caused an exception to be raised if the $query variable was used in a query.';
 
 $package = new PEAR_PackageFileManager2();
 $package->setOptions(array('filelistgenerator' => 'file',

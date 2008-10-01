@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<package packagerversion="1.7.1" version="2.0" xmlns="http://pear.php.net/dtd/package-2.0" xmlns:tasks="http://pear.php.net/dtd/tasks-1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://pear.php.net/dtd/tasks-1.0
+<package packagerversion="1.7.2" version="2.0" xmlns="http://pear.php.net/dtd/package-2.0" xmlns:tasks="http://pear.php.net/dtd/tasks-1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://pear.php.net/dtd/tasks-1.0
     http://pear.php.net/dtd/tasks-1.0.xsd
     http://pear.php.net/dtd/package-2.0
     http://pear.php.net/dtd/package-2.0.xsd">
@@ -15,8 +15,8 @@ Piece_ORM is a simple framework based on the DataMapper pattern, and features st
   <email>iteman@users.sourceforge.net</email>
   <active>yes</active>
  </lead>
- <date>2008-08-31</date>
- <time>02:01:59</time>
+ <date>2008-10-01</date>
+ <time>20:55:09</time>
  <version>
   <release>1.2.0</release>
   <api>0.3.0</api>
@@ -28,7 +28,10 @@ Piece_ORM is a simple framework based on the DataMapper pattern, and features st
  <license uri="http://www.opensource.org/licenses/bsd-license.php">BSD License (revised)</license>
  <notes>A new release of Piece_ORM is now available.
 
-What&apos;s New in Piece_ORM 1.2.0</notes>
+What&apos;s New in Piece_ORM 1.2.0
+
+ * getDefault(): getDefault() to get the default value of a given field has been added to the Mapper API.
+ * Two defect fixes: A defect has been fixed so that an exception to be raised if an assumed through table is not found. And also a defect has been fixed that caused an exception to be raised if the $query variable was used in a query.</notes>
  <contents>
   <dir baseinstalldir="/" name="/">
    <dir name="data">
@@ -555,11 +558,14 @@ What&apos;s New in Piece_ORM 1.2.0</notes>
     <release>stable</release>
     <api>stable</api>
    </stability>
-   <date>2008-08-31</date>
+   <date>2008-10-01</date>
    <license uri="http://www.opensource.org/licenses/bsd-license.php">BSD License (revised)</license>
    <notes>A new release of Piece_ORM is now available.
 
-What&apos;s New in Piece_ORM 1.2.0</notes>
+What&apos;s New in Piece_ORM 1.2.0
+
+ * getDefault(): getDefault() to get the default value of a given field has been added to the Mapper API.
+ * Two defect fixes: A defect has been fixed so that an exception to be raised if an assumed through table is not found. And also a defect has been fixed that caused an exception to be raised if the $query variable was used in a query.</notes>
   </release>
   <release>
    <version>
