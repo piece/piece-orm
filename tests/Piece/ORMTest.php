@@ -48,7 +48,7 @@ require_once 'spyc.php5';
 // {{{ Piece::ORMTest
 
 /**
- * Some tests for Piece_ORM.
+ * Some tests for Piece::ORM.
  *
  * @package    Piece_ORM
  * @copyright  2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
