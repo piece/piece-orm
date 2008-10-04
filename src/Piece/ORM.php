@@ -37,7 +37,7 @@
 
 namespace Piece;
 
-use Piece::ORM::Config::ConfigFactory;
+use Piece::ORM::Config::Reader;
 use Piece::ORM::Context;
 use Piece::ORM::Mapper::MapperFactory;
 use Piece::ORM::Metadata::MetadataFactory;
@@ -91,9 +91,8 @@ class ORM
      * Configures the Piece_ORM environment.
      *
      * First this method tries to load a configuration from a configuration file in
-     * the given configration directory using
-     * Piece::ORM::Config::ConfigFactory::factory(). The method creates a new object
-     * if the load failed.
+     * the given configration directory using a Piece::ORM::Config::Reader object.
+     * The method creates a new object if the load failed.
      * Second this method sets the configuration to the current context. And also
      * this method sets the configuration directory for the mapper configuration, and
      * the cache directory for mappers, and the cache directory for
@@ -110,10 +109,13 @@ class ORM
     {
         Registry::setContext(new Context());
         $context = Registry::getContext();
-        $config = ConfigFactory::factory($configDirectory, $cacheDirectory);
-        $context->setConfiguration($config);
         $context->setMapperConfigDirectory($mapperConfigDirectory);
         $context->setCacheDirectory($cacheDirectory);
+
+        $reader = new Reader($configDirectory);
+        $config = $reader->read();
+        $context->setConfiguration($config);
+
         $defaultDatabase = $config->getDefaultDatabase();
         if (!is_null($defaultDatabase)) {
             $context->setDatabase($defaultDatabase);
