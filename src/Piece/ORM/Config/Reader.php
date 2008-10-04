@@ -44,7 +44,7 @@ use Piece::ORM::Context::Registry;
 
 require_once 'spyc.php5';
 
-// {{{ Piece::ORM::Config::ConfigFactory
+// {{{ Piece::ORM::Config::Reader
 
 /**
  * A factory class for creating Piece::ORM::Config objects.
@@ -55,7 +55,7 @@ require_once 'spyc.php5';
  * @version    Release: @package_version@
  * @since      Class available since Release 0.1.0
  */
-class ConfigFactory
+class Reader
 {
 
     // {{{ properties
@@ -76,6 +76,8 @@ class ConfigFactory
      * @access private
      */
 
+    private $_configDirectory;
+
     /**#@-*/
 
     /**#@+
@@ -83,26 +85,36 @@ class ConfigFactory
      */
 
     // }}}
-    // {{{ factory()
+    // {{{ __construct()
+
+    /**
+     * @param string $configDirectory
+     */
+    public function __construct($configDirectory = null)
+    {
+        $this->_configDirectory = $configDirectory;
+    }
+
+    // }}}
+    // {{{ read()
 
     /**
      * Creates a Piece::ORM::Config object from a configuration file or a cache.
      *
-     * @param string $configDirectory
      * @return Piece::ORM::Config
      * @throws Piece::ORM::Exception
      */
-    public static function factory($configDirectory = null)
+    public function read()
     {
-        if (is_null($configDirectory)) {
+        if (is_null($this->_configDirectory)) {
             return new Config();
         }
 
-        if (!file_exists($configDirectory)) {
-            throw new Exception("The configuration directory [ $configDirectory ] is not found.");
+        if (!file_exists($this->_configDirectory)) {
+            throw new Exception("The configuration directory [ {$this->_configDirectory} ] is not found.");
         }
 
-        $dslFile = "$configDirectory/piece-orm-config.yaml";
+        $dslFile = "{$this->_configDirectory}/piece-orm-config.yaml";
         if (!file_exists($dslFile)) {
             throw new Exception("The configuration file [ $dslFile ] is not found.");
         }
@@ -112,7 +124,7 @@ class ConfigFactory
         }
 
         if (is_null(Registry::getContext()->getCacheDirectory())) {
-            return self::_createConfigurationFromFile($dslFile);
+            return $this->_createConfigurationFromFile($dslFile);
         }
 
         if (!file_exists(Registry::getContext()->getCacheDirectory())) {
@@ -121,7 +133,7 @@ class ConfigFactory
                           ' ] is not found.',
                           E_USER_WARNING
                           );
-            return self::_createConfigurationFromFile($dslFile);
+            return $this->_createConfigurationFromFile($dslFile);
         }
 
         if (!is_readable(Registry::getContext()->getCacheDirectory())
@@ -131,10 +143,10 @@ class ConfigFactory
                           ' ] is not readable or writable.',
                           E_USER_WARNING
                           );
-            return self::_createConfigurationFromFile($dslFile);
+            return $this->_createConfigurationFromFile($dslFile);
         }
 
-        return self::_getConfiguration($dslFile);
+        return $this->_getConfiguration($dslFile);
     }
 
     /**#@-*/
@@ -182,11 +194,11 @@ class ConfigFactory
                           ' ].',
                           E_USER_WARNING
                           );
-            return self::_createConfigurationFromFile($dslFile);
+            return $this->_createConfigurationFromFile($dslFile);
         }
 
         if (!$config) {
-            $config = self::_createConfigurationFromFile($dslFile);
+            $config = $this->_createConfigurationFromFile($dslFile);
             $result = $cache->save($config);
             if (::PEAR::isError($result)) {
                 trigger_error('Cannot write the Piece::ORM::Config object to the cache file in the directory [ ',
