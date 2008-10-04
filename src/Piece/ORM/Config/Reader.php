@@ -88,6 +88,8 @@ class Reader
     // {{{ __construct()
 
     /**
+     * Sets a directory where a configuration file exists to a property.
+     *
      * @param string $configDirectory
      */
     public function __construct($configDirectory = null)
