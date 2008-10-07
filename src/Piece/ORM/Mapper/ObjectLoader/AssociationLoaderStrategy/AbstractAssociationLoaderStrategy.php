@@ -224,10 +224,7 @@ abstract class AbstractAssociationLoaderStrategy
      *
      * @return callback
      */
-    protected function getPreloadCallback()
-    {
-        return null;
-    }
+    protected function getPreloadCallback() {}
 
     /**#@-*/
 

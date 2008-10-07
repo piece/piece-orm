@@ -662,18 +662,18 @@ class {$this->_mapperClass} extends AbstractMapper
      */
     private function _generateDefaultDeleteQuery()
     {
-        if ($this->_metadata->hasPrimaryKey()) {
-            $primaryKeys = $this->_metadata->getPrimaryKeys();
-            $fieldName = array_shift($primaryKeys);
-            $whereClause = "$fieldName = \$" . Inflector::camelize($fieldName, true);
-            foreach ($primaryKeys as $partOfPrimeryKey) {
-                $whereClause .= " AND $partOfPrimeryKey = \$" . Inflector::camelize($partOfPrimeryKey, true);
-            }
-
-            return "DELETE FROM \$__table WHERE $whereClause";
-        } else {
-            return null;
+        if (!$this->_metadata->hasPrimaryKey()) {
+            return;
         }
+
+        $primaryKeys = $this->_metadata->getPrimaryKeys();
+        $fieldName = array_shift($primaryKeys);
+        $whereClause = "$fieldName = \$" . Inflector::camelize($fieldName, true);
+        foreach ($primaryKeys as $partOfPrimeryKey) {
+            $whereClause .= " AND $partOfPrimeryKey = \$" . Inflector::camelize($partOfPrimeryKey, true);
+        }
+
+        return "DELETE FROM \$__table WHERE $whereClause";
     }
 
     // }}}
@@ -687,37 +687,37 @@ class {$this->_mapperClass} extends AbstractMapper
      */
     private function _generateDefaultUpdateQuery()
     {
-        if ($this->_metadata->hasPrimaryKey()) {
-            $primaryKeys = $this->_metadata->getPrimaryKeys();
-            $fieldName = array_shift($primaryKeys);
-            $whereClause = "$fieldName = \$" . Inflector::camelize($fieldName, true);
-            foreach ($primaryKeys as $partOfPrimeryKey) {
-                $whereClause .= " AND $partOfPrimeryKey = \$" . Inflector::camelize($partOfPrimeryKey, true);
-            }
+        if (!$this->_metadata->hasPrimaryKey()) {
+            return;
+        }
 
-            if ($this->_metadata->getDatatype('lock_version') == 'integer') {
-                $whereClause .= " AND lock_version = " . $this->generateExpression('lock_version');
-            }
+        $primaryKeys = $this->_metadata->getPrimaryKeys();
+        $fieldName = array_shift($primaryKeys);
+        $whereClause = "$fieldName = \$" . Inflector::camelize($fieldName, true);
+        foreach ($primaryKeys as $partOfPrimeryKey) {
+            $whereClause .= " AND $partOfPrimeryKey = \$" . Inflector::camelize($partOfPrimeryKey, true);
+        }
 
-            $fields = array();
-            foreach ($this->_metadata->getFieldNames() as $fieldName) {
-                if (!$this->_metadata->isAutoIncrement($fieldName)) {
-                    if (!$this->_metadata->isPartOfPrimaryKey($fieldName)) {
-                        if (!($fieldName == 'lock_version'
-                              && $this->_metadata->getDatatype('lock_version') == 'integer')
-                            ) {
-                            $fields[] = "$fieldName = " . $this->generateExpression($fieldName);
-                        } else {
-                            $fields[] = "$fieldName = $fieldName + 1";
-                        }
+        if ($this->_metadata->getDatatype('lock_version') == 'integer') {
+            $whereClause .= " AND lock_version = " . $this->generateExpression('lock_version');
+        }
+
+        $fields = array();
+        foreach ($this->_metadata->getFieldNames() as $fieldName) {
+            if (!$this->_metadata->isAutoIncrement($fieldName)) {
+                if (!$this->_metadata->isPartOfPrimaryKey($fieldName)) {
+                    if (!($fieldName == 'lock_version'
+                          && $this->_metadata->getDatatype('lock_version') == 'integer')
+                        ) {
+                        $fields[] = "$fieldName = " . $this->generateExpression($fieldName);
+                    } else {
+                        $fields[] = "$fieldName = $fieldName + 1";
                     }
                 }
             }
-
-            return 'UPDATE $__table SET ' . implode(", ", $fields) . " WHERE $whereClause";
-        } else {
-            return null;
         }
+
+        return 'UPDATE $__table SET ' . implode(", ", $fields) . " WHERE $whereClause";
     }
 
     // }}}
