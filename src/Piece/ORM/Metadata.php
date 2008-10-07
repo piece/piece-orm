@@ -168,20 +168,6 @@ class Metadata
     }
 
     // }}}
-    // {{{ getFieldNameWithAlias()
-
-    /**
-     * Gets the field name of a table by a given alias.
-     *
-     * @return string
-     * @deprecated Method deprecated in Release 1.2.0
-     */
-    public function getFieldNameWithAlias($alias)
-    {
-        return $this->getFieldNameByAlias($alias);
-    }
-
-    // }}}
     // {{{ hasID()
 
     /**
