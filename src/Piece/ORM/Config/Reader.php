@@ -47,7 +47,7 @@ require_once 'spyc.php5';
 // {{{ Piece::ORM::Config::Reader
 
 /**
- * A factory class for creating Piece::ORM::Config objects.
+ * A configuration reader for the Piece_ORM configuration DSL.
  *
  * @package    Piece_ORM
  * @copyright  2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
