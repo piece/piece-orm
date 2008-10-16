@@ -107,7 +107,7 @@ class MapperFactoryTest extends ::PHPUnit_Framework_TestCase
         Registry::clear();
     }
 
-    public function testShouldRaiseAnExceptionIfTheConfigurationDirectoryIsNotSpecified()
+    public function testRaiseAnExceptionIfTheConfigurationDirectoryIsNotSpecified()
     {
         MapperFactory::setConfigDirectory(null);
 
@@ -120,7 +120,7 @@ class MapperFactoryTest extends ::PHPUnit_Framework_TestCase
         $this->fail('An expected exception has not been raised.');
     }
 
-    public function testShouldRaiseAnExceptionIfAGivenConfigurationDirectoryIsNotFound()
+    public function testRaiseAnExceptionIfAGivenConfigurationDirectoryIsNotFound()
     {
         MapperFactory::setConfigDirectory(dirname(__FILE__) . '/foo');
 
@@ -133,7 +133,7 @@ class MapperFactoryTest extends ::PHPUnit_Framework_TestCase
         $this->fail('An expected exception has not been raised.');
     }
 
-    public function testShouldRaiseAnExceptionIfTheCacheDirectoryIsNotSpecified()
+    public function testRaiseAnExceptionIfTheCacheDirectoryIsNotSpecified()
     {
         Registry::getContext()->setCacheDirectory(null);
 
@@ -148,7 +148,7 @@ class MapperFactoryTest extends ::PHPUnit_Framework_TestCase
         $this->fail('An expected exception has not been raised.');
     }
 
-    public function testShouldRaiseAnExceptionIfAGivenCacheDirectoryIsNotFound()
+    public function testRaiseAnExceptionIfAGivenCacheDirectoryIsNotFound()
     {
         Registry::getContext()->setCacheDirectory(dirname(__FILE__) . '/foo');
 
@@ -166,19 +166,19 @@ class MapperFactoryTest extends ::PHPUnit_Framework_TestCase
     /**
      * @expectedException Piece::ORM::Exception
      */
-    public function testShouldRaiseAnExceptionIfAGivenConfigurationFileIsNotFound()
+    public function testRaiseAnExceptionIfAGivenConfigurationFileIsNotFound()
     {
         MapperFactory::factory('Foo');
     }
 
-    public function testShouldCreateAnObjectByAGivenMapper()
+    public function testCreateAnObjectByAGivenMapper()
     {
         $mapper = MapperFactory::factory('Employees');
 
         $this->assertType(__NAMESPACE__ . '::AbstractMapper', $mapper);
     }
 
-    public function testShouldReturnTheExistingObjectIfItExists()
+    public function testReturnTheExistingObjectIfItExists()
     {
         $mapper1 = MapperFactory::factory('Employees');
         $mapper2 = MapperFactory::factory('Employees');
@@ -191,7 +191,7 @@ class MapperFactoryTest extends ::PHPUnit_Framework_TestCase
         $this->assertEquals('bar', $mapper2->foo);
     }
 
-    public function testShouldSwitchDatabase()
+    public function testSwitchDatabase()
     {
         $context = Registry::getContext();
         $config = $context->getConfiguration();
@@ -215,7 +215,7 @@ class MapperFactoryTest extends ::PHPUnit_Framework_TestCase
     /**
      * @since Method available since Release 0.8.0
      */
-    public function testShouldCreateUniqueCacheIdsInOneCacheDirectory()
+    public function testCreateUniqueCacheIdsInOneCacheDirectory()
     {
         $oldDirectory = getcwd();
         chdir("{$this->_cacheDirectory}/CacheIDsShouldUniqueInOneCacheDirectory1");

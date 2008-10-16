@@ -102,7 +102,7 @@ class ORMTest extends ::PHPUnit_Framework_TestCase
         Registry::clear();
     }
 
-    public function testShouldConfigureWithAGivenConfigurationFile()
+    public function testConfigureWithAGivenConfigurationFile()
     {
         $dsl = ::Spyc::YAMLLoad("{$this->_cacheDirectory}/piece-orm-config.yaml");
 
@@ -137,7 +137,7 @@ class ORMTest extends ::PHPUnit_Framework_TestCase
         Registry::getContext()->restoreCacheDirectory();
     }
 
-    public function testShouldConfigureDynamicallyWithAGivenConfigurationFile()
+    public function testConfigureDynamicallyWithAGivenConfigurationFile()
     {
         $dsl = ::Spyc::YAMLLoad("{$this->_cacheDirectory}/piece-orm-config.yaml");
 
@@ -189,7 +189,7 @@ class ORMTest extends ::PHPUnit_Framework_TestCase
         $this->assertEquals('foo', $config->getDirectorySuffix('caseSensitive'));
     }
 
-    public function testShouldGetAMapper()
+    public function testGetAMapper()
     {
         ORM::configure($this->_cacheDirectory,
                        $this->_cacheDirectory,
@@ -204,7 +204,7 @@ class ORMTest extends ::PHPUnit_Framework_TestCase
     /**
      * @expectedException Piece::ORM::Exception
      */
-    public function testShouldRaiseAnExceptionWhenGetmapperIsCalledBeforeCallingConfigure()
+    public function testRaiseAnExceptionWhenGetmapperIsCalledBeforeCallingConfigure()
     {
         ORM::getMapper('Employees');
     }
@@ -212,12 +212,12 @@ class ORMTest extends ::PHPUnit_Framework_TestCase
     /**
      * @expectedException Piece::ORM::Exception
      */
-    public function testShouldRaiseAnExceptionWhenGetconfigurationIsCalledBeforeCallingConfigure()
+    public function testRaiseAnExceptionWhenGetconfigurationIsCalledBeforeCallingConfigure()
     {
         ORM::getConfiguration();
     }
 
-    public function testShouldSetADatabase()
+    public function testSetADatabase()
     {
         $cacheDirectory =
             dirname(__FILE__) . '/' . basename(__FILE__, '.php') . '/SetDatabase';
@@ -235,7 +235,7 @@ class ORMTest extends ::PHPUnit_Framework_TestCase
                             );
     }
 
-    public function testShouldCreateAnObjectByAGivenMapper()
+    public function testCreateAnObjectByAGivenMapper()
     {
         ORM::configure($this->_cacheDirectory,
                        $this->_cacheDirectory,
@@ -245,7 +245,7 @@ class ORMTest extends ::PHPUnit_Framework_TestCase
         $this->assertNotNull(ORM::createObject('Employees'));
     }
 
-    public function testShouldDressAnObject()
+    public function testDressAnObject()
     {
         ORM::configure($this->_cacheDirectory,
                        $this->_cacheDirectory,
@@ -273,7 +273,7 @@ class ORMTest extends ::PHPUnit_Framework_TestCase
      * @expectedException Piece::ORM::Exception
      * @since Method available since Release 0.3.0
      */
-    public function testShouldRaiseAnExceptionWhenSetdatabaseIsCalledBeforeCallingConfigure()
+    public function testRaiseAnExceptionWhenSetdatabaseIsCalledBeforeCallingConfigure()
     {
         ORM::setDatabase('database2');
     }
@@ -282,7 +282,7 @@ class ORMTest extends ::PHPUnit_Framework_TestCase
      * @expectedException Piece::ORM::Exception
      * @since Method available since Release 0.3.0
      */
-    public function testShouldRaiseAnExceptionWhenCreateobjectIsCalledBeforeCallingConfigure()
+    public function testRaiseAnExceptionWhenCreateobjectIsCalledBeforeCallingConfigure()
     {
         ORM::createObject('Employees');
     }
@@ -290,7 +290,7 @@ class ORMTest extends ::PHPUnit_Framework_TestCase
     /**
      * @since Method available since Release 0.7.0
      */
-    public function testShouldTreatDsnByArray()
+    public function testTreatDsnByArray()
     {
         ORM::configure($this->_cacheDirectory,
                        $this->_cacheDirectory,
@@ -305,7 +305,7 @@ class ORMTest extends ::PHPUnit_Framework_TestCase
      * @expectedException Piece::ORM::Exception
      * @since Method available since Release 0.7.0
      */
-    public function testShouldRaiseAnExceptionWhenUndefinedDatabaseIsGiven()
+    public function testRaiseAnExceptionWhenUndefinedDatabaseIsGiven()
     {
         ORM::configure($this->_cacheDirectory,
                        $this->_cacheDirectory,
@@ -317,7 +317,7 @@ class ORMTest extends ::PHPUnit_Framework_TestCase
     /**
      * @since Method available since Release 1.0.0
      */
-    public function testShouldUseAMapperNameAsATableNameIfEnabled()
+    public function testUseAMapperNameAsATableNameIfEnabled()
     {
         ORM::configure($this->_cacheDirectory,
                        $this->_cacheDirectory,
@@ -335,7 +335,7 @@ class ORMTest extends ::PHPUnit_Framework_TestCase
     /**
      * @since Method available since Release 1.0.0
      */
-    public function testShouldOverwriteTheDirectorySuffixBySetdirectorysuffixMethod()
+    public function testOverwriteTheDirectorySuffixBySetdirectorysuffixMethod()
     {
         $cacheDirectory =
             dirname(__FILE__) . '/' . basename(__FILE__, '.php') . '/SetDatabase';
@@ -352,7 +352,7 @@ class ORMTest extends ::PHPUnit_Framework_TestCase
     /**
      * @since Method available since Release 2.0.0
      */
-    public function testShouldRestoreThePreviousDatabaseSettings()
+    public function testRestoreThePreviousDatabaseSettings()
     {
         $cacheDirectory =
             dirname(__FILE__) . '/' . basename(__FILE__, '.php') . '/SetDatabase';

@@ -86,7 +86,7 @@ class PgsqlTest extends CompatibilityTests
     /**
      * @since Method available since Release 0.7.0
      */
-    public function testShouldSupportGeometricTypes()
+    public function testSupportGeometricTypes()
     {
         $this->tables[] = 'geometric_types';
         $this->cacheDirectory = dirname(__FILE__) . '/' . basename(__FILE__, '.php');
@@ -111,7 +111,7 @@ class PgsqlTest extends CompatibilityTests
     /**
      * @since Method available since Release 0.7.0
      */
-    public function testShouldSetCharsetByDSN()
+    public function testSetCharsetByDSN()
     {
         $config = new Config();
         $config->setDSN('CharsetShouldBeAbleToSetByDSN',
@@ -144,12 +144,12 @@ class PgsqlTest extends CompatibilityTests
     /**
      * @since Method available since Release 1.0.0
      */
-    public function testShouldSetAFunctionToGetTheCurrentTimestampToTheCreatedatFieldWhenExecutingInsert() {}
+    public function testSetAFunctionToGetTheCurrentTimestampToTheCreatedatFieldWhenExecutingInsert() {}
 
     /**
      * @since Method available since Release 1.2.0
      */
-    public function testShouldProvideTheDefaultValueOfAGivenField()
+    public function testProvideTheDefaultValueOfAGivenField()
     {
         $mapper = MapperFactory::factory('Employees');
 

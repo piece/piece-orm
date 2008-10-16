@@ -85,7 +85,7 @@ class MysqlTest extends CompatibilityTests
     /**
      * @since Method available since Release 0.6.0
      */
-    public function testShouldGenerateTheDefaultQueryIfTheQueryForAInsertMethodIsNotGiven()
+    public function testGenerateTheDefaultQueryIfTheQueryForAInsertMethodIsNotGiven()
     {
         $mapper = MapperFactory::factory('Employees');
 
@@ -95,7 +95,7 @@ class MysqlTest extends CompatibilityTests
     /**
      * @since Method available since Release 0.7.0
      */
-    public function testShouldSetCharsetByDSN()
+    public function testSetCharsetByDSN()
     {
         $config = new Config();
         $config->setDSN('CharsetShouldBeAbleToSetByDSN', array('phptype'  => 'mysql',
@@ -128,7 +128,7 @@ class MysqlTest extends CompatibilityTests
     /**
      * @since Method available since Release 1.2.0
      */
-    public function testShouldProvideTheDefaultValueOfAGivenField()
+    public function testProvideTheDefaultValueOfAGivenField()
     {
         $mapper = MapperFactory::factory('Employees');
 

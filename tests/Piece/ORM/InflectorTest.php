@@ -77,7 +77,7 @@ class InflectorTest extends ::PHPUnit_Framework_TestCase
      * @access public
      */
 
-    public function testShouldUnderscoreWords()
+    public function testUnderscoreWords()
     {
         $this->assertEquals('keyword_id', Inflector::underscore('keywordId'));
         $this->assertEquals('keyword1_id', Inflector::underscore('keyword1_id'));
@@ -92,7 +92,7 @@ class InflectorTest extends ::PHPUnit_Framework_TestCase
     /**
      * @since Method available since Release 0.8.1
      */
-    public function testShouldCamelizeWords()
+    public function testCamelizeWords()
     {
         $this->assertEquals('keywordId', Inflector::camelize('keyword_id', true));
         $this->assertEquals('keyword1_id', Inflector::camelize('keyword1_id', true));

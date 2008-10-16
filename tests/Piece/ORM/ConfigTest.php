@@ -77,7 +77,7 @@ class ConfigTest extends ::PHPUnit_Framework_TestCase
      * @access public
      */
 
-    public function testShouldReturnNullIfNoConfigurationsAreFound()
+    public function testReturnNullIfNoConfigurationsAreFound()
     {
         $config1 = new Config();
 

@@ -130,7 +130,7 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
         Registry::clear();
     }
 
-    public function testShouldFindAnObject()
+    public function testFindAnObject()
     {
         $id = $this->_insert();
         $mapper = MapperFactory::factory('Employees');
@@ -150,12 +150,12 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
     /**
      * @expectedException Piece::ORM::Exception
      */
-    public function testShouldRaiseAnExceptionWhenAGivenCriteriaIsIncomplete()
+    public function testRaiseAnExceptionWhenAGivenCriteriaIsIncomplete()
     {
         MapperFactory::factory('Employees')->findById(null);
     }
 
-    public function testShouldProvideBuiltinMethods()
+    public function testProvideBuiltinMethods()
     {
         $mapper = MapperFactory::factory('Employees');
 
@@ -181,7 +181,7 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
         $this->assertTrue(method_exists($mapper, 'update'));
     }
 
-    public function testShouldFindAnObjectWithCriteria()
+    public function testFindAnObjectWithCriteria()
     {
         $id = $this->_insert();
         $expectedQuery = "SELECT * FROM employees WHERE id = $id";
@@ -203,7 +203,7 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
         }
     }
 
-    public function testShouldFindAnObjectWithUserDefineMethod()
+    public function testFindAnObjectWithUserDefineMethod()
     {
         $id = $this->_insert();
         $criteria1 = new stdClass();
@@ -218,7 +218,7 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
         $this->assertNull($mapper->findByIdAndNote($criteria2));
     }
 
-    public function testShouldBeAbleToOverwriteBuiltinMethods()
+    public function testBeAbleToOverwriteBuiltinMethods()
     {
         $this->_configure('Overwrite');
         $this->_insert();
@@ -234,7 +234,7 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
         $this->assertNotNull($mapper->findByFirstName($criteria2));
     }
 
-    public function testShouldFindObjects()
+    public function testFindObjects()
     {
         $this->_insert();
         $this->_insert();
@@ -258,7 +258,7 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
         }
     }
 
-    public function testShouldFindObjectsWithCriteria()
+    public function testFindObjectsWithCriteria()
     {
         $this->_insert();
         $this->_insert();
@@ -285,7 +285,7 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
         }
     }
 
-    public function testShouldUpdateObjects()
+    public function testUpdateObjects()
     {
         $id = $this->_insert();
         $mapper = MapperFactory::factory('Employees');
@@ -309,7 +309,7 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
     /**
      * @expectedException Piece::ORM::Exception
      */
-    public function testShouldRaiseAnExceptionWhenAGivenCriteriaIsNull()
+    public function testRaiseAnExceptionWhenAGivenCriteriaIsNull()
     {
         $mapper = MapperFactory::factory('Employees');
         $mapper->delete(null);
@@ -318,7 +318,7 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
     /**
      * @expectedException Piece::ORM::Exception
      */
-    public function testShouldRaiseAnExceptionWhenAGivenCriteriaIsAnEmptyString()
+    public function testRaiseAnExceptionWhenAGivenCriteriaIsAnEmptyString()
     {
         $mapper = MapperFactory::factory('Employees');
         $mapper->delete('');
@@ -327,14 +327,14 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
     /**
      * @expectedException Piece::ORM::Exception
      */
-    public function testShouldRaiseAnExceptionWhenAGivenCriteriaIsAResource()
+    public function testRaiseAnExceptionWhenAGivenCriteriaIsAResource()
     {
         $mapper = MapperFactory::factory('Employees');
         $subject = fopen(__FILE__, 'r');
         $mapper->delete($subject);
     }
 
-    public function testShouldRaiseAnExceptionWhenDeletingObjectsByInappropriatePrimaryKey()
+    public function testRaiseAnExceptionWhenDeletingObjectsByInappropriatePrimaryKey()
     {
         $mapper = MapperFactory::factory('Employees');
         $subject = $mapper->createObject();
@@ -358,7 +358,7 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
         }
     }
 
-    public function testShouldRaiseAnExceptionWhenUpdatingObjectsByInappropriatePrimaryKey()
+    public function testRaiseAnExceptionWhenUpdatingObjectsByInappropriatePrimaryKey()
     {
         $mapper = MapperFactory::factory('Employees');
         $subject = $mapper->createObject();
@@ -382,7 +382,7 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
         }
     }
 
-    public function testShouldBeAbleToOverwriteTheBuiltinInsertQuery()
+    public function testBeAbleToOverwriteTheBuiltinInsertQuery()
     {
         $this->_configure('Overwrite');
         $id = $this->_insert();
@@ -402,7 +402,7 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
         $this->assertNull($mapper->findById($id));
     }
 
-    public function testShouldBeAbleToOverwriteTheBuiltinUpdateQuery()
+    public function testBeAbleToOverwriteTheBuiltinUpdateQuery()
     {
         $this->_configure('Overwrite');
         $id = $this->_insert();
@@ -423,7 +423,7 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
         $this->assertNull($mapper->findById($id));
     }
 
-    public function testShouldReplaceAnEmptyStringWithNull()
+    public function testReplaceAnEmptyStringWithNull()
     {
         $mapper = MapperFactory::factory('Employees');
         $subject = $mapper->createObject();
@@ -441,7 +441,7 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
     /**
      * @expectedException Piece::ORM::Exception
      */
-    public function testShouldRaiseAnExceptionWhenDetectingProblemWhileBuildingQuery()
+    public function testRaiseAnExceptionWhenDetectingProblemWhileBuildingQuery()
     {
         $id = $this->_insert();
         $mapper = MapperFactory::factory('Employees');
@@ -451,7 +451,7 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
         $mapper->update($employee);
     }
 
-    public function testShouldSupportManyToManyAssociations()
+    public function testSupportManyToManyAssociations()
     {
         foreach (array(false, true) as $useMapperNameAsTableName) {
             if ($useMapperNameAsTableName) {
@@ -510,7 +510,7 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
         }
     }
 
-    public function testShouldSupportManyToManyAssociationsWithBuiltinMethod()
+    public function testSupportManyToManyAssociationsWithBuiltinMethod()
     {
         foreach (array(false, true) as $useMapperNameAsTableName) {
             if ($useMapperNameAsTableName) {
@@ -534,7 +534,7 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
         }
     }
 
-    public function testShouldSupportOneToManyAssociations()
+    public function testSupportOneToManyAssociations()
     {
         foreach (array(false, true) as $useMapperNameAsTableName) {
             if ($useMapperNameAsTableName) {
@@ -582,7 +582,7 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
         }
     }
 
-    public function testShouldSupportManyToOneAssociations()
+    public function testSupportManyToOneAssociations()
     {
         foreach (array(false, true) as $useMapperNameAsTableName) {
             if ($useMapperNameAsTableName) {
@@ -639,7 +639,7 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
         }
     }
 
-    public function testShouldSupportOneToOneAssociations()
+    public function testSupportOneToOneAssociations()
     {
         foreach (array(false, true) as $useMapperNameAsTableName) {
             if ($useMapperNameAsTableName) {
@@ -696,7 +696,7 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
         }
     }
 
-    public function testShouldSupportLimitByMethod()
+    public function testSupportLimitByMethod()
     {
         foreach (array(false, true) as $useMapperNameAsTableName) {
             if ($useMapperNameAsTableName) {
@@ -723,7 +723,7 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
         }
     }
 
-    public function testShouldSupportOffsetByMethod()
+    public function testSupportOffsetByMethod()
     {
         foreach (array(false, true) as $useMapperNameAsTableName) {
             if ($useMapperNameAsTableName) {
@@ -748,7 +748,7 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
         }
     }
 
-    public function testShouldRaiseAnExceptionWhenAWrongLimitIsGiven()
+    public function testRaiseAnExceptionWhenAWrongLimitIsGiven()
     {
         foreach (array(false, true) as $useMapperNameAsTableName) {
             if ($useMapperNameAsTableName) {
@@ -773,7 +773,7 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
         }
     }
 
-    public function testShouldRaiseAnExceptionWhenAWrongOffsetIsGiven()
+    public function testRaiseAnExceptionWhenAWrongOffsetIsGiven()
     {
         foreach (array(false, true) as $useMapperNameAsTableName) {
             if ($useMapperNameAsTableName) {
@@ -798,7 +798,7 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
         }
     }
 
-    public function testShouldSupportOrderByMethod()
+    public function testSupportOrderByMethod()
     {
         foreach (array(false, true) as $useMapperNameAsTableName) {
             if ($useMapperNameAsTableName) {
@@ -840,7 +840,7 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
         }
     }
 
-    public function testShouldSupportOrderWithManyToManyAssociations()
+    public function testSupportOrderWithManyToManyAssociations()
     {
         foreach (array(false, true) as $useMapperNameAsTableName) {
             if ($useMapperNameAsTableName) {
@@ -866,7 +866,7 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
         }
     }
 
-    public function testShouldSupportOrderWithOneToManyAssociations()
+    public function testSupportOrderWithOneToManyAssociations()
     {
         foreach (array(false, true) as $useMapperNameAsTableName) {
             if ($useMapperNameAsTableName) {
@@ -891,7 +891,7 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
         }
     }
 
-    public function testShouldDeleteObjects()
+    public function testDeleteObjects()
     {
         $id = $this->_insert();
         $mapper = MapperFactory::factory('Employees');
@@ -905,7 +905,7 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
         $this->assertNull($employee2);
     }
 
-    public function testShouldCreateAnObject()
+    public function testCreateAnObject()
     {
         $mapper = MapperFactory::factory('Employees');
         $subject = $mapper->createObject();
@@ -922,7 +922,7 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
         $this->assertTrue(property_exists($subject, 'updatedAt'));
     }
 
-    public function testShouldSupportCascadeUpdateWithManyToManyAssociations()
+    public function testSupportCascadeUpdateWithManyToManyAssociations()
     {
         foreach (array(false, true) as $useMapperNameAsTableName) {
             if ($useMapperNameAsTableName) {
@@ -968,7 +968,7 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
         }
     }
 
-    public function testShouldSupportCascadeUpdateWithOneToManyAssociations()
+    public function testSupportCascadeUpdateWithOneToManyAssociations()
     {
         foreach (array(false, true) as $useMapperNameAsTableName) {
             if ($useMapperNameAsTableName) {
@@ -1029,7 +1029,7 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
         }
     }
 
-    public function testShouldSupportCascadeUpdateWithOneToOneAssociations()
+    public function testSupportCascadeUpdateWithOneToOneAssociations()
     {
         foreach (array(false, true) as $useMapperNameAsTableName) {
             if ($useMapperNameAsTableName) {
@@ -1121,7 +1121,7 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
         }
     }
 
-    public function testShouldSupportCascadeDeleteWithManyToManyAssociations()
+    public function testSupportCascadeDeleteWithManyToManyAssociations()
     {
         foreach (array(false, true) as $useMapperNameAsTableName) {
             if ($useMapperNameAsTableName) {
@@ -1148,7 +1148,7 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
         }
     }
 
-    public function testShouldSupportCascadeDeleteWithOneToManyAssociations()
+    public function testSupportCascadeDeleteWithOneToManyAssociations()
     {
         foreach (array(false, true) as $useMapperNameAsTableName) {
             if ($useMapperNameAsTableName) {
@@ -1176,7 +1176,7 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
         }
     }
 
-    public function testShouldSupportCascadeDeleteWithOneToOneAssociations()
+    public function testSupportCascadeDeleteWithOneToOneAssociations()
     {
         foreach (array(false, true) as $useMapperNameAsTableName) {
             if ($useMapperNameAsTableName) {
@@ -1206,7 +1206,7 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
     /**
      * @since Method available since Release 0.3.0
      */
-    public function testShouldProvideCountForTheLastQuery()
+    public function testProvideCountForTheLastQuery()
     {
         foreach (array(false, true) as $useMapperNameAsTableName) {
             if ($useMapperNameAsTableName) {
@@ -1245,7 +1245,7 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
     /**
      * @since Method available since Release 0.3.0
      */
-    public function testShouldFindAValue()
+    public function testFindAValue()
     {
         foreach (array(false, true) as $useMapperNameAsTableName) {
             if ($useMapperNameAsTableName) {
@@ -1273,7 +1273,7 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
     /**
      * @since Method available since Release 0.4.0
      */
-    public function testShouldProvideCountWithFindAll()
+    public function testProvideCountWithFindAll()
     {
         foreach (array(false, true) as $useMapperNameAsTableName) {
             if ($useMapperNameAsTableName) {
@@ -1300,7 +1300,7 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
     /**
      * @since Method available since Release 0.4.1
      */
-    public function testShouldExtractPhpNullAsDatabaseNull()
+    public function testExtractPhpNullAsDatabaseNull()
     {
         $mapper = MapperFactory::factory('Employees');
         $subject = $mapper->createObject();
@@ -1317,7 +1317,7 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
     /**
      * @since Method available since Release 0.5.0
      */
-    public function testShouldFindObjectsWithoutThePrimaryKey()
+    public function testFindObjectsWithoutThePrimaryKey()
     {
         $mapper = MapperFactory::factory('Employees');
         $subject = $mapper->createObject();
@@ -1341,7 +1341,7 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
     /**
      * @since Method available since Release 0.5.0
      */
-    public function testShouldProvideCountEvenThoughOrderIsSet()
+    public function testProvideCountEvenThoughOrderIsSet()
     {
         foreach (array(false, true) as $useMapperNameAsTableName) {
             if ($useMapperNameAsTableName) {
@@ -1369,7 +1369,7 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
     /**
      * @since Method available since Release 0.5.0
      */
-    public function testShouldBeAbleToDefineAnyInsertMethodsByConfiguration()
+    public function testBeAbleToDefineAnyInsertMethodsByConfiguration()
     {
         $mapper = MapperFactory::factory('Employees');
         $subject = $mapper->createObject();
@@ -1397,7 +1397,7 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
     /**
      * @since Method available since Release 0.5.0
      */
-    public function testShouldBeAbleToDefineAnyUpdateMethodsByConfiguration()
+    public function testBeAbleToDefineAnyUpdateMethodsByConfiguration()
     {
         $id = $this->_insert();
         $mapper = MapperFactory::factory('Employees');
@@ -1420,7 +1420,7 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
     /**
      * @since Method available since Release 0.5.0
      */
-    public function testShouldUpdateObjectsWithoutThePrimaryKey()
+    public function testUpdateObjectsWithoutThePrimaryKey()
     {
         $id1 = $this->_insert();
         $id2 = $this->_insert();
@@ -1445,7 +1445,7 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
     /**
      * @since Method available since Release 0.5.0
      */
-    public function testShouldDeleteObjectsWithoutThePrimaryKey()
+    public function testDeleteObjectsWithoutThePrimaryKey()
     {
         $id1 = $this->_insert();
         $id2 = $this->_insert();
@@ -1464,7 +1464,7 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
     /**
      * @since Method available since Release 0.5.0
      */
-    public function testShouldFindAnObjectWithAStaticQuery()
+    public function testFindAnObjectWithAStaticQuery()
     {
         $mapper = MapperFactory::factory('Employees');
         $employee = $mapper->findWithStaticQuery();
@@ -1475,7 +1475,7 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
     /**
      * @since Method available since Release 0.5.0
      */
-    public function testShouldFindObjectsWithAStaticQuery()
+    public function testFindObjectsWithAStaticQuery()
     {
         $mapper = MapperFactory::factory('Employees');
         $employees = $mapper->findAllWithStaticQuery();
@@ -1487,7 +1487,7 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
     /**
      * @since Method available since Release 0.5.0
      */
-    public function testShouldFindAValueWithAStaticQuery()
+    public function testFindAValueWithAStaticQuery()
     {
         $mapper = MapperFactory::factory('Employees');
 
@@ -1497,7 +1497,7 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
     /**
      * @since Method available since Release 0.5.0
      */
-    public function testShouldInsertAnObjectWithAStaticQuery()
+    public function testInsertAnObjectWithAStaticQuery()
     {
         $mapper = MapperFactory::factory('Employees');
         $id = @$mapper->insertWithStaticQuery();
@@ -1509,7 +1509,7 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
     /**
      * @since Method available since Release 0.5.0
      */
-    public function testShouldUpdateObjectsWithAStaticQuery()
+    public function testUpdateObjectsWithAStaticQuery()
     {
         $mapper = MapperFactory::factory('Employees');
 
@@ -1519,7 +1519,7 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
     /**
      * @since Method available since Release 0.5.0
      */
-    public function testShouldDeleteObjectsWithAStaticQuery()
+    public function testDeleteObjectsWithAStaticQuery()
     {
         $mapper = MapperFactory::factory('Employees');
 
@@ -1530,7 +1530,7 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
      * @expectedException Piece::ORM::Mapper::QueryExecutor::ConstraintException
      * @since Method available since Release 0.5.0
      */
-    public function testShouldRaiseAnExceptionWhenUniqueConstraintErrorIsOccurred()
+    public function testRaiseAnExceptionWhenUniqueConstraintErrorIsOccurred()
     {
         $mapper = MapperFactory::factory('Emails');
         $subject = $mapper->createObject();
@@ -1542,7 +1542,7 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
     /**
      * @since Method available since Release 0.6.0
      */
-    public function testShouldGenerateTheDefaultQueryIfTheQueryForAInsertMethodIsNotGiven()
+    public function testGenerateTheDefaultQueryIfTheQueryForAInsertMethodIsNotGiven()
     {
         $mapper = MapperFactory::factory('Employees');
 
@@ -1552,7 +1552,7 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
     /**
      * @since Method available since Release 0.6.0
      */
-    public function testShouldGenerateTheDefaultQueryIfTheQueryForAUpdateMethodIsNotGiven()
+    public function testGenerateTheDefaultQueryIfTheQueryForAUpdateMethodIsNotGiven()
     {
         $mapper = MapperFactory::factory('Employees');
 
@@ -1562,7 +1562,7 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
     /**
      * @since Method available since Release 0.6.0
      */
-    public function testShouldGenerateTheDefaultQueryIfTheQueryForADeleteMethodIsNotGiven()
+    public function testGenerateTheDefaultQueryIfTheQueryForADeleteMethodIsNotGiven()
     {
         $mapper = MapperFactory::factory('Employees');
 
@@ -1572,7 +1572,7 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
     /**
      * @since Method available since Release 0.6.0
      */
-    public function testShouldTreatManyToManyAssociationsWithUnderscoreTheSeparatedPrimaryKey()
+    public function testTreatManyToManyAssociationsWithUnderscoreTheSeparatedPrimaryKey()
     {
         foreach (array(false, true) as $useMapperNameAsTableName) {
             if ($useMapperNameAsTableName) {
@@ -1620,7 +1620,7 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
     /**
      * @since Method available since Release 0.6.0
      */
-    public function testShouldDefineSortOrdersByConfiguration()
+    public function testDefineSortOrdersByConfiguration()
     {
         $mapper = MapperFactory::factory('Employees');
         $subject = $mapper->createObject();
@@ -1652,7 +1652,7 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
     /**
      * @since Method available since Release 0.6.0
      */
-    public function testShouldPreferDynamicSortOrdersToStaticSortOrders()
+    public function testPreferDynamicSortOrdersToStaticSortOrders()
     {
         $mapper = MapperFactory::factory('Employees');
         $subject = $mapper->createObject();
@@ -1674,12 +1674,12 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
     /**
      * @since Method available since Release 0.7.0
      */
-    public function testShouldSetCharsetByDSN() {}
+    public function testSetCharsetByDSN() {}
 
     /**
      * @since Method available since Release 0.8.0
      */
-    public function testShouldUpdateObjectsOfATableWhichDoesNotHaveThePrimaryKey()
+    public function testUpdateObjectsOfATableWhichDoesNotHaveThePrimaryKey()
     {
         $mapper = MapperFactory::factory('Nonprimarykeys');
         $subject1 = $mapper->createObject();
@@ -1702,7 +1702,7 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
     /**
      * @since Method available since Release 0.8.0
      */
-    public function testShouldDeleteFromATableWhichDoesNotHaveThePrimaryKey()
+    public function testDeleteFromATableWhichDoesNotHaveThePrimaryKey()
     {
         $mapper = MapperFactory::factory('Nonprimarykeys');
         $subject1 = $mapper->createObject();
@@ -1724,7 +1724,7 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
     /**
      * @since Method available since Release 0.8.1
      */
-    public function testShouldWorkWithATableWhichHasTheCompositePrimaryKey()
+    public function testWorkWithATableWhichHasTheCompositePrimaryKey()
     {
         $mapper = MapperFactory::factory('Compositeprimarykey');
         $subject = $mapper->createObject();
@@ -1771,7 +1771,7 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
     /**
      * @since Method available since Release 0.8.1
      */
-    public function testShouldWorkWithATableWhichHasTheUnusualName()
+    public function testWorkWithATableWhichHasTheUnusualName()
     {
         foreach (array(false, true) as $useMapperNameAsTableName) {
             if ($useMapperNameAsTableName) {
@@ -1822,7 +1822,7 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
     /**
      * @since Method available since Release 0.8.1
      */
-    public function testShouldWorkWithAnyFinderMethodCallsForAMapperWhichHasAlreadyUsedInAssociations()
+    public function testWorkWithAnyFinderMethodCallsForAMapperWhichHasAlreadyUsedInAssociations()
     {
         foreach (array(false, true) as $useMapperNameAsTableName) {
             if ($useMapperNameAsTableName) {
@@ -1850,7 +1850,7 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
     /**
      * @since Method available since Release 0.8.1
      */
-    public function testShouldTreatMethodNamesAsCaseInsensitive()
+    public function testTreatMethodNamesAsCaseInsensitive()
     {
         $this->_configure('Overwrite');
         $id = $this->_insert();
@@ -1862,7 +1862,7 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
     /**
      * @since Method available since Release 1.0.0
      */
-    public function testShouldExpandValuesWithACommaIfAPropertyIsAnArray()
+    public function testExpandValuesWithACommaIfAPropertyIsAnArray()
     {
         $ids = array();
         $ids[] = $this->_insert();
@@ -1878,7 +1878,7 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
     /**
      * @since Method available since Release 1.0.0
      */
-    public function testShouldUseAMapperNameAsATableNameIfEnabled()
+    public function testUseAMapperNameAsATableNameIfEnabled()
     {
         $config = new Config();
         $config->setDSN('caseSensitive', $this->dsn);
@@ -1907,7 +1907,7 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
     /**
      * @since Method available since Release 1.0.0
      */
-    public function testShouldWorkAfterInsertUsingAnObjectReturnedFromFind()
+    public function testWorkAfterInsertUsingAnObjectReturnedFromFind()
     {
         $id1 = $this->_insert();
         $mapper = MapperFactory::factory('Employees');
@@ -1924,7 +1924,7 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
     /**
      * @since Method available since Release 1.0.0
      */
-    public function testShouldSupportLob()
+    public function testSupportLob()
     {
         $jpegPath = "{$this->cacheDirectory}/picture.jpg";
         $pngPath = "{$this->cacheDirectory}/picture.png";
@@ -1948,7 +1948,7 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
     /**
      * @since Method available since Release 1.0.0
      */
-    public function testShouldSetAFunctionToGetTheCurrentTimestampToTheCreatedatFieldWhenExecutingInsert()
+    public function testSetAFunctionToGetTheCurrentTimestampToTheCreatedatFieldWhenExecutingInsert()
     {
         $mapper = MapperFactory::factory('Employees');
         $subject = $mapper->createObject();
@@ -1962,7 +1962,7 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
     /**
      * @since Method available since Release 1.0.0
      */
-    public function testShouldSetAFunctionToGetTheCurrentTimestampToTheUpdatedatFieldWhenExecutingUpdate()
+    public function testSetAFunctionToGetTheCurrentTimestampToTheUpdatedatFieldWhenExecutingUpdate()
     {
         $id = $this->_insert();
         $mapper = MapperFactory::factory('Employees');
@@ -1975,7 +1975,7 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
     /**
      * @since Method available since Release 1.0.0
      */
-    public function testShouldSupportOptimisticLockingByTheLockversionFieldOnlyInDefaultQueries()
+    public function testSupportOptimisticLockingByTheLockversionFieldOnlyInDefaultQueries()
     {
         $id = $this->_insert();
         $mapper = MapperFactory::factory('Employees');
@@ -2005,7 +2005,7 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
     /**
      * @since Method available since Release 1.1.0
      */
-    public function testShouldWorkWithNullLobFields()
+    public function testWorkWithNullLobFields()
     {
         $jpegPath = "{$this->cacheDirectory}/picture.jpg";
         $mapper = MapperFactory::factory('Files');
@@ -2019,7 +2019,7 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
     /**
      * @since Method available since Release 1.1.0
      */
-    public function testShouldKeepALobFieldValueAfterInvokingUpdateIfTheValueIsNotChanged()
+    public function testKeepALobFieldValueAfterInvokingUpdateIfTheValueIsNotChanged()
     {
         $jpegPath = "{$this->cacheDirectory}/picture.jpg";
         $mapper = MapperFactory::factory('Files');
@@ -2036,7 +2036,7 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
     /**
      * @since Method available since Release 1.1.0
      */
-    public function testShouldTreatIndividualBlobs()
+    public function testTreatIndividualBlobs()
     {
         $jpegPath = "{$this->cacheDirectory}/picture.jpg";
         $pngPath = "{$this->cacheDirectory}/picture.png";
@@ -2055,12 +2055,12 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
     /**
      * @since Method available since Release 1.2.0
      */
-    abstract public function testShouldProvideTheDefaultValueOfAGivenField();
+    abstract public function testProvideTheDefaultValueOfAGivenField();
 
     /**
      * @since Method available since Release 1.2.0
      */
-    public function testShouldTreatInverseThroughTablesOnManyToManyAssociations()
+    public function testTreatInverseThroughTablesOnManyToManyAssociations()
     {
         foreach (array(false, true) as $useMapperNameAsTableName) {
             if ($useMapperNameAsTableName) {
@@ -2112,7 +2112,7 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
     /**
      * @since Method available since Release 1.2.0
      */
-    function testShouldBeAbleToUseQueryVariableInAQuery()
+    function testBeAbleToUseQueryVariableInAQuery()
     {
         try {
             MapperFactory::factory('Employees')->findByQueryVariable((object)array('query' => 1));

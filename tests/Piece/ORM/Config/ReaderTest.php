@@ -99,7 +99,7 @@ class ReaderTest extends ::PHPUnit_Framework_TestCase
         Registry::clear();
     }
 
-    public function testShouldCreateAnObjectWithoutConfigurationFile()
+    public function testCreateAnObjectWithoutConfigurationFile()
     {
         $reader = new Reader();
 
@@ -109,7 +109,7 @@ class ReaderTest extends ::PHPUnit_Framework_TestCase
     /**
      * @expectedException Piece::ORM::Exception
      */
-    public function testShouldRaiseAnExceptionWhenAGivenConfigurationDirectoryIsNotFound()
+    public function testRaiseAnExceptionWhenAGivenConfigurationDirectoryIsNotFound()
     {
         $reader = new Reader(dirname(__FILE__) . '/foo');
         $reader->read();
@@ -118,20 +118,20 @@ class ReaderTest extends ::PHPUnit_Framework_TestCase
     /**
      * @expectedException Piece::ORM::Exception
      */
-    public function testShouldRaiseAnExceptionWhenAGivenConfigurationFileIsNotFound()
+    public function testRaiseAnExceptionWhenAGivenConfigurationFileIsNotFound()
     {
         $reader = new Reader(dirname(__FILE__));
         $reader->read();
     }
 
-    public function testShouldCreateAnObjectEvenThoughAGivenCacheDirectoryIsNotFound()
+    public function testCreateAnObjectEvenThoughAGivenCacheDirectoryIsNotFound()
     {
         $reader = new Reader($this->_cacheDirectory);
 
         $this->assertType('Piece::ORM::Config', $reader->read());
     }
 
-    public function testShouldCreateAnObjectByAGivenConfigurationFile()
+    public function testCreateAnObjectByAGivenConfigurationFile()
     {
         $dsl = ::Spyc::YAMLLoad("{$this->_cacheDirectory}/piece-orm-config.yaml");
         $reader = new Reader($this->_cacheDirectory);
@@ -150,7 +150,7 @@ class ReaderTest extends ::PHPUnit_Framework_TestCase
     /**
      * @since Method available since Release 0.8.0
      */
-    public function testShouldCreateUniqueCacheIdsInOneCacheDirectory()
+    public function testCreateUniqueCacheIdsInOneCacheDirectory()
     {
         $oldDirectory = getcwd();
         chdir("{$this->_cacheDirectory}/CacheIDsShouldBeUniqueInOneCacheDirectory1");

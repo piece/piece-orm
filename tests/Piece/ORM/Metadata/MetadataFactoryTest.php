@@ -105,7 +105,7 @@ class MetadataFactoryTest extends ::PHPUnit_Framework_TestCase
         Registry::clear();
     }
 
-    public function testShouldCreateAnObjectByAGivenMapper()
+    public function testCreateAnObjectByAGivenMapper()
     {
         $metadata = MetadataFactory::factory('Employees');
   
@@ -113,7 +113,7 @@ class MetadataFactoryTest extends ::PHPUnit_Framework_TestCase
         $this->assertEquals('employees', $metadata->getTableName());
     }
 
-    public function testShouldReturnTheExistingObjectIfItExists()
+    public function testReturnTheExistingObjectIfItExists()
     {
         $metadata1 = MetadataFactory::factory('Employees');
         $metadata1->foo = 'bar';

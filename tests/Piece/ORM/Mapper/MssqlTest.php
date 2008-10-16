@@ -85,12 +85,12 @@ class MssqlTest extends CompatibilityTests
     /**
      * @since Method available since Release 1.0.0
      */
-    public function testShouldSetAFunctionToGetTheCurrentTimestampToTheCreatedatFieldWhenExecutingInsert() {}
+    public function testSetAFunctionToGetTheCurrentTimestampToTheCreatedatFieldWhenExecutingInsert() {}
 
     /**
      * @since Method available since Release 1.2.0
      */
-    public function testShouldProvideTheDefaultValueOfAGivenField()
+    public function testProvideTheDefaultValueOfAGivenField()
     {
         $mapper = MapperFactory::factory('Employees');
 
