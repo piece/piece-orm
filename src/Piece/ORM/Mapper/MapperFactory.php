@@ -193,7 +193,6 @@ class MapperFactory
      * @param string $mapperName
      * @param string $configFile
      * @return string
-     * @throws Piece::ORM::Exception
      * @throws Piece::ORM::Exception::PEARException
      */
     private function _getMapperSource($mapperID, $mapperName, $configFile)
@@ -205,24 +204,27 @@ class MapperFactory
                                        );
 
         if (!Env::isProduction()) {
+            ::PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
             $cache->remove($mapperID);
+            ::PEAR::staticPopErrorHandling();
         }
 
-        /*
-         * The Cache_Lite class always specifies PEAR_ERROR_RETURN when
-         * calling PEAR::raiseError in default.
-         */
+        ::PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
         $mapperSource = $cache->get($mapperID);
+        ::PEAR::staticPopErrorHandling();
         if (::PEAR::isError($mapperSource)) {
-            throw new Exception('Cannot read the mapper source file in the directory [ ' .
-                                ContextRegistry::getContext()->getCacheDirectory() . 
-                                ' ].'
-                                );
+            trigger_error('Cannot read the mapper source file in the directory [ ' .
+                          ContextRegistry::getContext()->getCacheDirectory() . 
+                          ' ].',
+                          E_USER_WARNING
+                          );
         }
 
-        if (!$mapperSource) {
+        if (!$mapperSource instanceof AbstractMapper) {
             $mapperSource = self::_generateMapperSource($mapperID, $mapperName, $configFile);
+            ::PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
             $result = $cache->save($mapperSource);
+            ::PEAR::staticPopErrorHandling();
             if (::PEAR::isError($result)) {
                 throw new PEARException($result);
             }
