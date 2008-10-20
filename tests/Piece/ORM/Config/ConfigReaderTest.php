@@ -89,8 +89,7 @@ class ConfigReaderTest extends ::PHPUnit_Framework_TestCase
     {
         $this->_cacheDirectory = dirname(__FILE__) . '/' . basename(__FILE__, '.php');
         ContextRegistry::setContext(new Context());
-        $context = ContextRegistry::getContext();
-        $context->setCacheDirectory($this->_cacheDirectory);
+        ContextRegistry::getContext()->setCacheDirectory($this->_cacheDirectory);
     }
 
     public function tearDown()
