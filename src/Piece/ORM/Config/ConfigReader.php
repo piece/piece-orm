@@ -41,6 +41,7 @@ use Piece::ORM::Config;
 use Piece::ORM::Exception;
 use Piece::ORM::Env;
 use Piece::ORM::Context::ContextRegistry;
+use Piece::ORM::Exception::PEARException;
 
 require_once 'spyc.php5';
 
@@ -116,18 +117,18 @@ class ConfigReader
             throw new Exception("The configuration directory [ {$this->_configDirectory} ] is not found.");
         }
 
-        $dslFile = "{$this->_configDirectory}/piece-orm-config.yaml";
-        if (!file_exists($dslFile)) {
-            throw new Exception("The configuration file [ $dslFile ] is not found.");
+        $configFile = "{$this->_configDirectory}/piece-orm-config.yaml";
+        if (!file_exists($configFile)) {
+            throw new Exception("The configuration file [ $configFile ] is not found.");
         }
 
-        if (!is_readable($dslFile)) {
-            throw new Exception("The configuration file [ $dslFile ] is not readable.");
+        if (!is_readable($configFile)) {
+            throw new Exception("The configuration file [ $configFile ] is not readable.");
         }
 
         ContextRegistry::getContext()->checkCacheDirectory();
 
-        return $this->_getConfiguration($dslFile);
+        return $this->_getConfiguration($configFile);
     }
 
     /**#@-*/
@@ -148,45 +149,43 @@ class ConfigReader
     /**
      * Gets a Piece::ORM::Config object from a cache.
      *
-     * @param string $dslFile
+     * @param string $configFile
      * @return Piece::ORM::Config
+     * @throws Piece::ORM::Exception::PEARException
      */
-    private function _getConfiguration($dslFile)
+    private function _getConfiguration($configFile)
     {
-        $dslFile = realpath($dslFile);
+        $configFile = realpath($configFile);
         $cache = new ::Cache_Lite_File(array('cacheDir' => ContextRegistry::getContext()->getCacheDirectory() . '/',
-                                             'masterFile' => $dslFile,
+                                             'masterFile' => $configFile,
                                              'automaticSerialization' => true,
                                              'errorHandlingAPIBreak' => true)
                                        );
 
         if (!Env::isProduction()) {
-            $cache->remove($dslFile);
+            ::PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
+            $cache->remove($configFile);
+            ::PEAR::staticPopErrorHandling();
         }
 
-        /*
-         * The Cache_Lite class always specifies PEAR_ERROR_RETURN when
-         * calling ::PEAR::raiseError in default.
-         */
-        $config = $cache->get($dslFile);
+        ::PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
+        $config = $cache->get($configFile);
+        ::PEAR::staticPopErrorHandling();
         if (::PEAR::isError($config)) {
             trigger_error('Cannot read the cache file in the directory [ ' .
                           ContextRegistry::getContext()->getCacheDirectory() .
                           ' ].',
                           E_USER_WARNING
                           );
-            return $this->_createConfigurationFromFile($dslFile);
         }
 
-        if (!$config) {
-            $config = $this->_createConfigurationFromFile($dslFile);
+        if (!$config instanceof Config) {
+            $config = $this->_readConfiguration($configFile);
+            ::PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
             $result = $cache->save($config);
+            ::PEAR::staticPopErrorHandling();
             if (::PEAR::isError($result)) {
-                trigger_error('Cannot write the Piece::ORM::Config object to the cache file in the directory [ ',
-                              ContextRegistry::getContext()->getCacheDirectory() .
-                              ' ].',
-                              E_USER_WARNING
-                              );
+                throw new PEARException($result);
             }
         }
 
@@ -194,18 +193,19 @@ class ConfigReader
     }
 
     // }}}
-    // {{{ _createConfigurationFromFile()
+    // {{{ _readConfiguration()
 
     /**
-     * Parses the given file and returns a Piece::ORM::Config object.
+     * Parses the given configuration file and returns a Piece::ORM::Config object.
      *
-     * @param string $dslFile
+     * @param string $configFile
      * @return Piece::ORM::Config
+     * @throws Piece::ORM::Exception
      */
-    private function _createConfigurationFromFile($dslFile)
+    private function _readConfiguration($configFile)
     {
         $config = new Config();
-        $dsl = ::Spyc::YAMLLoad($dslFile);
+        $dsl = ::Spyc::YAMLLoad($configFile);
         if (!is_array($dsl)) {
             return $config;
         }
@@ -216,18 +216,18 @@ class ConfigReader
 
         foreach ($dsl['databases'] as $database => $configuration) {
             if (!array_key_exists('dsn', $configuration)) {
-                throw new Exception("The element [ dsn ] is required in [ $dslFile ].");
+                throw new Exception("The element [ dsn ] is required in [ $configFile ].");
             }
 
             if (!is_array($configuration['dsn']) && !strlen($configuration['dsn'])) {
-                throw new Exception("The value of the element [ dsn ] is required in [ $dslFile ].");
+                throw new Exception("The value of the element [ dsn ] is required in [ $configFile ].");
             }
 
             $config->setDSN($database, $configuration['dsn']);
 
             if (array_key_exists('options', $configuration)) {
                 if (!is_array($configuration['options'])) {
-                    throw new Exception("The value of the element [ options ] must be an array in [ $dslFile ].");
+                    throw new Exception("The value of the element [ options ] must be an array in [ $configFile ].");
                 }
 
                 $config->setOptions($database, $configuration['options']);
@@ -235,7 +235,7 @@ class ConfigReader
 
             if (array_key_exists('directorySuffix', $configuration)) {
                 if (!strlen($configuration['directorySuffix'])) {
-                    throw new Exception("The value of the element [ directorySuffix ] is required in [ $dslFile ].");
+                    throw new Exception("The value of the element [ directorySuffix ] is required in [ $configFile ].");
                 }
 
                 $config->setDirectorySuffix($database, @$configuration['directorySuffix']);
@@ -243,7 +243,7 @@ class ConfigReader
 
             if (array_key_exists('useMapperNameAsTableName', $configuration)) {
                 if (!is_bool($configuration['useMapperNameAsTableName'])) {
-                    throw new Exception("The value of the element [ useMapperNameAsTableName ] must be a boolean in [ $dslFile ].");
+                    throw new Exception("The value of the element [ useMapperNameAsTableName ] must be a boolean in [ $configFile ].");
                 }
 
                 $config->setUseMapperNameAsTableName($database, $configuration['useMapperNameAsTableName']);
