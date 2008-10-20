@@ -142,7 +142,7 @@ class ManyToOne extends AbstractAssociationNormalizerStrategy
      *
      * @return boolean
      */
-    function checkHavingSinglePrimaryKey()
+    protected function checkHavingSinglePrimaryKey()
     {
         return false;
     }
