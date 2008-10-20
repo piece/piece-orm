@@ -100,17 +100,17 @@ class ORM
      * Piece::ORM::Metadata objects.
      *
      * @param string $configDirectory
+     * @param string $mapperDirectory
      * @param string $cacheDirectory
-     * @param string $mapperConfigDirectory
      */
     public static function configure($configDirectory,
-                                     $cacheDirectory,
-                                     $mapperConfigDirectory
+                                     $mapperDirectory,
+                                     $cacheDirectory
                                      )
     {
         ContextRegistry::setContext(new Context());
         $context = ContextRegistry::getContext();
-        $context->setMapperDirectory($mapperConfigDirectory);
+        $context->setMapperDirectory($mapperDirectory);
         $context->setCacheDirectory($cacheDirectory);
 
         $configReader = new ConfigReader($configDirectory);
