@@ -85,7 +85,7 @@ abstract class AbstractAssociationPersisterStrategy
      *
      * @param mixed $subject
      */
-    function __construct($subject)
+    public function __construct($subject)
     {
         $this->subject = $subject;
     }
