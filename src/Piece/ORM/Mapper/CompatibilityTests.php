@@ -2112,7 +2112,7 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
     /**
      * @since Method available since Release 1.2.0
      */
-    function testBeAbleToUseQueryVariableInAQuery()
+    public function testBeAbleToUseQueryVariableInAQuery()
     {
         try {
             MapperFactory::factory('Employees')->findByQueryVariable((object)array('query' => 1));
