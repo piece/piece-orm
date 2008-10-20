@@ -40,13 +40,13 @@ require_once 'PEAR.php';
 
 PEAR::staticPushErrorHandling(PEAR_ERROR_CALLBACK, create_function('$error', 'var_dump($error); exit();'));
 
-$releaseVersion = '2.0.0';
-$releaseStability = 'stable';
-$apiVersion = '2.0.0';
-$apiStability = 'stable';
+$releaseVersion = '2.0.0dev1';
+$releaseStability = 'devel';
+$apiVersion = '2.0.0dev1';
+$apiStability = 'devel';
 $notes = 'A new release of Piece_ORM is now available.
 
-What\'s New in Piece_ORM 2.0.0';
+What\'s New in Piece_ORM 2.0.0dev1';
 
 $package = new PEAR_PackageFileManager2();
 $package->setOptions(array('filelistgenerator' => 'file',

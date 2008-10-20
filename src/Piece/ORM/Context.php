@@ -238,7 +238,7 @@ class Context extends AttributeHolder
      * Sets a cache directory.
      *
      * @param string $cacheDirectory
-     * @since Method available since Release 2.0.0
+     * @since Method available since Release 2.0.0dev1
      */
     public function setCacheDirectory($cacheDirectory)
     {
@@ -252,7 +252,7 @@ class Context extends AttributeHolder
      * Gets the cache directory.
      *
      * @return array
-     * @since Method available since Release 2.0.0
+     * @since Method available since Release 2.0.0dev1
      */
     public function getCacheDirectory()
     {
@@ -269,7 +269,7 @@ class Context extends AttributeHolder
     /**
      * Restores the previous cache directory.
      *
-     * @since Method available since Release 2.0.0
+     * @since Method available since Release 2.0.0dev1
      */
     public function restoreCacheDirectory()
     {
@@ -282,7 +282,7 @@ class Context extends AttributeHolder
     /**
      * Clears all cache files in the cache directory.
      *
-     * @since Method available since Release 2.0.0
+     * @since Method available since Release 2.0.0dev1
      */
     public function clearCache()
     {
@@ -299,7 +299,7 @@ class Context extends AttributeHolder
     /**
      * Restores the previous database as the current database.
      *
-     * @since Method available since Release 2.0.0
+     * @since Method available since Release 2.0.0dev1
      */
     public function restoreDatabase()
     {
@@ -314,7 +314,7 @@ class Context extends AttributeHolder
      * Gets the current database.
      *
      * @return string
-     * @since Method available since Release 2.0.0
+     * @since Method available since Release 2.0.0dev1
      */
     public function getDatabase()
     {

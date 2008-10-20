@@ -350,7 +350,7 @@ class ORMTest extends ::PHPUnit_Framework_TestCase
     }
 
     /**
-     * @since Method available since Release 2.0.0
+     * @since Method available since Release 2.0.0dev1
      */
     public function testRestoreThePreviousDatabaseSettings()
     {

@@ -142,7 +142,7 @@ class MapperFactory
     /**
      * Restores the previous configuration directory.
      *
-     * @since Method available since Release 2.0.0
+     * @since Method available since Release 2.0.0dev1
      */
     public static function restoreConfigDirectory()
     {
@@ -158,7 +158,7 @@ class MapperFactory
      * Gets the config directory for the current context.
      *
      * @return array
-     * @since Method available since Release 2.0.0
+     * @since Method available since Release 2.0.0dev1
      */
     public function getConfigDirectory()
     {
@@ -340,7 +340,7 @@ class MapperFactory
      *
      * @param string $mapperID
      * @return Piece::ORM::Mapper::AbstractMapper
-     * @since Method available since Release 2.0.0
+     * @since Method available since Release 2.0.0dev1
      */
     private static function _getMapper($mapperID)
     {
@@ -359,7 +359,7 @@ class MapperFactory
      * Adds a Piece::ORM::Mapper object to the current context.
      *
      * @param Piece::ORM::Mapper::AbstractMapper $mapper
-     * @since Method available since Release 2.0.0
+     * @since Method available since Release 2.0.0dev1
      */
     private static function _addMapper(AbstractMapper $mapper)
     {
@@ -375,7 +375,7 @@ class MapperFactory
      * Gets the mapper registry from the current context.
      *
      * @return array
-     * @since Method available since Release 2.0.0
+     * @since Method available since Release 2.0.0dev1
      */
     private function _getMapperRegistry()
     {
@@ -393,7 +393,7 @@ class MapperFactory
      * Sets the mapper registry to the current context.
      *
      * @param array $mapperRegistry
-     * @since Method available since Release 2.0.0
+     * @since Method available since Release 2.0.0dev1
      */
     private function _setMapperRegistry(array $mapperRegistry)
     {
@@ -407,7 +407,7 @@ class MapperFactory
      * Gets the config directory stack from the current context.
      *
      * @return array
-     * @since Method available since Release 2.0.0
+     * @since Method available since Release 2.0.0dev1
      */
     private function _getConfigDirectoryStack()
     {
@@ -425,7 +425,7 @@ class MapperFactory
      * Sets the config directory stack to the current context.
      *
      * @param array $configDirectoryStack
-     * @since Method available since Release 2.0.0
+     * @since Method available since Release 2.0.0dev1
      */
     private function _setConfigDirectoryStack(array $configDirectoryStack)
     {

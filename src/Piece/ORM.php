@@ -227,7 +227,7 @@ class ORM
      * Clears all cache files in the cache directory.
      *
      * @throws Piece::ORM::Exception
-     * @since Method available since Release 2.0.0
+     * @since Method available since Release 2.0.0dev1
      */
     public static function clearCache()
     {
@@ -245,7 +245,7 @@ class ORM
      * Restores the previous database as the current database.
      *
      * @throws Piece::ORM::Exception
-     * @since Method available since Release 2.0.0
+     * @since Method available since Release 2.0.0dev1
      */
     public static function restoreDatabase()
     {
