@@ -37,7 +37,7 @@
 
 namespace Piece::ORM;
 
-use Piece::ORM::Context::Registry;
+use Piece::ORM::Context::ContextRegistry;
 
 // {{{ Piece::ORM::Env
 
@@ -87,7 +87,7 @@ class Env
      */
     public static function setIsProduction($isProduction)
     {
-        Registry::getContext()->setAttribute(__CLASS__ . '::isProduction', $isProduction);
+        ContextRegistry::getContext()->setAttribute(__CLASS__ . '::isProduction', $isProduction);
     }
 
     // }}}
@@ -100,11 +100,11 @@ class Env
      */
     public static function isProduction()
     {
-        if (!Registry::getContext()->hasAttribute(__CLASS__ . '::isProduction')) {
+        if (!ContextRegistry::getContext()->hasAttribute(__CLASS__ . '::isProduction')) {
             return true;
         }
 
-        return Registry::getContext()->getAttribute(__CLASS__ . '::isProduction');
+        return ContextRegistry::getContext()->getAttribute(__CLASS__ . '::isProduction');
     }
 
     /**#@-*/

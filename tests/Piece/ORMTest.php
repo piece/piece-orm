@@ -41,7 +41,7 @@ use Piece::ORM;
 use Piece::ORM::Metadata::MetadataFactory;
 use Piece::ORM::Mapper::MapperFactory;
 use Piece::ORMTest::Employee;
-use Piece::ORM::Context::Registry;
+use Piece::ORM::Context::ContextRegistry;
 
 require_once 'spyc.php5';
 
@@ -99,7 +99,7 @@ class ORMTest extends ::PHPUnit_Framework_TestCase
         } catch (Exception $e) {
         }
 
-        Registry::clear();
+        ContextRegistry::clear();
     }
 
     public function testConfigureWithAGivenConfigurationFile()
@@ -112,7 +112,7 @@ class ORMTest extends ::PHPUnit_Framework_TestCase
                        $this->_cacheDirectory,
                        $this->_cacheDirectory
                        );
-        $config = Registry::getContext()->getConfiguration();
+        $config = ContextRegistry::getContext()->getConfiguration();
 
         foreach ($dsl['databases'] as $database => $configuration) {
             $this->assertEquals($configuration['dsn'], $config->getDSN($database));
@@ -125,16 +125,16 @@ class ORMTest extends ::PHPUnit_Framework_TestCase
                             MapperFactory::getConfigDirectory()
                             );
         $this->assertEquals($this->_cacheDirectory,
-                            Registry::getContext()->getCacheDirectory()
+                            ContextRegistry::getContext()->getCacheDirectory()
                             );
 
         MapperFactory::setConfigDirectory('./foo');
-        Registry::getContext()->setCacheDirectory('./bar');
+        ContextRegistry::getContext()->setCacheDirectory('./bar');
 
         $this->assertEquals('./foo', MapperFactory::getConfigDirectory());
-        $this->assertEquals('./bar', Registry::getContext()->getCacheDirectory());
+        $this->assertEquals('./bar', ContextRegistry::getContext()->getCacheDirectory());
 
-        Registry::getContext()->restoreCacheDirectory();
+        ContextRegistry::getContext()->restoreCacheDirectory();
     }
 
     public function testConfigureDynamicallyWithAGivenConfigurationFile()
@@ -358,21 +358,21 @@ class ORMTest extends ::PHPUnit_Framework_TestCase
             dirname(__FILE__) . '/' . basename(__FILE__, '.php') . '/SetDatabase';
         ORM::configure($cacheDirectory, $cacheDirectory, $cacheDirectory);
 
-        $this->assertEquals('database1', Registry::getContext()->getDatabase());
+        $this->assertEquals('database1', ContextRegistry::getContext()->getDatabase());
         $this->assertEquals("$cacheDirectory/database1",
                             MapperFactory::getConfigDirectory()
                             );
 
         ORM::setDatabase('database2');
 
-        $this->assertEquals('database2', Registry::getContext()->getDatabase());
+        $this->assertEquals('database2', ContextRegistry::getContext()->getDatabase());
         $this->assertEquals("$cacheDirectory/database2",
                             MapperFactory::getConfigDirectory()
                             );
 
         ORM::restoreDatabase();
 
-        $this->assertEquals('database1', Registry::getContext()->getDatabase());
+        $this->assertEquals('database1', ContextRegistry::getContext()->getDatabase());
         $this->assertEquals("$cacheDirectory/database1",
                             MapperFactory::getConfigDirectory()
                             );

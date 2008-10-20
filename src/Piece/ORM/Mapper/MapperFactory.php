@@ -44,7 +44,7 @@ use Piece::ORM::Env;
 use Piece::ORM::Exception::PEARException;
 use Piece::ORM::Mapper::Generator;
 use Piece::ORM::Mapper::AbstractMapper;
-use Piece::ORM::Context::Registry;
+use Piece::ORM::Context::ContextRegistry;
 
 require_once 'spyc.php5';
 
@@ -98,7 +98,7 @@ class MapperFactory
      */
     public static function factory($mapperName)
     {
-        $context = Registry::getContext();
+        $context = ContextRegistry::getContext();
         if (!$context->getUseMapperNameAsTableName()) {
             $mapperName = Inflector::camelize($mapperName);
         }
@@ -198,7 +198,7 @@ class MapperFactory
      */
     private function _getMapperSource($mapperID, $mapperName, $configFile)
     {
-        $cache = new ::Cache_Lite_File(array('cacheDir' => Registry::getContext()->getCacheDirectory() . '/',
+        $cache = new ::Cache_Lite_File(array('cacheDir' => ContextRegistry::getContext()->getCacheDirectory() . '/',
                                              'masterFile' => $configFile,
                                              'automaticSerialization' => true,
                                              'errorHandlingAPIBreak' => true)
@@ -215,7 +215,7 @@ class MapperFactory
         $mapperSource = $cache->get($mapperID);
         if (::PEAR::isError($mapperSource)) {
             throw new Exception('Cannot read the mapper source file in the directory [ ' .
-                                Registry::getContext()->getCacheDirectory() . 
+                                ContextRegistry::getContext()->getCacheDirectory() . 
                                 ' ].'
                                 );
         }
@@ -295,22 +295,22 @@ class MapperFactory
                                 );
         }
 
-        if (is_null(Registry::getContext()->getCacheDirectory())) {
+        if (is_null(ContextRegistry::getContext()->getCacheDirectory())) {
             throw new Exception('The cache directory must be specified.');
         }
 
-        if (!file_exists(Registry::getContext()->getCacheDirectory())) {
+        if (!file_exists(ContextRegistry::getContext()->getCacheDirectory())) {
             throw new Exception('The cache directory [ ' .
-                                Registry::getContext()->getCacheDirectory() .
+                                ContextRegistry::getContext()->getCacheDirectory() .
                                 'is not found.'
                                 );
         }
 
-        if (!is_readable(Registry::getContext()->getCacheDirectory())
-            || !is_writable(Registry::getContext()->getCacheDirectory())
+        if (!is_readable(ContextRegistry::getContext()->getCacheDirectory())
+            || !is_writable(ContextRegistry::getContext()->getCacheDirectory())
             ) {
             throw new Exception('The cache directory [ ' .
-                                Registry::getContext()->getCacheDirectory() .
+                                ContextRegistry::getContext()->getCacheDirectory() .
                                 ' ] is not readable or writable.'
                                 );
         }
@@ -379,11 +379,11 @@ class MapperFactory
      */
     private function _getMapperRegistry()
     {
-        if (!Registry::getContext()->hasAttribute(__CLASS__ . '::mapperRegistry')) {
+        if (!ContextRegistry::getContext()->hasAttribute(__CLASS__ . '::mapperRegistry')) {
             return array();
         }
 
-        return Registry::getContext()->getAttribute(__CLASS__ . '::mapperRegistry');
+        return ContextRegistry::getContext()->getAttribute(__CLASS__ . '::mapperRegistry');
     }
 
     // }}}
@@ -397,7 +397,7 @@ class MapperFactory
      */
     private function _setMapperRegistry(array $mapperRegistry)
     {
-        Registry::getContext()->setAttribute(__CLASS__ . '::mapperRegistry', $mapperRegistry);
+        ContextRegistry::getContext()->setAttribute(__CLASS__ . '::mapperRegistry', $mapperRegistry);
     }
 
     // }}}
@@ -411,11 +411,11 @@ class MapperFactory
      */
     private function _getConfigDirectoryStack()
     {
-        if (!Registry::getContext()->hasAttribute(__CLASS__ . '::configDirectoryStack')) {
+        if (!ContextRegistry::getContext()->hasAttribute(__CLASS__ . '::configDirectoryStack')) {
             return array();
         }
 
-        return Registry::getContext()->getAttribute(__CLASS__ . '::configDirectoryStack');
+        return ContextRegistry::getContext()->getAttribute(__CLASS__ . '::configDirectoryStack');
     }
 
     // }}}
@@ -429,7 +429,7 @@ class MapperFactory
      */
     private function _setConfigDirectoryStack(array $configDirectoryStack)
     {
-        Registry::getContext()->setAttribute(__CLASS__ . '::configDirectoryStack', $configDirectoryStack);
+        ContextRegistry::getContext()->setAttribute(__CLASS__ . '::configDirectoryStack', $configDirectoryStack);
     }
 
     /**#@-*/

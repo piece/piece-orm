@@ -37,9 +37,7 @@
 
 namespace Piece::ORM::Context;
 
-use Stagehand::ContextRegistry;
-
-// {{{ Piece::ORM::Context::Registry
+// {{{ Piece::ORM::Context::ContextRegistry
 
 /**
  * A registry for Piece::ORM::Context objects.
@@ -50,7 +48,7 @@ use Stagehand::ContextRegistry;
  * @version    Release: @package_version@
  * @since      Class available since Release 0.1.0
  */
-class Registry extends ContextRegistry
+class ContextRegistry extends Stagehand::ContextRegistry
 {
 
     // {{{ properties

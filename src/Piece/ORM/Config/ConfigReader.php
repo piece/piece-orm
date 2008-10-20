@@ -40,7 +40,7 @@ namespace Piece::ORM::Config;
 use Piece::ORM::Config;
 use Piece::ORM::Exception;
 use Piece::ORM::Env;
-use Piece::ORM::Context::Registry;
+use Piece::ORM::Context::ContextRegistry;
 
 require_once 'spyc.php5';
 
@@ -125,23 +125,23 @@ class ConfigReader
             throw new Exception("The configuration file [ $dslFile ] is not readable.");
         }
 
-        if (is_null(Registry::getContext()->getCacheDirectory())) {
+        if (is_null(ContextRegistry::getContext()->getCacheDirectory())) {
             return $this->_createConfigurationFromFile($dslFile);
         }
 
-        if (!file_exists(Registry::getContext()->getCacheDirectory())) {
+        if (!file_exists(ContextRegistry::getContext()->getCacheDirectory())) {
             trigger_error('The cache directory [ ' .
-                          Registry::getContext()->getCacheDirectory() .
+                          ContextRegistry::getContext()->getCacheDirectory() .
                           ' ] is not found.',
                           E_USER_WARNING
                           );
             return $this->_createConfigurationFromFile($dslFile);
         }
 
-        if (!is_readable(Registry::getContext()->getCacheDirectory())
-            || !is_writable(Registry::getContext()->getCacheDirectory())) {
+        if (!is_readable(ContextRegistry::getContext()->getCacheDirectory())
+            || !is_writable(ContextRegistry::getContext()->getCacheDirectory())) {
             trigger_error('The cache directory [ ' .
-                          Registry::getContext()->getCacheDirectory() .
+                          ContextRegistry::getContext()->getCacheDirectory() .
                           ' ] is not readable or writable.',
                           E_USER_WARNING
                           );
@@ -175,7 +175,7 @@ class ConfigReader
     private function _getConfiguration($dslFile)
     {
         $dslFile = realpath($dslFile);
-        $cache = new ::Cache_Lite_File(array('cacheDir' => Registry::getContext()->getCacheDirectory() . '/',
+        $cache = new ::Cache_Lite_File(array('cacheDir' => ContextRegistry::getContext()->getCacheDirectory() . '/',
                                              'masterFile' => $dslFile,
                                              'automaticSerialization' => true,
                                              'errorHandlingAPIBreak' => true)
@@ -192,7 +192,7 @@ class ConfigReader
         $config = $cache->get($dslFile);
         if (::PEAR::isError($config)) {
             trigger_error('Cannot read the cache file in the directory [ ' .
-                          Registry::getContext()->getCacheDirectory() .
+                          ContextRegistry::getContext()->getCacheDirectory() .
                           ' ].',
                           E_USER_WARNING
                           );
@@ -204,7 +204,7 @@ class ConfigReader
             $result = $cache->save($config);
             if (::PEAR::isError($result)) {
                 trigger_error('Cannot write the Piece::ORM::Config object to the cache file in the directory [ ',
-                              Registry::getContext()->getCacheDirectory() .
+                              ContextRegistry::getContext()->getCacheDirectory() .
                               ' ].',
                               E_USER_WARNING
                               );

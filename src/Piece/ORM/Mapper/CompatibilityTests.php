@@ -42,7 +42,7 @@ use Piece::ORM::Context;
 use Piece::ORM::Mapper::MapperFactory;
 use Piece::ORM::Metadata::MetadataFactory;
 use Piece::ORM::Exception;
-use Piece::ORM::Context::Registry;
+use Piece::ORM::Context::ContextRegistry;
 
 // {{{ Piece::ORM::Mapper::CompatibilityTests
 
@@ -111,8 +111,8 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
         $config = new Config();
         $config->setDSN('piece', $this->dsn);
         $config->setOptions('piece', array('debug' => 2, 'result_buffering' => false));
-        Registry::setContext(new Context());
-        $context = Registry::getContext();
+        ContextRegistry::setContext(new Context());
+        $context = ContextRegistry::getContext();
         $context->setConfiguration($config);
         $context->setDatabase('piece');
         $context->setCacheDirectory($this->cacheDirectory);
@@ -126,8 +126,8 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
     public function tearDown()
     {
         $this->_clearTableRecords();
-        Registry::getContext()->clearCache();
-        Registry::clear();
+        ContextRegistry::getContext()->clearCache();
+        ContextRegistry::clear();
     }
 
     public function testFindAnObject()
@@ -1888,7 +1888,7 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
         $context->setConfiguration($config);
         $context->setDatabase('caseSensitive');
         $context->setCacheDirectory($this->cacheDirectory);
-        Registry::setContext($context);
+        ContextRegistry::setContext($context);
         MapperFactory::setConfigDirectory($this->cacheDirectory);
 
         try {
@@ -2223,12 +2223,12 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
     {
         $this->cacheDirectory = "{$this->cacheDirectory}/$cacheDirectory";
         MapperFactory::setConfigDirectory($this->cacheDirectory);
-        Registry::getContext()->setCacheDirectory($this->cacheDirectory);
+        ContextRegistry::getContext()->setCacheDirectory($this->cacheDirectory);
     }
 
     public function _clearTableRecords()
     {
-        $dbh = Registry::getContext()->getConnection();
+        $dbh = ContextRegistry::getContext()->getConnection();
         foreach ($this->tables as $table) {
             $dbh->exec("TRUNCATE TABLE $table");
         }
@@ -2239,7 +2239,7 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
         $config = new Config();
         $config->setDSN('caseSensitive', $this->dsn);
         $config->setUseMapperNameAsTableName('caseSensitive', true);
-        $context = Registry::getContext();
+        $context = ContextRegistry::getContext();
         $context->setConfiguration($config);
         $context->setDatabase('caseSensitive');
         $context->setCacheDirectory($this->cacheDirectory);

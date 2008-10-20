@@ -42,7 +42,7 @@ use Piece::ORM::Context;
 use Piece::ORM::Mapper::MapperFactory;
 use Piece::ORM::Metadata::MetadataFactory;
 use Piece::ORM::Exception;
-use Piece::ORM::Context::Registry;
+use Piece::ORM::Context::ContextRegistry;
 
 // {{{ Piece::ORM
 
@@ -108,8 +108,8 @@ class ORM
                                      $mapperConfigDirectory
                                      )
     {
-        Registry::setContext(new Context());
-        $context = Registry::getContext();
+        ContextRegistry::setContext(new Context());
+        $context = ContextRegistry::getContext();
         $context->setMapperConfigDirectory($mapperConfigDirectory);
         $context->setCacheDirectory($cacheDirectory);
 
@@ -135,7 +135,7 @@ class ORM
      */
     public static function getMapper($mapperName)
     {
-        if (is_null(Registry::getContext())) {
+        if (is_null(ContextRegistry::getContext())) {
             throw new Exception(__METHOD__ . ' method must be called after calling configure().');
         }
 
@@ -153,11 +153,11 @@ class ORM
      */
     public static function getConfiguration()
     {
-        if (is_null(Registry::getContext())) {
+        if (is_null(ContextRegistry::getContext())) {
             throw new Exception(__METHOD__ . ' method must be called after calling configure().');
         }
 
-        return Registry::getContext()->getConfiguration();
+        return ContextRegistry::getContext()->getConfiguration();
     }
 
     // }}}
@@ -171,11 +171,11 @@ class ORM
      */
     public static function setDatabase($database)
     {
-        if (is_null(Registry::getContext())) {
+        if (is_null(ContextRegistry::getContext())) {
             throw new Exception(__METHOD__ . ' method must be called after calling configure().');
         }
 
-        Registry::getContext()->setDatabase($database);
+        ContextRegistry::getContext()->setDatabase($database);
     }
 
     // }}}
@@ -190,7 +190,7 @@ class ORM
      */
     public static function createObject($mapperName)
     {
-        if (is_null(Registry::getContext())) {
+        if (is_null(ContextRegistry::getContext())) {
             throw new Exception(__METHOD__ . ' method must be called after calling configure().');
         }
 
@@ -231,11 +231,11 @@ class ORM
      */
     public static function clearCache()
     {
-        if (is_null(Registry::getContext())) {
+        if (is_null(ContextRegistry::getContext())) {
             throw new Exception(__METHOD__ . ' method must be called after calling configure().');
         }
 
-        Registry::getContext()->clearCache();
+        ContextRegistry::getContext()->clearCache();
     }
 
     // }}}
@@ -249,11 +249,11 @@ class ORM
      */
     public static function restoreDatabase()
     {
-        if (is_null(Registry::getContext())) {
+        if (is_null(ContextRegistry::getContext())) {
             throw new Exception(__METHOD__ . ' method must be called after calling configure().');
         }
 
-        Registry::getContext()->restoreDatabase();
+        ContextRegistry::getContext()->restoreDatabase();
     }
 
     /**#@-*/

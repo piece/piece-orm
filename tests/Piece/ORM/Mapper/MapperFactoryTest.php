@@ -42,7 +42,7 @@ use Piece::ORM::Context;
 use Piece::ORM::Mapper::MapperFactory;
 use Piece::ORM::Metadata::MetadataFactory;
 use Piece::ORM::Exception;
-use Piece::ORM::Context::Registry;
+use Piece::ORM::Context::ContextRegistry;
 
 // {{{ Piece::ORM::Mapper::MapperFactoryTest
 
@@ -92,8 +92,8 @@ class MapperFactoryTest extends ::PHPUnit_Framework_TestCase
         $config = new Config();
         $config->setDSN('piece', 'pgsql://piece:piece@pieceorm/piece');
         $config->setOptions('piece', array('debug' => 2, 'result_buffering' => false));
-        Registry::setContext(new Context());
-        $context = Registry::getContext();
+        ContextRegistry::setContext(new Context());
+        $context = ContextRegistry::getContext();
         $context->setConfiguration($config);
         $context->setMapperConfigDirectory($this->_cacheDirectory);
         $context->setDatabase('piece');
@@ -103,8 +103,8 @@ class MapperFactoryTest extends ::PHPUnit_Framework_TestCase
 
     public function tearDown()
     {
-        Registry::getContext()->clearCache();
-        Registry::clear();
+        ContextRegistry::getContext()->clearCache();
+        ContextRegistry::clear();
     }
 
     public function testRaiseAnExceptionIfTheConfigurationDirectoryIsNotSpecified()
@@ -135,13 +135,13 @@ class MapperFactoryTest extends ::PHPUnit_Framework_TestCase
 
     public function testRaiseAnExceptionIfTheCacheDirectoryIsNotSpecified()
     {
-        Registry::getContext()->setCacheDirectory(null);
+        ContextRegistry::getContext()->setCacheDirectory(null);
 
         try {
             MapperFactory::factory('Employees');
-            Registry::getContext()->restoreCacheDirectory();
+            ContextRegistry::getContext()->restoreCacheDirectory();
         } catch (Exception $e) {
-            Registry::getContext()->restoreCacheDirectory();
+            ContextRegistry::getContext()->restoreCacheDirectory();
             return;
         }
 
@@ -150,13 +150,13 @@ class MapperFactoryTest extends ::PHPUnit_Framework_TestCase
 
     public function testRaiseAnExceptionIfAGivenCacheDirectoryIsNotFound()
     {
-        Registry::getContext()->setCacheDirectory(dirname(__FILE__) . '/foo');
+        ContextRegistry::getContext()->setCacheDirectory(dirname(__FILE__) . '/foo');
 
         try {
             MapperFactory::factory('Employees');
-            Registry::getContext()->restoreCacheDirectory();
+            ContextRegistry::getContext()->restoreCacheDirectory();
         } catch (Exception $e) {
-            Registry::getContext()->restoreCacheDirectory();
+            ContextRegistry::getContext()->restoreCacheDirectory();
             return;
         }
 
@@ -193,7 +193,7 @@ class MapperFactoryTest extends ::PHPUnit_Framework_TestCase
 
     public function testSwitchDatabase()
     {
-        $context = Registry::getContext();
+        $context = ContextRegistry::getContext();
         $config = $context->getConfiguration();
         $config->setDSN('piece1', 'pgsql://piece:piece@pieceorm/piece');
         $config->setOptions('piece1',

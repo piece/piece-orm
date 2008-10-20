@@ -43,7 +43,7 @@ use Piece::ORM::Exception::PEARException;
 use Piece::ORM::Metadata::MetadataFactory::NoSuchTableException;
 use Piece::ORM::MDB2::Decorator::Reverse::Mssql;
 use Piece::ORM::Metadata;
-use Piece::ORM::Context::Registry;
+use Piece::ORM::Context::ContextRegistry;
 
 // {{{ Piece::ORM::Metadata::MetadataFactory
 
@@ -94,7 +94,7 @@ class MetadataFactory
      */
     public static function factory($tableName)
     {
-        $context = Registry::getContext();
+        $context = ContextRegistry::getContext();
         if (!$context->getUseMapperNameAsTableName()) {
             $tableName = Inflector::underscore($tableName);
         }
@@ -133,7 +133,7 @@ class MetadataFactory
      */
     private static function _getMetadataFromCache($tableName, $tableID)
     {
-        $cache = new ::Cache_Lite(array('cacheDir' => Registry::getContext()->getCacheDirectory() . '/',
+        $cache = new ::Cache_Lite(array('cacheDir' => ContextRegistry::getContext()->getCacheDirectory() . '/',
                                         'automaticSerialization' => true,
                                         'errorHandlingAPIBreak' => true)
                                   );
@@ -149,7 +149,7 @@ class MetadataFactory
         $metadata = $cache->get($tableID);
         if (::PEAR::isError($metadata)) {
             trigger_error('Cannot read the cache file in the directory [ ' .
-                          Registry::getContext()->getCacheDirectory() .
+                          ContextRegistry::getContext()->getCacheDirectory() .
                           ' ].',
                           E_USER_WARNING
                           );
@@ -162,7 +162,7 @@ class MetadataFactory
             $result = $cache->save($metadata);
             if (::PEAR::isError($result)) {
                 trigger_error('Cannot write a Piece::ORM::Metadata object to the cache file in the directory [ ' .
-                              Registry::getContext()->getCacheDirectory() .
+                              ContextRegistry::getContext()->getCacheDirectory() .
                               ' ].',
                               E_USER_WARNING
                               );
@@ -186,7 +186,7 @@ class MetadataFactory
      */
     private static function _createMetadataFromDatabase($tableName, $tableID)
     {
-        $context = Registry::getContext();
+        $context = ContextRegistry::getContext();
         $dbh = $context->getConnection();
 
         ::PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
@@ -256,20 +256,20 @@ class MetadataFactory
      */
     private static function _createMetadata($tableName, $tableID)
     {
-        if (!file_exists(Registry::getContext()->getCacheDirectory())) {
+        if (!file_exists(ContextRegistry::getContext()->getCacheDirectory())) {
             trigger_error('The cache directory [ ' .
-                          Registry::getContext()->getCacheDirectory() .
+                          ContextRegistry::getContext()->getCacheDirectory() .
                           ' ] is not found.',
                           E_USER_WARNING
                           );
             return self::_createMetadataFromDatabase($tableName, $tableID);
         }
 
-        if (!is_readable(Registry::getContext()->getCacheDirectory())
-            || !is_writable(Registry::getContext()->getCacheDirectory())
+        if (!is_readable(ContextRegistry::getContext()->getCacheDirectory())
+            || !is_writable(ContextRegistry::getContext()->getCacheDirectory())
             ) {
             trigger_error('The cache directory [ ' .
-                          Registry::getContext()->getCacheDirectory() .
+                          ContextRegistry::getContext()->getCacheDirectory() .
                           ' ] is not readable or writable.',
                           E_USER_WARNING
                           );
@@ -323,11 +323,11 @@ class MetadataFactory
      */
     private function _getMetadataRegistry()
     {
-        if (!Registry::getContext()->hasAttribute(__CLASS__ . '::metadataRegistry')) {
+        if (!ContextRegistry::getContext()->hasAttribute(__CLASS__ . '::metadataRegistry')) {
             return array();
         }
 
-        return Registry::getContext()->getAttribute(__CLASS__ . '::metadataRegistry');
+        return ContextRegistry::getContext()->getAttribute(__CLASS__ . '::metadataRegistry');
     }
 
     // }}}
@@ -340,7 +340,7 @@ class MetadataFactory
      */
     private function _setMetadataRegistry(array $metadataRegistry)
     {
-        Registry::getContext()->setAttribute(__CLASS__ . '::metadataRegistry', $metadataRegistry);
+        ContextRegistry::getContext()->setAttribute(__CLASS__ . '::metadataRegistry', $metadataRegistry);
     }
 
     /**#@-*/

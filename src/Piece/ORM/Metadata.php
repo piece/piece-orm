@@ -38,7 +38,7 @@
 namespace Piece::ORM;
 
 use Piece::ORM::Inflector;
-use Piece::ORM::Context::Registry;
+use Piece::ORM::Context::ContextRegistry;
 
 // {{{ Piece::ORM::Metadata
 
@@ -158,7 +158,7 @@ class Metadata
      */
     public function getTableName($notQuoteIdentifier = false)
     {
-        $context = Registry::getContext();
+        $context = ContextRegistry::getContext();
         if (!$context->getUseMapperNameAsTableName() || $notQuoteIdentifier) {
             return $this->_tableName;
         } else {

@@ -40,7 +40,7 @@ namespace Piece::ORM::Mapper;
 use Piece::ORM::Mapper::CompatibilityTests;
 use Piece::ORM::Mapper::MapperFactory;
 use Piece::ORM::Config;
-use Piece::ORM::Context::Registry;
+use Piece::ORM::Context::ContextRegistry;
 
 // {{{ Piece::ORM::Mapper::MysqlTest
 
@@ -106,7 +106,7 @@ class MysqlTest extends CompatibilityTests
                                                                'charset'  => 'sjis')
                         );
         $config->setOptions('piece', array('debug' => 2, 'result_buffering' => false));
-        $context = Registry::getContext();
+        $context = ContextRegistry::getContext();
         $context->setConfiguration($config);
         $context->setMapperConfigDirectory($this->cacheDirectory);
         $context->setDatabase('CharsetShouldBeAbleToSetByDSN');

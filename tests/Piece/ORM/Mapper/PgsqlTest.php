@@ -41,7 +41,7 @@ use Piece::ORM::Mapper::CompatibilityTests;
 use Piece::ORM::Mapper::MapperFactory;
 use Piece::ORM::Metadata::MetadataFactory;
 use Piece::ORM::Config;
-use Piece::ORM::Context::Registry;
+use Piece::ORM::Context::ContextRegistry;
 
 // {{{ Piece::ORM::Mapper::PgsqlTest
 
@@ -91,7 +91,7 @@ class PgsqlTest extends CompatibilityTests
         $this->tables[] = 'geometric_types';
         $this->cacheDirectory = dirname(__FILE__) . '/' . basename(__FILE__, '.php');
         MapperFactory::setConfigDirectory($this->cacheDirectory);
-        Registry::getContext()->setCacheDirectory($this->cacheDirectory);
+        ContextRegistry::getContext()->setCacheDirectory($this->cacheDirectory);
         $mapper = MapperFactory::factory('GeometricTypes');
         $geometricTypes = $mapper->createObject();
         $geometricTypes->pointField = '(1,1)';
@@ -125,7 +125,7 @@ class PgsqlTest extends CompatibilityTests
         $config->setOptions('piece',
                             array('debug' => 2, 'result_buffering' => false)
                             );
-        $context = Registry::getContext();
+        $context = ContextRegistry::getContext();
         $context->setConfiguration($config);
         $context->setMapperConfigDirectory($this->cacheDirectory);
         $context->setDatabase('CharsetShouldBeAbleToSetByDSN');

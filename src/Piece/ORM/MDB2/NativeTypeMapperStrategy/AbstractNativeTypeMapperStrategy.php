@@ -37,7 +37,7 @@
 
 namespace Piece::ORM::MDB2::NativeTypeMapperStrategy;
 
-use Piece::ORM::Context::Registry;
+use Piece::ORM::Context::ContextRegistry;
 
 // {{{ Piece::ORM::MDB2::NativeTypeMapperStrategy::AbstractNativeTypeMapperStrategy
 
@@ -88,7 +88,7 @@ abstract class AbstractNativeTypeMapperStrategy
     public function __construct()
     {
         $this->_driverName = strtolower(substr(strrchr(get_class($this), ':'), 1));
-        if (!Registry::getContext()->hasAttribute(__CLASS__ . '::nativeTypeMap')) {
+        if (!ContextRegistry::getContext()->hasAttribute(__CLASS__ . '::nativeTypeMap')) {
             $this->initialize();
         }
     }
@@ -183,11 +183,11 @@ abstract class AbstractNativeTypeMapperStrategy
      */
     private static function _getNativeTypeMap()
     {
-        if (!Registry::getContext()->hasAttribute(__CLASS__ . '::nativeTypeMap')) {
+        if (!ContextRegistry::getContext()->hasAttribute(__CLASS__ . '::nativeTypeMap')) {
             return array();
         }
 
-        return Registry::getContext()->getAttribute(__CLASS__ . '::nativeTypeMap');
+        return ContextRegistry::getContext()->getAttribute(__CLASS__ . '::nativeTypeMap');
     }
 
     // }}}
@@ -200,7 +200,7 @@ abstract class AbstractNativeTypeMapperStrategy
      */
     private static function _setNativeTypeMap(array $nativeTypeMap)
     {
-        Registry::getContext()->setAttribute(__CLASS__ . '::nativeTypeMap', $nativeTypeMap);
+        ContextRegistry::getContext()->setAttribute(__CLASS__ . '::nativeTypeMap', $nativeTypeMap);
     }
 
     /**#@-*/

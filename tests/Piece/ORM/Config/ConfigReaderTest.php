@@ -39,7 +39,7 @@ namespace Piece::ORM::Config;
 
 use Piece::ORM::Config::ConfigReader;
 use Piece::ORM::Context;
-use Piece::ORM::Context::Registry;
+use Piece::ORM::Context::ContextRegistry;
 
 require_once 'spyc.php5';
 
@@ -88,15 +88,15 @@ class ConfigReaderTest extends ::PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->_cacheDirectory = dirname(__FILE__) . '/' . basename(__FILE__, '.php');
-        Registry::setContext(new Context());
-        $context = Registry::getContext();
+        ContextRegistry::setContext(new Context());
+        $context = ContextRegistry::getContext();
         $context->setCacheDirectory($this->_cacheDirectory);
     }
 
     public function tearDown()
     {
-        Registry::getContext()->clearCache();
-        Registry::clear();
+        ContextRegistry::getContext()->clearCache();
+        ContextRegistry::clear();
     }
 
     public function testCreateAnObjectWithoutConfigurationFile()

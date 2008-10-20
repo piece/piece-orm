@@ -40,7 +40,7 @@ namespace Piece::ORM::Metadata;
 use Piece::ORM::Metadata::MetadataFactory;
 use Piece::ORM::Config;
 use Piece::ORM::Context;
-use Piece::ORM::Context::Registry;
+use Piece::ORM::Context::ContextRegistry;
 
 // {{{ Piece::ORM::Metadata::MetadataFactoryTest
 
@@ -92,8 +92,8 @@ class MetadataFactoryTest extends ::PHPUnit_Framework_TestCase
         $config->setOptions('piece',
                             array('debug' => 2, 'result_buffering' => false)
                             );
-        Registry::setContext(new Context());
-        $context = Registry::getContext();
+        ContextRegistry::setContext(new Context());
+        $context = ContextRegistry::getContext();
         $context->setConfiguration($config);
         $context->setDatabase('piece');
         $context->setCacheDirectory($this->_cacheDirectory);
@@ -101,8 +101,8 @@ class MetadataFactoryTest extends ::PHPUnit_Framework_TestCase
 
     public function tearDown()
     {
-        Registry::getContext()->clearCache();
-        Registry::clear();
+        ContextRegistry::getContext()->clearCache();
+        ContextRegistry::clear();
     }
 
     public function testCreateAnObjectByAGivenMapper()
