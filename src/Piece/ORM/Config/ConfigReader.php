@@ -102,7 +102,8 @@ class ConfigReader
     // {{{ read()
 
     /**
-     * Creates a Piece::ORM::Config object from a configuration file or a cache.
+     * Reads configuration from the given configuration file and creates
+     * a Piece::ORM::Config object.
      *
      * @return Piece::ORM::Config
      * @throws Piece::ORM::Exception
