@@ -130,6 +130,7 @@ class MetadataFactory
      * @param string $tableName
      * @param string $tableID
      * @return Piece::ORM::Metadata
+     * @throws Piece::ORM::Exception::PEARException
      */
     private static function _getMetadataFromCache($tableName, $tableID)
     {
@@ -139,33 +140,29 @@ class MetadataFactory
                                   );
 
         if (!Env::isProduction()) {
+            ::PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
             $cache->remove($tableID);
+            ::PEAR::staticPopErrorHandling();
         }
 
-        /*
-         * The Cache_Lite class always specifies PEAR_ERROR_RETURN when
-         * calling PEAR::raiseError in default.
-         */
+        ::PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
         $metadata = $cache->get($tableID);
+        ::PEAR::staticPopErrorHandling();
         if (::PEAR::isError($metadata)) {
             trigger_error('Cannot read the cache file in the directory [ ' .
                           ContextRegistry::getContext()->getCacheDirectory() .
                           ' ].',
                           E_USER_WARNING
                           );
-
-            return self::_createMetadataFromDatabase($tableName, $tableID);
         }
 
-        if (!$metadata) {
+        if (!$metadata instanceof Metadata) {
             $metadata = self::_createMetadataFromDatabase($tableName, $tableID);
+            ::PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
             $result = $cache->save($metadata);
+            ::PEAR::staticPopErrorHandling();
             if (::PEAR::isError($result)) {
-                trigger_error('Cannot write a Piece::ORM::Metadata object to the cache file in the directory [ ' .
-                              ContextRegistry::getContext()->getCacheDirectory() .
-                              ' ].',
-                              E_USER_WARNING
-                              );
+                throw new PEARException($result);
             }
         }
 
