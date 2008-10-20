@@ -37,16 +37,16 @@
 
 namespace Piece::ORM::Config;
 
-use Piece::ORM::Config::Reader;
+use Piece::ORM::Config::ConfigReader;
 use Piece::ORM::Context;
 use Piece::ORM::Context::Registry;
 
 require_once 'spyc.php5';
 
-// {{{ Piece::ORM::Config::ReaderTest
+// {{{ Piece::ORM::Config::ConfigReaderTest
 
 /**
- * Some tests for Piece::ORM::Config::Reader.
+ * Some tests for Piece::ORM::Config::ConfigReader.
  *
  * @package    Piece_ORM
  * @copyright  2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
@@ -54,7 +54,7 @@ require_once 'spyc.php5';
  * @version    Release: @package_version@
  * @since      Class available since Release 0.1.0
  */
-class ReaderTest extends ::PHPUnit_Framework_TestCase
+class ConfigReaderTest extends ::PHPUnit_Framework_TestCase
 {
 
     // {{{ properties
@@ -101,9 +101,9 @@ class ReaderTest extends ::PHPUnit_Framework_TestCase
 
     public function testCreateAnObjectWithoutConfigurationFile()
     {
-        $reader = new Reader();
+        $configReader = new ConfigReader();
 
-        $this->assertType('Piece::ORM::Config', $reader->read());
+        $this->assertType('Piece::ORM::Config', $configReader->read());
     }
 
     /**
@@ -111,8 +111,8 @@ class ReaderTest extends ::PHPUnit_Framework_TestCase
      */
     public function testRaiseAnExceptionWhenAGivenConfigurationDirectoryIsNotFound()
     {
-        $reader = new Reader(dirname(__FILE__) . '/foo');
-        $reader->read();
+        $configReader = new ConfigReader(dirname(__FILE__) . '/foo');
+        $configReader->read();
     }
 
     /**
@@ -120,22 +120,22 @@ class ReaderTest extends ::PHPUnit_Framework_TestCase
      */
     public function testRaiseAnExceptionWhenAGivenConfigurationFileIsNotFound()
     {
-        $reader = new Reader(dirname(__FILE__));
-        $reader->read();
+        $configReader = new ConfigReader(dirname(__FILE__));
+        $configReader->read();
     }
 
     public function testCreateAnObjectEvenThoughAGivenCacheDirectoryIsNotFound()
     {
-        $reader = new Reader($this->_cacheDirectory);
+        $configReader = new ConfigReader($this->_cacheDirectory);
 
-        $this->assertType('Piece::ORM::Config', $reader->read());
+        $this->assertType('Piece::ORM::Config', $configReader->read());
     }
 
     public function testCreateAnObjectByAGivenConfigurationFile()
     {
         $dsl = ::Spyc::YAMLLoad("{$this->_cacheDirectory}/piece-orm-config.yaml");
-        $reader = new Reader($this->_cacheDirectory);
-        $config = $reader->read();
+        $configReader = new ConfigReader($this->_cacheDirectory);
+        $config = $configReader->read();
 
         $this->assertEquals(2, count($dsl['databases']));
 
@@ -154,14 +154,14 @@ class ReaderTest extends ::PHPUnit_Framework_TestCase
     {
         $oldDirectory = getcwd();
         chdir("{$this->_cacheDirectory}/CacheIDsShouldBeUniqueInOneCacheDirectory1");
-        $reader = new Reader('.');
-        $reader->read();
+        $configReader = new ConfigReader('.');
+        $configReader->read();
 
         $this->assertEquals(1, $this->_getCacheFileCount($this->_cacheDirectory));
 
         chdir("{$this->_cacheDirectory}/CacheIDsShouldBeUniqueInOneCacheDirectory2");
-        $reader = new Reader('.');
-        $reader->read();
+        $configReader = new ConfigReader('.');
+        $configReader->read();
 
         $this->assertEquals(2, $this->_getCacheFileCount($this->_cacheDirectory));
 

@@ -44,7 +44,7 @@ use Piece::ORM::Context::Registry;
 
 require_once 'spyc.php5';
 
-// {{{ Piece::ORM::Config::Reader
+// {{{ Piece::ORM::Config::ConfigReader
 
 /**
  * A configuration reader for the Piece_ORM configuration DSL.
@@ -55,7 +55,7 @@ require_once 'spyc.php5';
  * @version    Release: @package_version@
  * @since      Class available since Release 0.1.0
  */
-class Reader
+class ConfigReader
 {
 
     // {{{ properties
