@@ -125,28 +125,7 @@ class ConfigReader
             throw new Exception("The configuration file [ $dslFile ] is not readable.");
         }
 
-        if (is_null(ContextRegistry::getContext()->getCacheDirectory())) {
-            return $this->_createConfigurationFromFile($dslFile);
-        }
-
-        if (!file_exists(ContextRegistry::getContext()->getCacheDirectory())) {
-            trigger_error('The cache directory [ ' .
-                          ContextRegistry::getContext()->getCacheDirectory() .
-                          ' ] is not found.',
-                          E_USER_WARNING
-                          );
-            return $this->_createConfigurationFromFile($dslFile);
-        }
-
-        if (!is_readable(ContextRegistry::getContext()->getCacheDirectory())
-            || !is_writable(ContextRegistry::getContext()->getCacheDirectory())) {
-            trigger_error('The cache directory [ ' .
-                          ContextRegistry::getContext()->getCacheDirectory() .
-                          ' ] is not readable or writable.',
-                          E_USER_WARNING
-                          );
-            return $this->_createConfigurationFromFile($dslFile);
-        }
+        ContextRegistry::getContext()->checkCacheDirectory();
 
         return $this->_getConfiguration($dslFile);
     }

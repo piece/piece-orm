@@ -256,25 +256,7 @@ class MetadataFactory
      */
     private static function _createMetadata($tableName, $tableID)
     {
-        if (!file_exists(ContextRegistry::getContext()->getCacheDirectory())) {
-            trigger_error('The cache directory [ ' .
-                          ContextRegistry::getContext()->getCacheDirectory() .
-                          ' ] is not found.',
-                          E_USER_WARNING
-                          );
-            return self::_createMetadataFromDatabase($tableName, $tableID);
-        }
-
-        if (!is_readable(ContextRegistry::getContext()->getCacheDirectory())
-            || !is_writable(ContextRegistry::getContext()->getCacheDirectory())
-            ) {
-            trigger_error('The cache directory [ ' .
-                          ContextRegistry::getContext()->getCacheDirectory() .
-                          ' ] is not readable or writable.',
-                          E_USER_WARNING
-                          );
-            return self::_createMetadataFromDatabase($tableName, $tableID);
-        }
+        ContextRegistry::getContext()->checkCacheDirectory();
 
         return self::_getMetadataFromCache($tableName, $tableID);
     }

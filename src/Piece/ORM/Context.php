@@ -325,6 +325,31 @@ class Context extends AttributeHolder
         return $this->_databaseStack[ count($this->_databaseStack) - 1 ];
     }
 
+    // }}}
+    // {{{ checkCacheDirectory()
+
+    /**
+     * Checks whether the cache directory is ready-to-use or not.
+     *
+     * @throws Piece::ORM::Exception
+     * @since Method available since Release 2.0.0dev1
+     */
+    public function checkCacheDirectory()
+    {
+        $cacheDirectory = $this->getCacheDirectory();
+        if (is_null($cacheDirectory)) {
+            throw new Exception('The cache directory is required.');
+        }
+
+        if (!file_exists($cacheDirectory)) {
+            throw new Exception("The cache directory [ $cacheDirectory ] is not found.");
+        }
+
+        if (!is_readable($cacheDirectory) || !is_writable($cacheDirectory)) {
+            throw new Exception("The cache directory [ $cacheDirectory ] is not readable or writable.");
+        }
+    }
+
     /**#@-*/
 
     /**#@+

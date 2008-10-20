@@ -295,25 +295,7 @@ class MapperFactory
                                 );
         }
 
-        if (is_null(ContextRegistry::getContext()->getCacheDirectory())) {
-            throw new Exception('The cache directory must be specified.');
-        }
-
-        if (!file_exists(ContextRegistry::getContext()->getCacheDirectory())) {
-            throw new Exception('The cache directory [ ' .
-                                ContextRegistry::getContext()->getCacheDirectory() .
-                                'is not found.'
-                                );
-        }
-
-        if (!is_readable(ContextRegistry::getContext()->getCacheDirectory())
-            || !is_writable(ContextRegistry::getContext()->getCacheDirectory())
-            ) {
-            throw new Exception('The cache directory [ ' .
-                                ContextRegistry::getContext()->getCacheDirectory() .
-                                ' ] is not readable or writable.'
-                                );
-        }
+        ContextRegistry::getContext()->checkCacheDirectory();
 
         $configFile = self::getConfigDirectory() . "/$mapperName.yaml";
         if (!file_exists($configFile)) {
