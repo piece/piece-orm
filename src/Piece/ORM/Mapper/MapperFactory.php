@@ -287,7 +287,7 @@ class MapperFactory
         }
 
         if (is_null(self::getConfigDirectory())) {
-            throw new Exception('The configuration directory must be specified.');
+            throw new Exception('The configuration directory is required.');
         }
 
         if (!file_exists(self::getConfigDirectory())) {
@@ -312,7 +312,7 @@ class MapperFactory
         eval($mapperSource);
 
         if (!self::_loaded($mapperID)) {
-            throw new Exception("The mapper [ $mapperName ] not found.");
+            throw new Exception("The mapper [ $mapperName ] was not present in the source.");
         }
     }
 
