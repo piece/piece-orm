@@ -205,14 +205,14 @@ class Context extends AttributeHolder
     }
 
     // }}}
-    // {{{ setMapperConfigDirectory()
+    // {{{ setMapperDirectory()
 
     /**
      * Sets the configuration directory for the mapper configuration.
      *
      * @param string $mapperConfigDirectory
      */
-    public function setMapperConfigDirectory($mapperConfigDirectory)
+    public function setMapperDirectory($mapperConfigDirectory)
     {
         $this->_mapperConfigDirectory = $mapperConfigDirectory;
     }

@@ -95,7 +95,7 @@ class MapperFactoryTest extends ::PHPUnit_Framework_TestCase
         ContextRegistry::setContext(new Context());
         $context = ContextRegistry::getContext();
         $context->setConfiguration($config);
-        $context->setMapperConfigDirectory($this->_cacheDirectory);
+        $context->setMapperDirectory($this->_cacheDirectory);
         $context->setDatabase('piece');
         $context->setCacheDirectory($this->_cacheDirectory);
         MapperFactory::setConfigDirectory($this->_cacheDirectory);

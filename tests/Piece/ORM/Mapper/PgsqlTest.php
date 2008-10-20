@@ -127,7 +127,7 @@ class PgsqlTest extends CompatibilityTests
                             );
         $context = ContextRegistry::getContext();
         $context->setConfiguration($config);
-        $context->setMapperConfigDirectory($this->cacheDirectory);
+        $context->setMapperDirectory($this->cacheDirectory);
         $context->setDatabase('CharsetShouldBeAbleToSetByDSN');
         $mapper = MapperFactory::factory('Employees');
         $subject = $mapper->createObject();

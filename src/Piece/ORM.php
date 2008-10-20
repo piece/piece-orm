@@ -110,7 +110,7 @@ class ORM
     {
         ContextRegistry::setContext(new Context());
         $context = ContextRegistry::getContext();
-        $context->setMapperConfigDirectory($mapperConfigDirectory);
+        $context->setMapperDirectory($mapperConfigDirectory);
         $context->setCacheDirectory($cacheDirectory);
 
         $configReader = new ConfigReader($configDirectory);
