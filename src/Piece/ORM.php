@@ -88,7 +88,7 @@ class ORM
     // {{{ configure()
 
     /**
-     * Configures the Piece_ORM environment.
+     * Configures a Piece_ORM environment.
      *
      * First this method tries to load a configuration from a configuration file in
      * the given configration directory using a Piece::ORM::Config::ConfigReader
