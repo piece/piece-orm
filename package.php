@@ -2,7 +2,7 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 
 /**
- * PHP versions 4 and 5
+ * PHP version 5
  *
  * Copyright (c) 2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>,
  * All rights reserved.
@@ -44,9 +44,11 @@ $releaseVersion = '2.0.0dev1';
 $releaseStability = 'devel';
 $apiVersion = '2.0.0dev1';
 $apiStability = 'devel';
-$notes = 'A new release of Piece_ORM is now available.
+$notes = 'A new release of Piece_ORM is now available. This is the first development release of Piece_ORM 2.x.
 
-What\'s New in Piece_ORM 2.0.0dev1';
+What\'s New in Piece_ORM 2.0.0dev1
+
+ * Migration to PHP 5.3: Piece_ORM now works with PHP 5.3.0alpha2 or greater.';
 
 $package = new PEAR_PackageFileManager2();
 $package->setOptions(array('filelistgenerator' => 'file',
@@ -75,7 +77,7 @@ $package->setAPIStability($apiStability);
 $package->setReleaseVersion($releaseVersion);
 $package->setReleaseStability($releaseStability);
 $package->setNotes($notes);
-$package->setPhpDep('5.3.0');
+$package->setPhpDep('5.3.0alpha2');
 $package->setPearinstallerDep('1.4.3');
 $package->addPackageDepWithChannel('required', 'MDB2', 'pear.php.net', '2.3.0');
 $package->addPackageDepWithChannel('required', 'Cache_Lite', 'pear.php.net', '1.7.0');
