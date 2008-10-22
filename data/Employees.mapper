@@ -1,0 +1,3 @@
+method findById {
+  query "SELECT * FROM $__table WHERE id = $id"
+}
