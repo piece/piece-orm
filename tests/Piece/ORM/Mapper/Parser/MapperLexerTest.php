@@ -35,26 +35,23 @@
  * @since      File available since Release 2.0.0dev1
  */
 
-namespace Piece::ORM::Mapper::DSL;
+namespace Piece::ORM::Mapper::Parser;
 
-// {{{ Piece::ORM::Mapper::DSL::Token
+use Piece::ORM::Mapper::Parser::MapperLexer;
+
+// {{{ Piece::ORM::Mapper::Parser::MapperLexerTest
 
 /**
+ * Some tests for Piece::ORM::Mapper::Parser::MapperLexer.
+ *
  * @package    Piece_ORM
  * @copyright  2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License (revised)
  * @version    Release: @package_version@
  * @since      Class available since Release 2.0.0dev1
  */
-class Token
+class MapperLexerTest extends ::PHPUnit_Framework_TestCase
 {
-
-    // {{{ constants
-
-    const ID = 1;
-    const STRING = 2;
-    const LCURLY = 3;
-    const RCURLY = 4;
 
     // {{{ properties
 
@@ -78,6 +75,52 @@ class Token
 
     /**#@+
      * @access public
+     */
+
+    public function testConvertASequenceOfCharactersIntoASequenceOfTokens()
+    {
+        $lexer = new MapperLexer(file_get_contents(dirname(__FILE__) . '/../../../../../data/Employees.mapper'));
+        $lexer->yylex();
+
+        $this->assertEquals('method', $lexer->value);
+        $this->assertEquals(Token::ID, $lexer->token);
+
+        $lexer->yylex();
+
+        $this->assertEquals('findById', $lexer->value);
+        $this->assertEquals(Token::ID, $lexer->token);
+
+        $lexer->yylex();
+
+        $this->assertEquals('{', $lexer->value);
+        $this->assertEquals(Token::LCURLY, $lexer->token);
+     
+        $lexer->yylex();
+
+        $this->assertEquals('query', $lexer->value);
+        $this->assertEquals(Token::ID, $lexer->token);
+
+        $lexer->yylex();
+
+        $this->assertEquals('"SELECT * FROM $__table WHERE id = $id"', $lexer->value);
+        $this->assertEquals(Token::STRING, $lexer->token);
+
+        $lexer->yylex();
+
+        $this->assertEquals('}', $lexer->value);
+        $this->assertEquals(Token::RCURLY, $lexer->token);
+    }
+
+    /**#@-*/
+
+    /**#@+
+     * @access protected
+     */
+
+    /**#@-*/
+
+    /**#@+
+     * @access private
      */
 
     /**#@-*/

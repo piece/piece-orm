@@ -35,11 +35,11 @@
  * @since      File available since Release 2.0.0dev1
  */
 
-namespace Piece::ORM::Mapper::DSL;
+namespace Piece::ORM::Mapper::Parser;
 
-use Piece::ORM::Mapper::DSL::Token;
+use Piece::ORM::Mapper::Parser::Token;
 
-// {{{ Piece::ORM::Mapper::DSL::MapperLexer
+// {{{ Piece::ORM::Mapper::Parser::MapperLexer
 
 /**
  * @package    Piece_ORM
