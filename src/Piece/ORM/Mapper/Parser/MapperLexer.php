@@ -31,7 +31,7 @@
  * @package    Piece_ORM
  * @copyright  2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License (revised)
- * @version    SVN: $Id: MapperLexer.plex 564 2008-10-23 13:45:46Z iteman $
+ * @version    SVN: $Id: MapperLexer.plex 567 2008-10-23 14:04:36Z iteman $
  * @since      File available since Release 2.0.0dev1
  */
 
