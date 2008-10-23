@@ -37,12 +37,12 @@
 
 namespace Piece::ORM::Mapper::DSL;
 
-use Piece::ORM::Mapper::DSL::Lexer;
+use Piece::ORM::Mapper::DSL::MapperLexer;
 
-// {{{ Piece::ORM::Mapper::DSL::LexerTest
+// {{{ Piece::ORM::Mapper::DSL::MapperLexerTest
 
 /**
- * Some tests for Piece::ORM::Mapper::DSL::Lexer.
+ * Some tests for Piece::ORM::Mapper::DSL::MapperLexer.
  *
  * @package    Piece_ORM
  * @copyright  2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
@@ -50,7 +50,7 @@ use Piece::ORM::Mapper::DSL::Lexer;
  * @version    Release: @package_version@
  * @since      Class available since Release 2.0.0dev1
  */
-class LexerTest extends ::PHPUnit_Framework_TestCase
+class MapperLexerTest extends ::PHPUnit_Framework_TestCase
 {
 
     // {{{ properties
@@ -79,7 +79,7 @@ class LexerTest extends ::PHPUnit_Framework_TestCase
 
     public function testConvertASequenceOfCharactersIntoASequenceOfTokens()
     {
-        $lexer = new Lexer(file_get_contents(dirname(__FILE__) . '/../../../../../data/Employees.mapper'));
+        $lexer = new MapperLexer(file_get_contents(dirname(__FILE__) . '/../../../../../data/Employees.mapper'));
         $lexer->yylex();
 
         $this->assertEquals('method', $lexer->value);

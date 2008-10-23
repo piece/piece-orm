@@ -39,7 +39,7 @@ namespace Piece::ORM::Mapper::DSL;
 
 use Piece::ORM::Mapper::DSL::Token;
 
-// {{{ Piece::ORM::Mapper::DSL::Lexer
+// {{{ Piece::ORM::Mapper::DSL::MapperLexer
 
 /**
  * @package    Piece_ORM
@@ -48,7 +48,7 @@ use Piece::ORM::Mapper::DSL::Token;
  * @version    Release: @package_version@
  * @since      Class available since Release 2.0.0dev1
  */
-class Lexer
+class MapperLexer
 {
     public $token;
     public $value;
