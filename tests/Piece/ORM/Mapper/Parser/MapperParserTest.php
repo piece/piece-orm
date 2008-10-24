@@ -78,7 +78,7 @@ class MapperParserTest extends ::PHPUnit_Framework_TestCase
      * @access public
      */
 
-    public function testSucceedToParseAMapperDSL()
+    public function testSucceedToParseAMapperDsl()
     {
         $mapperLexer = new MapperLexer(file_get_contents(dirname(__FILE__) . '/../../../../../data/Employees.mapper'));
         $mapperParser = new MapperParser($mapperLexer);
