@@ -1,36 +1,53 @@
 State 0:
-          mapper ::= * METHOD ID LCURLY QUERY STRING RCURLY
+          mapper ::= * method_declaration_statement_list
+          method_declaration_statement_list ::= * method_declaration_statement_list method_declaration_statement
+      (2) method_declaration_statement_list ::= *
 
-                        METHOD shift  4
                         mapper accept
+method_declaration_statement_list shift  1
+                     {default} reduce 2
 
 State 1:
-          mapper ::= METHOD ID LCURLY QUERY STRING * RCURLY
+      (0) mapper ::= method_declaration_statement_list *
+          method_declaration_statement_list ::= method_declaration_statement_list * method_declaration_statement
+          method_declaration_statement ::= * METHOD ID LCURLY QUERY STRING RCURLY
 
-                        RCURLY shift  6
+                        METHOD shift  6
+  method_declaration_statement shift  8
+                     {default} reduce 0
 
 State 2:
-          mapper ::= METHOD ID LCURLY QUERY * STRING RCURLY
+          method_declaration_statement ::= METHOD ID LCURLY QUERY * STRING RCURLY
 
-                        STRING shift  1
+                        STRING shift  3
 
 State 3:
-          mapper ::= METHOD ID LCURLY * QUERY STRING RCURLY
+          method_declaration_statement ::= METHOD ID LCURLY QUERY STRING * RCURLY
+
+                        RCURLY shift  7
+
+State 4:
+          method_declaration_statement ::= METHOD ID LCURLY * QUERY STRING RCURLY
 
                          QUERY shift  2
 
-State 4:
-          mapper ::= METHOD * ID LCURLY QUERY STRING RCURLY
+State 5:
+          method_declaration_statement ::= METHOD ID * LCURLY QUERY STRING RCURLY
+
+                        LCURLY shift  4
+
+State 6:
+          method_declaration_statement ::= METHOD * ID LCURLY QUERY STRING RCURLY
 
                             ID shift  5
 
-State 5:
-          mapper ::= METHOD ID * LCURLY QUERY STRING RCURLY
+State 7:
+      (3) method_declaration_statement ::= METHOD ID LCURLY QUERY STRING RCURLY *
 
-                        LCURLY shift  3
+                     {default} reduce 3
 
-State 6:
-      (0) mapper ::= METHOD ID LCURLY QUERY STRING RCURLY *
+State 8:
+      (1) method_declaration_statement_list ::= method_declaration_statement_list method_declaration_statement *
 
-                     {default} reduce 0
+                     {default} reduce 1
 

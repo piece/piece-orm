@@ -57,16 +57,21 @@ use Piece::ORM::Mapper::Parser::MapperLexer;
 }
 
 %syntax_error {
-    echo "Syntax Error on line " . $this->_mapperLexer->line . ": token '" . 
-        $this->_mapperLexer->value . "' while parsing rule:";
+    echo "Syntax Error on line {$this->_mapperLexer->line}: token '{$this->_mapperLexer->value}' while parsing rule:";
+
     foreach ($this->yystack as $entry) {
         echo $this->tokenName($entry->major) . ' ';
     }
+
+    $expectedTokens = array();
     foreach ($this->yy_get_expected_tokens($yymajor) as $token) {
-        $expect[] = self::$yyTokenName[$token];
+        $expectedTokens[] = self::$yyTokenName[$token];
     }
-    throw new Exception('Unexpected ' . $this->tokenName($yymajor) . '(' . $TOKEN
-        . '), expected one of: ' . implode(',', $expect));
+
+    throw new Exception('Unexpected ' . $this->tokenName($yymajor) .
+                        "($TOKEN), expected one of: " .
+                        implode(',', $expectedTokens)
+                        );
 }
 
 %include_class {
@@ -77,4 +82,9 @@ use Piece::ORM::Mapper::Parser::MapperLexer;
     }
 }
 
-mapper ::= METHOD ID LCURLY QUERY STRING RCURLY.
+mapper ::= method_declaration_statement_list.
+
+method_declaration_statement_list ::= method_declaration_statement_list method_declaration_statement.
+method_declaration_statement_list ::= .
+
+method_declaration_statement ::= METHOD ID LCURLY QUERY STRING RCURLY.
