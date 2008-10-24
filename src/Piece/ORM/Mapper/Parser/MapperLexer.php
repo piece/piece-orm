@@ -37,7 +37,7 @@
 
 namespace Piece::ORM::Mapper::Parser;
 
-use Piece::ORM::Mapper::Parser::Token;
+use Piece::ORM::Mapper::Parser::MapperParser;
 
 // {{{ Piece::ORM::Mapper::Parser::MapperLexer
 
@@ -106,11 +106,13 @@ class MapperLexer
               3 => 0,
               4 => 0,
               5 => 0,
+              6 => 0,
+              7 => 0,
             );
         if ($this->_counter >= strlen($this->_input)) {
             return false; // end of input
         }
-        $yy_global_pattern = "/^([a-zA-Z_][a-zA-Z_0-9]*)|^(\\{)|^(\\})|^([ \t\r\n]+)|^(\"[^[\"\\\\]+\")/";
+        $yy_global_pattern = "/^(method)|^(query)|^([a-zA-Z_][a-zA-Z_0-9]*)|^(\\{)|^(\\})|^([ \t\r\n]+)|^(\"[^[\"\\\\]+\")/";
 
         do {
             if (preg_match($yy_global_pattern, substr($this->_input, $this->_counter), $yymatches)) {
@@ -150,11 +152,13 @@ class MapperLexer
                     // skip this token
                     continue;
                 } else {                    $yy_yymore_patterns = array(
-        1 => array(0, "^(\\{)|^(\\})|^([ \t\r\n]+)|^(\"[^[\"\\\\]+\")"),
-        2 => array(0, "^(\\})|^([ \t\r\n]+)|^(\"[^[\"\\\\]+\")"),
-        3 => array(0, "^([ \t\r\n]+)|^(\"[^[\"\\\\]+\")"),
-        4 => array(0, "^(\"[^[\"\\\\]+\")"),
-        5 => array(0, ""),
+        1 => array(0, "^(query)|^([a-zA-Z_][a-zA-Z_0-9]*)|^(\\{)|^(\\})|^([ \t\r\n]+)|^(\"[^[\"\\\\]+\")"),
+        2 => array(0, "^([a-zA-Z_][a-zA-Z_0-9]*)|^(\\{)|^(\\})|^([ \t\r\n]+)|^(\"[^[\"\\\\]+\")"),
+        3 => array(0, "^(\\{)|^(\\})|^([ \t\r\n]+)|^(\"[^[\"\\\\]+\")"),
+        4 => array(0, "^(\\})|^([ \t\r\n]+)|^(\"[^[\"\\\\]+\")"),
+        5 => array(0, "^([ \t\r\n]+)|^(\"[^[\"\\\\]+\")"),
+        6 => array(0, "^(\"[^[\"\\\\]+\")"),
+        7 => array(0, ""),
     );
 
                     // yymore is needed
@@ -214,31 +218,43 @@ class MapperLexer
     function yy_r1_1($yy_subpatterns)
     {
 
-    if ($this->_debug) echo "found ID [ {$this->value} ]\n";
-    $this->token = Token::ID;
+    if ($this->_debug) echo "found METHOD [ {$this->value} ]\n";
+    $this->token = MapperParser::METHOD;
     }
     function yy_r1_2($yy_subpatterns)
     {
 
-    if ($this->_debug) echo "found LCURLY [ {$this->value} ]\n";
-    $this->token = Token::LCURLY;
+    if ($this->_debug) echo "found QUERY [ {$this->value} ]\n";
+    $this->token = MapperParser::QUERY;
     }
     function yy_r1_3($yy_subpatterns)
     {
 
-    if ($this->_debug) echo "found RCURLY [ {$this->value} ]\n";
-    $this->token = Token::RCURLY;
+    if ($this->_debug) echo "found ID [ {$this->value} ]\n";
+    $this->token = MapperParser::ID;
     }
     function yy_r1_4($yy_subpatterns)
     {
 
-    return false;
+    if ($this->_debug) echo "found LCURLY [ {$this->value} ]\n";
+    $this->token = MapperParser::LCURLY;
     }
     function yy_r1_5($yy_subpatterns)
     {
 
+    if ($this->_debug) echo "found RCURLY [ {$this->value} ]\n";
+    $this->token = MapperParser::RCURLY;
+    }
+    function yy_r1_6($yy_subpatterns)
+    {
+
+    return false;
+    }
+    function yy_r1_7($yy_subpatterns)
+    {
+
     if ($this->_debug) echo "found STRING [ {$this->value} ]\n";
-    $this->token = Token::STRING;
+    $this->token = MapperParser::STRING;
     }
 
 

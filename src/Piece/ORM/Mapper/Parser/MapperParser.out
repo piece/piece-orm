@@ -1,0 +1,36 @@
+State 0:
+          mapper ::= * METHOD ID LCURLY QUERY STRING RCURLY
+
+                        METHOD shift  4
+                        mapper accept
+
+State 1:
+          mapper ::= METHOD ID LCURLY QUERY STRING * RCURLY
+
+                        RCURLY shift  6
+
+State 2:
+          mapper ::= METHOD ID LCURLY QUERY * STRING RCURLY
+
+                        STRING shift  1
+
+State 3:
+          mapper ::= METHOD ID LCURLY * QUERY STRING RCURLY
+
+                         QUERY shift  2
+
+State 4:
+          mapper ::= METHOD * ID LCURLY QUERY STRING RCURLY
+
+                            ID shift  5
+
+State 5:
+          mapper ::= METHOD ID * LCURLY QUERY STRING RCURLY
+
+                        LCURLY shift  3
+
+State 6:
+      (0) mapper ::= METHOD ID LCURLY QUERY STRING RCURLY *
+
+                     {default} reduce 0
+
