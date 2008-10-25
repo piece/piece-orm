@@ -43,6 +43,7 @@ use Piece::ORM::Mapper::MapperFactory;
 use Piece::ORM::Metadata::MetadataFactory;
 use Piece::ORM::Exception;
 use Piece::ORM::Context::ContextRegistry;
+use Stagehand::Cache;
 
 // {{{ Piece::ORM::Mapper::CompatibilityTests
 
@@ -2248,11 +2249,8 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
 
     public function _clearCaseSensitiveContext()
     {
-        $cache = new ::Cache_Lite(array('cacheDir' => "{$this->cacheDirectory}/CaseSensitive/",
-                                        'automaticSerialization' => true,
-                                        'errorHandlingAPIBreak' => true)
-                                  );
-        $cache->clean();
+        $cache = new Cache("{$this->cacheDirectory}/CaseSensitive");
+        $cache->clear();
     }
 
     /**#@-*/

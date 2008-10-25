@@ -42,6 +42,7 @@ use Piece::ORM::Exception;
 use Piece::ORM::Mapper::MapperFactory;
 use Piece::ORM::Exception::PEARException;
 use Stagehand::AttributeHolder;
+use Stagehand::Cache;
 
 // {{{ Piece::ORM::Context
 
@@ -286,11 +287,8 @@ class Context extends AttributeHolder
      */
     public function clearCache()
     {
-        $cache = new ::Cache_Lite(array('cacheDir' => $this->getCacheDirectory() . '/',
-                                        'automaticSerialization' => true,
-                                        'errorHandlingAPIBreak' => true)
-                                  );
-        $cache->clean();
+        $cache = new Cache($this->getCacheDirectory());
+        $cache->clear();
     }
 
     // }}}
