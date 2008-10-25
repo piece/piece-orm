@@ -130,7 +130,7 @@ class MapperParseryyStackEntry
  * @package    Piece_ORM
  * @copyright  2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License (revised)
- * @version    SVN: $Id: MapperParser.y 575 2008-10-25 06:45:48Z iteman $
+ * @version    SVN: $Id: MapperParser.y 583 2008-10-25 14:39:47Z iteman $
  * @since      File available since Release 2.0.0dev1
  */
 
@@ -180,12 +180,13 @@ class MapperParser
     const METHOD                         =  1;
     const ID                             =  2;
     const LCURLY                         =  3;
-    const QUERY                          =  4;
-    const STRING                         =  5;
-    const RCURLY                         =  6;
-    const YY_NO_ACTION = 15;
-    const YY_ACCEPT_ACTION = 14;
-    const YY_ERROR_ACTION = 13;
+    const RCURLY                         =  4;
+    const QUERY                          =  5;
+    const STRING                         =  6;
+    const ORDERBY                        =  7;
+    const YY_NO_ACTION = 23;
+    const YY_ACCEPT_ACTION = 22;
+    const YY_ERROR_ACTION = 21;
 
 /* Next are that tables used to determine what action to take based on the
 ** current state and lookahead token.  These tables are used to implement
@@ -237,36 +238,43 @@ class MapperParser
 **                          shifting non-terminals after a reduce.
 **  self::$yy_default       Default action for each state.
 */
-    const YY_SZ_ACTTAB = 9;
+    const YY_SZ_ACTTAB = 15;
 static public $yy_action = array(
- /*     0 */    14,    1,    4,    5,    7,    6,    2,    8,    3,
+ /*     0 */    22,    1,    2,   12,   10,    5,    4,    9,    7,   11,
+ /*    10 */     8,    6,   24,   24,    3,
     );
     static public $yy_lookahead = array(
- /*     0 */     8,    9,    3,    2,    6,    1,    4,   10,    5,
+ /*     0 */     9,   10,    3,    6,    4,   13,    2,    6,    1,   11,
+ /*    10 */     7,    5,   14,   14,   12,
 );
-    const YY_SHIFT_USE_DFLT = -3;
-    const YY_SHIFT_MAX = 6;
+    const YY_SHIFT_USE_DFLT = -4;
+    const YY_SHIFT_MAX = 8;
     static public $yy_shift_ofst = array(
- /*     0 */    -3,    4,    3,   -2,    2,   -1,    1,
+ /*     0 */    -4,    7,    6,    3,   -1,    0,    1,    4,   -3,
 );
-    const YY_REDUCE_USE_DFLT = -9;
-    const YY_REDUCE_MAX = 1;
+    const YY_REDUCE_USE_DFLT = -10;
+    const YY_REDUCE_MAX = 3;
     static public $yy_reduce_ofst = array(
- /*     0 */    -8,   -3,
+ /*     0 */    -9,   -2,    2,   -8,
 );
     static public $yyExpectedTokens = array(
         /* 0 */ array(),
         /* 1 */ array(1, ),
         /* 2 */ array(5, ),
-        /* 3 */ array(6, ),
-        /* 4 */ array(4, ),
-        /* 5 */ array(3, ),
-        /* 6 */ array(2, ),
-        /* 7 */ array(),
-        /* 8 */ array(),
+        /* 3 */ array(7, ),
+        /* 4 */ array(3, ),
+        /* 5 */ array(4, ),
+        /* 6 */ array(6, ),
+        /* 7 */ array(2, ),
+        /* 8 */ array(6, ),
+        /* 9 */ array(),
+        /* 10 */ array(),
+        /* 11 */ array(),
+        /* 12 */ array(),
 );
     static public $yy_default = array(
- /*     0 */    11,    9,   13,   13,   13,   13,   13,   12,   10,
+ /*     0 */    15,   13,   18,   20,   21,   21,   21,   21,   21,   17,
+ /*    10 */    16,   14,   19,
 );
 /* The next thing included is series of defines which control
 ** various aspects of the generated parser.
@@ -283,11 +291,11 @@ static public $yy_action = array(
 **    self::YYERRORSYMBOL is the code number of the error symbol.  If not
 **                        defined, then do no error processing.
 */
-    const YYNOCODE = 12;
+    const YYNOCODE = 15;
     const YYSTACKDEPTH = 100;
-    const YYNSTATE = 9;
-    const YYNRULE = 4;
-    const YYERRORSYMBOL = 7;
+    const YYNSTATE = 13;
+    const YYNRULE = 8;
+    const YYERRORSYMBOL = 8;
     const YYERRSYMDT = 'yy0';
     const YYFALLBACK = 0;
     /** The next table maps tokens into fallback tokens.  If a construct
@@ -370,8 +378,9 @@ static public $yy_action = array(
      */
     static public $yyTokenName = array( 
   '$',             'METHOD',        'ID',            'LCURLY',      
-  'QUERY',         'STRING',        'RCURLY',        'error',       
-  'mapper',        'method_declaration_statement_list',  'method_declaration_statement',
+  'RCURLY',        'QUERY',         'STRING',        'ORDERBY',     
+  'error',         'mapper',        'method_declaration_statement_list',  'method_declaration_statement',
+  'query_declaration_statement',  'orderby_declaration_statement',
     );
 
     /**
@@ -382,7 +391,11 @@ static public $yy_action = array(
  /*   0 */ "mapper ::= method_declaration_statement_list",
  /*   1 */ "method_declaration_statement_list ::= method_declaration_statement_list method_declaration_statement",
  /*   2 */ "method_declaration_statement_list ::=",
- /*   3 */ "method_declaration_statement ::= METHOD ID LCURLY QUERY STRING RCURLY",
+ /*   3 */ "method_declaration_statement ::= METHOD ID LCURLY query_declaration_statement orderby_declaration_statement RCURLY",
+ /*   4 */ "query_declaration_statement ::= QUERY STRING",
+ /*   5 */ "query_declaration_statement ::=",
+ /*   6 */ "orderby_declaration_statement ::= ORDERBY STRING",
+ /*   7 */ "orderby_declaration_statement ::=",
     );
 
     /**
@@ -747,10 +760,14 @@ static public $yy_action = array(
      * </pre>
      */
     static public $yyRuleInfo = array(
-  array( 'lhs' => 8, 'rhs' => 1 ),
-  array( 'lhs' => 9, 'rhs' => 2 ),
-  array( 'lhs' => 9, 'rhs' => 0 ),
-  array( 'lhs' => 10, 'rhs' => 6 ),
+  array( 'lhs' => 9, 'rhs' => 1 ),
+  array( 'lhs' => 10, 'rhs' => 2 ),
+  array( 'lhs' => 10, 'rhs' => 0 ),
+  array( 'lhs' => 11, 'rhs' => 6 ),
+  array( 'lhs' => 12, 'rhs' => 2 ),
+  array( 'lhs' => 12, 'rhs' => 0 ),
+  array( 'lhs' => 13, 'rhs' => 2 ),
+  array( 'lhs' => 13, 'rhs' => 0 ),
     );
 
     /**
@@ -761,6 +778,8 @@ static public $yy_action = array(
      */
     static public $yyReduceMap = array(
         3 => 3,
+        4 => 4,
+        6 => 4,
     );
     /* Beginning here are the reduction cases.  A typical example
     ** follows:
@@ -768,11 +787,19 @@ static public $yy_action = array(
     **   function yy_r0($yymsp){ ... }           // User supplied code
     **  #line <lineno> <thisfile>
     */
-#line 91 "src/Piece/ORM/Mapper/Parser/MapperParser.y"
+#line 95 "src/Piece/ORM/Mapper/Parser/MapperParser.y"
     function yy_r3(){
-        $this->_ast->addMethod($this->yystack[$this->yyidx + -4]->minor, trim($this->yystack[$this->yyidx + -1]->minor, '"'));
+        $this->_ast->addMethod($this->yystack[$this->yyidx + -4]->minor,
+                               trim($this->yystack[$this->yyidx + -2]->minor, '"') ? : null,
+                               trim($this->yystack[$this->yyidx + -1]->minor, '"') ? : null
+                               );
     }
-#line 781 "src/Piece/ORM/Mapper/Parser/MapperParser.php"
+#line 803 "src/Piece/ORM/Mapper/Parser/MapperParser.php"
+#line 102 "src/Piece/ORM/Mapper/Parser/MapperParser.y"
+    function yy_r4(){
+       $this->_retvalue = $this->yystack[$this->yyidx + 0]->minor;
+    }
+#line 808 "src/Piece/ORM/Mapper/Parser/MapperParser.php"
 
     /**
      * placeholder for the left hand side in a reduce operation.
@@ -901,7 +928,7 @@ static public $yy_action = array(
                         "($TOKEN), expected one of: " .
                         implode(',', $expectedTokens)
                         );
-#line 911 "src/Piece/ORM/Mapper/Parser/MapperParser.php"
+#line 938 "src/Piece/ORM/Mapper/Parser/MapperParser.php"
     }
 
     /**

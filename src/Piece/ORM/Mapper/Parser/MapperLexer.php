@@ -31,7 +31,7 @@
  * @package    Piece_ORM
  * @copyright  2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License (revised)
- * @version    SVN: $Id: MapperLexer.plex 569 2008-10-24 12:55:28Z iteman $
+ * @version    SVN: $Id: MapperLexer.plex 574 2008-10-25 06:41:34Z iteman $
  * @since      File available since Release 2.0.0dev1
  */
 
@@ -108,11 +108,12 @@ class MapperLexer
               5 => 0,
               6 => 0,
               7 => 0,
+              8 => 0,
             );
         if ($this->_counter >= strlen($this->_input)) {
             return false; // end of input
         }
-        $yy_global_pattern = "/^(method)|^(query)|^([a-zA-Z_][a-zA-Z_0-9]*)|^(\\{)|^(\\})|^([ \t\r\n]+)|^(\"[^[\"\\\\]+\")/";
+        $yy_global_pattern = "/^(method)|^(query)|^(orderBy)|^([a-zA-Z_][a-zA-Z_0-9]*)|^(\\{)|^(\\})|^([ \t\r\n]+)|^(\"[^[\"\\\\]+\")/";
 
         do {
             if (preg_match($yy_global_pattern, substr($this->_input, $this->_counter), $yymatches)) {
@@ -152,13 +153,14 @@ class MapperLexer
                     // skip this token
                     continue;
                 } else {                    $yy_yymore_patterns = array(
-        1 => array(0, "^(query)|^([a-zA-Z_][a-zA-Z_0-9]*)|^(\\{)|^(\\})|^([ \t\r\n]+)|^(\"[^[\"\\\\]+\")"),
-        2 => array(0, "^([a-zA-Z_][a-zA-Z_0-9]*)|^(\\{)|^(\\})|^([ \t\r\n]+)|^(\"[^[\"\\\\]+\")"),
-        3 => array(0, "^(\\{)|^(\\})|^([ \t\r\n]+)|^(\"[^[\"\\\\]+\")"),
-        4 => array(0, "^(\\})|^([ \t\r\n]+)|^(\"[^[\"\\\\]+\")"),
-        5 => array(0, "^([ \t\r\n]+)|^(\"[^[\"\\\\]+\")"),
-        6 => array(0, "^(\"[^[\"\\\\]+\")"),
-        7 => array(0, ""),
+        1 => array(0, "^(query)|^(orderBy)|^([a-zA-Z_][a-zA-Z_0-9]*)|^(\\{)|^(\\})|^([ \t\r\n]+)|^(\"[^[\"\\\\]+\")"),
+        2 => array(0, "^(orderBy)|^([a-zA-Z_][a-zA-Z_0-9]*)|^(\\{)|^(\\})|^([ \t\r\n]+)|^(\"[^[\"\\\\]+\")"),
+        3 => array(0, "^([a-zA-Z_][a-zA-Z_0-9]*)|^(\\{)|^(\\})|^([ \t\r\n]+)|^(\"[^[\"\\\\]+\")"),
+        4 => array(0, "^(\\{)|^(\\})|^([ \t\r\n]+)|^(\"[^[\"\\\\]+\")"),
+        5 => array(0, "^(\\})|^([ \t\r\n]+)|^(\"[^[\"\\\\]+\")"),
+        6 => array(0, "^([ \t\r\n]+)|^(\"[^[\"\\\\]+\")"),
+        7 => array(0, "^(\"[^[\"\\\\]+\")"),
+        8 => array(0, ""),
     );
 
                     // yymore is needed
@@ -230,27 +232,33 @@ class MapperLexer
     function yy_r1_3($yy_subpatterns)
     {
 
+    if ($this->_debug) echo "found ORDERBY [ {$this->value} ]\n";
+    $this->token = MapperParser::ORDERBY;
+    }
+    function yy_r1_4($yy_subpatterns)
+    {
+
     if ($this->_debug) echo "found ID [ {$this->value} ]\n";
     $this->token = MapperParser::ID;
     }
-    function yy_r1_4($yy_subpatterns)
+    function yy_r1_5($yy_subpatterns)
     {
 
     if ($this->_debug) echo "found LCURLY [ {$this->value} ]\n";
     $this->token = MapperParser::LCURLY;
     }
-    function yy_r1_5($yy_subpatterns)
+    function yy_r1_6($yy_subpatterns)
     {
 
     if ($this->_debug) echo "found RCURLY [ {$this->value} ]\n";
     $this->token = MapperParser::RCURLY;
     }
-    function yy_r1_6($yy_subpatterns)
+    function yy_r1_7($yy_subpatterns)
     {
 
     return false;
     }
-    function yy_r1_7($yy_subpatterns)
+    function yy_r1_8($yy_subpatterns)
     {
 
     if ($this->_debug) echo "found STRING [ {$this->value} ]\n";

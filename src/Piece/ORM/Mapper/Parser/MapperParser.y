@@ -91,6 +91,23 @@ mapper ::= method_declaration_statement_list.
 method_declaration_statement_list ::= method_declaration_statement_list method_declaration_statement.
 method_declaration_statement_list ::= .
 
-method_declaration_statement ::= METHOD ID(A) LCURLY QUERY STRING(B) RCURLY. {
-        $this->_ast->addMethod(A, trim(B, '"'));
+method_declaration_statement ::=
+        METHOD ID(A) LCURLY
+            query_declaration_statement(B)
+            orderby_declaration_statement(C)
+        RCURLY. {
+        $this->_ast->addMethod(A,
+                               trim(B, '"') ? : null,
+                               trim(C, '"') ? : null
+                               );
 }
+
+query_declaration_statement(A) ::= QUERY STRING(B). {
+       A = B;
+}
+query_declaration_statement ::= .
+
+orderby_declaration_statement(A) ::= ORDERBY STRING(B). {
+       A = B;
+}
+orderby_declaration_statement ::= .
