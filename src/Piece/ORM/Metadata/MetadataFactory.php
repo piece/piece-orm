@@ -44,6 +44,7 @@ use Piece::ORM::Metadata::MetadataFactory::NoSuchTableException;
 use Piece::ORM::MDB2::Decorator::Reverse::Mssql;
 use Piece::ORM::Metadata;
 use Piece::ORM::Context::ContextRegistry;
+use Stagehand::Cache;
 
 // {{{ Piece::ORM::Metadata::MetadataFactory
 
@@ -102,7 +103,7 @@ class MetadataFactory
         $tableID = sha1($context->getDSN() . ".$tableName");
         $metadata = self::_getMetadata($tableID);
         if (is_null($metadata)) {
-            $metadata = self::_createMetadata($tableName, $tableID);
+            $metadata = self::_createMetadata($tableID, $tableName);
             self::_addMetadata($metadata);
         }
 
@@ -122,66 +123,18 @@ class MetadataFactory
      */
 
     // }}}
-    // {{{ _getMetadataFromCache()
-
-    /**
-     * Gets a Piece::ORM::Metadata object from a cache.
-     *
-     * @param string $tableName
-     * @param string $tableID
-     * @return Piece::ORM::Metadata
-     * @throws Piece::ORM::Exception::PEARException
-     */
-    private static function _getMetadataFromCache($tableName, $tableID)
-    {
-        $cache = new ::Cache_Lite(array('cacheDir' => ContextRegistry::getContext()->getCacheDirectory() . '/',
-                                        'automaticSerialization' => true,
-                                        'errorHandlingAPIBreak' => true)
-                                  );
-
-        if (!Env::isProduction()) {
-            ::PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
-            $cache->remove($tableID);
-            ::PEAR::staticPopErrorHandling();
-        }
-
-        ::PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
-        $metadata = $cache->get($tableID);
-        ::PEAR::staticPopErrorHandling();
-        if (::PEAR::isError($metadata)) {
-            trigger_error('Cannot read the cache file in the directory [ ' .
-                          ContextRegistry::getContext()->getCacheDirectory() .
-                          ' ].',
-                          E_USER_WARNING
-                          );
-        }
-
-        if (!$metadata instanceof Metadata) {
-            $metadata = self::_createMetadataFromDatabase($tableName, $tableID);
-            ::PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
-            $result = $cache->save($metadata);
-            ::PEAR::staticPopErrorHandling();
-            if (::PEAR::isError($result)) {
-                throw new PEARException($result);
-            }
-        }
-
-        return $metadata;
-    }
-
-    // }}}
-    // {{{ _createMetadataFromDatabase()
+    // {{{ _loadMetadata()
 
     /**
      * Creates a Piece::ORM::Metadata object from a database.
      *
-     * @param string $tableName
      * @param string $tableID
+     * @param string $tableName
      * @return Piece::ORM::Metadata
      * @throws Piece::ORM::Exception::PEARException
      * @throws Piece::ORM::Metadata::Factory::NoSuchTableException
      */
-    private static function _createMetadataFromDatabase($tableName, $tableID)
+    private static function _loadMetadata($tableID, $tableName)
     {
         $context = ContextRegistry::getContext();
         $dbh = $context->getConnection();
@@ -247,15 +200,37 @@ class MetadataFactory
     /**
      * Creates a Piece::ORM::Metadata object from a cache or a database.
      *
-     * @param string $tableName
      * @param string $tableID
+     * @param string $tableName
      * @return Piece::ORM::Metadata
+     * @throws Piece::ORM::Exception
      */
-    private static function _createMetadata($tableName, $tableID)
+    private static function _createMetadata($tableID, $tableName)
     {
         ContextRegistry::getContext()->checkCacheDirectory();
 
-        return self::_getMetadataFromCache($tableName, $tableID);
+        $cache = new Cache(ContextRegistry::getContext()->getCacheDirectory());
+
+        if (!Env::isProduction()) {
+            $cache->remove($tableID);
+        }
+
+        try {
+            $metadata = $cache->read($tableID);
+        } catch (Stagehand::Cache::Exception $e) {
+            throw new Exception($e->getMessage());
+        }
+
+        if (is_null($metadata)) {
+            $metadata = self::_loadMetadata($tableID, $tableName);
+            try {
+                $cache->write($metadata);
+            } catch (Stagehand::Cache::Exception $e) {
+                throw new Exception($e->getMessage());
+            }
+        }
+
+        return $metadata;
     }
 
     // }}}
