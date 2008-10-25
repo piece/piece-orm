@@ -1,19 +1,4 @@
-%name MapperParser
-
-%declare_class {
-// {{{ Piece::ORM::Mapper::Parser::MapperParser
-
-/**
- * @package    Piece_ORM
- * @copyright  2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
- * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License (revised)
- * @version    Release: @package_version@
- * @since      Class available since Release 2.0.0dev1
- */
-class MapperParser
-}
-
-%include {
+<?php
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 
 /**
@@ -50,47 +35,108 @@ class MapperParser
  * @since      File available since Release 2.0.0dev1
  */
 
-namespace Piece::ORM::Mapper::Parser;
+namespace Piece::ORM::Mapper;
 
-use Piece::ORM::Exception;
-use Piece::ORM::Mapper::Parser::MapperLexer;
-use Piece::ORM::Mapper::AST;
-}
+// {{{ Piece::ORM::Mapper::Method
 
-%syntax_error {
-    echo "Syntax Error on line {$this->_mapperLexer->line}: token '{$this->_mapperLexer->value}' while parsing rule:";
+/**
+ * @package    Piece_ORM
+ * @copyright  2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
+ * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License (revised)
+ * @version    Release: @package_version@
+ * @since      Class available since Release 2.0.0dev1
+ */
+class Method
+{
 
-    foreach ($this->yystack as $entry) {
-        echo $this->tokenName($entry->major) . ' ';
-    }
+    // {{{ properties
 
-    $expectedTokens = array();
-    foreach ($this->yy_get_expected_tokens($yymajor) as $token) {
-        $expectedTokens[] = self::$yyTokenName[$token];
-    }
+    /**#@+
+     * @access public
+     */
 
-    throw new Exception('Unexpected ' . $this->tokenName($yymajor) .
-                        "($TOKEN), expected one of: " .
-                        implode(',', $expectedTokens)
-                        );
-}
+    /**#@-*/
 
-%include_class {
-    private $_mapperLexer;
-    private $_ast;
+    /**#@+
+     * @access protected
+     */
 
-    public function __construct(MapperLexer $mapperLexer, AST $ast)
+    /**#@-*/
+
+    /**#@+
+     * @access private
+     */
+
+    private $_name;
+    private $_query;
+
+    /**#@-*/
+
+    /**#@+
+     * @access public
+     */
+
+    // }}}
+    // {{{ __construct()
+
+    /**
+     * @param string $name
+     * @param string $query
+     */
+    public function __construct($name, $query)
     {
-        $this->_mapperLexer = $mapperLexer;
-        $this->_ast = $ast;
+        $this->_name = $name;
+        $this->_query = $query;
     }
+
+    // }}}
+    // {{{ getName()
+
+    /**
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->_name;
+    }
+
+    // }}}
+    // {{{ getQuery()
+
+    /**
+     * @return string
+     */
+    public function getQuery()
+    {
+        return $this->_query;
+    }
+
+    /**#@-*/
+
+    /**#@+
+     * @access protected
+     */
+
+    /**#@-*/
+
+    /**#@+
+     * @access private
+     */
+
+    /**#@-*/
+
+    // }}}
 }
 
-mapper ::= method_declaration_statement_list.
+// }}}
 
-method_declaration_statement_list ::= method_declaration_statement_list method_declaration_statement.
-method_declaration_statement_list ::= .
-
-method_declaration_statement ::= METHOD ID(A) LCURLY QUERY STRING(B) RCURLY. {
-        $this->_ast->addMethod(A, trim(B, '"'));
-}
+/*
+ * Local Variables:
+ * mode: php
+ * coding: iso-8859-1
+ * tab-width: 4
+ * c-basic-offset: 4
+ * c-hanging-comment-ender-p: nil
+ * indent-tabs-mode: nil
+ * End:
+ */

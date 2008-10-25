@@ -41,12 +41,11 @@ use Piece::ORM::Inflector;
 use Piece::ORM::Metadata::MetadataFactory;
 use Piece::ORM::Exception;
 use Piece::ORM::Env;
-use Piece::ORM::Exception::PEARException;
-use Piece::ORM::Mapper::Generator;
-use Piece::ORM::Mapper::AbstractMapper;
 use Piece::ORM::Context::ContextRegistry;
-
-require_once 'spyc.php5';
+use Piece::ORM::Mapper::MapperLoader;
+use Stagehand::Cache;
+use Piece::ORM::Mapper;
+use Piece::ORM::Metadata;
 
 // {{{ Piece::ORM::Mapper::MapperFactory
 
@@ -93,7 +92,7 @@ class MapperFactory
      * Creates a mapper object for a given mapper name.
      *
      * @param string $mapperName
-     * @return Piece::ORM::Mapper::AbstractMapper
+     * @return Piece::ORM::Mapper
      * @throws Piece::ORM::Exception
      */
     public static function factory($mapperName)
@@ -103,17 +102,18 @@ class MapperFactory
             $mapperName = Inflector::camelize($mapperName);
         }
 
-        $mapperID = "{$mapperName}_" . sha1($context->getDSN() . ".$mapperName." . realpath(self::getConfigDirectory()));
+        $originalConfigDirectory = self::getConfigDirectory();
+        $configDirectory = realpath($originalConfigDirectory);
+        if ($configDirectory === false) {
+            throw new Exception("Failed to get the absolute path for the configuration directory [ $originalConfigDirectory ]");
+        }
+
+        $mapperID = "{$mapperName}_" . sha1($context->getDSN() . ".$mapperName." . $configDirectory);
         $mapper = self::_getMapper($mapperID);
         if (is_null($mapper)) {
-            self::_load($mapperID, $mapperName);
             $metadata = MetadataFactory::factory($mapperName);
-            $mapperClass = __NAMESPACE__ . "::$mapperID";
-            $mapper = new $mapperClass($metadata, $mapperID);
-            if (!$mapper instanceof AbstractMapper) {
-                throw new Exception("The mapper class for [ $mapperName ] is invalid.");
-            }
-
+            $mapper = self::_createMapper($mapperID, $mapperName, $metadata);
+            $mapper->setMetadata($metadata);
             self::_addMapper($mapper);
         }
 
@@ -183,147 +183,13 @@ class MapperFactory
      */
 
     // }}}
-    // {{{ _getMapperSource()
-
-    /**
-     * Gets a mapper source by either generating from a configuration file or getting
-     * from a cache.
-     *
-     * @param string $mapperID
-     * @param string $mapperName
-     * @param string $configFile
-     * @return string
-     * @throws Piece::ORM::Exception::PEARException
-     */
-    private function _getMapperSource($mapperID, $mapperName, $configFile)
-    {
-        $cache = new ::Cache_Lite_File(array('cacheDir' => ContextRegistry::getContext()->getCacheDirectory() . '/',
-                                             'masterFile' => $configFile,
-                                             'automaticSerialization' => true,
-                                             'errorHandlingAPIBreak' => true)
-                                       );
-
-        if (!Env::isProduction()) {
-            ::PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
-            $cache->remove($mapperID);
-            ::PEAR::staticPopErrorHandling();
-        }
-
-        ::PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
-        $mapperSource = $cache->get($mapperID);
-        ::PEAR::staticPopErrorHandling();
-        if (::PEAR::isError($mapperSource)) {
-            trigger_error('Cannot read the mapper source file in the directory [ ' .
-                          ContextRegistry::getContext()->getCacheDirectory() . 
-                          ' ].',
-                          E_USER_WARNING
-                          );
-        }
-
-        if (!$mapperSource instanceof AbstractMapper) {
-            $mapperSource = self::_generateMapperSource($mapperID, $mapperName, $configFile);
-            ::PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
-            $result = $cache->save($mapperSource);
-            ::PEAR::staticPopErrorHandling();
-            if (::PEAR::isError($result)) {
-                throw new PEARException($result);
-            }
-        }
-
-        return $mapperSource;
-    }
-
-    // }}}
-    // {{{ _generateMapperSource()
-
-    /**
-     * Generates a mapper source from the given configuration file.
-     *
-     * @param string $mapperID
-     * @param string $mapperName
-     * @param string $configFile
-     * @return string
-     */
-    private function _generateMapperSource($mapperID, $mapperName, $configFile)
-    {
-        $generator = new Generator($mapperID,
-                                   $mapperName,
-                                   $configFile,
-                                   MetadataFactory::factory($mapperName),
-                                   get_class_methods('Piece::ORM::Mapper::AbstractMapper')
-                                   );
-        return $generator->generate();
-    }
-
-    // }}}
-    // {{{ _loaded()
-
-    /**
-     * Returns whether or not the mapper class for a given mapper ID has already been
-     * loaded.
-     *
-     * @param string $mapperID
-     * @return boolean
-     */
-    private function _loaded($mapperID)
-    {
-        return class_exists(__NAMESPACE__ . "::$mapperID", false);
-    }
-
-    // }}}
-    // {{{ _load()
-
-    /**
-     * Loads a mapper class based on the given information.
-     *
-     * @param string $mapperID
-     * @param string $mapperName
-     * @throws Piece::ORM::Exception
-     */
-    private function _load($mapperID, $mapperName)
-    {
-        if (self::_loaded($mapperID)) {
-            return;
-        }
-
-        if (is_null(self::getConfigDirectory())) {
-            throw new Exception('The configuration directory is required.');
-        }
-
-        if (!file_exists(self::getConfigDirectory())) {
-            throw new Exception('The configuration directory [ ' .
-                                self::getConfigDirectory() .
-                                ' ] is not found.'
-                                );
-        }
-
-        ContextRegistry::getContext()->checkCacheDirectory();
-
-        $configFile = self::getConfigDirectory() . "/$mapperName.yaml";
-        if (!file_exists($configFile)) {
-            throw new Exception("The configuration file [ $configFile ] is not found.");
-        }
-
-        if (!is_readable($configFile)) {
-            throw new Exception("The configuration file [ $configFile ] is not readable.");
-        }
-
-        $mapperSource = self::_getMapperSource($mapperID, $mapperName, $configFile);
-        eval($mapperSource);
-
-        if (!self::_loaded($mapperID)) {
-            throw new Exception("The mapper [ $mapperName ] was not present in the source.");
-        }
-    }
-
-    // }}}
     // {{{ _getMapper()
 
     /**
-     * Gets a Piece::ORM::Mapper::AbstractMapper object from the current context.
+     * Gets a Piece::ORM::Mapper object from the current context.
      *
      * @param string $mapperID
-     * @return Piece::ORM::Mapper::AbstractMapper
+     * @return Piece::ORM::Mapper
      * @since Method available since Release 2.0.0dev1
      */
     private static function _getMapper($mapperID)
@@ -342,10 +208,10 @@ class MapperFactory
     /**
      * Adds a Piece::ORM::Mapper object to the current context.
      *
-     * @param Piece::ORM::Mapper::AbstractMapper $mapper
+     * @param Piece::ORM::Mapper $mapper
      * @since Method available since Release 2.0.0dev1
      */
-    private static function _addMapper(AbstractMapper $mapper)
+    private static function _addMapper(Mapper $mapper)
     {
         $mapperRegistry = self::_getMapperRegistry();
         $mapperRegistry[ $mapper->mapperID ] = $mapper;
@@ -414,6 +280,74 @@ class MapperFactory
     private function _setConfigDirectoryStack(array $configDirectoryStack)
     {
         ContextRegistry::getContext()->setAttribute(__CLASS__ . '::configDirectoryStack', $configDirectoryStack);
+    }
+
+    // }}}
+    // {{{ _createMapper()
+
+    /**
+     * @param string               $mapperID
+     * @param string               $mapperName
+     * @param Piece::ORM::Metadata $metadata
+     * @return Piece::ORM::Mapper
+     * @throws Piece::ORM::Exception
+     * @since Method available since Release 2.0.0dev1
+     */
+    private function _createMapper($mapperID, $mapperName, Metadata $metadata)
+    {
+        if (is_null(self::getConfigDirectory())) {
+            throw new Exception('The configuration directory is required.');
+        }
+
+        if (!file_exists(self::getConfigDirectory())) {
+            throw new Exception('The configuration directory [ ' .
+                                self::getConfigDirectory() .
+                                ' ] was not found'
+                                );
+        }
+
+        ContextRegistry::getContext()->checkCacheDirectory();
+
+        $originalConfigFile = self::getConfigDirectory() . "/$mapperName.mapper";
+        $configFile = realpath($originalConfigFile);
+        if ($configFile === false) {
+            throw new Exception("Failed to read the configuration file [ $originalConfigFile ]");
+        }
+
+        if (!file_exists($configFile)) {
+            throw new Exception("The configuration file [ $configFile ] was not found");
+        }
+
+        if (!is_readable($configFile)) {
+            throw new Exception("The configuration file [ $configFile ] was not readable");
+        }
+
+        $cache = new Cache(ContextRegistry::getContext()->getCacheDirectory(),
+                           $configFile
+                           );
+
+        if (!Env::isProduction()) {
+            $cache->remove($mapperID);
+        }
+
+        try {
+            $mapper = $cache->read($mapperID);
+        } catch (Stagehand::Cache::Exception $e) {
+            throw new Exception($e->getMessage());
+        }
+
+        if (is_null($mapper)) {
+            $mapperLoader = new MapperLoader($mapperID, $configFile, $metadata);
+            $mapperLoader->load();
+            $mapper = $mapperLoader->getMapper();
+            try {
+                $cache->write($mapper);
+            } catch (Stagehand::Cache::Exception $e) {
+                throw new Exception($e->getMessage());
+            }
+        }
+
+        return $mapper;
     }
 
     /**#@-*/

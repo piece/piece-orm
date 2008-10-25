@@ -35,12 +35,13 @@
  * @since      File available since Release 2.0.0dev1
  */
 
-namespace Piece::ORM::Mapper::Parser;
+namespace Piece::ORM::Mapper;
 
-use Piece::ORM::Mapper::Parser::MapperLexer;
-use Piece::ORM::Mapper::Parser::MapperParser;
+use Piece::ORM::Metadata;
+use Piece::ORM::Inflector;
+use Piece::ORM::Exception;
 
-// {{{ Piece::ORM::Mapper::Parser::MapperLoader
+// {{{ Piece::ORM::Mapper::AST
 
 /**
  * @package    Piece_ORM
@@ -49,7 +50,7 @@ use Piece::ORM::Mapper::Parser::MapperParser;
  * @version    Release: @package_version@
  * @since      Class available since Release 2.0.0dev1
  */
-class MapperLoader
+class AST
 {
 
     // {{{ properties
@@ -70,9 +71,9 @@ class MapperLoader
      * @access private
      */
 
-    private $_configFile;
     private $_ast;
-    private $_mapper;
+    private $_metadata;
+    private $_baseMapperMethods;
 
     /**#@-*/
 
@@ -84,23 +85,40 @@ class MapperLoader
     // {{{ __construct()
 
     /**
-     * @param $string $configFile
+     * @param Piece::ORM::Metadata $metadata
      */
-    public function __construct($configFile)
+    public function __construct(Metadata $metadata)
     {
-        $this->_configFile = $configFile;
+        $this->_metadata = $metadata;
+        $this->_ast = new DOMDocument();
+        $this->_baseMapperMethods = get_class_methods('Piece::ORM::Mapper');
+        $this->_loadMetadata();
     }
 
     // }}}
-    // {{{ load()
+    // {{{ addMethod()
 
     /**
      */
-    public function load()
+    public function addMethod($methodName, $query)
     {
-        $this->_loadAST();
-        $this->_loadSymbols();
-        $this->_createMapper();
+        if (!$this->_validateMethodName($methodName)) {
+            throw new Exception("Cannot use the method name [ $methodName ] since it is a reserved for internal use only.");
+        }
+
+        $method = $this->_ast->appendChild(new DOMElement('method'));
+        $method->setAttribute('name', $methodName);
+        $method->setAttribute('query', $query);
+    }
+
+    // }}}
+    // {{{ getAST()
+
+    /**
+     */
+    public function getAST()
+    {
+        return $this->_ast;
     }
 
     /**#@-*/
@@ -116,36 +134,52 @@ class MapperLoader
      */
 
     // }}}
-    // {{{ _loadAST()
+    // {{{ _loadMetadata()
 
     /**
      */
-    private function _loadAST()
+    private function _loadMetadata()
     {
-        $mapperLexer = new MapperLexer(file_get_contents($this->_configFile));
-        $mapperParser = new MapperParser($mapperLexer);
-
-        while ($mapperLexer->yylex()) {
-            $mapperParser->doParse($mapperLexer->token, $mapperLexer->value);
-        }
-        $mapperParser->doParse(0, 0);
-
-        $this->_ast = $mapperParser->getAST();
+        $this->_loadFindMethod();
     }
 
     // }}}
-    // {{{ _loadSymbols()
+    // {{{ _loadFindMethod()
 
     /**
+     * Loads built-in findXXX, findAll, findAllXXX methods.
      */
-    private function _loadSymbols() {}
+    private function _loadFindMethod()
+    {
+        foreach ($this->_metadata->getFieldNames() as $fieldName) {
+            $datatype = $this->_metadata->getDatatype($fieldName);
+            if ($datatype == 'integer' || $datatype == 'text') {
+                $camelizedFieldName = Inflector::camelize($fieldName);
+                foreach (array('findBy', 'findAllBy') as $methodNamePrefix) {
+                    $this->addMethod("$methodNamePrefix$camelizedFieldName",
+                                     "SELECT * FROM \$__table WHERE $fieldName = \$" .
+                                     Inflector::lowerCaseFirstLetter($camelizedFieldName)
+                                     );
+                }
+            }
+        }
+
+        $this->addMethod('findAll', 'SELECT * FROM $__table');
+    }
 
     // }}}
-    // {{{ _createMapper()
+    // {{{ _validateMethodName()
 
     /**
+     * Validates the method name.
+     *
+     * @param string $methodName
+     * @return boolean
      */
-    private function _createMapper() {}
+    private function _validateMethodName($methodName)
+    {
+        return !in_array($methodName, $this->_baseMapperMethods);
+    }
 
     /**#@-*/
 

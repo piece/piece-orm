@@ -130,13 +130,14 @@ class MapperParseryyStackEntry
  * @package    Piece_ORM
  * @copyright  2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License (revised)
- * @version    SVN: $Id: MapperParser.y 573 2008-10-24 14:15:18Z iteman $
+ * @version    SVN: $Id: MapperParser.y 575 2008-10-25 06:45:48Z iteman $
  * @since      File available since Release 2.0.0dev1
  */
 
 use Piece::ORM::Exception;
 use Piece::ORM::Mapper::Parser::MapperLexer;
-#line 141 "src/Piece/ORM/Mapper/Parser/MapperParser.php"
+use Piece::ORM::Mapper::AST;
+#line 142 "src/Piece/ORM/Mapper/Parser/MapperParser.php"
 
 // declare_class is output here
 #line 3 "src/Piece/ORM/Mapper/Parser/MapperParser.y"
@@ -151,26 +152,21 @@ use Piece::ORM::Mapper::Parser::MapperLexer;
  * @since      Class available since Release 2.0.0dev1
  */
 class MapperParser
-#line 157 "src/Piece/ORM/Mapper/Parser/MapperParser.php"
+#line 158 "src/Piece/ORM/Mapper/Parser/MapperParser.php"
 {
 /* First off, code is included which follows the "include_class" declaration
 ** in the input file. */
-#line 74 "src/Piece/ORM/Mapper/Parser/MapperParser.y"
+#line 75 "src/Piece/ORM/Mapper/Parser/MapperParser.y"
 
     private $_mapperLexer;
     private $_ast;
 
-    public function __construct(MapperLexer $mapperLexer)
+    public function __construct(MapperLexer $mapperLexer, AST $ast)
     {
         $this->_mapperLexer = $mapperLexer;
-        $this->_ast = new DOMDocument();
+        $this->_ast = $ast;
     }
-
-    public function getAst()
-    {
-        return $this->_ast;
-    }
-#line 177 "src/Piece/ORM/Mapper/Parser/MapperParser.php"
+#line 173 "src/Piece/ORM/Mapper/Parser/MapperParser.php"
 
 /* Next is all token values, as class constants
 */
@@ -772,13 +768,11 @@ static public $yy_action = array(
     **   function yy_r0($yymsp){ ... }           // User supplied code
     **  #line <lineno> <thisfile>
     */
-#line 95 "src/Piece/ORM/Mapper/Parser/MapperParser.y"
+#line 91 "src/Piece/ORM/Mapper/Parser/MapperParser.y"
     function yy_r3(){
-        $method = $this->_ast->appendChild(new DOMElement('method'));
-        $method->setAttribute('name', $this->yystack[$this->yyidx + -4]->minor);
-        $method->setAttribute('query', trim($this->yystack[$this->yyidx + -1]->minor, '"'));
+        $this->_ast->addMethod($this->yystack[$this->yyidx + -4]->minor, trim($this->yystack[$this->yyidx + -1]->minor, '"'));
     }
-#line 787 "src/Piece/ORM/Mapper/Parser/MapperParser.php"
+#line 781 "src/Piece/ORM/Mapper/Parser/MapperParser.php"
 
     /**
      * placeholder for the left hand side in a reduce operation.
@@ -890,7 +884,7 @@ static public $yy_action = array(
      */
     function yy_syntax_error($yymajor, $TOKEN)
     {
-#line 56 "src/Piece/ORM/Mapper/Parser/MapperParser.y"
+#line 57 "src/Piece/ORM/Mapper/Parser/MapperParser.y"
 
     echo "Syntax Error on line {$this->_mapperLexer->line}: token '{$this->_mapperLexer->value}' while parsing rule:";
 
@@ -907,7 +901,7 @@ static public $yy_action = array(
                         "($TOKEN), expected one of: " .
                         implode(',', $expectedTokens)
                         );
-#line 917 "src/Piece/ORM/Mapper/Parser/MapperParser.php"
+#line 911 "src/Piece/ORM/Mapper/Parser/MapperParser.php"
     }
 
     /**
