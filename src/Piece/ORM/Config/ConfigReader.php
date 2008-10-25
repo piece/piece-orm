@@ -42,6 +42,7 @@ use Piece::ORM::Exception;
 use Piece::ORM::Env;
 use Piece::ORM::Context::ContextRegistry;
 use Piece::ORM::Exception::PEARException;
+use Stagehand::Cache;
 
 require_once 'spyc.php5';
 
@@ -115,21 +116,46 @@ class ConfigReader
         }
 
         if (!file_exists($this->_configDirectory)) {
-            throw new Exception("The configuration directory [ {$this->_configDirectory} ] is not found.");
+            throw new Exception("The configuration directory [ {$this->_configDirectory} ] was not found");
         }
 
-        $configFile = "{$this->_configDirectory}/piece-orm-config.yaml";
+        $configFile = realpath("{$this->_configDirectory}/piece-orm-config.yaml");
+        if ($configFile === false) {
+            throw new Exception("Failed to read the configuration file [ $configFile ]");
+        }
+
         if (!file_exists($configFile)) {
-            throw new Exception("The configuration file [ $configFile ] is not found.");
+            throw new Exception("The configuration file [ $configFile ] was not found");
         }
 
         if (!is_readable($configFile)) {
-            throw new Exception("The configuration file [ $configFile ] is not readable.");
+            throw new Exception("The configuration file [ $configFile ] was not readable");
         }
 
-        ContextRegistry::getContext()->checkCacheDirectory();
+        $cache = new Cache(ContextRegistry::getContext()->getCacheDirectory(),
+                           $configFile
+                           );
 
-        return $this->_getConfiguration($configFile);
+        if (!Env::isProduction()) {
+            $cache->remove($configFile);
+        }
+
+        try {
+            $config = $cache->read($configFile);
+        } catch (Stagehand::Cache::Exception $e) {
+            throw new Exception($e->getMessage());
+        }
+
+        if (is_null($config)) {
+            $config = $this->_createConfig($configFile);
+            try {
+                $cache->write($config);
+            } catch (Stagehand::Cache::Exception $e) {
+                throw new Exception($e->getMessage());
+            }
+        }
+
+        return $config;
     }
 
     /**#@-*/
@@ -145,56 +171,7 @@ class ConfigReader
      */
 
     // }}}
-    // {{{ _getConfiguration()
-
-    /**
-     * Gets a Piece::ORM::Config object from a cache.
-     *
-     * @param string $configFile
-     * @return Piece::ORM::Config
-     * @throws Piece::ORM::Exception::PEARException
-     */
-    private function _getConfiguration($configFile)
-    {
-        $configFile = realpath($configFile);
-        $cache = new ::Cache_Lite_File(array('cacheDir' => ContextRegistry::getContext()->getCacheDirectory() . '/',
-                                             'masterFile' => $configFile,
-                                             'automaticSerialization' => true,
-                                             'errorHandlingAPIBreak' => true)
-                                       );
-
-        if (!Env::isProduction()) {
-            ::PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
-            $cache->remove($configFile);
-            ::PEAR::staticPopErrorHandling();
-        }
-
-        ::PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
-        $config = $cache->get($configFile);
-        ::PEAR::staticPopErrorHandling();
-        if (::PEAR::isError($config)) {
-            trigger_error('Cannot read the cache file in the directory [ ' .
-                          ContextRegistry::getContext()->getCacheDirectory() .
-                          ' ].',
-                          E_USER_WARNING
-                          );
-        }
-
-        if (!$config instanceof Config) {
-            $config = $this->_readConfiguration($configFile);
-            ::PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
-            $result = $cache->save($config);
-            ::PEAR::staticPopErrorHandling();
-            if (::PEAR::isError($result)) {
-                throw new PEARException($result);
-            }
-        }
-
-        return $config;
-    }
-
-    // }}}
-    // {{{ _readConfiguration()
+    // {{{ _createConfig()
 
     /**
      * Parses the given configuration file and returns a Piece::ORM::Config object.
@@ -203,7 +180,7 @@ class ConfigReader
      * @return Piece::ORM::Config
      * @throws Piece::ORM::Exception
      */
-    private function _readConfiguration($configFile)
+    private function _createConfig($configFile)
     {
         $config = new Config();
         $dsl = ::Spyc::YAMLLoad($configFile);
