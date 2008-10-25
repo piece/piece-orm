@@ -76,9 +76,17 @@ use Piece::ORM::Mapper::Parser::MapperLexer;
 
 %include_class {
     private $_mapperLexer;
+    private $_ast;
+
     public function __construct(MapperLexer $mapperLexer)
     {
         $this->_mapperLexer = $mapperLexer;
+        $this->_ast = new DOMDocument();
+    }
+
+    public function getAst()
+    {
+        return $this->_ast;
     }
 }
 
@@ -87,4 +95,8 @@ mapper ::= method_declaration_statement_list.
 method_declaration_statement_list ::= method_declaration_statement_list method_declaration_statement.
 method_declaration_statement_list ::= .
 
-method_declaration_statement ::= METHOD ID LCURLY QUERY STRING RCURLY.
+method_declaration_statement ::= METHOD ID(A) LCURLY QUERY STRING(B) RCURLY. {
+        $method = $this->_ast->appendChild(new DOMElement('method'));
+        $method->setAttribute('name', A);
+        $method->setAttribute('query', trim(B, '"'));
+}

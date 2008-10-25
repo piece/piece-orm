@@ -130,7 +130,7 @@ class MapperParseryyStackEntry
  * @package    Piece_ORM
  * @copyright  2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License (revised)
- * @version    SVN: $Id: MapperParser.y 569 2008-10-24 12:55:28Z iteman $
+ * @version    SVN: $Id: MapperParser.y 573 2008-10-24 14:15:18Z iteman $
  * @since      File available since Release 2.0.0dev1
  */
 
@@ -158,11 +158,19 @@ class MapperParser
 #line 74 "src/Piece/ORM/Mapper/Parser/MapperParser.y"
 
     private $_mapperLexer;
+    private $_ast;
+
     public function __construct(MapperLexer $mapperLexer)
     {
         $this->_mapperLexer = $mapperLexer;
+        $this->_ast = new DOMDocument();
     }
-#line 169 "src/Piece/ORM/Mapper/Parser/MapperParser.php"
+
+    public function getAst()
+    {
+        return $this->_ast;
+    }
+#line 177 "src/Piece/ORM/Mapper/Parser/MapperParser.php"
 
 /* Next is all token values, as class constants
 */
@@ -756,6 +764,7 @@ static public $yy_action = array(
      * If a rule is not set, it has no handler.
      */
     static public $yyReduceMap = array(
+        3 => 3,
     );
     /* Beginning here are the reduction cases.  A typical example
     ** follows:
@@ -763,6 +772,13 @@ static public $yy_action = array(
     **   function yy_r0($yymsp){ ... }           // User supplied code
     **  #line <lineno> <thisfile>
     */
+#line 95 "src/Piece/ORM/Mapper/Parser/MapperParser.y"
+    function yy_r3(){
+        $method = $this->_ast->appendChild(new DOMElement('method'));
+        $method->setAttribute('name', $this->yystack[$this->yyidx + -4]->minor);
+        $method->setAttribute('query', trim($this->yystack[$this->yyidx + -1]->minor, '"'));
+    }
+#line 787 "src/Piece/ORM/Mapper/Parser/MapperParser.php"
 
     /**
      * placeholder for the left hand side in a reduce operation.
@@ -891,7 +907,7 @@ static public $yy_action = array(
                         "($TOKEN), expected one of: " .
                         implode(',', $expectedTokens)
                         );
-#line 901 "src/Piece/ORM/Mapper/Parser/MapperParser.php"
+#line 917 "src/Piece/ORM/Mapper/Parser/MapperParser.php"
     }
 
     /**
