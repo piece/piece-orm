@@ -119,9 +119,10 @@ class ConfigReader
             throw new Exception("The configuration directory [ {$this->_configDirectory} ] was not found");
         }
 
-        $configFile = realpath("{$this->_configDirectory}/piece-orm-config.yaml");
+        $originalConfigFile = "{$this->_configDirectory}/piece-orm-config.yaml";
+        $configFile = realpath($originalConfigFile);
         if ($configFile === false) {
-            throw new Exception("Failed to read the configuration file [ $configFile ]");
+            throw new Exception("Failed to read the configuration file [ $originalConfigFile ]");
         }
 
         if (!file_exists($configFile)) {
