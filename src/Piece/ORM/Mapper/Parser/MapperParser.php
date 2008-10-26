@@ -130,7 +130,7 @@ class MapperParseryyStackEntry
  * @package    Piece_ORM
  * @copyright  2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License (revised)
- * @version    SVN: $Id: MapperParser.y 583 2008-10-25 14:39:47Z iteman $
+ * @version    SVN: $Id: MapperParser.y 585 2008-10-25 15:55:23Z iteman $
  * @since      File available since Release 2.0.0dev1
  */
 
@@ -789,17 +789,14 @@ static public $yy_action = array(
     */
 #line 95 "src/Piece/ORM/Mapper/Parser/MapperParser.y"
     function yy_r3(){
-        $this->_ast->addMethod($this->yystack[$this->yyidx + -4]->minor,
-                               trim($this->yystack[$this->yyidx + -2]->minor, '"') ? : null,
-                               trim($this->yystack[$this->yyidx + -1]->minor, '"') ? : null
-                               );
+        $this->_ast->addMethod($this->yystack[$this->yyidx + -4]->minor, trim($this->yystack[$this->yyidx + -2]->minor, '"'), trim($this->yystack[$this->yyidx + -1]->minor, '"'));
     }
-#line 803 "src/Piece/ORM/Mapper/Parser/MapperParser.php"
-#line 102 "src/Piece/ORM/Mapper/Parser/MapperParser.y"
+#line 800 "src/Piece/ORM/Mapper/Parser/MapperParser.php"
+#line 99 "src/Piece/ORM/Mapper/Parser/MapperParser.y"
     function yy_r4(){
        $this->_retvalue = $this->yystack[$this->yyidx + 0]->minor;
     }
-#line 808 "src/Piece/ORM/Mapper/Parser/MapperParser.php"
+#line 805 "src/Piece/ORM/Mapper/Parser/MapperParser.php"
 
     /**
      * placeholder for the left hand side in a reduce operation.
@@ -928,7 +925,7 @@ static public $yy_action = array(
                         "($TOKEN), expected one of: " .
                         implode(',', $expectedTokens)
                         );
-#line 938 "src/Piece/ORM/Mapper/Parser/MapperParser.php"
+#line 935 "src/Piece/ORM/Mapper/Parser/MapperParser.php"
     }
 
     /**

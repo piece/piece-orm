@@ -96,10 +96,7 @@ method_declaration_statement ::=
             query_declaration_statement(B)
             orderby_declaration_statement(C)
         RCURLY. {
-        $this->_ast->addMethod(A,
-                               trim(B, '"') ? : null,
-                               trim(C, '"') ? : null
-                               );
+        $this->_ast->addMethod(A, trim(B, '"'), trim(C, '"'));
 }
 
 query_declaration_statement(A) ::= QUERY STRING(B). {

@@ -99,8 +99,11 @@ class AST
     // {{{ addMethod()
 
     /**
+     * @param string $methodName
+     * @param string $query
+     * @param string $orderBy
      */
-    public function addMethod($methodName, $query)
+    public function addMethod($methodName, $query, $orderBy = null)
     {
         if (!$this->_validateMethodName($methodName)) {
             throw new Exception("Cannot use the method name [ $methodName ] since it is a reserved for internal use only.");
@@ -109,6 +112,7 @@ class AST
         $method = $this->_ast->appendChild(new DOMElement('method'));
         $method->setAttribute('name', $methodName);
         $method->setAttribute('query', $query);
+        $method->setAttribute('orderBy', $orderBy);
     }
 
     // }}}

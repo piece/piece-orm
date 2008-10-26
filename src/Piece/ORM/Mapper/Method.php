@@ -69,6 +69,8 @@ class Method
 
     private $_name;
     private $_query;
+    private $_orderBy;
+    private $_associations = array();
 
     /**#@-*/
 
@@ -82,11 +84,13 @@ class Method
     /**
      * @param string $name
      * @param string $query
+     * @param string $orderBy
      */
-    public function __construct($name, $query)
+    public function __construct($name, $query, $orderBy)
     {
         $this->_name = $name;
-        $this->_query = $query;
+        $this->_query = strlen($query) ? $query : null;
+        $this->_orderBy = strlen($orderBy) ? $orderBy : null;
     }
 
     // }}}
@@ -109,6 +113,28 @@ class Method
     public function getQuery()
     {
         return $this->_query;
+    }
+
+    // }}}
+    // {{{ getOrderBy()
+
+    /**
+     * @return string
+     */
+    public function getOrderBy()
+    {
+        return $this->_orderBy;
+    }
+
+    // }}}
+    // {{{ getAssociations()
+
+    /**
+     * @return array
+     */
+    public function getAssociations()
+    {
+        return $this->_associations;
     }
 
     /**#@-*/

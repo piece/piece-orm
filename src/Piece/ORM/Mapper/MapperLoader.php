@@ -186,7 +186,8 @@ class MapperLoader
         foreach ($methods as $method) {
             $name = $method->getAttribute('name');
             $query = $method->getAttribute('query');
-            $this->_methods[$name] = new Method($name, $query);
+            $orderBy = $method->getAttribute('orderBy');
+            $this->_methods[$name] = new Method($name, $query, $orderBy);
         }
     }
 
