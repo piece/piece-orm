@@ -83,7 +83,7 @@ LCURLY = "{"
 RCURLY = "}"
 METHOD = "method"
 QUERY = "query"
-ORDERBY = "orderBy"
+ORDER_BY = "orderBy"
 */
 
 /*!lex2php
@@ -98,9 +98,9 @@ QUERY {
     $this->token = MapperParser::QUERY;
 }
 
-ORDERBY {
-    if ($this->_debug) echo "found ORDERBY [ {$this->value} ]\n";
-    $this->token = MapperParser::ORDERBY;
+ORDER_BY {
+    if ($this->_debug) echo "found ORDER_BY [ {$this->value} ]\n";
+    $this->token = MapperParser::ORDER_BY;
 }
 
 ID {

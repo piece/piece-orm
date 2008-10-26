@@ -130,7 +130,7 @@ class MapperParseryyStackEntry
  * @package    Piece_ORM
  * @copyright  2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License (revised)
- * @version    SVN: $Id: MapperParser.y 585 2008-10-25 15:55:23Z iteman $
+ * @version    SVN: $Id: MapperParser.y 586 2008-10-26 07:20:57Z iteman $
  * @since      File available since Release 2.0.0dev1
  */
 
@@ -183,7 +183,7 @@ class MapperParser
     const RCURLY                         =  4;
     const QUERY                          =  5;
     const STRING                         =  6;
-    const ORDERBY                        =  7;
+    const ORDER_BY                       =  7;
     const YY_NO_ACTION = 23;
     const YY_ACCEPT_ACTION = 22;
     const YY_ERROR_ACTION = 21;
@@ -378,9 +378,9 @@ static public $yy_action = array(
      */
     static public $yyTokenName = array( 
   '$',             'METHOD',        'ID',            'LCURLY',      
-  'RCURLY',        'QUERY',         'STRING',        'ORDERBY',     
-  'error',         'mapper',        'method_declaration_statement_list',  'method_declaration_statement',
-  'query_declaration_statement',  'orderby_declaration_statement',
+  'RCURLY',        'QUERY',         'STRING',        'ORDER_BY',    
+  'error',         'mapper',        'methodList',    'method',      
+  'query',         'orderBy',     
     );
 
     /**
@@ -388,14 +388,14 @@ static public $yy_action = array(
      * @var array
      */
     static public $yyRuleName = array(
- /*   0 */ "mapper ::= method_declaration_statement_list",
- /*   1 */ "method_declaration_statement_list ::= method_declaration_statement_list method_declaration_statement",
- /*   2 */ "method_declaration_statement_list ::=",
- /*   3 */ "method_declaration_statement ::= METHOD ID LCURLY query_declaration_statement orderby_declaration_statement RCURLY",
- /*   4 */ "query_declaration_statement ::= QUERY STRING",
- /*   5 */ "query_declaration_statement ::=",
- /*   6 */ "orderby_declaration_statement ::= ORDERBY STRING",
- /*   7 */ "orderby_declaration_statement ::=",
+ /*   0 */ "mapper ::= methodList",
+ /*   1 */ "methodList ::= methodList method",
+ /*   2 */ "methodList ::=",
+ /*   3 */ "method ::= METHOD ID LCURLY query orderBy RCURLY",
+ /*   4 */ "query ::= QUERY STRING",
+ /*   5 */ "query ::=",
+ /*   6 */ "orderBy ::= ORDER_BY STRING",
+ /*   7 */ "orderBy ::=",
     );
 
     /**

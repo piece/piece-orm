@@ -1,81 +1,81 @@
 State 0:
-          mapper ::= * method_declaration_statement_list
-          method_declaration_statement_list ::= * method_declaration_statement_list method_declaration_statement
-      (2) method_declaration_statement_list ::= *
+          mapper ::= * methodList
+          methodList ::= * methodList method
+      (2) methodList ::= *
 
                         mapper accept
-method_declaration_statement_list shift  1
+                    methodList shift  1
                      {default} reduce 2
 
 State 1:
-      (0) mapper ::= method_declaration_statement_list *
-          method_declaration_statement_list ::= method_declaration_statement_list * method_declaration_statement
-          method_declaration_statement ::= * METHOD ID LCURLY query_declaration_statement orderby_declaration_statement RCURLY
+      (0) mapper ::= methodList *
+          methodList ::= methodList * method
+          method ::= * METHOD ID LCURLY query orderBy RCURLY
 
                         METHOD shift  7
-  method_declaration_statement shift  11
+                        method shift  11
                      {default} reduce 0
 
 State 2:
-          method_declaration_statement ::= METHOD ID LCURLY * query_declaration_statement orderby_declaration_statement RCURLY
-          query_declaration_statement ::= * QUERY STRING
-      (5) query_declaration_statement ::= *
+          method ::= METHOD ID LCURLY * query orderBy RCURLY
+          query ::= * QUERY STRING
+      (5) query ::= *
 
                          QUERY shift  6
-   query_declaration_statement shift  3
+                         query shift  3
                      {default} reduce 5
 
 State 3:
-          method_declaration_statement ::= METHOD ID LCURLY query_declaration_statement * orderby_declaration_statement RCURLY
-          orderby_declaration_statement ::= * ORDERBY STRING
-      (7) orderby_declaration_statement ::= *
+          method ::= METHOD ID LCURLY query * orderBy RCURLY
+          orderBy ::= * ORDER_BY STRING
+      (7) orderBy ::= *
 
-                       ORDERBY shift  8
- orderby_declaration_statement shift  5
+                      ORDER_BY shift  8
+                       orderBy shift  5
                      {default} reduce 7
 
 State 4:
-          method_declaration_statement ::= METHOD ID * LCURLY query_declaration_statement orderby_declaration_statement RCURLY
+          method ::= METHOD ID * LCURLY query orderBy RCURLY
 
                         LCURLY shift  2
 
 State 5:
-          method_declaration_statement ::= METHOD ID LCURLY query_declaration_statement orderby_declaration_statement * RCURLY
+          method ::= METHOD ID LCURLY query orderBy * RCURLY
 
                         RCURLY shift  10
 
 State 6:
-          query_declaration_statement ::= QUERY * STRING
+          query ::= QUERY * STRING
 
                         STRING shift  9
 
 State 7:
-          method_declaration_statement ::= METHOD * ID LCURLY query_declaration_statement orderby_declaration_statement RCURLY
+          method ::= METHOD * ID LCURLY query orderBy RCURLY
 
                             ID shift  4
 
 State 8:
-          orderby_declaration_statement ::= ORDERBY * STRING
+          orderBy ::= ORDER_BY * STRING
 
                         STRING shift  12
 
 State 9:
-      (4) query_declaration_statement ::= QUERY STRING *
+      (4) query ::= QUERY STRING *
 
                      {default} reduce 4
 
 State 10:
-      (3) method_declaration_statement ::= METHOD ID LCURLY query_declaration_statement orderby_declaration_statement RCURLY *
+      (3) method ::= METHOD ID LCURLY query orderBy RCURLY *
 
                      {default} reduce 3
 
 State 11:
-      (1) method_declaration_statement_list ::= method_declaration_statement_list method_declaration_statement *
+      (1) methodList ::= methodList method *
 
                      {default} reduce 1
 
 State 12:
-      (6) orderby_declaration_statement ::= ORDERBY STRING *
+      (6) orderBy ::= ORDER_BY STRING *
 
                      {default} reduce 6
 

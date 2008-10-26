@@ -31,7 +31,7 @@
  * @package    Piece_ORM
  * @copyright  2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License (revised)
- * @version    SVN: $Id: MapperLexer.plex 574 2008-10-25 06:41:34Z iteman $
+ * @version    SVN: $Id: MapperLexer.plex 585 2008-10-25 15:55:23Z iteman $
  * @since      File available since Release 2.0.0dev1
  */
 
@@ -232,8 +232,8 @@ class MapperLexer
     function yy_r1_3($yy_subpatterns)
     {
 
-    if ($this->_debug) echo "found ORDERBY [ {$this->value} ]\n";
-    $this->token = MapperParser::ORDERBY;
+    if ($this->_debug) echo "found ORDER_BY [ {$this->value} ]\n";
+    $this->token = MapperParser::ORDER_BY;
     }
     function yy_r1_4($yy_subpatterns)
     {

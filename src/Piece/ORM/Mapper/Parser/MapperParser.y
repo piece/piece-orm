@@ -86,25 +86,25 @@ use Piece::ORM::Mapper::AST;
     }
 }
 
-mapper ::= method_declaration_statement_list.
+mapper ::= methodList.
 
-method_declaration_statement_list ::= method_declaration_statement_list method_declaration_statement.
-method_declaration_statement_list ::= .
+methodList ::= methodList method.
+methodList ::= .
 
-method_declaration_statement ::=
+method ::=
         METHOD ID(A) LCURLY
-            query_declaration_statement(B)
-            orderby_declaration_statement(C)
+            query(B)
+            orderBy(C)
         RCURLY. {
         $this->_ast->addMethod(A, trim(B, '"'), trim(C, '"'));
 }
 
-query_declaration_statement(A) ::= QUERY STRING(B). {
+query(A) ::= QUERY STRING(B). {
        A = B;
 }
-query_declaration_statement ::= .
+query ::= .
 
-orderby_declaration_statement(A) ::= ORDERBY STRING(B). {
+orderBy(A) ::= ORDER_BY STRING(B). {
        A = B;
 }
-orderby_declaration_statement ::= .
+orderBy ::= .
