@@ -130,7 +130,7 @@ class MapperParseryyStackEntry
  * @package    Piece_ORM
  * @copyright  2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License (revised)
- * @version    SVN: $Id: MapperParser.y 586 2008-10-26 07:20:57Z iteman $
+ * @version    SVN: $Id: MapperParser.y 589 2008-10-26 09:24:08Z iteman $
  * @since      File available since Release 2.0.0dev1
  */
 
@@ -184,9 +184,17 @@ class MapperParser
     const QUERY                          =  5;
     const STRING                         =  6;
     const ORDER_BY                       =  7;
-    const YY_NO_ACTION = 23;
-    const YY_ACCEPT_ACTION = 22;
-    const YY_ERROR_ACTION = 21;
+    const ASSOCIATION                    =  8;
+    const THROUGH                        =  9;
+    const TABLE                          = 10;
+    const ASSOCIATION_TYPE               = 11;
+    const PROPERTY                       = 12;
+    const COLUMN                         = 13;
+    const REFERENCED_COLUMN              = 14;
+    const INVERSE_COLUMN                 = 15;
+    const YY_NO_ACTION = 87;
+    const YY_ACCEPT_ACTION = 86;
+    const YY_ERROR_ACTION = 85;
 
 /* Next are that tables used to determine what action to take based on the
 ** current state and lookahead token.  These tables are used to implement
@@ -238,43 +246,92 @@ class MapperParser
 **                          shifting non-terminals after a reduce.
 **  self::$yy_default       Default action for each state.
 */
-    const YY_SZ_ACTTAB = 15;
+    const YY_SZ_ACTTAB = 54;
 static public $yy_action = array(
- /*     0 */    22,    1,    2,   12,   10,    5,    4,    9,    7,   11,
- /*    10 */     8,    6,   24,   24,    3,
+ /*     0 */    44,   86,    4,   48,   46,   45,   42,   32,   43,   49,
+ /*    10 */    47,   38,   39,    9,    5,   13,   12,   17,   15,    8,
+ /*    20 */    11,   23,   29,   28,   20,   22,   30,   16,   21,   31,
+ /*    30 */    37,   18,   12,    9,   10,    8,   11,   19,   36,   33,
+ /*    40 */    34,   35,    7,   27,   41,   25,   40,    6,   26,    3,
+ /*    50 */    14,    2,   24,    1,
     );
     static public $yy_lookahead = array(
- /*     0 */     9,   10,    3,    6,    4,   13,    2,    6,    1,   11,
- /*    10 */     7,    5,   14,   14,   12,
+ /*     0 */    24,   17,   18,   27,   28,   29,   30,   31,   32,   33,
+ /*    10 */     4,   19,   20,    7,    3,    9,   10,   11,   12,   13,
+ /*    20 */    14,   28,    2,    2,   31,   32,    4,    2,   35,   36,
+ /*    30 */     4,    5,   10,    7,    8,   13,   14,   15,   22,   23,
+ /*    40 */    24,   25,    3,    2,    6,    2,    6,    3,    2,   21,
+ /*    50 */     1,   34,    2,   26,
 );
-    const YY_SHIFT_USE_DFLT = -4;
-    const YY_SHIFT_MAX = 8;
+    const YY_SHIFT_USE_DFLT = -1;
+    const YY_SHIFT_MAX = 19;
     static public $yy_shift_ofst = array(
- /*     0 */    -4,    7,    6,    3,   -1,    0,    1,    4,   -3,
+ /*     0 */    -1,    6,   22,   26,   49,   -1,   -1,   -1,   50,   38,
+ /*    10 */    39,   21,   20,   11,   25,   46,   44,   43,   40,   41,
 );
-    const YY_REDUCE_USE_DFLT = -10;
-    const YY_REDUCE_MAX = 3;
+    const YY_REDUCE_USE_DFLT = -25;
+    const YY_REDUCE_MAX = 7;
     static public $yy_reduce_ofst = array(
- /*     0 */    -9,   -2,    2,   -8,
+ /*     0 */   -16,  -24,   -7,   16,   -8,   17,   28,   27,
 );
     static public $yyExpectedTokens = array(
         /* 0 */ array(),
-        /* 1 */ array(1, ),
-        /* 2 */ array(5, ),
-        /* 3 */ array(7, ),
-        /* 4 */ array(3, ),
-        /* 5 */ array(4, ),
-        /* 6 */ array(6, ),
-        /* 7 */ array(2, ),
-        /* 8 */ array(6, ),
-        /* 9 */ array(),
-        /* 10 */ array(),
-        /* 11 */ array(),
-        /* 12 */ array(),
+        /* 1 */ array(4, 7, 9, 10, 11, 12, 13, 14, ),
+        /* 2 */ array(4, 10, 13, 14, 15, ),
+        /* 3 */ array(4, 5, 7, 8, ),
+        /* 4 */ array(1, ),
+        /* 5 */ array(),
+        /* 6 */ array(),
+        /* 7 */ array(),
+        /* 8 */ array(2, ),
+        /* 9 */ array(6, ),
+        /* 10 */ array(3, ),
+        /* 11 */ array(2, ),
+        /* 12 */ array(2, ),
+        /* 13 */ array(3, ),
+        /* 14 */ array(2, ),
+        /* 15 */ array(2, ),
+        /* 16 */ array(3, ),
+        /* 17 */ array(2, ),
+        /* 18 */ array(6, ),
+        /* 19 */ array(2, ),
+        /* 20 */ array(),
+        /* 21 */ array(),
+        /* 22 */ array(),
+        /* 23 */ array(),
+        /* 24 */ array(),
+        /* 25 */ array(),
+        /* 26 */ array(),
+        /* 27 */ array(),
+        /* 28 */ array(),
+        /* 29 */ array(),
+        /* 30 */ array(),
+        /* 31 */ array(),
+        /* 32 */ array(),
+        /* 33 */ array(),
+        /* 34 */ array(),
+        /* 35 */ array(),
+        /* 36 */ array(),
+        /* 37 */ array(),
+        /* 38 */ array(),
+        /* 39 */ array(),
+        /* 40 */ array(),
+        /* 41 */ array(),
+        /* 42 */ array(),
+        /* 43 */ array(),
+        /* 44 */ array(),
+        /* 45 */ array(),
+        /* 46 */ array(),
+        /* 47 */ array(),
+        /* 48 */ array(),
+        /* 49 */ array(),
 );
     static public $yy_default = array(
- /*     0 */    15,   13,   18,   20,   21,   21,   21,   21,   21,   17,
- /*    10 */    16,   14,   19,
+ /*     0 */    52,   85,   85,   85,   50,   74,   56,   64,   85,   85,
+ /*    10 */    85,   85,   85,   85,   85,   85,   85,   85,   85,   85,
+ /*    20 */    76,   73,   77,   75,   82,   80,   81,   84,   83,   79,
+ /*    30 */    72,   78,   68,   57,   58,   59,   55,   54,   51,   53,
+ /*    40 */    60,   61,   67,   69,   70,   66,   65,   62,   63,   71,
 );
 /* The next thing included is series of defines which control
 ** various aspects of the generated parser.
@@ -291,11 +348,11 @@ static public $yy_action = array(
 **    self::YYERRORSYMBOL is the code number of the error symbol.  If not
 **                        defined, then do no error processing.
 */
-    const YYNOCODE = 15;
+    const YYNOCODE = 38;
     const YYSTACKDEPTH = 100;
-    const YYNSTATE = 13;
-    const YYNRULE = 8;
-    const YYERRORSYMBOL = 8;
+    const YYNSTATE = 50;
+    const YYNRULE = 35;
+    const YYERRORSYMBOL = 16;
     const YYERRSYMDT = 'yy0';
     const YYFALLBACK = 0;
     /** The next table maps tokens into fallback tokens.  If a construct
@@ -379,8 +436,14 @@ static public $yy_action = array(
     static public $yyTokenName = array( 
   '$',             'METHOD',        'ID',            'LCURLY',      
   'RCURLY',        'QUERY',         'STRING',        'ORDER_BY',    
-  'error',         'mapper',        'methodList',    'method',      
-  'query',         'orderBy',     
+  'ASSOCIATION',   'THROUGH',       'TABLE',         'ASSOCIATION_TYPE',
+  'PROPERTY',      'COLUMN',        'REFERENCED_COLUMN',  'INVERSE_COLUMN',
+  'error',         'start',         'topStatementList',  'topStatement',
+  'method',        'methodStatementList',  'methodStatement',  'query',       
+  'orderBy',       'association',   'associationStatementList',  'associationStatement',
+  'table',         'associationType',  'property',      'column',      
+  'referencedColumn',  'through',       'throughStatementList',  'throughStatement',
+  'inverseColumn',
     );
 
     /**
@@ -388,14 +451,41 @@ static public $yy_action = array(
      * @var array
      */
     static public $yyRuleName = array(
- /*   0 */ "mapper ::= methodList",
- /*   1 */ "methodList ::= methodList method",
- /*   2 */ "methodList ::=",
- /*   3 */ "method ::= METHOD ID LCURLY query orderBy RCURLY",
- /*   4 */ "query ::= QUERY STRING",
- /*   5 */ "query ::=",
- /*   6 */ "orderBy ::= ORDER_BY STRING",
- /*   7 */ "orderBy ::=",
+ /*   0 */ "start ::= topStatementList",
+ /*   1 */ "topStatementList ::= topStatementList topStatement",
+ /*   2 */ "topStatementList ::=",
+ /*   3 */ "topStatement ::= method",
+ /*   4 */ "method ::= METHOD ID LCURLY methodStatementList RCURLY",
+ /*   5 */ "methodStatementList ::= methodStatementList methodStatement",
+ /*   6 */ "methodStatementList ::=",
+ /*   7 */ "methodStatement ::= query",
+ /*   8 */ "methodStatement ::= orderBy",
+ /*   9 */ "methodStatement ::= association",
+ /*  10 */ "query ::= QUERY STRING",
+ /*  11 */ "orderBy ::= ORDER_BY STRING",
+ /*  12 */ "association ::= ASSOCIATION LCURLY associationStatementList RCURLY",
+ /*  13 */ "associationStatementList ::= associationStatementList associationStatement",
+ /*  14 */ "associationStatementList ::=",
+ /*  15 */ "associationStatement ::= table",
+ /*  16 */ "associationStatement ::= associationType",
+ /*  17 */ "associationStatement ::= property",
+ /*  18 */ "associationStatement ::= column",
+ /*  19 */ "associationStatement ::= referencedColumn",
+ /*  20 */ "associationStatement ::= orderBy",
+ /*  21 */ "associationStatement ::= through",
+ /*  22 */ "through ::= THROUGH LCURLY throughStatementList RCURLY",
+ /*  23 */ "throughStatementList ::= throughStatementList throughStatement",
+ /*  24 */ "throughStatementList ::=",
+ /*  25 */ "throughStatement ::= table",
+ /*  26 */ "throughStatement ::= column",
+ /*  27 */ "throughStatement ::= referencedColumn",
+ /*  28 */ "throughStatement ::= inverseColumn",
+ /*  29 */ "table ::= TABLE ID",
+ /*  30 */ "associationType ::= ASSOCIATION_TYPE ID",
+ /*  31 */ "property ::= PROPERTY ID",
+ /*  32 */ "column ::= COLUMN ID",
+ /*  33 */ "referencedColumn ::= REFERENCED_COLUMN ID",
+ /*  34 */ "inverseColumn ::= INVERSE_COLUMN ID",
     );
 
     /**
@@ -760,14 +850,41 @@ static public $yy_action = array(
      * </pre>
      */
     static public $yyRuleInfo = array(
-  array( 'lhs' => 9, 'rhs' => 1 ),
-  array( 'lhs' => 10, 'rhs' => 2 ),
-  array( 'lhs' => 10, 'rhs' => 0 ),
-  array( 'lhs' => 11, 'rhs' => 6 ),
-  array( 'lhs' => 12, 'rhs' => 2 ),
-  array( 'lhs' => 12, 'rhs' => 0 ),
-  array( 'lhs' => 13, 'rhs' => 2 ),
-  array( 'lhs' => 13, 'rhs' => 0 ),
+  array( 'lhs' => 17, 'rhs' => 1 ),
+  array( 'lhs' => 18, 'rhs' => 2 ),
+  array( 'lhs' => 18, 'rhs' => 0 ),
+  array( 'lhs' => 19, 'rhs' => 1 ),
+  array( 'lhs' => 20, 'rhs' => 5 ),
+  array( 'lhs' => 21, 'rhs' => 2 ),
+  array( 'lhs' => 21, 'rhs' => 0 ),
+  array( 'lhs' => 22, 'rhs' => 1 ),
+  array( 'lhs' => 22, 'rhs' => 1 ),
+  array( 'lhs' => 22, 'rhs' => 1 ),
+  array( 'lhs' => 23, 'rhs' => 2 ),
+  array( 'lhs' => 24, 'rhs' => 2 ),
+  array( 'lhs' => 25, 'rhs' => 4 ),
+  array( 'lhs' => 26, 'rhs' => 2 ),
+  array( 'lhs' => 26, 'rhs' => 0 ),
+  array( 'lhs' => 27, 'rhs' => 1 ),
+  array( 'lhs' => 27, 'rhs' => 1 ),
+  array( 'lhs' => 27, 'rhs' => 1 ),
+  array( 'lhs' => 27, 'rhs' => 1 ),
+  array( 'lhs' => 27, 'rhs' => 1 ),
+  array( 'lhs' => 27, 'rhs' => 1 ),
+  array( 'lhs' => 27, 'rhs' => 1 ),
+  array( 'lhs' => 33, 'rhs' => 4 ),
+  array( 'lhs' => 34, 'rhs' => 2 ),
+  array( 'lhs' => 34, 'rhs' => 0 ),
+  array( 'lhs' => 35, 'rhs' => 1 ),
+  array( 'lhs' => 35, 'rhs' => 1 ),
+  array( 'lhs' => 35, 'rhs' => 1 ),
+  array( 'lhs' => 35, 'rhs' => 1 ),
+  array( 'lhs' => 28, 'rhs' => 2 ),
+  array( 'lhs' => 29, 'rhs' => 2 ),
+  array( 'lhs' => 30, 'rhs' => 2 ),
+  array( 'lhs' => 31, 'rhs' => 2 ),
+  array( 'lhs' => 32, 'rhs' => 2 ),
+  array( 'lhs' => 36, 'rhs' => 2 ),
     );
 
     /**
@@ -777,9 +894,34 @@ static public $yy_action = array(
      * If a rule is not set, it has no handler.
      */
     static public $yyReduceMap = array(
-        3 => 3,
         4 => 4,
-        6 => 4,
+        5 => 5,
+        7 => 7,
+        8 => 8,
+        20 => 8,
+        9 => 9,
+        10 => 10,
+        11 => 10,
+        29 => 10,
+        30 => 10,
+        31 => 10,
+        32 => 10,
+        33 => 10,
+        34 => 10,
+        12 => 12,
+        13 => 13,
+        23 => 13,
+        15 => 15,
+        25 => 15,
+        16 => 16,
+        17 => 17,
+        18 => 18,
+        26 => 18,
+        19 => 19,
+        27 => 19,
+        21 => 21,
+        22 => 22,
+        28 => 28,
     );
     /* Beginning here are the reduction cases.  A typical example
     ** follows:
@@ -787,16 +929,92 @@ static public $yy_action = array(
     **   function yy_r0($yymsp){ ... }           // User supplied code
     **  #line <lineno> <thisfile>
     */
-#line 95 "src/Piece/ORM/Mapper/Parser/MapperParser.y"
-    function yy_r3(){
-        $this->_ast->addMethod($this->yystack[$this->yyidx + -4]->minor, trim($this->yystack[$this->yyidx + -2]->minor, '"'), trim($this->yystack[$this->yyidx + -1]->minor, '"'));
-    }
-#line 800 "src/Piece/ORM/Mapper/Parser/MapperParser.php"
-#line 99 "src/Piece/ORM/Mapper/Parser/MapperParser.y"
+#line 93 "src/Piece/ORM/Mapper/Parser/MapperParser.y"
     function yy_r4(){
-       $this->_retvalue = $this->yystack[$this->yyidx + 0]->minor;
+        $this->_ast->addMethod($this->yystack[$this->yyidx + -3]->minor, @$this->yystack[$this->yyidx + -1]->minor['query'], @$this->yystack[$this->yyidx + -1]->minor['orderBy'], @$this->yystack[$this->yyidx + -1]->minor['associations']);
     }
-#line 805 "src/Piece/ORM/Mapper/Parser/MapperParser.php"
+#line 942 "src/Piece/ORM/Mapper/Parser/MapperParser.php"
+#line 97 "src/Piece/ORM/Mapper/Parser/MapperParser.y"
+    function yy_r5(){
+        if (!is_array($this->yystack[$this->yyidx + -1]->minor)) {
+            $this->yystack[$this->yyidx + -1]->minor = array();
+        }
+        $this->_retvalue = $this->yystack[$this->yyidx + -1]->minor;
+        foreach (array_keys($this->yystack[$this->yyidx + 0]->minor) as $key) {
+            if ($key == 'association') {
+                $this->_retvalue['associations'][] = $this->yystack[$this->yyidx + 0]->minor[$key];
+                continue;
+            }
+            $this->_retvalue[$key] = $this->yystack[$this->yyidx + 0]->minor[$key];
+        }
+    }
+#line 957 "src/Piece/ORM/Mapper/Parser/MapperParser.php"
+#line 112 "src/Piece/ORM/Mapper/Parser/MapperParser.y"
+    function yy_r7(){ $this->_retvalue['query'] = trim($this->yystack[$this->yyidx + 0]->minor, '"');     }
+#line 960 "src/Piece/ORM/Mapper/Parser/MapperParser.php"
+#line 113 "src/Piece/ORM/Mapper/Parser/MapperParser.y"
+    function yy_r8(){ $this->_retvalue['orderBy'] = trim($this->yystack[$this->yyidx + 0]->minor, '"');     }
+#line 963 "src/Piece/ORM/Mapper/Parser/MapperParser.php"
+#line 114 "src/Piece/ORM/Mapper/Parser/MapperParser.y"
+    function yy_r9(){ $this->_retvalue['association'] = $this->yystack[$this->yyidx + 0]->minor;     }
+#line 966 "src/Piece/ORM/Mapper/Parser/MapperParser.php"
+#line 116 "src/Piece/ORM/Mapper/Parser/MapperParser.y"
+    function yy_r10(){ $this->_retvalue = $this->yystack[$this->yyidx + 0]->minor;     }
+#line 969 "src/Piece/ORM/Mapper/Parser/MapperParser.php"
+#line 120 "src/Piece/ORM/Mapper/Parser/MapperParser.y"
+    function yy_r12(){
+        $association = $this->_ast->createElement('association');
+        foreach (array_keys((array)$this->yystack[$this->yyidx + -1]->minor) as $key) {
+            if ($key == 'through') {
+                $association->appendChild($this->yystack[$this->yyidx + -1]->minor[$key]);
+                continue;
+            }
+            $association->setAttribute($key, $this->yystack[$this->yyidx + -1]->minor[$key]);
+        }
+        $this->_retvalue = $association;
+    }
+#line 982 "src/Piece/ORM/Mapper/Parser/MapperParser.php"
+#line 132 "src/Piece/ORM/Mapper/Parser/MapperParser.y"
+    function yy_r13(){
+        if (!is_array($this->yystack[$this->yyidx + -1]->minor)) {
+            $this->yystack[$this->yyidx + -1]->minor = array();
+        }
+        $this->_retvalue = $this->yystack[$this->yyidx + -1]->minor;
+        foreach (array_keys($this->yystack[$this->yyidx + 0]->minor) as $key) {
+            $this->_retvalue[$key] = $this->yystack[$this->yyidx + 0]->minor[$key];
+        }
+    }
+#line 993 "src/Piece/ORM/Mapper/Parser/MapperParser.php"
+#line 143 "src/Piece/ORM/Mapper/Parser/MapperParser.y"
+    function yy_r15(){ $this->_retvalue['table'] = $this->yystack[$this->yyidx + 0]->minor;     }
+#line 996 "src/Piece/ORM/Mapper/Parser/MapperParser.php"
+#line 144 "src/Piece/ORM/Mapper/Parser/MapperParser.y"
+    function yy_r16(){ $this->_retvalue['type'] = $this->yystack[$this->yyidx + 0]->minor;     }
+#line 999 "src/Piece/ORM/Mapper/Parser/MapperParser.php"
+#line 145 "src/Piece/ORM/Mapper/Parser/MapperParser.y"
+    function yy_r17(){ $this->_retvalue['property'] = $this->yystack[$this->yyidx + 0]->minor;     }
+#line 1002 "src/Piece/ORM/Mapper/Parser/MapperParser.php"
+#line 146 "src/Piece/ORM/Mapper/Parser/MapperParser.y"
+    function yy_r18(){ $this->_retvalue['column'] = $this->yystack[$this->yyidx + 0]->minor;     }
+#line 1005 "src/Piece/ORM/Mapper/Parser/MapperParser.php"
+#line 147 "src/Piece/ORM/Mapper/Parser/MapperParser.y"
+    function yy_r19(){ $this->_retvalue['referencedColumn'] = $this->yystack[$this->yyidx + 0]->minor;     }
+#line 1008 "src/Piece/ORM/Mapper/Parser/MapperParser.php"
+#line 149 "src/Piece/ORM/Mapper/Parser/MapperParser.y"
+    function yy_r21(){ $this->_retvalue['through'] = $this->yystack[$this->yyidx + 0]->minor;     }
+#line 1011 "src/Piece/ORM/Mapper/Parser/MapperParser.php"
+#line 151 "src/Piece/ORM/Mapper/Parser/MapperParser.y"
+    function yy_r22(){
+        $through = $this->_ast->createElement('through');
+        foreach (array_keys($this->yystack[$this->yyidx + -1]->minor) as $key) {
+            $through->setAttribute($key, $this->yystack[$this->yyidx + -1]->minor[$key]);
+        }
+        $this->_retvalue = $through;
+    }
+#line 1020 "src/Piece/ORM/Mapper/Parser/MapperParser.php"
+#line 173 "src/Piece/ORM/Mapper/Parser/MapperParser.y"
+    function yy_r28(){ $this->_retvalue['inverseColumn'] = $this->yystack[$this->yyidx + 0]->minor;     }
+#line 1023 "src/Piece/ORM/Mapper/Parser/MapperParser.php"
 
     /**
      * placeholder for the left hand side in a reduce operation.
@@ -925,7 +1143,7 @@ static public $yy_action = array(
                         "($TOKEN), expected one of: " .
                         implode(',', $expectedTokens)
                         );
-#line 935 "src/Piece/ORM/Mapper/Parser/MapperParser.php"
+#line 1153 "src/Piece/ORM/Mapper/Parser/MapperParser.php"
     }
 
     /**

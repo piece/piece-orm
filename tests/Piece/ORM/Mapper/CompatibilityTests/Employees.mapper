@@ -1,0 +1,293 @@
+method findByIdAndNote {
+    query "SELECT * FROM $__table WHERE id = $id AND note = $note"
+}
+
+method findAllWithSkills1 {
+    association {
+        table skills
+        type manyToMany
+        property skills
+    }
+}
+
+method findAllWithSkills2 {
+    association {
+        table skills
+        type manyToMany
+        property skills
+        column id
+        through {
+            table employees_skills
+            column employees_id
+            referencedColumn id
+            inverseColumn skills_id
+        }
+    }
+}
+
+method insert {
+    association {
+        table skills
+        type manyToMany
+        property skills
+    }
+    association {
+        table computers
+        type oneToOne
+        property computer
+    }
+}
+
+method findAllByFirstName {
+    association {
+        table skills
+        type manyToMany
+        property skills
+    }
+}
+
+method findAllWithDepartment1 {
+    association {
+        table departments
+        type manyToOne
+        property department
+    }
+}
+
+method findAllWithDepartment2 {
+    association {
+        table departments
+        type manyToOne
+        property department
+        column id
+        referencedColumn departments_id
+    }
+}
+
+method findAllWithComputer1 {
+    association {
+        table computers
+        type oneToOne
+        property computer
+    }
+}
+
+method findAllWithComputer2 {
+    association {
+        table computers
+        type oneToOne
+        property computer
+        column employees_id
+        referencedColumn id
+    }
+}
+
+method findWithDepartmentByFirstName {
+    query "SELECT * FROM $__table WHERE first_name = $firstName"
+    association {
+        table departments
+        type manyToOne
+        property department
+    }
+}
+
+method findAllWithOrderedSkills {
+    association {
+        table skills
+        type manyToMany
+        property skills
+        orderBy "skills.id DESC"
+    }
+}
+
+method findWithOrderedSkills {
+    association {
+        table skills
+        type manyToMany
+        property skills
+        orderBy "skills.id DESC"
+    }
+}
+
+method findWithSkillsByFirstName {
+    query "SELECT * FROM $__table WHERE first_name = $firstName"
+    association {
+        table skills
+        type manyToMany
+        property skills
+    }
+}
+
+method update {
+    association {
+        table skills
+        type manyToMany
+        property skills
+    }
+    association {
+        table computers
+        type oneToOne
+        property computer
+    }
+}
+
+method findWithComputerByFirstName {
+    query "SELECT * FROM $__table WHERE first_name = $firstName"
+    association {
+        table computers
+        type oneToOne
+        property computer
+    }
+}
+
+method delete {
+    association {
+        table skills
+        type manyToMany
+        property skills
+    }
+    association {
+        table computers
+        type oneToOne
+        property computer
+    }
+}
+
+method findOneForFirstNameByFirstName {
+    query "SELECT first_name FROM $__table WHERE first_name = $firstName"
+}
+
+method findOneForCount {
+    query "SELECT COUNT(*) FROM $__table"
+}
+
+method findAllNotes {
+    query "SELECT note FROM $__table"
+}
+
+method insertUserDefined {
+    query "
+INSERT INTO $__table (
+  first_name,
+  last_name,
+  note,
+  created_at
+  )
+VALUES (
+  $firstName,
+  $lastName,
+  'Bar',
+  $createdAt
+  )
+"
+}
+
+method updateUserDefined {}
+
+method deleteUserDefined {
+    query "DELETE FROM $__table WHERE id = $id"
+}
+
+method updateNoteByNote {
+    query "
+UPDATE $__table
+SET
+   note = $note,
+   updated_at = $updatedAt
+WHERE
+  note = $oldNote
+"
+}
+
+method deleteByNote {
+    query "DELETE FROM $__table WHERE note = $note"
+}
+
+method findWithStaticQuery {
+    query "SELECT 1 AS one"
+}
+
+method findAllWithStaticQuery {
+    query "SELECT 1 AS one"
+}
+
+method findOneWithStaticQuery {
+    query "SELECT 1 AS one"
+}
+
+method insertWithStaticQuery {
+    query "
+      INSERT INTO $__table (
+        first_name,
+        last_name,
+        note,
+        created_at
+        )
+      VALUES (
+        'Foo',
+        'Bar',
+        'Baz',
+        $createdAt
+        )
+"
+}
+
+method updateWithStaticQuery {
+    query "UPDATE $__table SET note = 'Qux', updated_at = $updatedAt"
+}
+
+method deleteWithStaticQuery {
+    query "DELETE FROM $__table"
+}
+
+method insertWithNoQuery {}
+
+method updateWithNoQuery {}
+
+method deleteWithNoQuery {}
+
+method insertWithEmails {
+    association {
+        table emails
+        type manyToMany
+        property emails
+        through {
+            table employees_emails
+            inverseColumn emails_id
+        }
+    }
+}
+
+method findAllWithEmails {
+    association {
+        table emails
+        type manyToMany
+        property emails
+        orderBy "emails.emails_id"
+        through {
+            table employees_emails
+            inverseColumn emails_id
+        }
+    }
+}
+
+method findAllOrderByLastName {
+    orderBy "last_name"
+}
+
+method findOrderByLastName {
+    orderBy "last_name"
+}
+
+method findOneOrderByLastName {
+    query "SELECT last_name FROM $__table"
+    orderBy "last_name"
+}
+
+method findAllByIds {
+    query "SELECT * FROM $__table WHERE id IN ($ids)"
+}
+
+method findByQueryVariable {
+    query "SELECT * FROM $__table WHERE id = $query"
+}

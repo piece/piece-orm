@@ -86,25 +86,103 @@ use Piece::ORM::Mapper::AST;
     }
 }
 
-mapper ::= methodList.
+start ::= topStatementList.
 
-methodList ::= methodList method.
-methodList ::= .
+topStatementList ::= topStatementList topStatement.
+topStatementList ::= .
 
-method ::=
-        METHOD ID(A) LCURLY
-            query(B)
-            orderBy(C)
-        RCURLY. {
-        $this->_ast->addMethod(A, trim(B, '"'), trim(C, '"'));
+topStatement ::= method.
+
+method ::= METHOD ID(A) LCURLY methodStatementList(B) RCURLY. {
+        $this->_ast->addMethod(A, @B['query'], @B['orderBy'], @B['associations']);
 }
 
-query(A) ::= QUERY STRING(B). {
-       A = B;
+methodStatementList(X) ::= methodStatementList(A) methodStatement(B). {
+        if (!is_array(A)) {
+            A = array();
+        }
+        X = A;
+        foreach (array_keys(B) as $key) {
+            if ($key == 'association') {
+                X['associations'][] = B[$key];
+                continue;
+            }
+            X[$key] = B[$key];
+        }
 }
-query ::= .
+methodStatementList ::= .
 
-orderBy(A) ::= ORDER_BY STRING(B). {
-       A = B;
+methodStatement(X) ::= query(A). { X['query'] = trim(A, '"'); }
+methodStatement(X) ::= orderBy(A). { X['orderBy'] = trim(A, '"'); }
+methodStatement(X) ::= association(A). { X['association'] = A; }
+
+query(X) ::= QUERY STRING(A). { X = A; }
+
+orderBy(X) ::= ORDER_BY STRING(A). { X = A; }
+
+association(X) ::= ASSOCIATION LCURLY associationStatementList(A) RCURLY. {
+        $association = $this->_ast->createElement('association');
+        foreach (array_keys((array)A) as $key) {
+            if ($key == 'through') {
+                $association->appendChild(A[$key]);
+                continue;
+            }
+            $association->setAttribute($key, A[$key]);
+        }
+        X = $association;
 }
-orderBy ::= .
+
+associationStatementList(X) ::= associationStatementList(A) associationStatement(B). {
+        if (!is_array(A)) {
+            A = array();
+        }
+        X = A;
+        foreach (array_keys(B) as $key) {
+            X[$key] = B[$key];
+        }
+}
+associationStatementList ::= .
+
+associationStatement(X) ::= table(A). { X['table'] = A; }
+associationStatement(X) ::= associationType(A). { X['type'] = A; }
+associationStatement(X) ::= property(A). { X['property'] = A; }
+associationStatement(X) ::= column(A). { X['column'] = A; }
+associationStatement(X) ::= referencedColumn(A). { X['referencedColumn'] = A; }
+associationStatement(X) ::= orderBy(A). { X['orderBy'] = trim(A, '"'); }
+associationStatement(X) ::= through(A). { X['through'] = A; }
+
+through(X) ::= THROUGH LCURLY throughStatementList(A) RCURLY. {
+        $through = $this->_ast->createElement('through');
+        foreach (array_keys(A) as $key) {
+            $through->setAttribute($key, A[$key]);
+        }
+        X = $through;
+}
+
+throughStatementList(X) ::= throughStatementList(A) throughStatement(B). {
+        if (!is_array(A)) {
+            A = array();
+        }
+        X = A;
+        foreach (array_keys(B) as $key) {
+            X[$key] = B[$key];
+        }
+}
+throughStatementList ::= .
+
+throughStatement(X) ::= table(A). { X['table'] = A; }
+throughStatement(X) ::= column(A). { X['column'] = A; }
+throughStatement(X) ::= referencedColumn(A). { X['referencedColumn'] = A; }
+throughStatement(X) ::= inverseColumn(A). { X['inverseColumn'] = A; }
+
+table(X) ::= TABLE ID(A). { X = A; }
+
+associationType(X) ::= ASSOCIATION_TYPE ID(A). { X = A; }
+
+property(X) ::= PROPERTY ID(A). { X = A; }
+
+column(X) ::= COLUMN ID(A). { X = A; }
+
+referencedColumn(X) ::= REFERENCED_COLUMN ID(A). { X = A; }
+
+inverseColumn(X) ::= INVERSE_COLUMN ID(A). { X = A; }

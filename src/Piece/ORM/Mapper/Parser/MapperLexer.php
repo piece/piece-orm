@@ -31,7 +31,7 @@
  * @package    Piece_ORM
  * @copyright  2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License (revised)
- * @version    SVN: $Id: MapperLexer.plex 585 2008-10-25 15:55:23Z iteman $
+ * @version    SVN: $Id: MapperLexer.plex 589 2008-10-26 09:24:08Z iteman $
  * @since      File available since Release 2.0.0dev1
  */
 
@@ -109,11 +109,19 @@ class MapperLexer
               6 => 0,
               7 => 0,
               8 => 0,
+              9 => 0,
+              10 => 0,
+              11 => 0,
+              12 => 0,
+              13 => 0,
+              14 => 0,
+              15 => 0,
+              16 => 0,
             );
         if ($this->_counter >= strlen($this->_input)) {
             return false; // end of input
         }
-        $yy_global_pattern = "/^(method)|^(query)|^(orderBy)|^([a-zA-Z_][a-zA-Z_0-9]*)|^(\\{)|^(\\})|^([ \t\r\n]+)|^(\"[^[\"\\\\]+\")/";
+        $yy_global_pattern = "/^(method)|^(query)|^(orderBy)|^(association)|^(table)|^(type)|^(property)|^(column)|^(through)|^(referencedColumn)|^(inverseColumn)|^([a-zA-Z_][a-zA-Z_0-9]*)|^(\\{)|^(\\})|^([ \t\r\n]+)|^(\"[^[\"\\\\]+\")/";
 
         do {
             if (preg_match($yy_global_pattern, substr($this->_input, $this->_counter), $yymatches)) {
@@ -153,14 +161,22 @@ class MapperLexer
                     // skip this token
                     continue;
                 } else {                    $yy_yymore_patterns = array(
-        1 => array(0, "^(query)|^(orderBy)|^([a-zA-Z_][a-zA-Z_0-9]*)|^(\\{)|^(\\})|^([ \t\r\n]+)|^(\"[^[\"\\\\]+\")"),
-        2 => array(0, "^(orderBy)|^([a-zA-Z_][a-zA-Z_0-9]*)|^(\\{)|^(\\})|^([ \t\r\n]+)|^(\"[^[\"\\\\]+\")"),
-        3 => array(0, "^([a-zA-Z_][a-zA-Z_0-9]*)|^(\\{)|^(\\})|^([ \t\r\n]+)|^(\"[^[\"\\\\]+\")"),
-        4 => array(0, "^(\\{)|^(\\})|^([ \t\r\n]+)|^(\"[^[\"\\\\]+\")"),
-        5 => array(0, "^(\\})|^([ \t\r\n]+)|^(\"[^[\"\\\\]+\")"),
-        6 => array(0, "^([ \t\r\n]+)|^(\"[^[\"\\\\]+\")"),
-        7 => array(0, "^(\"[^[\"\\\\]+\")"),
-        8 => array(0, ""),
+        1 => array(0, "^(query)|^(orderBy)|^(association)|^(table)|^(type)|^(property)|^(column)|^(through)|^(referencedColumn)|^(inverseColumn)|^([a-zA-Z_][a-zA-Z_0-9]*)|^(\\{)|^(\\})|^([ \t\r\n]+)|^(\"[^[\"\\\\]+\")"),
+        2 => array(0, "^(orderBy)|^(association)|^(table)|^(type)|^(property)|^(column)|^(through)|^(referencedColumn)|^(inverseColumn)|^([a-zA-Z_][a-zA-Z_0-9]*)|^(\\{)|^(\\})|^([ \t\r\n]+)|^(\"[^[\"\\\\]+\")"),
+        3 => array(0, "^(association)|^(table)|^(type)|^(property)|^(column)|^(through)|^(referencedColumn)|^(inverseColumn)|^([a-zA-Z_][a-zA-Z_0-9]*)|^(\\{)|^(\\})|^([ \t\r\n]+)|^(\"[^[\"\\\\]+\")"),
+        4 => array(0, "^(table)|^(type)|^(property)|^(column)|^(through)|^(referencedColumn)|^(inverseColumn)|^([a-zA-Z_][a-zA-Z_0-9]*)|^(\\{)|^(\\})|^([ \t\r\n]+)|^(\"[^[\"\\\\]+\")"),
+        5 => array(0, "^(type)|^(property)|^(column)|^(through)|^(referencedColumn)|^(inverseColumn)|^([a-zA-Z_][a-zA-Z_0-9]*)|^(\\{)|^(\\})|^([ \t\r\n]+)|^(\"[^[\"\\\\]+\")"),
+        6 => array(0, "^(property)|^(column)|^(through)|^(referencedColumn)|^(inverseColumn)|^([a-zA-Z_][a-zA-Z_0-9]*)|^(\\{)|^(\\})|^([ \t\r\n]+)|^(\"[^[\"\\\\]+\")"),
+        7 => array(0, "^(column)|^(through)|^(referencedColumn)|^(inverseColumn)|^([a-zA-Z_][a-zA-Z_0-9]*)|^(\\{)|^(\\})|^([ \t\r\n]+)|^(\"[^[\"\\\\]+\")"),
+        8 => array(0, "^(through)|^(referencedColumn)|^(inverseColumn)|^([a-zA-Z_][a-zA-Z_0-9]*)|^(\\{)|^(\\})|^([ \t\r\n]+)|^(\"[^[\"\\\\]+\")"),
+        9 => array(0, "^(referencedColumn)|^(inverseColumn)|^([a-zA-Z_][a-zA-Z_0-9]*)|^(\\{)|^(\\})|^([ \t\r\n]+)|^(\"[^[\"\\\\]+\")"),
+        10 => array(0, "^(inverseColumn)|^([a-zA-Z_][a-zA-Z_0-9]*)|^(\\{)|^(\\})|^([ \t\r\n]+)|^(\"[^[\"\\\\]+\")"),
+        11 => array(0, "^([a-zA-Z_][a-zA-Z_0-9]*)|^(\\{)|^(\\})|^([ \t\r\n]+)|^(\"[^[\"\\\\]+\")"),
+        12 => array(0, "^(\\{)|^(\\})|^([ \t\r\n]+)|^(\"[^[\"\\\\]+\")"),
+        13 => array(0, "^(\\})|^([ \t\r\n]+)|^(\"[^[\"\\\\]+\")"),
+        14 => array(0, "^([ \t\r\n]+)|^(\"[^[\"\\\\]+\")"),
+        15 => array(0, "^(\"[^[\"\\\\]+\")"),
+        16 => array(0, ""),
     );
 
                     // yymore is needed
@@ -238,27 +254,75 @@ class MapperLexer
     function yy_r1_4($yy_subpatterns)
     {
 
+    if ($this->_debug) echo "found ASSOCIATION [ {$this->value} ]\n";
+    $this->token = MapperParser::ASSOCIATION;
+    }
+    function yy_r1_5($yy_subpatterns)
+    {
+
+    if ($this->_debug) echo "found TABLE [ {$this->value} ]\n";
+    $this->token = MapperParser::TABLE;
+    }
+    function yy_r1_6($yy_subpatterns)
+    {
+
+    if ($this->_debug) echo "found ASSOCIATION_TYPE [ {$this->value} ]\n";
+    $this->token = MapperParser::ASSOCIATION_TYPE;
+    }
+    function yy_r1_7($yy_subpatterns)
+    {
+
+    if ($this->_debug) echo "found PROPERTY [ {$this->value} ]\n";
+    $this->token = MapperParser::PROPERTY;
+    }
+    function yy_r1_8($yy_subpatterns)
+    {
+
+    if ($this->_debug) echo "found COLUMN [ {$this->value} ]\n";
+    $this->token = MapperParser::COLUMN;
+    }
+    function yy_r1_9($yy_subpatterns)
+    {
+
+    if ($this->_debug) echo "found THROUGH [ {$this->value} ]\n";
+    $this->token = MapperParser::THROUGH;
+    }
+    function yy_r1_10($yy_subpatterns)
+    {
+
+    if ($this->_debug) echo "found REFERENCED_COLUMN [ {$this->value} ]\n";
+    $this->token = MapperParser::REFERENCED_COLUMN;
+    }
+    function yy_r1_11($yy_subpatterns)
+    {
+
+    if ($this->_debug) echo "found INVERSE_COLUMN [ {$this->value} ]\n";
+    $this->token = MapperParser::INVERSE_COLUMN;
+    }
+    function yy_r1_12($yy_subpatterns)
+    {
+
     if ($this->_debug) echo "found ID [ {$this->value} ]\n";
     $this->token = MapperParser::ID;
     }
-    function yy_r1_5($yy_subpatterns)
+    function yy_r1_13($yy_subpatterns)
     {
 
     if ($this->_debug) echo "found LCURLY [ {$this->value} ]\n";
     $this->token = MapperParser::LCURLY;
     }
-    function yy_r1_6($yy_subpatterns)
+    function yy_r1_14($yy_subpatterns)
     {
 
     if ($this->_debug) echo "found RCURLY [ {$this->value} ]\n";
     $this->token = MapperParser::RCURLY;
     }
-    function yy_r1_7($yy_subpatterns)
+    function yy_r1_15($yy_subpatterns)
     {
 
     return false;
     }
-    function yy_r1_8($yy_subpatterns)
+    function yy_r1_16($yy_subpatterns)
     {
 
     if ($this->_debug) echo "found STRING [ {$this->value} ]\n";

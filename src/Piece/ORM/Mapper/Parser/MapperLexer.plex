@@ -84,6 +84,14 @@ RCURLY = "}"
 METHOD = "method"
 QUERY = "query"
 ORDER_BY = "orderBy"
+ASSOCIATION = "association"
+TABLE = "table"
+ASSOCIATION_TYPE = "type"
+PROPERTY = "property"
+COLUMN = "column"
+THROUGH = "through"
+REFERENCED_COLUMN = "referencedColumn"
+INVERSE_COLUMN = "inverseColumn"
 */
 
 /*!lex2php
@@ -101,6 +109,46 @@ QUERY {
 ORDER_BY {
     if ($this->_debug) echo "found ORDER_BY [ {$this->value} ]\n";
     $this->token = MapperParser::ORDER_BY;
+}
+
+ASSOCIATION {
+    if ($this->_debug) echo "found ASSOCIATION [ {$this->value} ]\n";
+    $this->token = MapperParser::ASSOCIATION;
+}
+
+TABLE {
+    if ($this->_debug) echo "found TABLE [ {$this->value} ]\n";
+    $this->token = MapperParser::TABLE;
+}
+
+ASSOCIATION_TYPE {
+    if ($this->_debug) echo "found ASSOCIATION_TYPE [ {$this->value} ]\n";
+    $this->token = MapperParser::ASSOCIATION_TYPE;
+}
+
+PROPERTY {
+    if ($this->_debug) echo "found PROPERTY [ {$this->value} ]\n";
+    $this->token = MapperParser::PROPERTY;
+}
+
+COLUMN {
+    if ($this->_debug) echo "found COLUMN [ {$this->value} ]\n";
+    $this->token = MapperParser::COLUMN;
+}
+
+THROUGH {
+    if ($this->_debug) echo "found THROUGH [ {$this->value} ]\n";
+    $this->token = MapperParser::THROUGH;
+}
+
+REFERENCED_COLUMN {
+    if ($this->_debug) echo "found REFERENCED_COLUMN [ {$this->value} ]\n";
+    $this->token = MapperParser::REFERENCED_COLUMN;
+}
+
+INVERSE_COLUMN {
+    if ($this->_debug) echo "found INVERSE_COLUMN [ {$this->value} ]\n";
+    $this->token = MapperParser::INVERSE_COLUMN;
 }
 
 ID {

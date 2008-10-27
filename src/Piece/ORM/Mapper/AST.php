@@ -50,7 +50,7 @@ use Piece::ORM::Exception;
  * @version    Release: @package_version@
  * @since      Class available since Release 2.0.0dev1
  */
-class AST
+class AST extends DOMDocument
 {
 
     // {{{ properties
@@ -71,7 +71,6 @@ class AST
      * @access private
      */
 
-    private $_ast;
     private $_metadata;
     private $_baseMapperMethods;
 
@@ -89,8 +88,8 @@ class AST
      */
     public function __construct(Metadata $metadata)
     {
+        parent::__construct();
         $this->_metadata = $metadata;
-        $this->_ast = new DOMDocument();
         $this->_baseMapperMethods = get_class_methods('Piece::ORM::Mapper');
         $this->_loadMetadata();
     }
@@ -99,30 +98,26 @@ class AST
     // {{{ addMethod()
 
     /**
-     * @param string $methodName
+     * @param string $method
      * @param string $query
      * @param string $orderBy
+     * @param array  $associations
      */
-    public function addMethod($methodName, $query, $orderBy = null)
+    public function addMethod($method, $query, $orderBy = null, $associations = null)
     {
-        if (!$this->_validateMethodName($methodName)) {
-            throw new Exception("Cannot use the method name [ $methodName ] since it is a reserved for internal use only.");
+        if (!$this->_validateMethod($method)) {
+            throw new Exception("Cannot use the method name [ $method ] since it is a reserved for internal use only.");
         }
 
-        $method = $this->_ast->appendChild(new DOMElement('method'));
-        $method->setAttribute('name', $methodName);
-        $method->setAttribute('query', $query);
-        $method->setAttribute('orderBy', $orderBy);
-    }
-
-    // }}}
-    // {{{ getAST()
-
-    /**
-     */
-    public function getAST()
-    {
-        return $this->_ast;
+        $methodElement = $this->appendChild(new DOMElement('method'));
+        $methodElement->setAttribute('name', $method);
+        $methodElement->setAttribute('query', $query);
+        $methodElement->setAttribute('orderBy', $orderBy);
+        if (!is_null($associations)) {
+            foreach ($associations as $association) {
+                $associationElement = $methodElement->appendChild(new DOMElement('association'));
+            }
+        }
     }
 
     /**#@-*/
@@ -172,17 +167,17 @@ class AST
     }
 
     // }}}
-    // {{{ _validateMethodName()
+    // {{{ _validateMethod()
 
     /**
      * Validates the method name.
      *
-     * @param string $methodName
+     * @param string $method
      * @return boolean
      */
-    private function _validateMethodName($methodName)
+    private function _validateMethod($method)
     {
-        return !in_array($methodName, $this->_baseMapperMethods);
+        return !in_array($method, $this->_baseMapperMethods);
     }
 
     /**#@-*/

@@ -37,15 +37,7 @@
 
 namespace Piece::ORM::Mapper;
 
-use Piece::ORM::Mapper::Parser::MapperLexer;
-use Piece::ORM::Mapper::Parser::MapperParser;
-use Piece::ORM::Mapper;
-use Piece::ORM::Mapper::Method;
-use Piece::ORM::Exception;
-use Piece::ORM::Mapper::AST;
-use Piece::ORM::Metadata;
-
-// {{{ Piece::ORM::Mapper::MapperLoader
+// {{{ Piece::ORM::Mapper::Association
 
 /**
  * @package    Piece_ORM
@@ -54,7 +46,7 @@ use Piece::ORM::Metadata;
  * @version    Release: @package_version@
  * @since      Class available since Release 2.0.0dev1
  */
-class MapperLoader
+class Association
 {
 
     // {{{ properties
@@ -75,11 +67,6 @@ class MapperLoader
      * @access private
      */
 
-    private $_configFile;
-    private $_ast;
-    private $_mapper;
-    private $_methods = array();
-
     /**#@-*/
 
     /**#@+
@@ -90,38 +77,9 @@ class MapperLoader
     // {{{ __construct()
 
     /**
-     * @param string               $mapperID
-     * @param string               $configFile
-     * @param Piece::ORM::Metadata $metadata
      */
-    public function __construct($mapperID, $configFile, Metadata $metadata)
+    public function __construct()
     {
-        $this->_mapper = new Mapper($mapperID);
-        $this->_configFile = $configFile;
-        $this->_ast = new Ast($metadata);
-    }
-
-    // }}}
-    // {{{ load()
-
-    /**
-     */
-    public function load()
-    {
-        $this->_loadAST();
-        $this->_loadSymbols();
-        $this->_createMapper();
-    }
-
-    // }}}
-    // {{{ getMapper()
-
-    /**
-     * @return Piece::ORM::Mapper
-     */
-    public function getMapper()
-    {
-        return $this->_mapper;
     }
 
     /**#@-*/
@@ -135,61 +93,6 @@ class MapperLoader
     /**#@+
      * @access private
      */
-
-    // }}}
-    // {{{ _loadAST()
-
-    /**
-     */
-    private function _loadAST()
-    {
-        $mapperLexer = new MapperLexer(file_get_contents($this->_configFile));
-        $mapperParser = new MapperParser($mapperLexer, $this->_ast);
-
-        while ($mapperLexer->yylex()) {
-            $mapperParser->doParse($mapperLexer->token, $mapperLexer->value);
-        }
-        $mapperParser->doParse(0, 0);
-    }
-
-    // }}}
-    // {{{ _loadSymbols()
-
-    /**
-     */
-    private function _loadSymbols()
-    {
-        $this->_loadMethods();
-    }
-
-    // }}}
-    // {{{ _createMapper()
-
-    /**
-     */
-    private function _createMapper()
-    {
-        foreach ($this->_methods as $method) {
-            $this->_mapper->addMethod($method);
-        }
-    }
-
-    // }}}
-    // {{{ _loadMethods()
-
-    /**
-     */
-    private function _loadMethods()
-    {
-        $xpath = new DOMXPath($this->_ast);
-        $methods = $xpath->query('//method');
-        foreach ($methods as $method) {
-            $name = $method->getAttribute('name');
-            $query = $method->getAttribute('query');
-            $orderBy = $method->getAttribute('orderBy');
-            $this->_methods[$name] = new Method($name, $query, $orderBy);
-        }
-    }
 
     /**#@-*/
 
