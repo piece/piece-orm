@@ -1,170 +1,252 @@
 State 0:
           start ::= * topStatementList
+          topStatementList ::= * topStatementList topStatement
+      (2) topStatementList ::= *
 
                          start accept
-              topStatementList shift  4
+              topStatementList shift  6
                      {default} reduce 2
 
 State 1:
-          association ::= ASSOCIATION LCURLY associationStatementList * RCURLY
-          associationStatementList ::= associationStatementList * associationStatement
+          orderBy ::= * ORDER_BY STRING
+          association ::= ASSOCIATION LCURLY * associationStatementList RCURLY
+          associationStatementList ::= * associationStatementList associationStatement
+          associationStatementList ::= * associationStatement
+          associationStatement ::= * table
+          associationStatement ::= * associationType
+          associationStatement ::= * property
+          associationStatement ::= * column
+          associationStatement ::= * referencedColumn
+          associationStatement ::= * orderBy
+          associationStatement ::= * through
+          through ::= * THROUGH LCURLY throughStatementList RCURLY
+          table ::= * TABLE ID
+          associationType ::= * ASSOCIATION_TYPE ID
+          property ::= * PROPERTY ID
+          column ::= * COLUMN ID
+          referencedColumn ::= * REFERENCED_COLUMN ID
 
-                        RCURLY shift  47
-                      ORDER_BY shift  9
-                       THROUGH shift  13
-                         TABLE shift  12
-              ASSOCIATION_TYPE shift  17
-                      PROPERTY shift  15
-                        COLUMN shift  8
-             REFERENCED_COLUMN shift  11
-                       orderBy shift  44
-          associationStatement shift  48
-                         table shift  46
-               associationType shift  45
-                      property shift  42
-                        column shift  32
-              referencedColumn shift  43
-                       through shift  49
+                      ORDER_BY shift  8
+                       THROUGH shift  18
+                         TABLE shift  19
+              ASSOCIATION_TYPE shift  13
+                      PROPERTY shift  17
+                        COLUMN shift  9
+             REFERENCED_COLUMN shift  10
+                       orderBy shift  45
+      associationStatementList shift  2
+          associationStatement shift  27
+                         table shift  50
+               associationType shift  48
+                      property shift  47
+                        column shift  44
+              referencedColumn shift  33
+                       through shift  46
 
 State 2:
-          through ::= THROUGH LCURLY throughStatementList * RCURLY
-          throughStatementList ::= throughStatementList * throughStatement
+          orderBy ::= * ORDER_BY STRING
+          association ::= ASSOCIATION LCURLY associationStatementList * RCURLY
+          associationStatementList ::= associationStatementList * associationStatement
+          associationStatement ::= * table
+          associationStatement ::= * associationType
+          associationStatement ::= * property
+          associationStatement ::= * column
+          associationStatement ::= * referencedColumn
+          associationStatement ::= * orderBy
+          associationStatement ::= * through
+          through ::= * THROUGH LCURLY throughStatementList RCURLY
+          table ::= * TABLE ID
+          associationType ::= * ASSOCIATION_TYPE ID
+          property ::= * PROPERTY ID
+          column ::= * COLUMN ID
+          referencedColumn ::= * REFERENCED_COLUMN ID
 
-                        RCURLY shift  30
-                         TABLE shift  12
-                        COLUMN shift  8
-             REFERENCED_COLUMN shift  11
-                INVERSE_COLUMN shift  19
-                         table shift  23
-                        column shift  20
-              referencedColumn shift  22
-              throughStatement shift  21
-                 inverseColumn shift  31
+                        RCURLY shift  43
+                      ORDER_BY shift  8
+                       THROUGH shift  18
+                         TABLE shift  19
+              ASSOCIATION_TYPE shift  13
+                      PROPERTY shift  17
+                        COLUMN shift  9
+             REFERENCED_COLUMN shift  10
+                       orderBy shift  45
+          associationStatement shift  49
+                         table shift  50
+               associationType shift  48
+                      property shift  47
+                        column shift  44
+              referencedColumn shift  33
+                       through shift  46
 
 State 3:
+          through ::= THROUGH LCURLY * throughStatementList RCURLY
+          throughStatementList ::= * throughStatementList throughStatement
+          throughStatementList ::= * throughStatement
+          throughStatement ::= * table
+          throughStatement ::= * column
+          throughStatement ::= * referencedColumn
+          throughStatement ::= * inverseColumn
+          table ::= * TABLE ID
+          column ::= * COLUMN ID
+          referencedColumn ::= * REFERENCED_COLUMN ID
+          inverseColumn ::= * INVERSE_COLUMN ID
+
+                         TABLE shift  19
+                        COLUMN shift  9
+             REFERENCED_COLUMN shift  10
+                INVERSE_COLUMN shift  11
+                         table shift  22
+                        column shift  21
+              referencedColumn shift  23
+          throughStatementList shift  4
+              throughStatement shift  28
+                 inverseColumn shift  20
+
+State 4:
+          through ::= THROUGH LCURLY throughStatementList * RCURLY
+          throughStatementList ::= throughStatementList * throughStatement
+          throughStatement ::= * table
+          throughStatement ::= * column
+          throughStatement ::= * referencedColumn
+          throughStatement ::= * inverseColumn
+          table ::= * TABLE ID
+          column ::= * COLUMN ID
+          referencedColumn ::= * REFERENCED_COLUMN ID
+          inverseColumn ::= * INVERSE_COLUMN ID
+
+                        RCURLY shift  51
+                         TABLE shift  19
+                        COLUMN shift  9
+             REFERENCED_COLUMN shift  10
+                INVERSE_COLUMN shift  11
+                         table shift  22
+                        column shift  21
+              referencedColumn shift  23
+              throughStatement shift  31
+                 inverseColumn shift  20
+
+State 5:
           method ::= METHOD ID LCURLY methodStatementList * RCURLY
           methodStatementList ::= methodStatementList * methodStatement
+          methodStatement ::= * query
+          methodStatement ::= * orderBy
+          methodStatement ::= * association
+          query ::= * QUERY STRING
+          orderBy ::= * ORDER_BY STRING
+          association ::= * ASSOCIATION LCURLY associationStatementList RCURLY
 
-                        RCURLY shift  37
-                         QUERY shift  18
-                      ORDER_BY shift  9
-                   ASSOCIATION shift  10
-               methodStatement shift  36
-                         query shift  33
+                        RCURLY shift  41
+                         QUERY shift  16
+                      ORDER_BY shift  8
+                   ASSOCIATION shift  12
+               methodStatement shift  38
+                         query shift  37
                        orderBy shift  34
                    association shift  35
 
-State 4:
+State 6:
       (0) start ::= topStatementList *
           topStatementList ::= topStatementList * topStatement
+          topStatement ::= * method
+          method ::= * METHOD ID LCURLY methodStatementList RCURLY
 
-                        METHOD shift  14
-                  topStatement shift  38
-                        method shift  39
+                        METHOD shift  15
+                  topStatement shift  39
+                        method shift  40
                      {default} reduce 0
 
-State 5:
-          through ::= THROUGH LCURLY * throughStatementList RCURLY
-
-          throughStatementList shift  2
-                     {default} reduce 24
-
-State 6:
+State 7:
           method ::= METHOD ID LCURLY * methodStatementList RCURLY
+          methodStatementList ::= * methodStatementList methodStatement
+      (6) methodStatementList ::= *
 
-           methodStatementList shift  3
+           methodStatementList shift  5
                      {default} reduce 6
 
-State 7:
-          association ::= ASSOCIATION LCURLY * associationStatementList RCURLY
-
-      associationStatementList shift  1
-                     {default} reduce 14
-
 State 8:
+          orderBy ::= ORDER_BY * STRING
+
+                        STRING shift  42
+
+State 9:
           column ::= COLUMN * ID
+
+                            ID shift  30
+
+State 10:
+          referencedColumn ::= REFERENCED_COLUMN * ID
 
                             ID shift  24
 
-State 9:
-          orderBy ::= ORDER_BY * STRING
-
-                        STRING shift  41
-
-State 10:
-          association ::= ASSOCIATION * LCURLY associationStatementList RCURLY
-
-                        LCURLY shift  7
-
 State 11:
-          referencedColumn ::= REFERENCED_COLUMN * ID
-
-                            ID shift  28
-
-State 12:
-          table ::= TABLE * ID
+          inverseColumn ::= INVERSE_COLUMN * ID
 
                             ID shift  29
 
+State 12:
+          association ::= ASSOCIATION * LCURLY associationStatementList RCURLY
+
+                        LCURLY shift  1
+
 State 13:
-          through ::= THROUGH * LCURLY throughStatementList RCURLY
-
-                        LCURLY shift  5
-
-State 14:
-          method ::= METHOD * ID LCURLY methodStatementList RCURLY
-
-                            ID shift  16
-
-State 15:
-          property ::= PROPERTY * ID
-
-                            ID shift  26
-
-State 16:
-          method ::= METHOD ID * LCURLY methodStatementList RCURLY
-
-                        LCURLY shift  6
-
-State 17:
           associationType ::= ASSOCIATION_TYPE * ID
 
                             ID shift  25
 
-State 18:
+State 14:
+          method ::= METHOD ID * LCURLY methodStatementList RCURLY
+
+                        LCURLY shift  7
+
+State 15:
+          method ::= METHOD * ID LCURLY methodStatementList RCURLY
+
+                            ID shift  14
+
+State 16:
           query ::= QUERY * STRING
 
-                        STRING shift  40
+                        STRING shift  36
+
+State 17:
+          property ::= PROPERTY * ID
+
+                            ID shift  26
+
+State 18:
+          through ::= THROUGH * LCURLY throughStatementList RCURLY
+
+                        LCURLY shift  3
 
 State 19:
-          inverseColumn ::= INVERSE_COLUMN * ID
+          table ::= TABLE * ID
 
-                            ID shift  27
+                            ID shift  32
 
 State 20:
+     (28) throughStatement ::= inverseColumn *
+
+                     {default} reduce 28
+
+State 21:
      (26) throughStatement ::= column *
 
                      {default} reduce 26
 
-State 21:
-     (23) throughStatementList ::= throughStatementList throughStatement *
-
-                     {default} reduce 23
-
 State 22:
-     (27) throughStatement ::= referencedColumn *
-
-                     {default} reduce 27
-
-State 23:
      (25) throughStatement ::= table *
 
                      {default} reduce 25
 
-State 24:
-     (32) column ::= COLUMN ID *
+State 23:
+     (27) throughStatement ::= referencedColumn *
 
-                     {default} reduce 32
+                     {default} reduce 27
+
+State 24:
+     (33) referencedColumn ::= REFERENCED_COLUMN ID *
+
+                     {default} reduce 33
 
 State 25:
      (30) associationType ::= ASSOCIATION_TYPE ID *
@@ -177,39 +259,39 @@ State 26:
                      {default} reduce 31
 
 State 27:
+     (14) associationStatementList ::= associationStatement *
+
+                     {default} reduce 14
+
+State 28:
+     (24) throughStatementList ::= throughStatement *
+
+                     {default} reduce 24
+
+State 29:
      (34) inverseColumn ::= INVERSE_COLUMN ID *
 
                      {default} reduce 34
 
-State 28:
-     (33) referencedColumn ::= REFERENCED_COLUMN ID *
+State 30:
+     (32) column ::= COLUMN ID *
 
-                     {default} reduce 33
+                     {default} reduce 32
 
-State 29:
+State 31:
+     (23) throughStatementList ::= throughStatementList throughStatement *
+
+                     {default} reduce 23
+
+State 32:
      (29) table ::= TABLE ID *
 
                      {default} reduce 29
 
-State 30:
-     (22) through ::= THROUGH LCURLY throughStatementList RCURLY *
-
-                     {default} reduce 22
-
-State 31:
-     (28) throughStatement ::= inverseColumn *
-
-                     {default} reduce 28
-
-State 32:
-     (18) associationStatement ::= column *
-
-                     {default} reduce 18
-
 State 33:
-      (7) methodStatement ::= query *
+     (19) associationStatement ::= referencedColumn *
 
-                     {default} reduce 7
+                     {default} reduce 19
 
 State 34:
       (8) methodStatement ::= orderBy *
@@ -222,72 +304,82 @@ State 35:
                      {default} reduce 9
 
 State 36:
-      (5) methodStatementList ::= methodStatementList methodStatement *
-
-                     {default} reduce 5
-
-State 37:
-      (4) method ::= METHOD ID LCURLY methodStatementList RCURLY *
-
-                     {default} reduce 4
-
-State 38:
-      (1) topStatementList ::= topStatementList topStatement *
-
-                     {default} reduce 1
-
-State 39:
-      (3) topStatement ::= method *
-
-                     {default} reduce 3
-
-State 40:
      (10) query ::= QUERY STRING *
 
                      {default} reduce 10
 
+State 37:
+      (7) methodStatement ::= query *
+
+                     {default} reduce 7
+
+State 38:
+      (5) methodStatementList ::= methodStatementList methodStatement *
+
+                     {default} reduce 5
+
+State 39:
+      (1) topStatementList ::= topStatementList topStatement *
+
+                     {default} reduce 1
+
+State 40:
+      (3) topStatement ::= method *
+
+                     {default} reduce 3
+
 State 41:
+      (4) method ::= METHOD ID LCURLY methodStatementList RCURLY *
+
+                     {default} reduce 4
+
+State 42:
      (11) orderBy ::= ORDER_BY STRING *
 
                      {default} reduce 11
 
-State 42:
-     (17) associationStatement ::= property *
-
-                     {default} reduce 17
-
 State 43:
-     (19) associationStatement ::= referencedColumn *
-
-                     {default} reduce 19
-
-State 44:
-     (20) associationStatement ::= orderBy *
-
-                     {default} reduce 20
-
-State 45:
-     (16) associationStatement ::= associationType *
-
-                     {default} reduce 16
-
-State 46:
-     (15) associationStatement ::= table *
-
-                     {default} reduce 15
-
-State 47:
      (12) association ::= ASSOCIATION LCURLY associationStatementList RCURLY *
 
                      {default} reduce 12
 
+State 44:
+     (18) associationStatement ::= column *
+
+                     {default} reduce 18
+
+State 45:
+     (20) associationStatement ::= orderBy *
+
+                     {default} reduce 20
+
+State 46:
+     (21) associationStatement ::= through *
+
+                     {default} reduce 21
+
+State 47:
+     (17) associationStatement ::= property *
+
+                     {default} reduce 17
+
 State 48:
+     (16) associationStatement ::= associationType *
+
+                     {default} reduce 16
+
+State 49:
      (13) associationStatementList ::= associationStatementList associationStatement *
 
                      {default} reduce 13
 
-State 49:
-     (21) associationStatement ::= through *
+State 50:
+     (15) associationStatement ::= table *
 
-                     {default} reduce 21
+                     {default} reduce 15
+
+State 51:
+     (22) through ::= THROUGH LCURLY throughStatementList RCURLY *
+
+                     {default} reduce 22
 

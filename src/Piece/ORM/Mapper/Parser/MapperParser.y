@@ -121,6 +121,12 @@ query(X) ::= QUERY STRING(A). { X = A; }
 orderBy(X) ::= ORDER_BY STRING(A). { X = A; }
 
 association(X) ::= ASSOCIATION LCURLY associationStatementList(A) RCURLY. {
+        $requiredKeys = array('table', 'type', 'property');
+        foreach ($requiredKeys as $requiredKey) {
+            if (!array_key_exists($requiredKey, A)) {
+                throw new Exception("The [ $requiredKey ] statement was not found in the 'association' statement on line {$this->_mapperLexer->line}. An 'association' statement must contain the 'table', 'type', and 'property' statements.");
+            }
+        }
         $association = $this->_ast->createElement('association');
         foreach (array_keys((array)A) as $key) {
             if ($key == 'through') {
@@ -141,7 +147,11 @@ associationStatementList(X) ::= associationStatementList(A) associationStatement
             X[$key] = B[$key];
         }
 }
-associationStatementList ::= .
+associationStatementList(X) ::= associationStatement(A). {
+        foreach (array_keys(A) as $key) {
+            X[$key] = A[$key];
+        }
+}
 
 associationStatement(X) ::= table(A). { X['table'] = A; }
 associationStatement(X) ::= associationType(A). { X['type'] = A; }
@@ -152,6 +162,10 @@ associationStatement(X) ::= orderBy(A). { X['orderBy'] = trim(A, '"'); }
 associationStatement(X) ::= through(A). { X['through'] = A; }
 
 through(X) ::= THROUGH LCURLY throughStatementList(A) RCURLY. {
+        if (!array_key_exists('table', A)) {
+            throw new Exception("The [ table ] statement was not found in the 'through' statement on line {$this->_mapperLexer->line}. An 'association' statement must contain the 'table' statement.");
+        }
+
         $through = $this->_ast->createElement('through');
         foreach (array_keys(A) as $key) {
             $through->setAttribute($key, A[$key]);
@@ -168,7 +182,11 @@ throughStatementList(X) ::= throughStatementList(A) throughStatement(B). {
             X[$key] = B[$key];
         }
 }
-throughStatementList ::= .
+throughStatementList(X) ::= throughStatement(A). {
+        foreach (array_keys(A) as $key) {
+            X[$key] = A[$key];
+        }
+}
 
 throughStatement(X) ::= table(A). { X['table'] = A; }
 throughStatement(X) ::= column(A). { X['column'] = A; }
