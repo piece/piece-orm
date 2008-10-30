@@ -135,7 +135,7 @@ class AST extends DOMDocument
     }
 
     // }}}
-    // {{{ getExpression()
+    // {{{ generateExpression()
 
     /**
      * Gets an appropriate expression for the given field.
@@ -143,7 +143,7 @@ class AST extends DOMDocument
      * @param string $fieldName
      * @return string
      */
-    public function getExpression($fieldName)
+    public function generateExpression($fieldName)
     {
         if (!$this->_metadata->isLOB($fieldName)) {
             return '$' . Inflector::camelize($fieldName, true);
@@ -173,6 +173,7 @@ class AST extends DOMDocument
     {
         $this->_loadFindMethods();
         $this->_loadInsertMethod();
+        $this->_loadUpdateMethod();
     }
 
     // }}}
@@ -221,27 +222,95 @@ class AST extends DOMDocument
      */
     private function _loadInsertMethod()
     {
-        $this->addMethod('insert', $this->_getDefaultInsertQuery());
+        $this->addMethod('insert', $this->_generateDefaultInsertQuery());
     }
 
     // }}}
-    // {{{ _getDefaultInsertQuery()
+    // {{{ _generateDefaultInsertQuery()
 
     /**
-     * Gets the default INSERT query.
+     * Generates the default INSERT query.
      *
      * @return string
      */
-    private function _getDefaultInsertQuery()
+    private function _generateDefaultInsertQuery()
     {
         $fields = array();
         foreach ($this->_metadata->getFieldNames() as $fieldName) {
-            if (!$this->_metadata->hasDefault($fieldName) && !$this->_metadata->isAutoIncrement($fieldName)) {
+            if (!$this->_metadata->hasDefault($fieldName)
+                && !$this->_metadata->isAutoIncrement($fieldName)
+                ) {
                 $fields[] = $fieldName;
             }
         }
 
-        return 'INSERT INTO $__table (' . implode(", ", $fields) . ') VALUES (' . implode(', ', array_map(array($this, 'getExpression'), $fields)) . ')';
+        return 'INSERT INTO $__table (' .
+            implode(", ", $fields) .
+            ') VALUES (' .
+            implode(', ', array_map(array($this, 'generateExpression'), $fields)) .
+            ')';
+    }
+
+    // }}}
+    // {{{ _loadUpdateMethod()
+
+    /**
+     * Loads the built-in update method if it exists.
+     */
+    private function _loadUpdateMethod()
+    {
+        $query = $this->_generateDefaultUpdateQuery();
+        if (!is_null($query)) {
+            $this->addMethod('update', $query);
+        }
+    }
+
+    // }}}
+    // {{{ _generateDefaultUpdateQuery()
+
+    /**
+     * Generates the default UPDATE query.
+     *
+     * @return string
+     */
+    private function _generateDefaultUpdateQuery()
+    {
+        if (!$this->_metadata->hasPrimaryKey()) {
+            return;
+        }
+
+        $primaryKeys = $this->_metadata->getPrimaryKeys();
+        $fieldName = array_shift($primaryKeys);
+        $whereClause = "$fieldName = \$" . Inflector::camelize($fieldName, true);
+        foreach ($primaryKeys as $partOfPrimeryKey) {
+            $whereClause .= " AND $partOfPrimeryKey = \$" .
+                Inflector::camelize($partOfPrimeryKey, true);
+        }
+
+        if ($this->_metadata->getDatatype('lock_version') == 'integer') {
+            $whereClause .=
+                " AND lock_version = " . $this->generateExpression('lock_version');
+        }
+
+        $fields = array();
+        foreach ($this->_metadata->getFieldNames() as $fieldName) {
+            if (!$this->_metadata->isAutoIncrement($fieldName)
+                && !$this->_metadata->isPartOfPrimaryKey($fieldName)
+                ) {
+                if (!($fieldName == 'lock_version'
+                      && $this->_metadata->getDatatype('lock_version') == 'integer')
+                    ) {
+                    $fields[] =
+                        "$fieldName = " . $this->generateExpression($fieldName);
+                } else {
+                    $fields[] = "$fieldName = $fieldName + 1";
+                }
+            }
+        }
+
+        return 'UPDATE $__table SET ' .
+            implode(', ', $fields) .
+            " WHERE $whereClause";
     }
 
     /**#@-*/

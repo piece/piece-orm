@@ -122,6 +122,10 @@ class Mapper
         if (QueryType::isInsert($methodName)) {
             return $this->_insertObject($methodName, count($arguments) ? $arguments[0] : null);
         }
+
+        if (QueryType::isUpdate($methodName)) {
+            return $this->_updateObjects($methodName, count($arguments) ? $arguments[0] : null);
+        }
     }
 
     // }}}
