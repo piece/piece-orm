@@ -35,13 +35,13 @@
  * @since      File available since Release 2.0.0dev1
  */
 
-namespace Piece::ORM::Mapper;
+namespace Piece::ORM::Mapper::Parser;
 
 use Piece::ORM::Metadata;
 use Piece::ORM::Inflector;
 use Piece::ORM::Exception;
 
-// {{{ Piece::ORM::Mapper::AST
+// {{{ Piece::ORM::Mapper::Parser::AST
 
 /**
  * @package    Piece_ORM

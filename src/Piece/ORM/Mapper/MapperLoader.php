@@ -42,7 +42,7 @@ use Piece::ORM::Mapper::Parser::MapperParser;
 use Piece::ORM::Mapper;
 use Piece::ORM::Mapper::Method;
 use Piece::ORM::Exception;
-use Piece::ORM::Mapper::AST;
+use Piece::ORM::Mapper::Parser::AST;
 use Piece::ORM::Metadata;
 
 // {{{ Piece::ORM::Mapper::MapperLoader

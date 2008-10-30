@@ -136,7 +136,7 @@ class MapperParseryyStackEntry
 
 use Piece::ORM::Exception;
 use Piece::ORM::Mapper::Parser::MapperLexer;
-use Piece::ORM::Mapper::AST;
+use Piece::ORM::Mapper::Parser::AST;
 #line 142 "src/Piece/ORM/Mapper/Parser/MapperParser.php"
 
 // declare_class is output here

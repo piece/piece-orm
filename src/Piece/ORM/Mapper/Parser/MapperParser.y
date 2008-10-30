@@ -54,7 +54,7 @@ namespace Piece::ORM::Mapper::Parser;
 
 use Piece::ORM::Exception;
 use Piece::ORM::Mapper::Parser::MapperLexer;
-use Piece::ORM::Mapper::AST;
+use Piece::ORM::Mapper::Parser::AST;
 }
 
 %syntax_error {
