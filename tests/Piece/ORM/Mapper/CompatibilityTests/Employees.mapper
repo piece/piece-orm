@@ -1,3 +1,5 @@
+// $Id$
+
 method findByIdAndNote {
     query "SELECT * FROM $__table WHERE id = $id AND note = $note"
 }
@@ -291,3 +293,14 @@ method findAllByIds {
 method findByQueryVariable {
     query "SELECT * FROM $__table WHERE id = $query"
 }
+
+/*
+ * Local Variables:
+ * mode: c
+ * coding: iso-8859-1
+ * tab-width: 4
+ * c-basic-offset: 4
+ * c-hanging-comment-ender-p: nil
+ * indent-tabs-mode: nil
+ * End:
+ */

@@ -38,6 +38,7 @@
 namespace Piece::ORM::Mapper::Parser;
 
 use Piece::ORM::Mapper::Parser::MapperParser;
+use Piece::ORM::Exception;
 
 // {{{ Piece::ORM::Mapper::Parser::MapperLexer
 
@@ -56,7 +57,7 @@ class MapperLexer
 
     private $_input;
     private $_counter;
-    private $_debug = false;
+    private $_debug = true;
     private $_string;
 
     function __construct($input)
@@ -92,10 +93,12 @@ COLUMN = "column"
 THROUGH = "through"
 REFERENCED_COLUMN = "referencedColumn"
 INVERSE_COLUMN = "inverseColumn"
+SL_COMMENT = !//[^\n\r]*\r?\n!
+ML_COMMENT = !/\*[^*]*\*+([^*/][^*]*\*+)*/!
 */
-
 /*!lex2php
-%statename YYINITIAL
+%statename INITIAL
+
 METHOD {
     if ($this->_debug) echo "found METHOD [ {$this->value} ]\n";
     $this->token = MapperParser::METHOD;
@@ -174,6 +177,15 @@ STRING {
     if ($this->_debug) echo "found STRING [ {$this->value} ]\n";
     $this->token = MapperParser::STRING;
 }
-*/
 
+SL_COMMENT {
+    if ($this->_debug) echo "found SL_COMMENT [ {$this->value} ]\n";
+    return false;           
+}
+
+ML_COMMENT {
+    if ($this->_debug) echo "found ML_COMMENT [ {$this->value} ]\n";
+    return false;
+}
+*/
 }

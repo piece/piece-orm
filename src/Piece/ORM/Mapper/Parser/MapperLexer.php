@@ -31,13 +31,14 @@
  * @package    Piece_ORM
  * @copyright  2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License (revised)
- * @version    SVN: $Id: MapperLexer.plex 589 2008-10-26 09:24:08Z iteman $
+ * @version    SVN: $Id: MapperLexer.plex 590 2008-10-27 15:41:26Z iteman $
  * @since      File available since Release 2.0.0dev1
  */
 
 namespace Piece::ORM::Mapper::Parser;
 
 use Piece::ORM::Mapper::Parser::MapperParser;
+use Piece::ORM::Exception;
 
 // {{{ Piece::ORM::Mapper::Parser::MapperLexer
 
@@ -97,7 +98,6 @@ class MapperLexer
 
 
 
-
     function yylex1()
     {
         $tokenMap = array (
@@ -117,11 +117,13 @@ class MapperLexer
               14 => 0,
               15 => 0,
               16 => 0,
+              17 => 0,
+              18 => 1,
             );
         if ($this->_counter >= strlen($this->_input)) {
             return false; // end of input
         }
-        $yy_global_pattern = "/^(method)|^(query)|^(orderBy)|^(association)|^(table)|^(type)|^(property)|^(column)|^(through)|^(referencedColumn)|^(inverseColumn)|^([a-zA-Z_][a-zA-Z_0-9]*)|^(\\{)|^(\\})|^([ \t\r\n]+)|^(\"[^[\"\\\\]+\")/";
+        $yy_global_pattern = "/^(method)|^(query)|^(orderBy)|^(association)|^(table)|^(type)|^(property)|^(column)|^(through)|^(referencedColumn)|^(inverseColumn)|^([a-zA-Z_][a-zA-Z_0-9]*)|^(\\{)|^(\\})|^([ \t\r\n]+)|^(\"[^[\"\\\\]+\")|^(\/\/[^\n\r]*\r?\n)|^(\/\\*[^*]*\\*+([^*\/][^*]*\\*+)*\/)/";
 
         do {
             if (preg_match($yy_global_pattern, substr($this->_input, $this->_counter), $yymatches)) {
@@ -130,7 +132,7 @@ class MapperLexer
                 if (!count($yymatches)) {
                     throw new Exception('Error: lexing failed because a rule matched' .
                         'an empty string.  Input "' . substr($this->_input,
-                        $this->_counter, 5) . '... state YYINITIAL');
+                        $this->_counter, 5) . '... state INITIAL');
                 }
                 next($yymatches); // skip global match
                 $this->token = key($yymatches); // token number
@@ -161,22 +163,24 @@ class MapperLexer
                     // skip this token
                     continue;
                 } else {                    $yy_yymore_patterns = array(
-        1 => array(0, "^(query)|^(orderBy)|^(association)|^(table)|^(type)|^(property)|^(column)|^(through)|^(referencedColumn)|^(inverseColumn)|^([a-zA-Z_][a-zA-Z_0-9]*)|^(\\{)|^(\\})|^([ \t\r\n]+)|^(\"[^[\"\\\\]+\")"),
-        2 => array(0, "^(orderBy)|^(association)|^(table)|^(type)|^(property)|^(column)|^(through)|^(referencedColumn)|^(inverseColumn)|^([a-zA-Z_][a-zA-Z_0-9]*)|^(\\{)|^(\\})|^([ \t\r\n]+)|^(\"[^[\"\\\\]+\")"),
-        3 => array(0, "^(association)|^(table)|^(type)|^(property)|^(column)|^(through)|^(referencedColumn)|^(inverseColumn)|^([a-zA-Z_][a-zA-Z_0-9]*)|^(\\{)|^(\\})|^([ \t\r\n]+)|^(\"[^[\"\\\\]+\")"),
-        4 => array(0, "^(table)|^(type)|^(property)|^(column)|^(through)|^(referencedColumn)|^(inverseColumn)|^([a-zA-Z_][a-zA-Z_0-9]*)|^(\\{)|^(\\})|^([ \t\r\n]+)|^(\"[^[\"\\\\]+\")"),
-        5 => array(0, "^(type)|^(property)|^(column)|^(through)|^(referencedColumn)|^(inverseColumn)|^([a-zA-Z_][a-zA-Z_0-9]*)|^(\\{)|^(\\})|^([ \t\r\n]+)|^(\"[^[\"\\\\]+\")"),
-        6 => array(0, "^(property)|^(column)|^(through)|^(referencedColumn)|^(inverseColumn)|^([a-zA-Z_][a-zA-Z_0-9]*)|^(\\{)|^(\\})|^([ \t\r\n]+)|^(\"[^[\"\\\\]+\")"),
-        7 => array(0, "^(column)|^(through)|^(referencedColumn)|^(inverseColumn)|^([a-zA-Z_][a-zA-Z_0-9]*)|^(\\{)|^(\\})|^([ \t\r\n]+)|^(\"[^[\"\\\\]+\")"),
-        8 => array(0, "^(through)|^(referencedColumn)|^(inverseColumn)|^([a-zA-Z_][a-zA-Z_0-9]*)|^(\\{)|^(\\})|^([ \t\r\n]+)|^(\"[^[\"\\\\]+\")"),
-        9 => array(0, "^(referencedColumn)|^(inverseColumn)|^([a-zA-Z_][a-zA-Z_0-9]*)|^(\\{)|^(\\})|^([ \t\r\n]+)|^(\"[^[\"\\\\]+\")"),
-        10 => array(0, "^(inverseColumn)|^([a-zA-Z_][a-zA-Z_0-9]*)|^(\\{)|^(\\})|^([ \t\r\n]+)|^(\"[^[\"\\\\]+\")"),
-        11 => array(0, "^([a-zA-Z_][a-zA-Z_0-9]*)|^(\\{)|^(\\})|^([ \t\r\n]+)|^(\"[^[\"\\\\]+\")"),
-        12 => array(0, "^(\\{)|^(\\})|^([ \t\r\n]+)|^(\"[^[\"\\\\]+\")"),
-        13 => array(0, "^(\\})|^([ \t\r\n]+)|^(\"[^[\"\\\\]+\")"),
-        14 => array(0, "^([ \t\r\n]+)|^(\"[^[\"\\\\]+\")"),
-        15 => array(0, "^(\"[^[\"\\\\]+\")"),
-        16 => array(0, ""),
+        1 => array(0, "^(query)|^(orderBy)|^(association)|^(table)|^(type)|^(property)|^(column)|^(through)|^(referencedColumn)|^(inverseColumn)|^([a-zA-Z_][a-zA-Z_0-9]*)|^(\\{)|^(\\})|^([ \t\r\n]+)|^(\"[^[\"\\\\]+\")|^(\/\/[^\n\r]*\r?\n)|^(\/\\*[^*]*\\*+([^*\/][^*]*\\*+)*\/)"),
+        2 => array(0, "^(orderBy)|^(association)|^(table)|^(type)|^(property)|^(column)|^(through)|^(referencedColumn)|^(inverseColumn)|^([a-zA-Z_][a-zA-Z_0-9]*)|^(\\{)|^(\\})|^([ \t\r\n]+)|^(\"[^[\"\\\\]+\")|^(\/\/[^\n\r]*\r?\n)|^(\/\\*[^*]*\\*+([^*\/][^*]*\\*+)*\/)"),
+        3 => array(0, "^(association)|^(table)|^(type)|^(property)|^(column)|^(through)|^(referencedColumn)|^(inverseColumn)|^([a-zA-Z_][a-zA-Z_0-9]*)|^(\\{)|^(\\})|^([ \t\r\n]+)|^(\"[^[\"\\\\]+\")|^(\/\/[^\n\r]*\r?\n)|^(\/\\*[^*]*\\*+([^*\/][^*]*\\*+)*\/)"),
+        4 => array(0, "^(table)|^(type)|^(property)|^(column)|^(through)|^(referencedColumn)|^(inverseColumn)|^([a-zA-Z_][a-zA-Z_0-9]*)|^(\\{)|^(\\})|^([ \t\r\n]+)|^(\"[^[\"\\\\]+\")|^(\/\/[^\n\r]*\r?\n)|^(\/\\*[^*]*\\*+([^*\/][^*]*\\*+)*\/)"),
+        5 => array(0, "^(type)|^(property)|^(column)|^(through)|^(referencedColumn)|^(inverseColumn)|^([a-zA-Z_][a-zA-Z_0-9]*)|^(\\{)|^(\\})|^([ \t\r\n]+)|^(\"[^[\"\\\\]+\")|^(\/\/[^\n\r]*\r?\n)|^(\/\\*[^*]*\\*+([^*\/][^*]*\\*+)*\/)"),
+        6 => array(0, "^(property)|^(column)|^(through)|^(referencedColumn)|^(inverseColumn)|^([a-zA-Z_][a-zA-Z_0-9]*)|^(\\{)|^(\\})|^([ \t\r\n]+)|^(\"[^[\"\\\\]+\")|^(\/\/[^\n\r]*\r?\n)|^(\/\\*[^*]*\\*+([^*\/][^*]*\\*+)*\/)"),
+        7 => array(0, "^(column)|^(through)|^(referencedColumn)|^(inverseColumn)|^([a-zA-Z_][a-zA-Z_0-9]*)|^(\\{)|^(\\})|^([ \t\r\n]+)|^(\"[^[\"\\\\]+\")|^(\/\/[^\n\r]*\r?\n)|^(\/\\*[^*]*\\*+([^*\/][^*]*\\*+)*\/)"),
+        8 => array(0, "^(through)|^(referencedColumn)|^(inverseColumn)|^([a-zA-Z_][a-zA-Z_0-9]*)|^(\\{)|^(\\})|^([ \t\r\n]+)|^(\"[^[\"\\\\]+\")|^(\/\/[^\n\r]*\r?\n)|^(\/\\*[^*]*\\*+([^*\/][^*]*\\*+)*\/)"),
+        9 => array(0, "^(referencedColumn)|^(inverseColumn)|^([a-zA-Z_][a-zA-Z_0-9]*)|^(\\{)|^(\\})|^([ \t\r\n]+)|^(\"[^[\"\\\\]+\")|^(\/\/[^\n\r]*\r?\n)|^(\/\\*[^*]*\\*+([^*\/][^*]*\\*+)*\/)"),
+        10 => array(0, "^(inverseColumn)|^([a-zA-Z_][a-zA-Z_0-9]*)|^(\\{)|^(\\})|^([ \t\r\n]+)|^(\"[^[\"\\\\]+\")|^(\/\/[^\n\r]*\r?\n)|^(\/\\*[^*]*\\*+([^*\/][^*]*\\*+)*\/)"),
+        11 => array(0, "^([a-zA-Z_][a-zA-Z_0-9]*)|^(\\{)|^(\\})|^([ \t\r\n]+)|^(\"[^[\"\\\\]+\")|^(\/\/[^\n\r]*\r?\n)|^(\/\\*[^*]*\\*+([^*\/][^*]*\\*+)*\/)"),
+        12 => array(0, "^(\\{)|^(\\})|^([ \t\r\n]+)|^(\"[^[\"\\\\]+\")|^(\/\/[^\n\r]*\r?\n)|^(\/\\*[^*]*\\*+([^*\/][^*]*\\*+)*\/)"),
+        13 => array(0, "^(\\})|^([ \t\r\n]+)|^(\"[^[\"\\\\]+\")|^(\/\/[^\n\r]*\r?\n)|^(\/\\*[^*]*\\*+([^*\/][^*]*\\*+)*\/)"),
+        14 => array(0, "^([ \t\r\n]+)|^(\"[^[\"\\\\]+\")|^(\/\/[^\n\r]*\r?\n)|^(\/\\*[^*]*\\*+([^*\/][^*]*\\*+)*\/)"),
+        15 => array(0, "^(\"[^[\"\\\\]+\")|^(\/\/[^\n\r]*\r?\n)|^(\/\\*[^*]*\\*+([^*\/][^*]*\\*+)*\/)"),
+        16 => array(0, "^(\/\/[^\n\r]*\r?\n)|^(\/\\*[^*]*\\*+([^*\/][^*]*\\*+)*\/)"),
+        17 => array(0, "^(\/\\*[^*]*\\*+([^*\/][^*]*\\*+)*\/)"),
+        18 => array(1, ""),
     );
 
                     // yymore is needed
@@ -232,7 +236,7 @@ class MapperLexer
     } // end function
 
 
-    const YYINITIAL = 1;
+    const INITIAL = 1;
     function yy_r1_1($yy_subpatterns)
     {
 
@@ -328,6 +332,17 @@ class MapperLexer
     if ($this->_debug) echo "found STRING [ {$this->value} ]\n";
     $this->token = MapperParser::STRING;
     }
+    function yy_r1_17($yy_subpatterns)
+    {
 
+    if ($this->_debug) echo "found SL_COMMENT [ {$this->value} ]\n";
+    return false;           
+    }
+    function yy_r1_18($yy_subpatterns)
+    {
+
+    if ($this->_debug) echo "found ML_COMMENT [ {$this->value} ]\n";
+    return false;
+    }
 
 }
