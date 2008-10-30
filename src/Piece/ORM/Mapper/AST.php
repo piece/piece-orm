@@ -109,14 +109,46 @@ class AST extends DOMDocument
             throw new Exception("Cannot use the method name [ $method ] since it is a reserved for internal use only.");
         }
 
-        $methodElement = $this->appendChild(new DOMElement('method'));
-        $methodElement->setAttribute('name', $method);
-        $methodElement->setAttribute('query', $query);
-        $methodElement->setAttribute('orderBy', $orderBy);
+        $xpath = new DOMXPath($this);
+        $methodNodeList = $xpath->query("//method[@name='$method']");
+        if (!$methodNodeList->length) {
+            $methodNode = $this->appendChild(new DOMElement('method'));
+            $methodNode->setAttribute('name', $method);
+        } else {
+            $methodNode = $methodNodeList->item(0);
+        }
+
+        if (!is_null($query)) {
+            $methodNode->setAttribute('query', $query);
+        }
+
+        if (!is_null($orderBy)) {
+            $methodNode->setAttribute('orderBy', $orderBy);
+        }
+
         if (!is_null($associations)) {
             foreach ($associations as $association) {
-                $associationElement = $methodElement->appendChild(new DOMElement('association'));
+                $associationNode =
+                    $methodNode->appendChild(new DOMElement('association'));
             }
+        }
+    }
+
+    // }}}
+    // {{{ getExpression()
+
+    /**
+     * Gets an appropriate expression for the given field.
+     *
+     * @param string $fieldName
+     * @return string
+     */
+    public function getExpression($fieldName)
+    {
+        if (!$this->_metadata->isLOB($fieldName)) {
+            return '$' . Inflector::camelize($fieldName, true);
+        } else {
+            return ":$fieldName";
         }
     }
 
@@ -139,16 +171,17 @@ class AST extends DOMDocument
      */
     private function _loadMetadata()
     {
-        $this->_loadFindMethod();
+        $this->_loadFindMethods();
+        $this->_loadInsertMethod();
     }
 
     // }}}
-    // {{{ _loadFindMethod()
+    // {{{ _loadFindMethods()
 
     /**
      * Loads built-in findXXX, findAll, findAllXXX methods.
      */
-    private function _loadFindMethod()
+    private function _loadFindMethods()
     {
         foreach ($this->_metadata->getFieldNames() as $fieldName) {
             $datatype = $this->_metadata->getDatatype($fieldName);
@@ -178,6 +211,37 @@ class AST extends DOMDocument
     private function _validateMethod($method)
     {
         return !in_array($method, $this->_baseMapperMethods);
+    }
+
+    // }}}
+    // {{{ _loadInsertMethod()
+
+    /**
+     * Loads the built-in insert method.
+     */
+    private function _loadInsertMethod()
+    {
+        $this->addMethod('insert', $this->_getDefaultInsertQuery());
+    }
+
+    // }}}
+    // {{{ _getDefaultInsertQuery()
+
+    /**
+     * Gets the default INSERT query.
+     *
+     * @return string
+     */
+    private function _getDefaultInsertQuery()
+    {
+        $fields = array();
+        foreach ($this->_metadata->getFieldNames() as $fieldName) {
+            if (!$this->_metadata->hasDefault($fieldName) && !$this->_metadata->isAutoIncrement($fieldName)) {
+                $fields[] = $fieldName;
+            }
+        }
+
+        return 'INSERT INTO $__table (' . implode(", ", $fields) . ') VALUES (' . implode(', ', array_map(array($this, 'getExpression'), $fields)) . ')';
     }
 
     /**#@-*/

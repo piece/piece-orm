@@ -114,6 +114,10 @@ class Mapper
         if (QueryType::isFind($methodName)) {
             return $this->_findObject($methodName, count($arguments) ? $arguments[0] : null);
         }
+
+        if (QueryType::isInsert($methodName)) {
+            return $this->_insertObject($methodName, count($arguments) ? $arguments[0] : null);
+        }
     }
 
     // }}}

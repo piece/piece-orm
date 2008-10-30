@@ -37,7 +37,7 @@
 
 namespace Piece::ORM::Mapper;
 
-use Piece::ORM::Mapper::AbstractMapper;
+use Piece::ORM::Mapper;
 use Piece::ORM::Mapper::AssociationType;
 use Piece::ORM::Exception;
 use Piece::ORM::Inflector;
@@ -93,11 +93,11 @@ class ObjectPersister
     /**
      * Initializes properties with the given values.
      *
-     * @param Piece::ORM::Mapper::AbstractMapper $mapper
-     * @param mixed                              $subject
-     * @param array                              $associations
+     * @param Piece::ORM::Mapper $mapper
+     * @param mixed              $subject
+     * @param array              $associations
      */
-    public function __construct(AbstractMapper $mapper, $subject, array $associations)
+    public function __construct(Mapper $mapper, $subject, array $associations)
     {
         $metadata = $mapper->getMetadata();
 
