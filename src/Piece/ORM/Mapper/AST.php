@@ -72,7 +72,6 @@ class AST extends DOMDocument
      */
 
     private $_metadata;
-    private $_baseMapperMethods;
 
     /**#@-*/
 
@@ -90,7 +89,6 @@ class AST extends DOMDocument
     {
         parent::__construct();
         $this->_metadata = $metadata;
-        $this->_baseMapperMethods = get_class_methods('Piece::ORM::Mapper');
         $this->_loadMetadata();
     }
 
@@ -105,10 +103,6 @@ class AST extends DOMDocument
      */
     public function addMethod($method, $query, $orderBy = null, $associations = null)
     {
-        if (!$this->_validateMethod($method)) {
-            throw new Exception("Cannot use the method name [ $method ] since it is a reserved for internal use only.");
-        }
-
         $xpath = new DOMXPath($this);
         $methodNodeList = $xpath->query("//method[@name='$method']");
         if (!$methodNodeList->length) {
@@ -198,20 +192,6 @@ class AST extends DOMDocument
         }
 
         $this->addMethod('findAll', 'SELECT * FROM $__table');
-    }
-
-    // }}}
-    // {{{ _validateMethod()
-
-    /**
-     * Validates the method name.
-     *
-     * @param string $method
-     * @return boolean
-     */
-    private function _validateMethod($method)
-    {
-        return !in_array($method, $this->_baseMapperMethods);
     }
 
     // }}}

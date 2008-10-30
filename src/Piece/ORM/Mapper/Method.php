@@ -37,6 +37,8 @@
 
 namespace Piece::ORM::Mapper;
 
+use Piece::ORM::Exception;
+
 // {{{ Piece::ORM::Mapper::Method
 
 /**
@@ -85,9 +87,14 @@ class Method
      * @param string $name
      * @param string $query
      * @param string $orderBy
+     * @throws Piece::ORM::Exception
      */
     public function __construct($name, $query, $orderBy)
     {
+        if (!$this->_validateName($name)) {
+            throw new Exception("Cannot use the method name [ $method ] since it is a reserved for internal use only.");
+        }
+
         $this->_name = $name;
         $this->_query = strlen($query) ? $query : null;
         $this->_orderBy = strlen($orderBy) ? $orderBy : null;
@@ -148,6 +155,27 @@ class Method
     /**#@+
      * @access private
      */
+
+    // }}}
+    // {{{ _validateName()
+
+    /**
+     * @param string $name
+     * @return boolean
+     */
+    private function _validateName($name)
+    {
+        if (method_exists('Piece::ORM::Mapper', $name)) {
+            return false;
+        }
+
+        return QueryType::isFindAll($name)
+            || QueryType::isFindOne($name)
+            || QueryType::isFind($name)
+            || QueryType::isInsert($name)
+            || QueryType::isUpdate($name)
+            || QueryType::isDelete($name);
+    }
 
     /**#@-*/
 
