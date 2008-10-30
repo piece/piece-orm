@@ -111,6 +111,10 @@ class Mapper
             throw new Exception("The method [ $methodName ] was not defined");
         }
 
+        if (QueryType::isFindAll($methodName)) {
+            return $this->_findObjects($methodName, count($arguments) ? $arguments[0] : null);
+        }
+
         if (QueryType::isFind($methodName)) {
             return $this->_findObject($methodName, count($arguments) ? $arguments[0] : null);
         }
