@@ -111,20 +111,22 @@ class Mapper
             throw new Exception("The method [ $methodName ] was not defined");
         }
 
+        $criteria = count($arguments) ? $arguments[0] : null;
+
         if (QueryType::isFindAll($methodName)) {
-            return $this->_findObjects($methodName, count($arguments) ? $arguments[0] : null);
+            return $this->_findObjects($methodName, $criteria);
         }
 
         if (QueryType::isFind($methodName)) {
-            return $this->_findObject($methodName, count($arguments) ? $arguments[0] : null);
+            return $this->_findObject($methodName, $criteria);
         }
 
         if (QueryType::isInsert($methodName)) {
-            return $this->_insertObject($methodName, count($arguments) ? $arguments[0] : null);
+            return $this->_insertObject($methodName, $criteria);
         }
 
         if (QueryType::isUpdate($methodName)) {
-            return $this->_updateObjects($methodName, count($arguments) ? $arguments[0] : null);
+            return $this->_updateObjects($methodName, $criteria);
         }
     }
 
