@@ -1,0 +1,41 @@
+method findByFirstName {
+    query "SELECT * FROM $__table WHERE first_name = $firstName AND note = $note"
+}
+
+method insert{
+    query "
+INSERT INTO $__table (
+  first_name,
+  last_name,
+  note,
+  created_at
+  )
+VALUES (
+  $firstName,
+  $lastName,
+  'Bar',
+  $createdAt
+  )
+"
+}
+
+method update {
+    query "
+UPDATE $__table
+SET
+  first_name = $firstName,
+  last_name = $lastName,
+  updated_at = $updatedAt
+WHERE
+  id = $id
+  AND note = 'Bar'
+"
+}
+
+method delete {
+    query "DELETE FROM $__table WHERE id = $id AND note = 'Bar'"
+}
+
+method findbylastname {
+    query "SELECT * FROM $__table WHERE last_name = $lastName AND note = 'Bar'"
+}
