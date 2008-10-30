@@ -107,7 +107,7 @@ class Mapper
      */
     public function __call($methodName, $arguments)
     {
-        if (!array_key_exists($methodName, $this->_methods)) {
+        if (!$this->hasMethod($methodName)) {
             throw new Exception("The method [ $methodName ] was not defined");
         }
 
@@ -348,7 +348,7 @@ class Mapper
      */
     public function executeQueryWithCriteria($methodName, $criteria, $isManip = false)
     {
-        if (!array_key_exists($methodName, $this->_methods)) {
+        if (!$this->hasMethod($methodName)) {
             throw new Exception("The method [ $methodName ] was not defined");
         }
 
@@ -432,7 +432,7 @@ class Mapper
      */
     public function getQuery($methodName)
     {
-        if (!array_key_exists($methodName, $this->_methods)) {
+        if (!$this->hasMethod($methodName)) {
             throw new Exception("The method [ $methodName ] was not defined");
         }
 
@@ -479,7 +479,7 @@ class Mapper
      */
     public function getOrderBy($methodName)
     {
-        if (!array_key_exists($methodName, $this->_methods)) {
+        if (!$this->hasMethod($methodName)) {
             throw new Exception("The method [ $methodName ] was not defined");
         }
 
