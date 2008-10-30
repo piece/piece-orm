@@ -89,7 +89,7 @@ class AST extends DOMDocument
     {
         parent::__construct();
         $this->_metadata = $metadata;
-        $this->_loadMetadata();
+        $this->_generateMethods();
     }
 
     // }}}
@@ -159,25 +159,25 @@ class AST extends DOMDocument
      */
 
     // }}}
-    // {{{ _loadMetadata()
+    // {{{ _generateMethods()
 
     /**
      */
-    private function _loadMetadata()
+    private function _generateMethods()
     {
-        $this->_loadFindMethods();
-        $this->_loadInsertMethod();
-        $this->_loadUpdateMethod();
-        $this->_loadDeleteMethod();
+        $this->_generateFindMethods();
+        $this->_generateInsertMethod();
+        $this->_generateUpdateMethod();
+        $this->_generateDeleteMethod();
     }
 
     // }}}
-    // {{{ _loadFindMethods()
+    // {{{ _generateFindMethods()
 
     /**
-     * Loads built-in findXXX, findAll, findAllXXX methods.
+     * Generates built-in findXXX, findAll, findAllXXX methods.
      */
-    private function _loadFindMethods()
+    private function _generateFindMethods()
     {
         foreach ($this->_metadata->getFieldNames() as $fieldName) {
             $datatype = $this->_metadata->getDatatype($fieldName);
@@ -196,12 +196,12 @@ class AST extends DOMDocument
     }
 
     // }}}
-    // {{{ _loadInsertMethod()
+    // {{{ _generateInsertMethod()
 
     /**
-     * Loads the built-in insert method.
+     * Generates the built-in insert method.
      */
-    private function _loadInsertMethod()
+    private function _generateInsertMethod()
     {
         $this->addMethod('insert', $this->_generateDefaultInsertQuery());
     }
@@ -233,12 +233,12 @@ class AST extends DOMDocument
     }
 
     // }}}
-    // {{{ _loadUpdateMethod()
+    // {{{ _generateUpdateMethod()
 
     /**
-     * Loads the built-in update method if it exists.
+     * Generates the built-in update method if it exists.
      */
-    private function _loadUpdateMethod()
+    private function _generateUpdateMethod()
     {
         $query = $this->_generateDefaultUpdateQuery();
         if (!is_null($query)) {
@@ -295,12 +295,12 @@ class AST extends DOMDocument
     }
 
     // }}}
-    // {{{ _loadDeleteMethod()
+    // {{{ _generateDeleteMethod()
 
     /**
-     * Loads the built-in delete method.
+     * Generates the built-in delete method.
      */
-    private function _loadDeleteMethod()
+    private function _generateDeleteMethod()
     {
         $query = $this->_generateDefaultDeleteQuery();
         if (!is_null($query)) {
