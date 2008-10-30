@@ -128,6 +128,10 @@ class Mapper
         if (QueryType::isUpdate($methodName)) {
             return $this->_updateObjects($methodName, $criteria);
         }
+
+        if (QueryType::isDelete($methodName)) {
+            return $this->_deleteObjects($methodName, $criteria);
+        }
     }
 
     // }}}

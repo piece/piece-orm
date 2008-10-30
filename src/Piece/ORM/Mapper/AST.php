@@ -168,6 +168,7 @@ class AST extends DOMDocument
         $this->_loadFindMethods();
         $this->_loadInsertMethod();
         $this->_loadUpdateMethod();
+        $this->_loadDeleteMethod();
     }
 
     // }}}
@@ -291,6 +292,45 @@ class AST extends DOMDocument
         return 'UPDATE $__table SET ' .
             implode(', ', $fields) .
             " WHERE $whereClause";
+    }
+
+    // }}}
+    // {{{ _loadDeleteMethod()
+
+    /**
+     * Loads the built-in delete method.
+     */
+    private function _loadDeleteMethod()
+    {
+        $query = $this->_generateDefaultDeleteQuery();
+        if (!is_null($query)) {
+            $this->addMethod('delete', $query);
+        }
+    }
+
+    // }}}
+    // {{{ _generateDefaultDeleteQuery()
+
+    /**
+     * Generates the default DELETE query.
+     *
+     * @return string
+     */
+    private function _generateDefaultDeleteQuery()
+    {
+        if (!$this->_metadata->hasPrimaryKey()) {
+            return;
+        }
+
+        $primaryKeys = $this->_metadata->getPrimaryKeys();
+        $fieldName = array_shift($primaryKeys);
+        $whereClause = "$fieldName = \$" . Inflector::camelize($fieldName, true);
+        foreach ($primaryKeys as $partOfPrimeryKey) {
+            $whereClause .= " AND $partOfPrimeryKey = \$" .
+                Inflector::camelize($partOfPrimeryKey, true);
+        }
+
+        return "DELETE FROM \$__table WHERE $whereClause";
     }
 
     /**#@-*/
