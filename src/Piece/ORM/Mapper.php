@@ -563,6 +563,19 @@ class Mapper
         $this->_methods[ $method->getName() ] = $method;
     }
 
+    // }}}
+    // {{{ hasMethod()
+
+    /**
+     * @param string $methodName
+     * @return boolean
+     * @since Method available since Release 2.0.0dev1
+     */
+    public function hasMethod($methodName)
+    {
+        return array_key_exists($methodName, $this->_methods);
+    }
+
     /**#@-*/
 
     /**#@+
