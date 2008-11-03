@@ -18,7 +18,7 @@ method findAllWithSkills2 {
         type manyToMany
         property skills
         column id
-        through {
+        linkTable {
             table employees_skills
             column employees_id
             referencedColumn id
@@ -253,7 +253,7 @@ method insertWithEmails {
         table emails
         type manyToMany
         property emails
-        through {
+        linkTable {
             table employees_emails
             inverseColumn emails_id
         }
@@ -266,7 +266,7 @@ method findAllWithEmails {
         type manyToMany
         property emails
         orderBy "emails.emails_id"
-        through {
+        linkTable {
             table employees_emails
             inverseColumn emails_id
         }

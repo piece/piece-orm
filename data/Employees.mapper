@@ -1,7 +1,0 @@
-method findById {
-  query "SELECT * FROM $__table WHERE id = $id"
-}
-
-method findByLastName {
-  query "SELECT * FROM $__table WHERE last_name = $lastName"
-}

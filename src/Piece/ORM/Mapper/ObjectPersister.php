@@ -38,10 +38,10 @@
 namespace Piece::ORM::Mapper;
 
 use Piece::ORM::Mapper;
-use Piece::ORM::Mapper::AssociationType;
 use Piece::ORM::Exception;
 use Piece::ORM::Inflector;
 use Piece::ORM::Exception::PEARException;
+use Piece::ORM::Mapper::Association;
 
 // {{{ Piece::ORM::Mapper::ObjectPersister
 
@@ -113,13 +113,13 @@ class ObjectPersister
             }
         }
 
-        if (count(array_keys($associations))) {
-            foreach (AssociationType::getAssociationTypes() as $associationType) {
+        if (count($associations)) {
+            foreach (Association::getAssociationTypes() as $associationType) {
                 $associatedObjectsPersisterClass =
                     __CLASS__ .
                     '::AssociationPersisterStrategy::' .
                     ucwords($associationType);
-                $this->_associatedObjectPersisters[$associationType] = new $associatedObjectsPersisterClass($subject);
+                $this->_associatedObjectPersisters[$associationType] = new $associatedObjectsPersisterClass();
             }
         }
 
@@ -157,8 +157,8 @@ class ObjectPersister
         }
 
         if ($primaryKey) {
-            foreach ($this->_associations as $mappedAs => $definition) {
-                $this->_associatedObjectPersisters[ $definition['type'] ]->insert($definition, $mappedAs);
+            foreach ($this->_associations as $association) {
+                $this->_associatedObjectPersisters[ $association->getAssociationType() ]->insert($association, $this->_subject);
             }
 
             return $this->_subject->$primaryKeyProperty;
@@ -187,8 +187,8 @@ class ObjectPersister
 
         $affectedRows = $this->_mapper->executeQueryWithCriteria($methodName, $this->_subject, true);
 
-        foreach ($this->_associations as $mappedAs => $definition) {
-            $this->_associatedObjectPersisters[ $definition['type'] ]->update($definition, $mappedAs);
+        foreach ($this->_associations as $association) {
+            $this->_associatedObjectPersisters[ $association->getAssociationType() ]->update($association, $this->_subject);
         }
 
         return $affectedRows;
@@ -214,8 +214,8 @@ class ObjectPersister
             throw new Exception("An unexpected value detected. Correct values are required for the primary keys to invoke $methodName().");
         }
 
-        foreach ($this->_associations as $mappedAs => $definition) {
-            $this->_associatedObjectPersisters[ $definition['type'] ]->delete($definition, $mappedAs);
+        foreach ($this->_associations as $association) {
+            $this->_associatedObjectPersisters[ $association->getAssociationType() ]->delete($association, $this->_subject);
         }
 
         return $this->_mapper->executeQueryWithCriteria($methodName, $this->_subject, true);

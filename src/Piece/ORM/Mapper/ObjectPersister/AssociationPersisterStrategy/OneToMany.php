@@ -37,9 +37,10 @@
 
 namespace Piece::ORM::Mapper::ObjectPersister::AssociationPersisterStrategy;
 
-use Piece::ORM::Mapper::ObjectPersister::AssociationPersisterStrategy::AbstractAssociationPersisterStrategy;
 use Piece::ORM::Mapper::MapperFactory;
 use Piece::ORM::Inflector;
+use Piece::ORM::Mapper::ObjectPersister::AssociationPersisterStrategy::AssociationPersisterStrategyInterface;
+use Piece::ORM::Mapper::Association;
 
 // {{{ Piece::ORM::Mapper::ObjectPersister::AssociationPersisterStrategy::OneToMany
 
@@ -52,7 +53,7 @@ use Piece::ORM::Inflector;
  * @version    Release: @package_version@
  * @since      Class available since Release 0.2.0
  */
-class OneToMany extends AbstractAssociationPersisterStrategy
+class OneToMany implements AssociationPersisterStrategyInterface
 {
 
     // {{{ properties
@@ -87,25 +88,26 @@ class OneToMany extends AbstractAssociationPersisterStrategy
     /**
      * Inserts associated objects to a table.
      *
-     * @param array  $association
-     * @param string $mappedAs
+     * @param Piece::ORM::Mapper::Association $association
+     * @param mixed                           $subject
      */
-    public function insert(array $association, $mappedAs)
+    public function insert(Association $association, $subject)
     {
-        if (!property_exists($this->subject, $mappedAs)) {
+        $property = $association->getProperty();
+        if (!property_exists($subject, $property)) {
             return;
         }
 
-        if (!is_array($this->subject->$mappedAs)) {
+        if (!is_array($subject->$property)) {
             return;
         }
 
-        $mapper = MapperFactory::factory($association['table']);
+        $mapper = MapperFactory::factory($association->getTable());
 
-        $referencedColumnValue = $this->subject->{ Inflector::camelize($association['referencedColumn'], true) };
-        for ($i = 0, $count = count($this->subject->$mappedAs); $i < $count; ++$i) {
-            $this->subject->{ $mappedAs }[$i]->{ Inflector::camelize($association['column'], true) } = $referencedColumnValue;
-            $mapper->insert($this->subject->{ $mappedAs }[$i]);
+        $referencedColumnValue = $subject->{ Inflector::camelize($association->getReferencedColumn(), true) };
+        foreach ($subject->$property as $associatedObject) {
+            $associatedObject->{ Inflector::camelize($association->getColumn(), true) } = $referencedColumnValue;
+            $mapper->insert($associatedObject);
         }
     }
 
@@ -115,41 +117,48 @@ class OneToMany extends AbstractAssociationPersisterStrategy
     /**
      * Updates associated objects in a table.
      *
-     * @param array  $association
-     * @param string $mappedAs
+     * @param Piece::ORM::Mapper::Association $association
+     * @param mixed                           $subject
      */
-    public function update(array $association, $mappedAs)
+    public function update(Association $association, $subject)
     {
-        if (!property_exists($this->subject, $mappedAs)) {
+        $property = $association->getProperty();
+        if (!property_exists($subject, $property)) {
             return;
         }
 
-        if (!is_array($this->subject->$mappedAs)) {
+        if (!is_array($subject->$property)) {
             return;
         }
 
-        $mapper = MapperFactory::factory($association['table']);
+        $mapper = MapperFactory::factory($association->getTable());
 
-        $referencedColumnValue = $this->subject->{ Inflector::camelize($association['referencedColumn'], true) };
-        $oldObjects = $mapper->findAllWithQuery("SELECT * FROM {$association['table']} WHERE {$association['column']} = " . $mapper->quote($referencedColumnValue, $association['column']));
+        $referencedColumnValue = $subject->{ Inflector::camelize($association->getReferencedColumn(), true) };
+        $oldObjects = $mapper->findAllWithQuery('SELECT * FROM ' .
+                                                $association->getTable() .
+                                                ' WHERE ' .
+                                                $association->getColumn() .
+                                                ' = ' .
+                                                $mapper->quote($referencedColumnValue, $association->getColumn())
+                                                );
 
         $metadata = $mapper->getMetadata();
         $this->_primaryKeyProperty = Inflector::camelize($metadata->getPrimaryKey(), true);
         $targetsForInsert = array();
         $targetsForUpdate = array();
         $targetsForDelete = array();
-        for ($i = 0, $count = count($this->subject->$mappedAs); $i < $count; ++$i) {
-            if (!property_exists($this->subject->{ $mappedAs }[$i], $this->_primaryKeyProperty)) {
-                $targetsForInsert[] = $this->subject->{ $mappedAs }[$i];
+        foreach ($subject->$property as $associatedObject) {
+            if (!property_exists($associatedObject, $this->_primaryKeyProperty)) {
+                $targetsForInsert[] = $associatedObject;
                 continue;
             }
 
-            if (is_null($this->subject->{ $mappedAs }[$i]->{ $this->_primaryKeyProperty })) {
-                $targetsForInsert[] = $this->subject->{ $mappedAs }[$i];
+            if (is_null($associatedObject->{ $this->_primaryKeyProperty })) {
+                $targetsForInsert[] = $associatedObject;
                 continue;
             }
 
-            $targetsForUpdate[] = $this->subject->{ $mappedAs}[$i];
+            $targetsForUpdate[] = $associatedObject;
         }
 
         usort($oldObjects, array($this, 'sortByPrimaryKey'));
@@ -171,12 +180,12 @@ class OneToMany extends AbstractAssociationPersisterStrategy
         }
 
         foreach (array_keys($targetsForInsert) as $i) {
-            $targetsForInsert[$i]->{ Inflector::camelize($association['column'], true) } = $referencedColumnValue;
+            $targetsForInsert[$i]->{ Inflector::camelize($association->getColumn(), true) } = $referencedColumnValue;
             $mapper->insert($targetsForInsert[$i]);
         }
 
         foreach (array_keys($targetsForUpdate) as $i) {
-            $targetsForUpdate[$i]->{ Inflector::camelize($association['column'], true) } = $referencedColumnValue;
+            $targetsForUpdate[$i]->{ Inflector::camelize($association->getColumn(), true) } = $referencedColumnValue;
             $mapper->update($targetsForUpdate[$i]);
         }
     }
@@ -187,19 +196,23 @@ class OneToMany extends AbstractAssociationPersisterStrategy
     /**
      * Removes associated objects from a table.
      *
-     * @param array  $association
-     * @param string $mappedAs
+     * @param Piece::ORM::Mapper::Association $association
+     * @param mixed                           $subject
      */
-    public function delete(array $association, $mappedAs)
+    public function delete(Association $association, $subject)
     {
-        $property = Inflector::camelize($association['referencedColumn'], true);
-        if (!property_exists($this->subject, $property)) {
+        $property = Inflector::camelize($association->getReferencedColumn(), true);
+        if (!property_exists($subject, $property)) {
             return;
         }
 
-        $mapper = MapperFactory::factory($association['table']);
-        $mapper->executeQuery("DELETE FROM {$association['table']} WHERE {$association['column']} = " .
-                              $mapper->quote($this->subject->$property, $association['column']),
+        $mapper = MapperFactory::factory($association->getTable());
+        $mapper->executeQuery('DELETE FROM ' .
+                              $association->getTable() .
+                              ' WHERE ' .
+                              $association->getColumn() .
+                              ' = ' .
+                              $mapper->quote($subject->$property, $association->getColumn()),
                               true
                               );
     }

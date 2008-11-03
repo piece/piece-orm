@@ -107,8 +107,8 @@ class ObjectLoader
     {
         $this->_result = $result;
 
-        if (count(array_keys($associations))) {
-            foreach (AssociationType::getAssociationTypes() as $associationType) {
+        if (count($associations)) {
+            foreach (Association::getAssociationTypes() as $associationType) {
                 $associatedObjectsLoaderClass =
                     __CLASS__ .
                     '::AssociationLoaderStrategy::' .
@@ -220,8 +220,8 @@ class ObjectLoader
                 $this->_objects[] = $this->_load($row);
             }
 
-            foreach ($this->_associations as $mappedAs => $definition) {
-                $this->_associatedObjectLoaders[ $definition['type'] ]->prepareLoading($row, $i, $mappedAs);
+            for ($j = 0, $count = count($this->_associations); $j < $count; ++$j) {
+                $this->_associatedObjectLoaders[ $this->_associations[$j]->getAssociationType() ]->prepareLoading($row, $i, $j);
             }
         }
         ::PEAR::staticPopErrorHandling();
@@ -235,9 +235,9 @@ class ObjectLoader
      */
     private function _loadAssociatedObjects()
     {
-        foreach ($this->_associations as $mappedAs => $definition) {
-            $mapper = MapperFactory::factory($definition['table']);
-            $this->_associatedObjectLoaders[ $definition['type'] ]->loadAll($mapper, $mappedAs);
+        for ($i = 0, $count = count($this->_associations); $i < $count; ++$i) {
+            $mapper = MapperFactory::factory($this->_associations[$i]->getTable());
+            $this->_associatedObjectLoaders[ $this->_associations[$i]->getAssociationType() ]->loadAll($mapper, $i);
         }
     }
 

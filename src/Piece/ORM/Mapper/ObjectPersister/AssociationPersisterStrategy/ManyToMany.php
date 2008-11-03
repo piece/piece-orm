@@ -37,9 +37,10 @@
 
 namespace Piece::ORM::Mapper::ObjectPersister::AssociationPersisterStrategy;
 
-use Piece::ORM::Mapper::ObjectPersister::AssociationPersisterStrategy::AbstractAssociationPersisterStrategy;
 use Piece::ORM::Mapper::MapperFactory;
 use Piece::ORM::Inflector;
+use Piece::ORM::Mapper::ObjectPersister::AssociationPersisterStrategy::AssociationPersisterStrategyInterface;
+use Piece::ORM::Mapper::Association;
 
 // {{{ Piece::ORM::Mapper::ObjectPersister::AssociationPersisterStrategy::ManyToMany
 
@@ -52,7 +53,7 @@ use Piece::ORM::Inflector;
  * @version    Release: @package_version@
  * @since      Class available since Release 0.2.0
  */
-class ManyToMany extends AbstractAssociationPersisterStrategy
+class ManyToMany implements AssociationPersisterStrategyInterface
 {
 
     // {{{ properties
@@ -85,26 +86,30 @@ class ManyToMany extends AbstractAssociationPersisterStrategy
     /**
      * Inserts associated objects to a table.
      *
-     * @param array  $association
-     * @param string $mappedAs
+     * @param Piece::ORM::Mapper::Association $association
+     * @param mixed                           $subject
      */
-    public function insert(array $association, $mappedAs)
+    public function insert(Association $association, $subject)
     {
-        if (!property_exists($this->subject, $mappedAs)) {
+        $property = $association->getProperty();
+        if (!property_exists($subject, $property)) {
             return;
         }
 
-        if (!is_array($this->subject->$mappedAs)) {
+        if (!is_array($subject->$property)) {
             return;
         }
 
-        $mapper = MapperFactory::factory($association['through']['table']);
+        $linkTable = $association->getLinkTable();
+        $mapper = MapperFactory::factory($linkTable->getTable());
 
-        $referencedColumnValue = $this->subject->{ Inflector::camelize($association['through']['referencedColumn'], true) };
+        $referencedColumnValue = $subject->{ Inflector::camelize($linkTable->getReferencedColumn(), true) };
         $object = $mapper->createObject();
-        foreach ($this->subject->$mappedAs as $associatedObject) {
-            $object->{ Inflector::camelize($association['through']['column'], true) } = $referencedColumnValue;
-            $object->{ Inflector::camelize($association['through']['inverseColumn'], true) } = $associatedObject->{ Inflector::camelize($association['column'], true) };
+        foreach ($subject->$property as $associatedObject) {
+            $object->{ Inflector::camelize($linkTable->getColumn(), true) } =
+                $referencedColumnValue;
+            $object->{ Inflector::camelize($linkTable->getInverseColumn(), true) } =
+                $associatedObject->{ Inflector::camelize($association->getColumn(), true) };
             $mapper->insert($object);
         }
     }
@@ -115,28 +120,37 @@ class ManyToMany extends AbstractAssociationPersisterStrategy
     /**
      * Updates associated objects in a table.
      *
-     * @param array  $association
-     * @param string $mappedAs
+     * @param Piece::ORM::Mapper::Association $association
+     * @param mixed                           $subject
      */
-    public function update(array $association, $mappedAs)
+    public function update(Association $association, $subject)
     {
-        if (!property_exists($this->subject, $mappedAs)) {
+        $property = $association->getProperty();
+        if (!property_exists($subject, $property)) {
             return;
         }
 
-        if (!is_array($this->subject->$mappedAs)) {
+        if (!is_array($subject->$property)) {
             return;
         }
 
-        $mapper = MapperFactory::factory($association['through']['table']);
+        $linkTable = $association->getLinkTable();
+        $mapper = MapperFactory::factory($linkTable->getTable());
 
-        $referencedColumnValue = $this->subject->{ Inflector::camelize($association['through']['referencedColumn'], true) };
-        $mapper->executeQuery("DELETE FROM {$association['through']['table']} WHERE {$association['through']['column']} = " . $mapper->quote($referencedColumnValue, $association['through']['column']), true);
+        $referencedColumnValue = $subject->{ Inflector::camelize($linkTable->getReferencedColumn(), true) };
+        $mapper->executeQuery('DELETE FROM ' .
+                              $linkTable->getTable() .
+                              ' WHERE ' .
+                              $linkTable->getColumn() .
+                              ' = ' .
+                              $mapper->quote($referencedColumnValue, $linkTable->getColumn()),
+                              true
+                              );
 
         $object = $mapper->createObject();
-        foreach ($this->subject->$mappedAs as $associatedObject) {
-            $object->{ Inflector::camelize($association['through']['column'], true) } = $referencedColumnValue;
-            $object->{ Inflector::camelize($association['through']['inverseColumn'], true) } = $associatedObject->{ Inflector::camelize($association['column'], true) };
+        foreach ($subject->$property as $associatedObject) {
+            $object->{ Inflector::camelize($linkTable->getColumn(), true) } = $referencedColumnValue;
+            $object->{ Inflector::camelize($linkTable->getInverseColumn(), true) } = $associatedObject->{ Inflector::camelize($association->getColumn(), true) };
             $mapper->insert($object);
         }
     }
@@ -147,19 +161,24 @@ class ManyToMany extends AbstractAssociationPersisterStrategy
     /**
      * Removes associated objects from a table.
      *
-     * @param array  $association
-     * @param string $mappedAs
+     * @param Piece::ORM::Mapper::Association $association
+     * @param mixed                           $subject
      */
-    public function delete(array $association, $mappedAs)
+    public function delete(Association $association, $subject)
     {
-        $property = Inflector::camelize($association['through']['referencedColumn'], true);
-        if (!property_exists($this->subject, $property)) {
+        $linkTable = $association->getLinkTable();
+        $property = Inflector::camelize($linkTable->getReferencedColumn(), true);
+        if (!property_exists($subject, $property)) {
             return;
         }
 
-        $mapper = MapperFactory::factory($association['through']['table']);
-        $mapper->executeQuery("DELETE FROM {$association['through']['table']} WHERE {$association['through']['column']} = " .
-                              $mapper->quote($this->subject->$property, $association['through']['column']),
+        $mapper = MapperFactory::factory($linkTable->getTable());
+        $mapper->executeQuery('DELETE FROM ' .
+                              $linkTable->getTable() .
+                              ' WHERE ' .
+                              $linkTable->getColumn() .
+                              ' = ' .
+                              $mapper->quote($subject->$property, $linkTable->getColumn()),
                               true
                               );
     }

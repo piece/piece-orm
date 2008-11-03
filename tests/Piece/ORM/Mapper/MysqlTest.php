@@ -87,9 +87,7 @@ class MysqlTest extends CompatibilityTests
      */
     public function testGenerateTheDefaultQueryIfTheQueryForAInsertMethodIsNotGiven()
     {
-        $mapper = MapperFactory::factory('Employees');
-
-        $this->assertEquals('INSERT INTO $__table (first_name, last_name, note, departments_id, created_at) VALUES ($firstName, $lastName, $note, $departmentsId, $createdAt)', $mapper->__query__insertwithnoquery);
+        $this->assertEquals('INSERT INTO $__table (first_name, last_name, note, departments_id, created_at) VALUES ($firstName, $lastName, $note, $departmentsId, $createdAt)', MapperFactory::factory('Employees')->getQuery('insertWithNoQuery'));
     }
 
     /**

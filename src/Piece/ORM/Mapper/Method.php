@@ -38,6 +38,8 @@
 namespace Piece::ORM::Mapper;
 
 use Piece::ORM::Exception;
+use Piece::ORM::Mapper::Association;
+use Piece::ORM::Mapper::QueryType;
 
 // {{{ Piece::ORM::Mapper::Method
 
@@ -85,19 +87,15 @@ class Method
 
     /**
      * @param string $name
-     * @param string $query
-     * @param string $orderBy
      * @throws Piece::ORM::Exception
      */
-    public function __construct($name, $query, $orderBy)
+    public function __construct($name)
     {
         if (!$this->_validateName($name)) {
-            throw new Exception("Cannot use the method name [ $method ] since it is a reserved for internal use only.");
+            throw new Exception("Cannot use the method [ $name ] since it is a reserved for internal use only.");
         }
 
         $this->_name = $name;
-        $this->_query = strlen($query) ? $query : null;
-        $this->_orderBy = strlen($orderBy) ? $orderBy : null;
     }
 
     // }}}
@@ -142,6 +140,39 @@ class Method
     public function getAssociations()
     {
         return $this->_associations;
+    }
+
+    // }}}
+    // {{{ setQuery()
+
+    /**
+     * @param string $query
+     */
+    public function setQuery($query)
+    {
+        $this->_query = $query;
+    }
+
+    // }}}
+    // {{{ setOrderBy()
+
+    /**
+     * @param string $orderBy
+     */
+    public function setOrderBy($orderBy)
+    {
+        $this->_orderBy = $orderBy;
+    }
+
+    // }}}
+    // {{{ addAssociation()
+
+    /**
+     * @param Piece::ORM::Mapper::Association $association
+     */
+    public function addAssociation(Association $association)
+    {
+        $this->_associations[] = $association;
     }
 
     /**#@-*/

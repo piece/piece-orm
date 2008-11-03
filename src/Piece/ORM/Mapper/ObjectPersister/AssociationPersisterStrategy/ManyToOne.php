@@ -37,8 +37,9 @@
 
 namespace Piece::ORM::Mapper::ObjectPersister::AssociationPersisterStrategy;
 
-use Piece::ORM::Mapper::ObjectPersister::AssociationPersisterStrategy::AbstractAssociationPersisterStrategy;
 use Piece::ORM::Exception;
+use Piece::ORM::Mapper::ObjectPersister::AssociationPersisterStrategy::AssociationPersisterStrategyInterface;
+use Piece::ORM::Mapper::Association;
 
 // {{{ Piece::ORM::Mapper::ObjectPersister::AssociationPersisterStrategy::ManyToOne
 
@@ -51,7 +52,7 @@ use Piece::ORM::Exception;
  * @version    Release: @package_version@
  * @since      Class available since Release 0.2.0
  */
-class ManyToOne extends AbstractAssociationPersisterStrategy
+class ManyToOne implements AssociationPersisterStrategyInterface
 {
 
     // {{{ properties
@@ -84,11 +85,11 @@ class ManyToOne extends AbstractAssociationPersisterStrategy
     /**
      * Inserts associated objects to a table.
      *
-     * @param array $association
-     * @param string $mappedAs
+     * @param Piece::ORM::Mapper::Association $association
+     * @param mixed                           $subject
      * @throws Piece::ORM::Exception
      */
-    public function insert(array $association, $mappedAs)
+    public function insert(Association $association, $subject)
     {
         throw new Exception("This operation does not supported for the association type [ {$association['type']} ]. Please check your configuration.");
     }
@@ -99,11 +100,11 @@ class ManyToOne extends AbstractAssociationPersisterStrategy
     /**
      * Updates associated objects in a table.
      *
-     * @param array  $association
-     * @param string $mappedAs
+     * @param Piece::ORM::Mapper::Association $association
+     * @param mixed                           $subject
      * @throws Piece::ORM::Exception
      */
-    public function update(array $association, $mappedAs)
+    public function update(Association $association, $subject)
     {
         throw new Exception("This operation does not supported for the association type [ {$association['type']} ]. Please check your configuration.");
     }
@@ -114,11 +115,11 @@ class ManyToOne extends AbstractAssociationPersisterStrategy
     /**
      * Removes associated objects from a table.
      *
-     * @param array  $association
-     * @param string $mappedAs
+     * @param Piece::ORM::Mapper::Association $association
+     * @param mixed                           $subject
      * @throws Piece::ORM::Exception
      */
-    public function delete(array $association, $mappedAs)
+    public function delete(Association $association, $subject)
     {
         throw new Exception("This operation does not supported for the association type [ {$association['type']} ]. Please check your configuration.");
     }

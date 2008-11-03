@@ -130,7 +130,7 @@ class MapperParseryyStackEntry
  * @package    Piece_ORM
  * @copyright  2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License (revised)
- * @version    SVN: $Id: MapperParser.y 590 2008-10-27 15:41:26Z iteman $
+ * @version    SVN: $Id: MapperParser.y 604 2008-10-30 16:33:18Z iteman $
  * @since      File available since Release 2.0.0dev1
  */
 
@@ -185,7 +185,7 @@ class MapperParser
     const STRING                         =  6;
     const ORDER_BY                       =  7;
     const ASSOCIATION                    =  8;
-    const THROUGH                        =  9;
+    const LINK_TABLE                     =  9;
     const TABLE                          = 10;
     const ASSOCIATION_TYPE               = 11;
     const PROPERTY                       = 12;
@@ -443,13 +443,13 @@ static public $yy_action = array(
     static public $yyTokenName = array( 
   '$',             'METHOD',        'ID',            'LCURLY',      
   'RCURLY',        'QUERY',         'STRING',        'ORDER_BY',    
-  'ASSOCIATION',   'THROUGH',       'TABLE',         'ASSOCIATION_TYPE',
+  'ASSOCIATION',   'LINK_TABLE',    'TABLE',         'ASSOCIATION_TYPE',
   'PROPERTY',      'COLUMN',        'REFERENCED_COLUMN',  'INVERSE_COLUMN',
   'error',         'start',         'topStatementList',  'topStatement',
   'method',        'methodStatementList',  'methodStatement',  'query',       
   'orderBy',       'association',   'associationStatementList',  'associationStatement',
   'table',         'associationType',  'property',      'column',      
-  'referencedColumn',  'through',       'throughStatementList',  'throughStatement',
+  'referencedColumn',  'linkTable',     'linkTableStatementList',  'linkTableStatement',
   'inverseColumn',
     );
 
@@ -479,14 +479,14 @@ static public $yy_action = array(
  /*  18 */ "associationStatement ::= column",
  /*  19 */ "associationStatement ::= referencedColumn",
  /*  20 */ "associationStatement ::= orderBy",
- /*  21 */ "associationStatement ::= through",
- /*  22 */ "through ::= THROUGH LCURLY throughStatementList RCURLY",
- /*  23 */ "throughStatementList ::= throughStatementList throughStatement",
- /*  24 */ "throughStatementList ::= throughStatement",
- /*  25 */ "throughStatement ::= table",
- /*  26 */ "throughStatement ::= column",
- /*  27 */ "throughStatement ::= referencedColumn",
- /*  28 */ "throughStatement ::= inverseColumn",
+ /*  21 */ "associationStatement ::= linkTable",
+ /*  22 */ "linkTable ::= LINK_TABLE LCURLY linkTableStatementList RCURLY",
+ /*  23 */ "linkTableStatementList ::= linkTableStatementList linkTableStatement",
+ /*  24 */ "linkTableStatementList ::= linkTableStatement",
+ /*  25 */ "linkTableStatement ::= table",
+ /*  26 */ "linkTableStatement ::= column",
+ /*  27 */ "linkTableStatement ::= referencedColumn",
+ /*  28 */ "linkTableStatement ::= inverseColumn",
  /*  29 */ "table ::= TABLE ID",
  /*  30 */ "associationType ::= ASSOCIATION_TYPE ID",
  /*  31 */ "property ::= PROPERTY ID",
@@ -980,7 +980,7 @@ static public $yy_action = array(
         }
         $association = $this->_ast->createElement('association');
         foreach (array_keys((array)$this->yystack[$this->yyidx + -1]->minor) as $key) {
-            if ($key == 'through') {
+            if ($key == 'linkTable') {
                 $association->appendChild($this->yystack[$this->yyidx + -1]->minor[$key]);
                 continue;
             }
@@ -1023,19 +1023,19 @@ static public $yy_action = array(
     function yy_r19(){ $this->_retvalue['referencedColumn'] = $this->yystack[$this->yyidx + 0]->minor;     }
 #line 1030 "src/Piece/ORM/Mapper/Parser/MapperParser.php"
 #line 159 "src/Piece/ORM/Mapper/Parser/MapperParser.y"
-    function yy_r21(){ $this->_retvalue['through'] = $this->yystack[$this->yyidx + 0]->minor;     }
+    function yy_r21(){ $this->_retvalue['linkTable'] = $this->yystack[$this->yyidx + 0]->minor;     }
 #line 1033 "src/Piece/ORM/Mapper/Parser/MapperParser.php"
 #line 161 "src/Piece/ORM/Mapper/Parser/MapperParser.y"
     function yy_r22(){
         if (!array_key_exists('table', $this->yystack[$this->yyidx + -1]->minor)) {
-            throw new Exception("The [ table ] statement was not found in the 'through' statement on line {$this->_mapperLexer->line}. An 'association' statement must contain the 'table' statement.");
+            throw new Exception("The [ table ] statement was not found in the 'linkTable' statement on line {$this->_mapperLexer->line}. An 'association' statement must contain the 'table' statement.");
         }
 
-        $through = $this->_ast->createElement('through');
+        $linkTable = $this->_ast->createElement('linkTable');
         foreach (array_keys($this->yystack[$this->yyidx + -1]->minor) as $key) {
-            $through->setAttribute($key, $this->yystack[$this->yyidx + -1]->minor[$key]);
+            $linkTable->setAttribute($key, $this->yystack[$this->yyidx + -1]->minor[$key]);
         }
-        $this->_retvalue = $through;
+        $this->_retvalue = $linkTable;
     }
 #line 1046 "src/Piece/ORM/Mapper/Parser/MapperParser.php"
 #line 191 "src/Piece/ORM/Mapper/Parser/MapperParser.y"

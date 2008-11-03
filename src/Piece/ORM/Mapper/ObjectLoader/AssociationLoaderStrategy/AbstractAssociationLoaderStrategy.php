@@ -37,10 +37,11 @@
 
 namespace Piece::ORM::Mapper::ObjectLoader::AssociationLoaderStrategy;
 
-use Piece::ORM::Mapper::AbstractMapper;
 use Piece::ORM::Inflector;
+use Piece::ORM::Mapper;
+use Piece::ORM::Mapper::Association;
 
-// {{{ Piece::ORM::Mapper::ObjectLoader::AssociationLoaderStrategy::AbstractAssociationLoaderStrategy
+// {{{ Piece::ORM::Mapper::ObjectLoader::AbstractAssociationLoaderStrategy
 
 /**
  * The base class for associated object loaders.
@@ -66,20 +67,19 @@ abstract class AbstractAssociationLoaderStrategy
      * @access protected
      */
 
-    protected $useMultipleIndexes = false;
-    protected $defaultValueOfMappedAs;
+    protected $ueMultipleIndexes = false;
+    protected $defaultValueOfProperty;
     protected $associations;
     protected $associationKeys;
     protected $objects;
     protected $objectIndexes;
+    protected $mapper;
 
     /**#@-*/
 
     /**#@+
      * @access private
      */
-
-    private $_mapper;
 
     /**#@-*/
 
@@ -93,24 +93,24 @@ abstract class AbstractAssociationLoaderStrategy
     /**
      * Initializes properties with the given value.
      *
-     * @param array                              $associations
-     * @param array                              &$associationKeys
-     * @param array                              &$objects
-     * @param array                              &$objectIndexes
-     * @param Piece::ORM::Mapper::AbstractMapper $mapper
+     * @param array              $associations
+     * @param array              &$associationKeys
+     * @param array              &$objects
+     * @param array              &$objectIndexes
+     * @param Piece::ORM::Mapper $mapper
      */
-    public function __construct(array $associations,
-                                array &$associationKeys,
-                                array &$objects,
-                                array &$objectIndexes,
-                                AbstractMapper $mapper
+    public function __construct($associations,
+                                &$associationKeys,
+                                &$objects,
+                                &$objectIndexes,
+                                Mapper $mapper
                                 )
     {
         $this->associations = $associations;
         $this->associationKeys = &$associationKeys;
         $this->objects = &$objects;
         $this->objectIndexes = &$objectIndexes;
-        $this->_mapper = $mapper;
+        $this->mapper = $mapper;
     }
 
     // }}}
@@ -121,19 +121,19 @@ abstract class AbstractAssociationLoaderStrategy
      *
      * @param array   $row
      * @param integer $objectIndex
-     * @param string  $mappedAs
+     * @param integer $associationIndex
      */
-    public function prepareLoading(array $row, $objectIndex, $mappedAs)
+    public function prepareLoading($row, $objectIndex, $associationIndex)
     {
-        $associationKeyFieldName = $this->getAssociationKeyFieldNameInPrimaryQuery($this->associations[$mappedAs]);
-        $this->objects[$objectIndex]->$mappedAs = $this->defaultValueOfMappedAs;
+        $associationKeyField = $this->_getAssociationKeyFieldInPrimaryQuery($this->associations[$associationIndex]);
+        $this->objects[$objectIndex]->{ $this->associations[$associationIndex]->getProperty() } = $this->defaultValueOfProperty;
 
-        $this->associationKeys[$mappedAs][] = $this->_mapper->quote($row[$associationKeyFieldName], $associationKeyFieldName);
+        $this->associationKeys[$associationIndex][] = $this->mapper->quote($row[$associationKeyField], $associationKeyField);
 
-        if (!$this->useMultipleIndexes) {
-            $this->objectIndexes[$mappedAs][ $row[$associationKeyFieldName] ] = $objectIndex;
+        if (!$this->ueMultipleIndexes) {
+            $this->objectIndexes[$associationIndex][ $row[$associationKeyField] ] = $objectIndex;
         } else {
-            $this->objectIndexes[$mappedAs][ $row[$associationKeyFieldName] ][] = $objectIndex;
+            $this->objectIndexes[$associationIndex][ $row[$associationKeyField] ][] = $objectIndex;
         }
     }
 
@@ -143,21 +143,25 @@ abstract class AbstractAssociationLoaderStrategy
     /**
      * Loads all associated objects into appropriate objects.
      *
-     * @param Piece::ORM::Mapper::AbstractMapper $mapper
-     * @param string                             $mappedAs
+     * @param Piece_ORM_Mapper_Common $mapper
+     * @param integer                 $associationIndex
      */
-    public function loadAll(AbstractMapper $mapper, $mappedAs)
+    public function loadAll($mapper, $associationIndex)
     {
-        $mapper->setPreloadCallback($this->getPreloadCallback());
-        $mapper->setPreloadCallbackArgs(array($mappedAs));
-        $associatedObjects = $mapper->findAllWithQuery($this->buildQuery($mappedAs) . (is_null($this->associations[$mappedAs]['orderBy']) ? '' : " ORDER BY {$this->associations[$mappedAs]['orderBy']}"));
+        $mapper->setPreloadCallback($this->_getPreloadCallback());
+        $mapper->setPreloadCallbackArgs(array($associationIndex));
+        $associatedObjects =
+            $mapper->findAllWithQuery($this->_buildQuery($associationIndex) .
+                                      (is_null($this->associations[$associationIndex]->getOrderBy()) ? ''
+                                       : ' ORDER BY ' . $this->associations[$associationIndex]->getOrderBy())
+                                      );
         $mapper->setPreloadCallback(null);
         $mapper->setPreloadCallbackArgs(null);
 
-        $associationKeyPropertyName = Inflector::camelize($this->getAssociationKeyFieldNameInSecondaryQuery($this->associations[$mappedAs]), true);
+        $associationKeyProperty = Inflector::camelize($this->_getAssociationKeyFieldInSecondaryQuery($this->associations[$associationIndex]), true);
 
         for ($j = 0, $count = count($associatedObjects); $j < $count; ++$j) {
-            $this->associateObject($associatedObjects[$j], $mapper, $associationKeyPropertyName, $mappedAs);
+            $this->_associateObject($associatedObjects[$j], $mapper, $associationKeyProperty, $associationIndex);
         }
     }
 
@@ -168,63 +172,61 @@ abstract class AbstractAssociationLoaderStrategy
      */
 
     // }}}
-    // {{{ buildQuery()
+    // {{{ _buildQuery()
 
     /**
      * Builds a query to get associated objects.
      *
-     * @param string $mappedAs
-     * @return string
+     * @param integer $associationIndex
      */
-    abstract protected function buildQuery($mappedAs);
+    abstract protected function _buildQuery($associationIndex);
 
     // }}}
-    // {{{ getAssociationKeyFieldNameInPrimaryQuery()
+    // {{{ _getAssociationKeyFieldInPrimaryQuery()
 
     /**
      * Gets the name of the association key field in the primary query.
      *
-     * @param array $association
+     * @param Piece::ORM::Mapper::Association $association
      */
-    abstract protected function getAssociationKeyFieldNameInPrimaryQuery(array $association);
+    abstract protected function _getAssociationKeyFieldInPrimaryQuery(Association $association);
 
     // }}}
-    // {{{ getAssociationKeyFieldNameInSecondaryQuery()
+    // {{{ _getAssociationKeyFieldInSecondaryQuery()
 
     /**
      * Gets the name of the association key field in the secondary query.
      *
-     * @param array $association
+     * @param Piece::ORM::Mapper::Association $association
      */
-    abstract protected function getAssociationKeyFieldNameInSecondaryQuery(array $association);
+    abstract protected function _getAssociationKeyFieldInSecondaryQuery(Association $association);
 
     // }}}
-    // {{{ associateObject()
+    // {{{ _associateObject()
 
     /**
      * Associates an object which are loaded by the secondary query into objects which
      * are loaded by the primary query.
      *
-     * @param stdClass                           $associatedObject
-     * @param Piece::ORM::Mapper::AbstractMapper $mapper
-     * @param string                             $associationKeyPropertyName
-     * @param string                             $mappedAs
+     * @param stdClass           $associatedObject
+     * @param Piece::ORM::Mapper $mapper
+     * @param string             $associationKeyProperty
+     * @param integer            $associationIndex
      */
-    abstract protected function associateObject($associatedObject,
-                                                AbstractMapper $mapper,
-                                                $associationKeyPropertyName,
-                                                $mappedAs
-                                                );
+    abstract protected function _associateObject($associatedObject, Mapper $mapper, $associationKeyProperty, $associationIndex);
 
     // }}}
-    // {{{ getPreloadCallback()
+    // {{{ _getPreloadCallback()
 
     /**
      * Gets the preload callback for a loader.
      *
      * @return callback
      */
-    protected function getPreloadCallback() {}
+    protected function _getPreloadCallback()
+    {
+        return null;
+    }
 
     /**#@-*/
 

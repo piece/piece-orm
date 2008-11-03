@@ -1,0 +1,65 @@
+// $Id$
+
+method findAllWithEmployees1 {
+    association {
+        table employees
+        type oneToMany
+        property employees
+    }
+}
+
+method findAllWithEmployees2 {
+    association {
+        table employees
+        type oneToMany
+        property employees
+        column departments_id
+        referencedColumn id
+    }
+}
+
+method findAllWithOrderedEmployees {
+    association {
+        table employees
+        type oneToMany
+        property employees
+        orderBy "id DESC"
+    }
+}
+
+method findWithEmployeesByName {
+    query "SELECT * FROM $__table WHERE name = $name"
+    association {
+        table employees
+        type oneToMany
+        property employees
+        orderBy "id DESC"
+    }
+}
+
+method update {
+    association {
+        table employees
+        type oneToMany
+        property employees
+    }
+}
+
+method delete {
+    association {
+        table employees
+        type oneToMany
+        property employees
+    }
+}
+
+/*
+ * Local Variables:
+ * mode: c
+ * coding: iso-8859-1
+ * tab-width: 4
+ * c-basic-offset: 4
+ * c-hanging-comment-ender-p: nil
+ * indent-tabs-mode: nil
+ * End:
+ */

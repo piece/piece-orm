@@ -35,9 +35,9 @@
  * @since      File available since Release 2.0.0dev1
  */
 
-namespace Piece::ORM::Mapper::Parser;
+namespace Piece::ORM::Mapper::Association;
 
-// {{{ Piece::ORM::Mapper::Parser::AST
+// {{{ Piece::ORM::Mapper::Association::LinkTable
 
 /**
  * @package    Piece_ORM
@@ -46,7 +46,7 @@ namespace Piece::ORM::Mapper::Parser;
  * @version    Release: @package_version@
  * @since      Class available since Release 2.0.0dev1
  */
-class AST extends DOMDocument
+class LinkTable
 {
 
     // {{{ properties
@@ -67,6 +67,11 @@ class AST extends DOMDocument
      * @access private
      */
 
+    private $_table;
+    private $_column;
+    private $_referencedColumn;
+    private $_inverseColumn;
+
     /**#@-*/
 
     /**#@+
@@ -74,36 +79,91 @@ class AST extends DOMDocument
      */
 
     // }}}
-    // {{{ addMethod()
+    // {{{ setTable()
 
     /**
-     * @param string $name
-     * @param string $query
-     * @param string $orderBy
-     * @param array  $associations
+     * @param string $table
      */
-    public function addMethod($name, $query = null, $orderBy = null, $associations = null)
+    public function setTable($table)
     {
-        $xpath = new DOMXPath($this);
-        $methodNodeList = $xpath->query("//method[@name='$name']");
-        if (!$methodNodeList->length) {
-            $methodElement = $this->appendChild(new DOMElement('method'));
-            $methodElement->setAttribute('name', $name);
-        } else {
-            $methodElement = $methodNodeList->item(0);
-        }
+        $this->_table = $table;
+    }
 
-        if (!is_null($query)) {
-            $methodElement->setAttribute('query', $query);
-        }
+    // }}}
+    // {{{ setColumn()
 
-        $methodElement->setAttribute('orderBy', $orderBy);
+    /**
+     * @param string $column
+     */
+    public function setColumn($column)
+    {
+        $this->_column = $column;
+    }
 
-        if (!is_null($associations)) {
-            foreach ($associations as $associationElement) {
-                $methodElement->appendChild($associationElement);
-            }
-        }
+    // }}}
+    // {{{ setReferencedColumn()
+
+    /**
+     * @param string $referencedColumn
+     */
+    public function setReferencedColumn($referencedColumn)
+    {
+        $this->_referencedColumn = $referencedColumn;
+    }
+
+    // }}}
+    // {{{ setInverseColumn()
+
+    /**
+     * @param string $inverseColumn
+     */
+    public function setInverseColumn($inverseColumn)
+    {
+        $this->_inverseColumn = $inverseColumn;
+    }
+
+    // }}}
+    // {{{ getTable()
+
+    /**
+     * @return string
+     */
+    public function getTable()
+    {
+        return $this->_table;
+    }
+
+    // }}}
+    // {{{ getColumn()
+
+    /**
+     * @return string
+     */
+    public function getColumn()
+    {
+        return $this->_column;
+    }
+
+    // }}}
+    // {{{ getReferencedColumn()
+
+    /**
+     * @return string
+     */
+    public function getReferencedColumn()
+    {
+        return $this->_referencedColumn;
+    }
+
+    // }}}
+    // {{{ getInverseColumn()
+
+    /**
+     * @return string
+     */
+    public function getInverseColumn()
+    {
+        return $this->_inverseColumn;
     }
 
     /**#@-*/

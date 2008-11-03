@@ -31,7 +31,7 @@
  * @package    Piece_ORM
  * @copyright  2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License (revised)
- * @version    SVN: $Id: MapperLexer.plex 590 2008-10-27 15:41:26Z iteman $
+ * @version    SVN: $Id: MapperLexer.plex 597 2008-10-30 15:25:57Z iteman $
  * @since      File available since Release 2.0.0dev1
  */
 
@@ -123,7 +123,7 @@ class MapperLexer
         if ($this->_counter >= strlen($this->_input)) {
             return false; // end of input
         }
-        $yy_global_pattern = "/^(method)|^(query)|^(orderBy)|^(association)|^(table)|^(type)|^(property)|^(column)|^(through)|^(referencedColumn)|^(inverseColumn)|^([a-zA-Z_][a-zA-Z_0-9]*)|^(\\{)|^(\\})|^([ \t\r\n]+)|^(\"[^[\"\\\\]+\")|^(\/\/[^\n\r]*\r?\n)|^(\/\\*[^*]*\\*+([^*\/][^*]*\\*+)*\/)/";
+        $yy_global_pattern = "/^(method)|^(query)|^(orderBy)|^(association)|^(table)|^(type)|^(property)|^(column)|^(linkTable)|^(referencedColumn)|^(inverseColumn)|^([a-zA-Z_][a-zA-Z_0-9]*)|^(\\{)|^(\\})|^([ \t\r\n]+)|^(\"[^[\"\\\\]+\")|^(\/\/[^\n\r]*\r?\n)|^(\/\\*[^*]*\\*+([^*\/][^*]*\\*+)*\/)/";
 
         do {
             if (preg_match($yy_global_pattern, substr($this->_input, $this->_counter), $yymatches)) {
@@ -163,14 +163,14 @@ class MapperLexer
                     // skip this token
                     continue;
                 } else {                    $yy_yymore_patterns = array(
-        1 => array(0, "^(query)|^(orderBy)|^(association)|^(table)|^(type)|^(property)|^(column)|^(through)|^(referencedColumn)|^(inverseColumn)|^([a-zA-Z_][a-zA-Z_0-9]*)|^(\\{)|^(\\})|^([ \t\r\n]+)|^(\"[^[\"\\\\]+\")|^(\/\/[^\n\r]*\r?\n)|^(\/\\*[^*]*\\*+([^*\/][^*]*\\*+)*\/)"),
-        2 => array(0, "^(orderBy)|^(association)|^(table)|^(type)|^(property)|^(column)|^(through)|^(referencedColumn)|^(inverseColumn)|^([a-zA-Z_][a-zA-Z_0-9]*)|^(\\{)|^(\\})|^([ \t\r\n]+)|^(\"[^[\"\\\\]+\")|^(\/\/[^\n\r]*\r?\n)|^(\/\\*[^*]*\\*+([^*\/][^*]*\\*+)*\/)"),
-        3 => array(0, "^(association)|^(table)|^(type)|^(property)|^(column)|^(through)|^(referencedColumn)|^(inverseColumn)|^([a-zA-Z_][a-zA-Z_0-9]*)|^(\\{)|^(\\})|^([ \t\r\n]+)|^(\"[^[\"\\\\]+\")|^(\/\/[^\n\r]*\r?\n)|^(\/\\*[^*]*\\*+([^*\/][^*]*\\*+)*\/)"),
-        4 => array(0, "^(table)|^(type)|^(property)|^(column)|^(through)|^(referencedColumn)|^(inverseColumn)|^([a-zA-Z_][a-zA-Z_0-9]*)|^(\\{)|^(\\})|^([ \t\r\n]+)|^(\"[^[\"\\\\]+\")|^(\/\/[^\n\r]*\r?\n)|^(\/\\*[^*]*\\*+([^*\/][^*]*\\*+)*\/)"),
-        5 => array(0, "^(type)|^(property)|^(column)|^(through)|^(referencedColumn)|^(inverseColumn)|^([a-zA-Z_][a-zA-Z_0-9]*)|^(\\{)|^(\\})|^([ \t\r\n]+)|^(\"[^[\"\\\\]+\")|^(\/\/[^\n\r]*\r?\n)|^(\/\\*[^*]*\\*+([^*\/][^*]*\\*+)*\/)"),
-        6 => array(0, "^(property)|^(column)|^(through)|^(referencedColumn)|^(inverseColumn)|^([a-zA-Z_][a-zA-Z_0-9]*)|^(\\{)|^(\\})|^([ \t\r\n]+)|^(\"[^[\"\\\\]+\")|^(\/\/[^\n\r]*\r?\n)|^(\/\\*[^*]*\\*+([^*\/][^*]*\\*+)*\/)"),
-        7 => array(0, "^(column)|^(through)|^(referencedColumn)|^(inverseColumn)|^([a-zA-Z_][a-zA-Z_0-9]*)|^(\\{)|^(\\})|^([ \t\r\n]+)|^(\"[^[\"\\\\]+\")|^(\/\/[^\n\r]*\r?\n)|^(\/\\*[^*]*\\*+([^*\/][^*]*\\*+)*\/)"),
-        8 => array(0, "^(through)|^(referencedColumn)|^(inverseColumn)|^([a-zA-Z_][a-zA-Z_0-9]*)|^(\\{)|^(\\})|^([ \t\r\n]+)|^(\"[^[\"\\\\]+\")|^(\/\/[^\n\r]*\r?\n)|^(\/\\*[^*]*\\*+([^*\/][^*]*\\*+)*\/)"),
+        1 => array(0, "^(query)|^(orderBy)|^(association)|^(table)|^(type)|^(property)|^(column)|^(linkTable)|^(referencedColumn)|^(inverseColumn)|^([a-zA-Z_][a-zA-Z_0-9]*)|^(\\{)|^(\\})|^([ \t\r\n]+)|^(\"[^[\"\\\\]+\")|^(\/\/[^\n\r]*\r?\n)|^(\/\\*[^*]*\\*+([^*\/][^*]*\\*+)*\/)"),
+        2 => array(0, "^(orderBy)|^(association)|^(table)|^(type)|^(property)|^(column)|^(linkTable)|^(referencedColumn)|^(inverseColumn)|^([a-zA-Z_][a-zA-Z_0-9]*)|^(\\{)|^(\\})|^([ \t\r\n]+)|^(\"[^[\"\\\\]+\")|^(\/\/[^\n\r]*\r?\n)|^(\/\\*[^*]*\\*+([^*\/][^*]*\\*+)*\/)"),
+        3 => array(0, "^(association)|^(table)|^(type)|^(property)|^(column)|^(linkTable)|^(referencedColumn)|^(inverseColumn)|^([a-zA-Z_][a-zA-Z_0-9]*)|^(\\{)|^(\\})|^([ \t\r\n]+)|^(\"[^[\"\\\\]+\")|^(\/\/[^\n\r]*\r?\n)|^(\/\\*[^*]*\\*+([^*\/][^*]*\\*+)*\/)"),
+        4 => array(0, "^(table)|^(type)|^(property)|^(column)|^(linkTable)|^(referencedColumn)|^(inverseColumn)|^([a-zA-Z_][a-zA-Z_0-9]*)|^(\\{)|^(\\})|^([ \t\r\n]+)|^(\"[^[\"\\\\]+\")|^(\/\/[^\n\r]*\r?\n)|^(\/\\*[^*]*\\*+([^*\/][^*]*\\*+)*\/)"),
+        5 => array(0, "^(type)|^(property)|^(column)|^(linkTable)|^(referencedColumn)|^(inverseColumn)|^([a-zA-Z_][a-zA-Z_0-9]*)|^(\\{)|^(\\})|^([ \t\r\n]+)|^(\"[^[\"\\\\]+\")|^(\/\/[^\n\r]*\r?\n)|^(\/\\*[^*]*\\*+([^*\/][^*]*\\*+)*\/)"),
+        6 => array(0, "^(property)|^(column)|^(linkTable)|^(referencedColumn)|^(inverseColumn)|^([a-zA-Z_][a-zA-Z_0-9]*)|^(\\{)|^(\\})|^([ \t\r\n]+)|^(\"[^[\"\\\\]+\")|^(\/\/[^\n\r]*\r?\n)|^(\/\\*[^*]*\\*+([^*\/][^*]*\\*+)*\/)"),
+        7 => array(0, "^(column)|^(linkTable)|^(referencedColumn)|^(inverseColumn)|^([a-zA-Z_][a-zA-Z_0-9]*)|^(\\{)|^(\\})|^([ \t\r\n]+)|^(\"[^[\"\\\\]+\")|^(\/\/[^\n\r]*\r?\n)|^(\/\\*[^*]*\\*+([^*\/][^*]*\\*+)*\/)"),
+        8 => array(0, "^(linkTable)|^(referencedColumn)|^(inverseColumn)|^([a-zA-Z_][a-zA-Z_0-9]*)|^(\\{)|^(\\})|^([ \t\r\n]+)|^(\"[^[\"\\\\]+\")|^(\/\/[^\n\r]*\r?\n)|^(\/\\*[^*]*\\*+([^*\/][^*]*\\*+)*\/)"),
         9 => array(0, "^(referencedColumn)|^(inverseColumn)|^([a-zA-Z_][a-zA-Z_0-9]*)|^(\\{)|^(\\})|^([ \t\r\n]+)|^(\"[^[\"\\\\]+\")|^(\/\/[^\n\r]*\r?\n)|^(\/\\*[^*]*\\*+([^*\/][^*]*\\*+)*\/)"),
         10 => array(0, "^(inverseColumn)|^([a-zA-Z_][a-zA-Z_0-9]*)|^(\\{)|^(\\})|^([ \t\r\n]+)|^(\"[^[\"\\\\]+\")|^(\/\/[^\n\r]*\r?\n)|^(\/\\*[^*]*\\*+([^*\/][^*]*\\*+)*\/)"),
         11 => array(0, "^([a-zA-Z_][a-zA-Z_0-9]*)|^(\\{)|^(\\})|^([ \t\r\n]+)|^(\"[^[\"\\\\]+\")|^(\/\/[^\n\r]*\r?\n)|^(\/\\*[^*]*\\*+([^*\/][^*]*\\*+)*\/)"),
@@ -288,8 +288,8 @@ class MapperLexer
     function yy_r1_9($yy_subpatterns)
     {
 
-    if ($this->_debug) echo "found THROUGH [ {$this->value} ]\n";
-    $this->token = MapperParser::THROUGH;
+    if ($this->_debug) echo "found LINK_TABLE [ {$this->value} ]\n";
+    $this->token = MapperParser::LINK_TABLE;
     }
     function yy_r1_10($yy_subpatterns)
     {

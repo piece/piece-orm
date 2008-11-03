@@ -129,7 +129,7 @@ association(X) ::= ASSOCIATION LCURLY associationStatementList(A) RCURLY. {
         }
         $association = $this->_ast->createElement('association');
         foreach (array_keys((array)A) as $key) {
-            if ($key == 'through') {
+            if ($key == 'linkTable') {
                 $association->appendChild(A[$key]);
                 continue;
             }
@@ -159,21 +159,21 @@ associationStatement(X) ::= property(A). { X['property'] = A; }
 associationStatement(X) ::= column(A). { X['column'] = A; }
 associationStatement(X) ::= referencedColumn(A). { X['referencedColumn'] = A; }
 associationStatement(X) ::= orderBy(A). { X['orderBy'] = trim(A, '"'); }
-associationStatement(X) ::= through(A). { X['through'] = A; }
+associationStatement(X) ::= linkTable(A). { X['linkTable'] = A; }
 
-through(X) ::= THROUGH LCURLY throughStatementList(A) RCURLY. {
+linkTable(X) ::= LINK_TABLE LCURLY linkTableStatementList(A) RCURLY. {
         if (!array_key_exists('table', A)) {
-            throw new Exception("The [ table ] statement was not found in the 'through' statement on line {$this->_mapperLexer->line}. An 'association' statement must contain the 'table' statement.");
+            throw new Exception("The [ table ] statement was not found in the 'linkTable' statement on line {$this->_mapperLexer->line}. An 'association' statement must contain the 'table' statement.");
         }
 
-        $through = $this->_ast->createElement('through');
+        $linkTable = $this->_ast->createElement('linkTable');
         foreach (array_keys(A) as $key) {
-            $through->setAttribute($key, A[$key]);
+            $linkTable->setAttribute($key, A[$key]);
         }
-        X = $through;
+        X = $linkTable;
 }
 
-throughStatementList(X) ::= throughStatementList(A) throughStatement(B). {
+linkTableStatementList(X) ::= linkTableStatementList(A) linkTableStatement(B). {
         if (!is_array(A)) {
             A = array();
         }
@@ -182,16 +182,16 @@ throughStatementList(X) ::= throughStatementList(A) throughStatement(B). {
             X[$key] = B[$key];
         }
 }
-throughStatementList(X) ::= throughStatement(A). {
+linkTableStatementList(X) ::= linkTableStatement(A). {
         foreach (array_keys(A) as $key) {
             X[$key] = A[$key];
         }
 }
 
-throughStatement(X) ::= table(A). { X['table'] = A; }
-throughStatement(X) ::= column(A). { X['column'] = A; }
-throughStatement(X) ::= referencedColumn(A). { X['referencedColumn'] = A; }
-throughStatement(X) ::= inverseColumn(A). { X['inverseColumn'] = A; }
+linkTableStatement(X) ::= table(A). { X['table'] = A; }
+linkTableStatement(X) ::= column(A). { X['column'] = A; }
+linkTableStatement(X) ::= referencedColumn(A). { X['referencedColumn'] = A; }
+linkTableStatement(X) ::= inverseColumn(A). { X['inverseColumn'] = A; }
 
 table(X) ::= TABLE ID(A). { X = A; }
 

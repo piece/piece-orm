@@ -111,7 +111,7 @@ class PgsqlTest extends CompatibilityTests
     /**
      * @since Method available since Release 0.7.0
      */
-    public function testSetCharsetByDSN()
+    public function testSetCharsetByDsn()
     {
         $config = new Config();
         $config->setDSN('CharsetShouldBeAbleToSetByDSN',

@@ -44,6 +44,11 @@ use Piece::ORM::Mapper::Method;
 use Piece::ORM::Exception;
 use Piece::ORM::Mapper::Parser::AST;
 use Piece::ORM::Metadata;
+use Piece::ORM::Mapper::Association;
+use Piece::ORM::Mapper::Association::LinkTable;
+use Piece::ORM::Metadata::MetadataFactory::NoSuchTableException;
+use Piece::ORM::Metadata::MetadataFactory;
+use Piece::ORM::Inflector;
 
 // {{{ Piece::ORM::Mapper::MapperLoader
 
@@ -79,6 +84,9 @@ class MapperLoader
     private $_ast;
     private $_mapper;
     private $_methods = array();
+    private $_mapperID;
+    private $_xpath;
+    private $_metadata;
 
     /**#@-*/
 
@@ -96,9 +104,9 @@ class MapperLoader
      */
     public function __construct($mapperID, $configFile, Metadata $metadata)
     {
-        $this->_mapper = new Mapper($mapperID);
+        $this->_mapperID = $mapperID;
         $this->_configFile = $configFile;
-        $this->_ast = new Ast($metadata);
+        $this->_metadata = $metadata;
     }
 
     // }}}
@@ -108,6 +116,7 @@ class MapperLoader
      */
     public function load()
     {
+        $this->_initializeAST();
         $this->_loadAST();
         $this->_loadSymbols();
         $this->_createMapper();
@@ -122,6 +131,24 @@ class MapperLoader
     public function getMapper()
     {
         return $this->_mapper;
+    }
+
+    // }}}
+    // {{{ generateExpression()
+
+    /**
+     * Gets an appropriate expression for the given field.
+     *
+     * @param string $fieldName
+     * @return string
+     */
+    public function generateExpression($fieldName)
+    {
+        if (!$this->_metadata->isLOB($fieldName)) {
+            return '$' . Inflector::camelize($fieldName, true);
+        } else {
+            return ":$fieldName";
+        }
     }
 
     /**#@-*/
@@ -169,9 +196,7 @@ class MapperLoader
      */
     private function _createMapper()
     {
-        foreach ($this->_methods as $method) {
-            $this->_mapper->addMethod($method);
-        }
+        $this->_mapper = new Mapper($this->_mapperID, $this->_methods);
     }
 
     // }}}
@@ -181,14 +206,396 @@ class MapperLoader
      */
     private function _loadMethods()
     {
-        $xpath = new DOMXPath($this->_ast);
-        $methods = $xpath->query('//method');
-        foreach ($methods as $method) {
-            $name = $method->getAttribute('name');
-            $query = $method->getAttribute('query');
-            $orderBy = $method->getAttribute('orderBy');
-            $this->_methods[$name] = new Method($name, $query, $orderBy);
+        $this->_xpath = new DOMXPath($this->_ast);
+        $methodNodeList = $this->_xpath->query('//method');
+        foreach ($methodNodeList as $methodElement) {
+            $name = $methodElement->getAttribute('name');
+            $this->_methods[$name] = new Method($name);
+
+            $query = $methodElement->getAttribute('query');
+            if (!strlen($query)) {
+                if (QueryType::isFindAll($name)) {
+                    $query = 'SELECT * FROM $__table';
+                } elseif (QueryType::isFindOne($name)) {
+                    throw new Exception("The query for the method [ $name ] is required");
+                } elseif (QueryType::isFind($name)) {
+                    $query = 'SELECT * FROM $__table';
+                } elseif (QueryType::isInsert($name)) {
+                    $query = $this->_generateDefaultInsertQuery();
+                } elseif (QueryType::isUpdate($name)) {
+                    $query = $this->_generateDefaultUpdateQuery();
+                } elseif (QueryType::isDelete($name)) {
+                    $query = $this->_generateDefaultDeleteQuery();
+                }
+            }
+
+            if (strlen($query)) {
+                $this->_methods[$name]->setQuery($query);
+            }
+
+            $orderBy = $methodElement->getAttribute('orderBy');
+            if (strlen($orderBy)) {
+                $this->_methods[$name]->setOrderBy($orderBy);
+            }
+
+            $associations = $this->_createAssociations($name);
+            foreach ($associations as $association) {
+                $this->_methods[$name]->addAssociation($association);
+            }
         }
+    }
+
+    // }}}
+    // {{{ _createAssociations()
+
+    /**
+     * @param string $methodName
+     * @throws Piece::ORM::Exception
+     */
+    private function _createAssociations($methodName)
+    {
+        $associations = array();
+        $associationNodeList =
+            $this->_xpath->query("//method[@name='$methodName']/association");
+        foreach ($associationNodeList as $associationElement) {
+            $table = $associationElement->getAttribute('table');
+            $type = $associationElement->getAttribute('type');
+
+            $association = new Association();
+            $association->setTable($table);
+            $association->setAssociationType($type);
+            $association->setProperty($associationElement->getAttribute('property'));
+
+            $metadata = MetadataFactory::factory($table);
+            if ($type == Association::ASSOCIATIONTYPE_MANYTOMANY
+                || $type == Association::ASSOCIATIONTYPE_ONETOMANY
+                ) {
+                if (!$metadata->getPrimaryKey()) {
+                    throw new Exception('A single primary key field is required in the table [ ' .
+                                        $metadata->getTableName(true) .
+                                        ' ].'
+                                        );
+                }
+            }
+
+            $column = $associationElement->getAttribute('column');
+            if (!strlen($column)) {
+                $primaryKey = $metadata->getPrimaryKey();
+                if (!$primaryKey) {
+                    throw new Exception('A single primary key field is required, if the [ column ] statement in the [ association ] statement omit.');
+                }
+
+                if ($type == Association::ASSOCIATIONTYPE_MANYTOMANY
+                    || $type == Association::ASSOCIATIONTYPE_MANYTOONE
+                    ) {
+                    $column = $primaryKey;
+                } else {
+                    $column = $this->_metadata->getTableName(true) . "_$primaryKey";
+                }
+            }
+
+            if (!$metadata->hasField($column)) {
+                throw new Exception("The field [ $column ] was not found in the table [ " .
+                                    $metadata->getTableName(true) .
+                                    ' ].'
+                                    );
+            }
+
+            $association->setColumn($column);
+
+            $referencedColumn = $associationElement->getAttribute('referencedColumn');
+            if (!strlen($referencedColumn)) {
+                switch ($type) {
+                case Association::ASSOCIATIONTYPE_MANYTOMANY:
+                    $referencedColumn = null;
+                    break;
+                case Association::ASSOCIATIONTYPE_MANYTOONE:
+                    $primaryKey = $metadata->getPrimaryKey();
+                    if (!$primaryKey) {
+                        throw new Exception('A single primary key field is required, if the [ referencedColumn ] statement in the [ association ] statement omit.');
+                    }
+
+                    $referencedColumn = $metadata->getTableName(true) . "_$primaryKey";
+                    break;
+                case Association::ASSOCIATIONTYPE_ONETOMANY:
+                case Association::ASSOCIATIONTYPE_ONETOONE:
+                    $primaryKey = $metadata->getPrimaryKey();
+                    if (!$primaryKey) {
+                        throw new Exception('A single primary key field is required, if the [ referencedColumn ] statement in the [ association ] statement omit.');
+                    }
+
+                    $referencedColumn = $primaryKey;
+                    break;
+                }
+            }
+
+            if ($type != Association::ASSOCIATIONTYPE_MANYTOMANY
+                && !$this->_metadata->hasField($referencedColumn)
+                ) {
+                throw new Exception("The field [ $referencedColumn ] was not found in the table [ " .
+                                    $this->_metadata->getTableName(true) .
+                                    ' ].'
+                                    );
+            }
+
+            $association->setReferencedColumn($referencedColumn);
+
+            $orderBy = $associationElement->getAttribute('orderBy');
+            if (!strlen($orderBy)
+                || $type == Association::ASSOCIATIONTYPE_MANYTOONE
+                || $type == Association::ASSOCIATIONTYPE_ONETOONE
+                ) {
+                $orderBy = null;
+            }
+
+            $association->setOrderBy($orderBy);
+
+            if ($associationElement->getAttribute('type') == Association::ASSOCIATIONTYPE_MANYTOMANY) {
+                $association->setLinkTable($this->_createLinkTable($methodName, $association));
+            }
+
+            $associations[] = $association;
+        }
+
+        return $associations;
+    }
+
+    // }}}
+    // {{{ _createLinkTable()
+
+    /**
+     * @param string                          $methodName
+     * @param Piece::ORM::Mapper::Association $association
+     * @throws Piece::ORM::Exception
+     */
+    private function _createLinkTable($methodName, Association $association)
+    {
+        $table = null;
+        $column = null;
+        $referencedColumn = null;
+        $inverseColumn = null;
+        $associationMetadata = MetadataFactory::factory($association->getTable());
+
+        $linkTableNodeList = $this->_xpath->query("//method[@name='$methodName']/association/linkTable");
+        foreach ($linkTableNodeList as $linkTableElement) {
+            $table = $linkTableElement->getAttribute('table');
+            $column = $linkTableElement->getAttribute('property');
+            $referencedColumn = $linkTableElement->getAttribute('referencedColumn');
+            $inverseColumn = $linkTableElement->getAttribute('inverseColumn');
+        }
+
+        if (!strlen($table)) {
+            $linkTableMetadata = null;
+            $expectedTable1 = $this->_metadata->getTableName(true) . '_' . $association->getTable();
+            $expectedTable2 = $association->getTable() . '_' . $this->_metadata->getTableName(true);
+            foreach (array($expectedTable1, $expectedTable2) as $expectedTable) {
+                try {
+                    $linkTableMetadata = MetadataFactory::factory($expectedTable);
+                } catch (NoSuchTableException $e) {
+                    continue;
+                } catch (Exception $e) {
+                    throw $e;
+                }
+
+                $table = $expectedTable;
+                break;
+            }
+
+            if (is_null($linkTableMetadata)) {
+                throw new Exception("The table [ $expectedTable1 ] or [ $expectedTable2 ] must exists in the database, if the [ table ] statement in the [ linkTable ] statement omit.");
+            }
+        }
+
+        $linkTableMetadata = MetadataFactory::factory($table);
+        $linkTable = new LinkTable();
+        $linkTable->setTable($table);
+
+        if (!strlen($column)) {
+            $primaryKey = $this->_metadata->getPrimaryKey();
+            if (!$primaryKey) {
+                throw new Exception('A single primary key field is required, if the [ column ] statement in the [ linkTable ] statement omit.');
+            }
+
+            $column = $this->_metadata->getTableName(true) . "_$primaryKey";
+        } 
+
+        if (!$linkTableMetadata->hasField($column)) {
+            throw new Exception("The field [ $column ] was not found in the table [ " .
+                                $linkTableMetadata->getTableName(true) .
+                                ' ].'
+                                );
+        }
+
+        $linkTable->setColumn($column);
+
+        if (!strlen($referencedColumn)) {
+            $primaryKey = $this->_metadata->getPrimaryKey();
+            if (!$primaryKey) {
+                throw new Exception('A single primary key field is required, if the [ referencedColumn ] statement in the [ linkTable ] statement omit.');
+            }
+
+            $referencedColumn = $primaryKey;
+        } 
+
+        if (!$this->_metadata->hasField($referencedColumn)) {
+            throw new Exception("The field [ $referencedColumn ] was not found in the table [ " .
+                                $this->_metadata->getTableName(true) .
+                                ' ].'
+                                );
+        }
+
+        $linkTable->setReferencedColumn($referencedColumn);
+
+        if (!strlen($inverseColumn)) {
+            $primaryKey = $associationMetadata->getPrimaryKey();
+            if (!$primaryKey) {
+                throw new Exception('A single primary key field is required, if the [ column ] statement in the [ linkTable ] statement omit.');
+            }
+
+            $inverseColumn = $associationMetadata->getTableName(true) . "_$primaryKey";
+        } 
+
+        if (!$linkTableMetadata->hasField($inverseColumn)) {
+            throw new Exception("The field [ $inverseColumn ] was not found in the table [ " .
+                                $linkTableMetadata->getTableName(true) .
+                                ' ].'
+                                );
+        }
+
+        $linkTable->setInverseColumn($inverseColumn);
+
+        return $linkTable;
+    }
+
+    // }}}
+    // {{{ _generateDefaultInsertQuery()
+
+    /**
+     * Generates the default INSERT query.
+     *
+     * @return string
+     */
+    private function _generateDefaultInsertQuery()
+    {
+        $fields = array();
+        foreach ($this->_metadata->getFieldNames() as $fieldName) {
+            if (!$this->_metadata->hasDefault($fieldName)
+                && !$this->_metadata->isAutoIncrement($fieldName)
+                ) {
+                $fields[] = $fieldName;
+            }
+        }
+
+        if (!count($fields)) {
+            return;
+        }
+
+        return 'INSERT INTO $__table (' .
+            implode(", ", $fields) .
+            ') VALUES (' .
+            implode(', ', array_map(array($this, 'generateExpression'), $fields)) .
+            ')';
+    }
+
+    // }}}
+    // {{{ _generateDefaultUpdateQuery()
+
+    /**
+     * Generates the default UPDATE query.
+     *
+     * @return string
+     */
+    private function _generateDefaultUpdateQuery()
+    {
+        if (!$this->_metadata->hasPrimaryKey()) {
+            return;
+        }
+
+        $primaryKeys = $this->_metadata->getPrimaryKeys();
+        $fieldName = array_shift($primaryKeys);
+        $whereClause = "$fieldName = \$" . Inflector::camelize($fieldName, true);
+        foreach ($primaryKeys as $partOfPrimeryKey) {
+            $whereClause .= " AND $partOfPrimeryKey = \$" .
+                Inflector::camelize($partOfPrimeryKey, true);
+        }
+
+        if ($this->_metadata->getDatatype('lock_version') == 'integer') {
+            $whereClause .=
+                " AND lock_version = " . $this->generateExpression('lock_version');
+        }
+
+        $fields = array();
+        foreach ($this->_metadata->getFieldNames() as $fieldName) {
+            if (!$this->_metadata->isAutoIncrement($fieldName)
+                && !$this->_metadata->isPartOfPrimaryKey($fieldName)
+                ) {
+                if (!($fieldName == 'lock_version'
+                      && $this->_metadata->getDatatype('lock_version') == 'integer')
+                    ) {
+                    $fields[] =
+                        "$fieldName = " . $this->generateExpression($fieldName);
+                } else {
+                    $fields[] = "$fieldName = $fieldName + 1";
+                }
+            }
+        }
+
+        return 'UPDATE $__table SET ' .
+            implode(', ', $fields) .
+            " WHERE $whereClause";
+    }
+
+    // }}}
+    // {{{ _generateDefaultDeleteQuery()
+
+    /**
+     * Generates the default DELETE query.
+     *
+     * @return string
+     */
+    private function _generateDefaultDeleteQuery()
+    {
+        if (!$this->_metadata->hasPrimaryKey()) {
+            return;
+        }
+
+        $primaryKeys = $this->_metadata->getPrimaryKeys();
+        $fieldName = array_shift($primaryKeys);
+        $whereClause = "$fieldName = \$" . Inflector::camelize($fieldName, true);
+        foreach ($primaryKeys as $partOfPrimeryKey) {
+            $whereClause .= " AND $partOfPrimeryKey = \$" .
+                Inflector::camelize($partOfPrimeryKey, true);
+        }
+
+        return "DELETE FROM \$__table WHERE $whereClause";
+    }
+
+    // }}}
+    // {{{ _initializeAST()
+
+    /**
+     */
+    private function _initializeAST()
+    {
+        $this->_ast = new Ast();
+
+        foreach ($this->_metadata->getFieldNames() as $fieldName) {
+            $datatype = $this->_metadata->getDatatype($fieldName);
+            if ($datatype == 'integer' || $datatype == 'text') {
+                $camelizedFieldName = Inflector::camelize($fieldName);
+                foreach (array('findBy', 'findAllBy') as $methodNamePrefix) {
+                    $this->_ast->addMethod("$methodNamePrefix$camelizedFieldName",
+                                           "SELECT * FROM \$__table WHERE $fieldName = \$" .
+                                           Inflector::lowerCaseFirstLetter($camelizedFieldName)
+                                           );
+                }
+            }
+        }
+
+        $this->_ast->addMethod('findAll', 'SELECT * FROM $__table');
+        $this->_ast->addMethod('insert');
+        $this->_ast->addMethod('update');
+        $this->_ast->addMethod('delete');
     }
 
     /**#@-*/

@@ -35,76 +35,60 @@
  * @since      File available since Release 2.0.0dev1
  */
 
-namespace Piece::ORM::Mapper::Parser;
+namespace Piece::ORM::Mapper::ObjectPersister::AssociationPersisterStrategy;
 
-// {{{ Piece::ORM::Mapper::Parser::AST
+use Piece::ORM::Mapper::Association;
+
+// {{{ Piece::ORM::Mapper::ObjectPersister::AssociationPersisterStrategy::AssociationPersisterStrategyInterface
 
 /**
+ * The interface for associated object persisters.
+ *
  * @package    Piece_ORM
  * @copyright  2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License (revised)
  * @version    Release: @package_version@
  * @since      Class available since Release 2.0.0dev1
  */
-class AST extends DOMDocument
+interface AssociationPersisterStrategyInterface
 {
-
-    // {{{ properties
-
-    /**#@+
-     * @access public
-     */
-
-    /**#@-*/
-
-    /**#@+
-     * @access protected
-     */
-
-    /**#@-*/
-
-    /**#@+
-     * @access private
-     */
-
-    /**#@-*/
 
     /**#@+
      * @access public
      */
 
     // }}}
-    // {{{ addMethod()
+    // {{{ insert()
 
     /**
-     * @param string $name
-     * @param string $query
-     * @param string $orderBy
-     * @param array  $associations
+     * Inserts associated objects to a table.
+     *
+     * @param Piece::ORM::Mapper::Association $association
+     * @param mixed                           $subject
      */
-    public function addMethod($name, $query = null, $orderBy = null, $associations = null)
-    {
-        $xpath = new DOMXPath($this);
-        $methodNodeList = $xpath->query("//method[@name='$name']");
-        if (!$methodNodeList->length) {
-            $methodElement = $this->appendChild(new DOMElement('method'));
-            $methodElement->setAttribute('name', $name);
-        } else {
-            $methodElement = $methodNodeList->item(0);
-        }
+    public function insert(Association $association, $subject);
 
-        if (!is_null($query)) {
-            $methodElement->setAttribute('query', $query);
-        }
+    // }}}
+    // {{{ update()
 
-        $methodElement->setAttribute('orderBy', $orderBy);
+    /**
+     * Updates associated objects in a table.
+     *
+     * @param Piece::ORM::Mapper::Association $association
+     * @param mixed                           $subject
+     */
+    public function update(Association $association, $subject);
 
-        if (!is_null($associations)) {
-            foreach ($associations as $associationElement) {
-                $methodElement->appendChild($associationElement);
-            }
-        }
-    }
+    // }}}
+    // {{{ delete()
+
+    /**
+     * Removes associated objects from a table.
+     *
+     * @param Piece::ORM::Mapper::Association $association
+     * @param mixed                           $subject
+     */
+    public function delete(Association $association, $subject);
 
     /**#@-*/
 

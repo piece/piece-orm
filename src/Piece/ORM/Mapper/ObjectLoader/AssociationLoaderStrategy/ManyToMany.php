@@ -38,13 +38,14 @@
 namespace Piece::ORM::Mapper::ObjectLoader::AssociationLoaderStrategy;
 
 use Piece::ORM::Mapper::ObjectLoader::AssociationLoaderStrategy::AbstractAssociationLoaderStrategy;
-use Piece::ORM::Mapper::AbstractMapper;
+use Piece::ORM::Mapper;
+use Piece::ORM::Mapper::Association;
 use Piece::ORM::Inflector;
 
-// {{{ Piece::ORM::Mapper::ObjectLoader::AssociationLoaderStrategy::ManyToMany
+// {{{ Piece::ORM::Mapper::ObjectLoader::AbstractAssociationLoaderStrategy::ManyToMany
 
 /**
- * An associated object loader for Many-to-Many associations.
+ * An associated object loader for Many-to-Many relationships.
  *
  * @package    Piece_ORM
  * @copyright  2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
@@ -67,7 +68,8 @@ class ManyToMany extends AbstractAssociationLoaderStrategy
      * @access protected
      */
 
-    protected $defaultValueOfMappedAs = array();
+    protected $defaultValueOfProperty = array();
+    protected $associations = array();
 
     /**#@-*/
 
@@ -75,8 +77,7 @@ class ManyToMany extends AbstractAssociationLoaderStrategy
      * @access private
      */
 
-    private $_associations = array();
-    private $_loadedRows = array();
+    private $loadedRows = array();
 
     /**#@-*/
 
@@ -91,22 +92,22 @@ class ManyToMany extends AbstractAssociationLoaderStrategy
      * Adds an association about what an inverse side record is associated with
      * an owning side record.
      *
-     * @param array                              $row
-     * @param Piece::ORM::Mapper::AbstractMapper $mapper
-     * @param string                             $mappedAs
+     * @param array              &$row
+     * @param Piece::ORM::Mapper $mapper
+     * @param integer            $associationIndex
      * @return boolean
      */
-    public function addAssociation(array $row, AbstractMapper $mapper, $mappedAs)
+    public function addAssociation(&$row, Mapper $mapper, $associationIndex)
     {
         $metadata = $mapper->getMetadata();
         $primaryKey = $metadata->getPrimaryKey();
-        $this->_associations[$mappedAs][ $row[$primaryKey] ][] = $row[ $this->getAssociationKeyFieldNameInSecondaryQuery($this->associations[$mappedAs]) ];
+        $this->_associations[$associationIndex][ $row[$primaryKey] ][] = $row[ $this->_getAssociationKeyFieldInSecondaryQuery($this->associations[$associationIndex]) ];
 
-        if (@array_key_exists($row[$primaryKey], $this->_loadedRows[$mappedAs])) {
+        if (@array_key_exists($row[$primaryKey], $this->_loadedRows[$associationIndex])) {
             return false;
         } else {
-            @$this->_loadedRows[$mappedAs][ $row[$primaryKey] ] = true;
-            unset($row[ $this->getAssociationKeyFieldNameInSecondaryQuery($this->associations[$mappedAs]) ]);
+            @$this->_loadedRows[$associationIndex][ $row[$primaryKey] ] = true;
+            unset($row[ $this->_getAssociationKeyFieldInSecondaryQuery($this->associations[$associationIndex]) ]);
             return true;
         }
     }
@@ -117,92 +118,113 @@ class ManyToMany extends AbstractAssociationLoaderStrategy
      * @access protected
      */
 
-    /**#@-*/
-
-    /**#@+
-     * @access private
-     */
-
     // }}}
-    // {{{ buildQuery()
+    // {{{ _buildQuery()
 
     /**
      * Builds a query to get associated objects.
      *
-     * @param string $mappedAs
+     * @param integer $associationIndex
      * @return string
      */
-    protected function buildQuery($mappedAs)
+    protected function _buildQuery($associationIndex)
     {
-        return "SELECT {$this->associations[$mappedAs]['through']['table']}.{$this->associations[$mappedAs]['through']['column']} AS " . $this->getAssociationKeyFieldNameInSecondaryQuery($this->associations[$mappedAs]) . ", {$this->associations[$mappedAs]['table']}.* FROM {$this->associations[$mappedAs]['table']}, {$this->associations[$mappedAs]['through']['table']} WHERE {$this->associations[$mappedAs]['through']['table']}.{$this->associations[$mappedAs]['through']['column']} IN (" . implode(',', $this->associationKeys[$mappedAs]) . ") AND {$this->associations[$mappedAs]['table']}.{$this->associations[$mappedAs]['column']} = {$this->associations[$mappedAs]['through']['table']}.{$this->associations[$mappedAs]['through']['inverseColumn']}";
+        $association = $this->associations[$associationIndex];
+        $linkTable = $association->getLinkTable();
+        return 'SELECT ' .
+            $linkTable->getTable() .
+            '.' .
+            $linkTable->getColumn() .
+            ' AS ' .
+            $this->_getAssociationKeyFieldInSecondaryQuery($association) .
+            ', ' .
+            $association->getTable() .
+            '.* FROM ' .
+            $association->getTable() .
+            ', ' .
+            $linkTable->getTable() .
+            ' WHERE ' .
+            $linkTable->getTable() .
+            '.' .
+            $linkTable->getColumn() .
+            ' IN (' .
+            implode(',', $this->associationKeys[$associationIndex]) .
+            ') AND ' .
+            $association->getTable() .
+            '.' .
+            $association->getColumn() .
+            ' = ' .
+            $linkTable->getTable() .
+            '.' .
+            $linkTable->getInverseColumn();
     }
 
     // }}}
-    // {{{ getAssociationKeyFieldNameInPrimaryQuery()
+    // {{{ _getAssociationKeyFieldInPrimaryQuery()
 
     /**
      * Gets the name of the association key field in the primary query.
      *
-     * @param array $association
-     * @return string
+     * @param Piece::ORM::Mapper::Association $association
      */
-    protected function getAssociationKeyFieldNameInPrimaryQuery(array $association)
+    protected function _getAssociationKeyFieldInPrimaryQuery(Association $association)
     {
-        return $association['through']['referencedColumn'];
+        return $association->getLinkTable()->getReferencedColumn();
     }
 
     // }}}
-    // {{{ getAssociationKeyFieldNameInSecondaryQuery()
+    // {{{ _getAssociationKeyFieldInSecondaryQuery()
 
     /**
      * Gets the name of the association key field in the secondary query.
      *
-     * @param array $association
-     * @return string
+     * @param Piece::ORM::Mapper::Association $association
      */
-    protected function getAssociationKeyFieldNameInSecondaryQuery(array $association)
+    protected function _getAssociationKeyFieldInSecondaryQuery(Association $association)
     {
-        return "__association_key_field";
+        return '__relationship_key_field';
     }
 
     // }}}
-    // {{{ associateObject()
+    // {{{ _associateObject()
 
     /**
      * Associates an object which are loaded by the secondary query into objects which
      * are loaded by the primary query.
      *
-     * @param stdClass                           $associatedObject
-     * @param Piece::ORM::Mapper::AbstractMapper $mapper
-     * @param string                             $associationKeyPropertyName
-     * @param string                             $mappedAs
+     * @param stdClass           $associatedObject
+     * @param Piece::ORM::Mapper $mapper
+     * @param string             $associationKeyProperty
+     * @param integer            $associationIndex
      */
-    protected function associateObject($associatedObject,
-                                       AbstractMapper $mapper,
-                                       $associationKeyPropertyName,
-                                       $mappedAs
-                                       )
+    protected function _associateObject($associatedObject, Mapper $mapper, $associationKeyProperty, $associationIndex)
     {
         $metadata = $mapper->getMetadata();
         $primaryKey = Inflector::camelize($metadata->getPrimaryKey(), true);
 
-        for ($j = 0, $count = count($this->_associations[$mappedAs][ $associatedObject->$primaryKey ]); $j < $count; ++$j) {
-            $this->objects[ $this->objectIndexes[$mappedAs][ $this->_associations[$mappedAs][ $associatedObject->$primaryKey ][$j] ] ]->{$mappedAs}[] = $associatedObject;
+        for ($j = 0, $count = count($this->_associations[$associationIndex][ $associatedObject->$primaryKey ]); $j < $count; ++$j) {
+            $this->objects[ $this->objectIndexes[$associationIndex][ $this->_associations[$associationIndex][ $associatedObject->$primaryKey ][$j] ] ]->{ $this->associations[$associationIndex]->getProperty() }[] = $associatedObject;
         }
     }
 
     // }}}
-    // {{{ getPreloadCallback()
+    // {{{ _getPreloadCallback()
 
     /**
      * Gets the preload callback for a loader.
      *
      * @return callback
      */
-    protected function getPreloadCallback()
+    protected function _getPreloadCallback()
     {
         return array($this, 'addAssociation');
     }
+
+    /**#@-*/
+
+    /**#@+
+     * @access private
+     */
 
     /**#@-*/
 

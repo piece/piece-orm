@@ -57,7 +57,7 @@ class MapperLexer
 
     private $_input;
     private $_counter;
-    private $_debug = true;
+    private $_debug = false;
     private $_string;
 
     function __construct($input)
@@ -90,7 +90,7 @@ TABLE = "table"
 ASSOCIATION_TYPE = "type"
 PROPERTY = "property"
 COLUMN = "column"
-THROUGH = "through"
+LINK_TABLE = "linkTable"
 REFERENCED_COLUMN = "referencedColumn"
 INVERSE_COLUMN = "inverseColumn"
 SL_COMMENT = !//[^\n\r]*\r?\n!
@@ -139,9 +139,9 @@ COLUMN {
     $this->token = MapperParser::COLUMN;
 }
 
-THROUGH {
-    if ($this->_debug) echo "found THROUGH [ {$this->value} ]\n";
-    $this->token = MapperParser::THROUGH;
+LINK_TABLE {
+    if ($this->_debug) echo "found LINK_TABLE [ {$this->value} ]\n";
+    $this->token = MapperParser::LINK_TABLE;
 }
 
 REFERENCED_COLUMN {

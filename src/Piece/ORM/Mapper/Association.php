@@ -37,6 +37,9 @@
 
 namespace Piece::ORM::Mapper;
 
+use Piece::ORM::Exception;
+use Piece::ORM::Mapper::Association::LinkTable;
+
 // {{{ Piece::ORM::Mapper::Association
 
 /**
@@ -49,6 +52,14 @@ namespace Piece::ORM::Mapper;
 class Association
 {
 
+    // {{{ constants
+
+    const ASSOCIATIONTYPE_MANYTOMANY = 'manyToMany';
+    const ASSOCIATIONTYPE_ONETOMANY = 'oneToMany';
+    const ASSOCIATIONTYPE_MANYTOONE = 'manyToOne';
+    const ASSOCIATIONTYPE_ONETOONE = 'oneToOne';
+
+    // }}}
     // {{{ properties
 
     /**#@+
@@ -67,6 +78,19 @@ class Association
      * @access private
      */
 
+    private static $_associationTypes = array(self::ASSOCIATIONTYPE_MANYTOMANY,
+                                              self::ASSOCIATIONTYPE_ONETOMANY,
+                                              self::ASSOCIATIONTYPE_MANYTOONE,
+                                              self::ASSOCIATIONTYPE_ONETOONE
+                                              );
+    private $_table;
+    private $_associationType;
+    private $_property;
+    private $_column;
+    private $_referencedColumn;
+    private $_orderBy;
+    private $_linkTable;
+
     /**#@-*/
 
     /**#@+
@@ -74,12 +98,178 @@ class Association
      */
 
     // }}}
-    // {{{ __construct()
+    // {{{ setTable()
 
     /**
+     * @param string $table
      */
-    public function __construct()
+    public function setTable($table)
     {
+        $this->_table = $table;
+    }
+
+    // }}}
+    // {{{ setAssociationType()
+
+    /**
+     * @param integer $associationType
+     * @throw Piece::ORM::Exception
+     */
+    public function setAssociationType($associationType)
+    {
+        if (!in_array($associationType, self::$_associationTypes)) {
+            throw new Exception('An association type must be one of ' .
+                                implode(', ', self::$_associationTypes) .
+                                ". [ $associationType ] is given."
+                                );
+        }
+
+        $this->_associationType = $associationType;
+    }
+
+    // }}}
+    // {{{ setProperty()
+
+    /**
+     * @param string $property
+     */
+    public function setProperty($property)
+    {
+        $this->_property = $property;
+    }
+
+    // }}}
+    // {{{ setColumn()
+
+    /**
+     * @param string $column
+     */
+    public function setColumn($column)
+    {
+        $this->_column = $column;
+    }
+
+    // }}}
+    // {{{ setReferencedColumn()
+
+    /**
+     * @param string $referencedColumn
+     */
+    public function setReferencedColumn($referencedColumn)
+    {
+        $this->_referencedColumn = $referencedColumn;
+    }
+
+    // }}}
+    // {{{ setOrderBy()
+
+    /**
+     * @param string $orderBy
+     */
+    public function setOrderBy($orderBy)
+    {
+        $this->_orderBy = $orderBy;
+    }
+
+    // }}}
+    // {{{ setLinkTable()
+
+    /**
+     * @param Piece::ORM::Mapper::Association::LinkTable $linkTable
+     */
+    public function setLinkTable(LinkTable $linkTable)
+    {
+        $this->_linkTable = $linkTable;
+    }
+
+    // }}}
+    // {{{ getAssociationTypes()
+
+    /**
+     * Gets the association types.
+     *
+     * @return array
+     */
+    public static function getAssociationTypes()
+    {
+        return self::$_associationTypes;
+    }
+
+    // }}}
+    // {{{ getTable()
+
+    /**
+     * @return string
+     */
+    public function getTable()
+    {
+        return $this->_table;
+    }
+
+    // }}}
+    // {{{ getAssociationType()
+
+    /**
+     * @return integer
+     */
+    public function getAssociationType()
+    {
+        return $this->_associationType;
+    }
+
+    // }}}
+    // {{{ getProperty()
+
+    /**
+     * @return string
+     */
+    public function getProperty()
+    {
+        return $this->_property;
+    }
+
+    // }}}
+    // {{{ getColumn()
+
+    /**
+     * @return string
+     */
+    public function getColumn()
+    {
+        return $this->_column;
+    }
+
+    // }}}
+    // {{{ getReferencedColumn()
+
+    /**
+     * @return string
+     */
+    public function getReferencedColumn()
+    {
+        return $this->_referencedColumn;
+    }
+
+    // }}}
+    // {{{ getOrderBy()
+
+    /**
+     * @return string
+     */
+    public function getOrderBy()
+    {
+        return $this->_orderBy;
+    }
+
+    // }}}
+    // {{{ getLinkTable()
+
+    /**
+     * @return Piece::ORM::Mapper::Association::LinkTable
+     */
+    public function getLinkTable()
+    {
+        return $this->_linkTable;
     }
 
     /**#@-*/

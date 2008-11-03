@@ -18,8 +18,8 @@ State 1:
           associationStatement ::= * column
           associationStatement ::= * referencedColumn
           associationStatement ::= * orderBy
-          associationStatement ::= * through
-          through ::= * THROUGH LCURLY throughStatementList RCURLY
+          associationStatement ::= * linkTable
+          linkTable ::= * LINK_TABLE LCURLY linkTableStatementList RCURLY
           table ::= * TABLE ID
           associationType ::= * ASSOCIATION_TYPE ID
           property ::= * PROPERTY ID
@@ -27,7 +27,7 @@ State 1:
           referencedColumn ::= * REFERENCED_COLUMN ID
 
                       ORDER_BY shift  8
-                       THROUGH shift  18
+                    LINK_TABLE shift  18
                          TABLE shift  19
               ASSOCIATION_TYPE shift  13
                       PROPERTY shift  17
@@ -41,7 +41,7 @@ State 1:
                       property shift  47
                         column shift  44
               referencedColumn shift  33
-                       through shift  46
+                     linkTable shift  46
 
 State 2:
           orderBy ::= * ORDER_BY STRING
@@ -53,8 +53,8 @@ State 2:
           associationStatement ::= * column
           associationStatement ::= * referencedColumn
           associationStatement ::= * orderBy
-          associationStatement ::= * through
-          through ::= * THROUGH LCURLY throughStatementList RCURLY
+          associationStatement ::= * linkTable
+          linkTable ::= * LINK_TABLE LCURLY linkTableStatementList RCURLY
           table ::= * TABLE ID
           associationType ::= * ASSOCIATION_TYPE ID
           property ::= * PROPERTY ID
@@ -63,7 +63,7 @@ State 2:
 
                         RCURLY shift  43
                       ORDER_BY shift  8
-                       THROUGH shift  18
+                    LINK_TABLE shift  18
                          TABLE shift  19
               ASSOCIATION_TYPE shift  13
                       PROPERTY shift  17
@@ -76,16 +76,16 @@ State 2:
                       property shift  47
                         column shift  44
               referencedColumn shift  33
-                       through shift  46
+                     linkTable shift  46
 
 State 3:
-          through ::= THROUGH LCURLY * throughStatementList RCURLY
-          throughStatementList ::= * throughStatementList throughStatement
-          throughStatementList ::= * throughStatement
-          throughStatement ::= * table
-          throughStatement ::= * column
-          throughStatement ::= * referencedColumn
-          throughStatement ::= * inverseColumn
+          linkTable ::= LINK_TABLE LCURLY * linkTableStatementList RCURLY
+          linkTableStatementList ::= * linkTableStatementList linkTableStatement
+          linkTableStatementList ::= * linkTableStatement
+          linkTableStatement ::= * table
+          linkTableStatement ::= * column
+          linkTableStatement ::= * referencedColumn
+          linkTableStatement ::= * inverseColumn
           table ::= * TABLE ID
           column ::= * COLUMN ID
           referencedColumn ::= * REFERENCED_COLUMN ID
@@ -98,17 +98,17 @@ State 3:
                          table shift  22
                         column shift  21
               referencedColumn shift  23
-          throughStatementList shift  4
-              throughStatement shift  28
+        linkTableStatementList shift  4
+            linkTableStatement shift  28
                  inverseColumn shift  20
 
 State 4:
-          through ::= THROUGH LCURLY throughStatementList * RCURLY
-          throughStatementList ::= throughStatementList * throughStatement
-          throughStatement ::= * table
-          throughStatement ::= * column
-          throughStatement ::= * referencedColumn
-          throughStatement ::= * inverseColumn
+          linkTable ::= LINK_TABLE LCURLY linkTableStatementList * RCURLY
+          linkTableStatementList ::= linkTableStatementList * linkTableStatement
+          linkTableStatement ::= * table
+          linkTableStatement ::= * column
+          linkTableStatement ::= * referencedColumn
+          linkTableStatement ::= * inverseColumn
           table ::= * TABLE ID
           column ::= * COLUMN ID
           referencedColumn ::= * REFERENCED_COLUMN ID
@@ -122,7 +122,7 @@ State 4:
                          table shift  22
                         column shift  21
               referencedColumn shift  23
-              throughStatement shift  31
+            linkTableStatement shift  31
                  inverseColumn shift  20
 
 State 5:
@@ -214,7 +214,7 @@ State 17:
                             ID shift  26
 
 State 18:
-          through ::= THROUGH * LCURLY throughStatementList RCURLY
+          linkTable ::= LINK_TABLE * LCURLY linkTableStatementList RCURLY
 
                         LCURLY shift  3
 
@@ -224,22 +224,22 @@ State 19:
                             ID shift  32
 
 State 20:
-     (28) throughStatement ::= inverseColumn *
+     (28) linkTableStatement ::= inverseColumn *
 
                      {default} reduce 28
 
 State 21:
-     (26) throughStatement ::= column *
+     (26) linkTableStatement ::= column *
 
                      {default} reduce 26
 
 State 22:
-     (25) throughStatement ::= table *
+     (25) linkTableStatement ::= table *
 
                      {default} reduce 25
 
 State 23:
-     (27) throughStatement ::= referencedColumn *
+     (27) linkTableStatement ::= referencedColumn *
 
                      {default} reduce 27
 
@@ -264,7 +264,7 @@ State 27:
                      {default} reduce 14
 
 State 28:
-     (24) throughStatementList ::= throughStatement *
+     (24) linkTableStatementList ::= linkTableStatement *
 
                      {default} reduce 24
 
@@ -279,7 +279,7 @@ State 30:
                      {default} reduce 32
 
 State 31:
-     (23) throughStatementList ::= throughStatementList throughStatement *
+     (23) linkTableStatementList ::= linkTableStatementList linkTableStatement *
 
                      {default} reduce 23
 
@@ -354,7 +354,7 @@ State 45:
                      {default} reduce 20
 
 State 46:
-     (21) associationStatement ::= through *
+     (21) associationStatement ::= linkTable *
 
                      {default} reduce 21
 
@@ -379,7 +379,7 @@ State 50:
                      {default} reduce 15
 
 State 51:
-     (22) through ::= THROUGH LCURLY throughStatementList RCURLY *
+     (22) linkTable ::= LINK_TABLE LCURLY linkTableStatementList RCURLY *
 
                      {default} reduce 22
 

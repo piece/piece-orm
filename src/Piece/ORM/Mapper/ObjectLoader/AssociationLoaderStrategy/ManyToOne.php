@@ -38,12 +38,13 @@
 namespace Piece::ORM::Mapper::ObjectLoader::AssociationLoaderStrategy;
 
 use Piece::ORM::Mapper::ObjectLoader::AssociationLoaderStrategy::AbstractAssociationLoaderStrategy;
-use Piece::ORM::Mapper::AbstractMapper;
+use Piece::ORM::Mapper::Association;
+use Piece::ORM::Mapper;
 
-// {{{ Piece::ORM::Mapper::ObjectLoader::AssociationLoaderStrategy::ManyToOne
+// {{{ Piece::ORM::Mapper::ObjectLoader::AbstractAssociationLoaderStrategy::ManyToOne
 
 /**
- * An associated object loader for Many-to-One associations.
+ * An associated object loader for Many-to-One relationships.
  *
  * @package    Piece_ORM
  * @copyright  2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
@@ -66,7 +67,7 @@ class ManyToOne extends AbstractAssociationLoaderStrategy
      * @access protected
      */
 
-    protected $useMultipleIndexes = true;
+    protected $ueMultipleIndexes = true;
 
     /**#@-*/
 
@@ -80,74 +81,72 @@ class ManyToOne extends AbstractAssociationLoaderStrategy
      * @access public
      */
 
-    /**#@-*/
-
     /**#@+
      * @access protected
      */
 
     // }}}
-    // {{{ buildQuery()
+    // {{{ _buildQuery()
 
     /**
      * Builds a query to get associated objects.
      *
-     * @param string $mappedAs
+     * @param integer $associationIndex
      * @return string
      */
-    protected function buildQuery($mappedAs)
+    protected function _buildQuery($associationIndex)
     {
-        return "SELECT * FROM {$this->associations[$mappedAs]['table']} WHERE {$this->associations[$mappedAs]['column']} IN (" . implode(',', $this->associationKeys[$mappedAs]) . ')';
+        return 'SELECT * FROM ' .
+            $this->associations[$associationIndex]->getTable() .
+            ' WHERE ' .
+            $this->associations[$associationIndex]->getColumn() .
+            ' IN (' .
+            implode(',', $this->associationKeys[$associationIndex]) .
+            ')';
     }
 
     // }}}
-    // {{{ getAssociationKeyFieldNameInPrimaryQuery()
+    // {{{ _getAssociationKeyFieldInPrimaryQuery()
 
     /**
      * Gets the name of the association key field in the primary query.
      *
-     * @param array $association
-     * @return string
+     * @param Piece::ORM::Mapper::Association $association
      */
-    protected function getAssociationKeyFieldNameInPrimaryQuery(array $association)
+    protected function _getAssociationKeyFieldInPrimaryQuery(Association $association)
     {
-        return $association['referencedColumn'];
+        return $association->getReferencedColumn();
     }
 
     // }}}
-    // {{{ getAssociationKeyFieldNameInSecondaryQuery()
+    // {{{ _getAssociationKeyFieldInSecondaryQuery()
 
     /**
      * Gets the name of the association key field in the secondary query.
      *
-     * @param array $association
-     * @return string
+     * @param Piece::ORM::Mapper::Association $association
      */
-    protected function getAssociationKeyFieldNameInSecondaryQuery(array $association)
+    protected function _getAssociationKeyFieldInSecondaryQuery(Association $association)
     {
-        return $association['column'];
+        return $association->getColumn();
     }
 
     // }}}
-    // {{{ associateObject()
+    // {{{ _associateObject()
 
     /**
      * Associates an object which are loaded by the secondary query into objects which
      * are loaded by the primary query.
      *
-     * @param stdClass                           $associatedObject
-     * @param Piece::ORM::Mapper::AbstractMapper $mapper
-     * @param string                             $associationKeyPropertyName
-     * @param string                             $mappedAs
+     * @param stdClass           $associatedObject
+     * @param Piece::ORM::Mapper $mapper
+     * @param string             $associationKeyProperty
+     * @param integer            $associationIndex
      */
-    protected function associateObject($associatedObject,
-                                       AbstractMapper $mapper,
-                                       $associationKeyPropertyName,
-                                       $mappedAs
-                                       )
+    protected function _associateObject($associatedObject, Mapper $mapper, $associationKeyProperty, $associationIndex)
     {
-        for ($i = 0, $count = count($this->objectIndexes[$mappedAs][ $associatedObject->$associationKeyPropertyName ]); $i < $count; ++$i) {
-            $this->objects[ $this->objectIndexes[$mappedAs][ $associatedObject->$associationKeyPropertyName ][$i] ]->$mappedAs = $associatedObject;
+        for ($i = 0, $count = count($this->objectIndexes[$associationIndex][ $associatedObject->$associationKeyProperty ]); $i < $count; ++$i) {
+            $this->objects[ $this->objectIndexes[$associationIndex][ $associatedObject->$associationKeyProperty ][$i] ]->{ $this->associations[$associationIndex]->getProperty() } = $associatedObject;
         }
     }
 

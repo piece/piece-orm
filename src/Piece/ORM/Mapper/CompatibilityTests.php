@@ -160,26 +160,26 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
     {
         $mapper = MapperFactory::factory('Employees');
 
-        $this->assertTrue(method_exists($mapper, 'findById'));
-        $this->assertTrue(method_exists($mapper, 'findByFirstName'));
-        $this->assertTrue(method_exists($mapper, 'findByLastName'));
-        $this->assertTrue(method_exists($mapper, 'findByNote'));
-        $this->assertTrue(method_exists($mapper, 'findByDepartmentsId'));
-        $this->assertTrue(method_exists($mapper, 'findByLockVersion'));
-        $this->assertFalse(method_exists($mapper, 'findByCreatedAt'));
-        $this->assertFalse(method_exists($mapper, 'findByUpdatedAt'));
-        $this->assertTrue(method_exists($mapper, 'findAll'));
-        $this->assertTrue(method_exists($mapper, 'findAllById'));
-        $this->assertTrue(method_exists($mapper, 'findAllByFirstName'));
-        $this->assertTrue(method_exists($mapper, 'findAllByLastName'));
-        $this->assertTrue(method_exists($mapper, 'findAllByNote'));
-        $this->assertTrue(method_exists($mapper, 'findAllByDepartmentsId'));
-        $this->assertTrue(method_exists($mapper, 'findAllByLockVersion'));
-        $this->assertFalse(method_exists($mapper, 'findAllByCreatedAt'));
-        $this->assertFalse(method_exists($mapper, 'findAllByUpdatedAt'));
-        $this->assertTrue(method_exists($mapper, 'insert'));
-        $this->assertTrue(method_exists($mapper, 'delete'));
-        $this->assertTrue(method_exists($mapper, 'update'));
+        $this->assertTrue($mapper->hasMethod('findById'));
+        $this->assertTrue($mapper->hasMethod('findByFirstName'));
+        $this->assertTrue($mapper->hasMethod('findByLastName'));
+        $this->assertTrue($mapper->hasMethod('findByNote'));
+        $this->assertTrue($mapper->hasMethod('findByDepartmentsId'));
+        $this->assertTrue($mapper->hasMethod('findByLockVersion'));
+        $this->assertFalse($mapper->hasMethod('findByCreatedAt'));
+        $this->assertFalse($mapper->hasMethod('findByUpdatedAt'));
+        $this->assertTrue($mapper->hasMethod('findAll'));
+        $this->assertTrue($mapper->hasMethod('findAllById'));
+        $this->assertTrue($mapper->hasMethod('findAllByFirstName'));
+        $this->assertTrue($mapper->hasMethod('findAllByLastName'));
+        $this->assertTrue($mapper->hasMethod('findAllByNote'));
+        $this->assertTrue($mapper->hasMethod('findAllByDepartmentsId'));
+        $this->assertTrue($mapper->hasMethod('findAllByLockVersion'));
+        $this->assertFalse($mapper->hasMethod('findAllByCreatedAt'));
+        $this->assertFalse($mapper->hasMethod('findAllByUpdatedAt'));
+        $this->assertTrue($mapper->hasMethod('insert'));
+        $this->assertTrue($mapper->hasMethod('delete'));
+        $this->assertTrue($mapper->hasMethod('update'));
     }
 
     public function testFindAnObjectWithCriteria()
@@ -1545,9 +1545,7 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
      */
     public function testGenerateTheDefaultQueryIfTheQueryForAInsertMethodIsNotGiven()
     {
-        $mapper = MapperFactory::factory('Employees');
-
-        $this->assertEquals('INSERT INTO $__table (first_name, last_name, note, departments_id) VALUES ($firstName, $lastName, $note, $departmentsId)', $mapper->__query__insertwithnoquery);
+        $this->assertEquals('INSERT INTO $__table (first_name, last_name, note, departments_id) VALUES ($firstName, $lastName, $note, $departmentsId)', MapperFactory::factory('Employees')->getQuery('insertWithNoQuery'));
     }
 
     /**
@@ -1555,9 +1553,7 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
      */
     public function testGenerateTheDefaultQueryIfTheQueryForAUpdateMethodIsNotGiven()
     {
-        $mapper = MapperFactory::factory('Employees');
-
-        $this->assertEquals('UPDATE $__table SET first_name = $firstName, last_name = $lastName, note = $note, departments_id = $departmentsId, created_at = $createdAt, updated_at = $updatedAt, lock_version = lock_version + 1 WHERE id = $id AND lock_version = $lockVersion', $mapper->__query__updatewithnoquery);
+        $this->assertEquals('UPDATE $__table SET first_name = $firstName, last_name = $lastName, note = $note, departments_id = $departmentsId, created_at = $createdAt, updated_at = $updatedAt, lock_version = lock_version + 1 WHERE id = $id AND lock_version = $lockVersion', MapperFactory::factory('Employees')->getQuery('updateWithNoQuery'));
     }
 
     /**
@@ -1565,9 +1561,7 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
      */
     public function testGenerateTheDefaultQueryIfTheQueryForADeleteMethodIsNotGiven()
     {
-        $mapper = MapperFactory::factory('Employees');
-
-        $this->assertEquals('DELETE FROM $__table WHERE id = $id', $mapper->__query__deletewithnoquery);
+        $this->assertEquals('DELETE FROM $__table WHERE id = $id', MapperFactory::factory('Employees')->getQuery('deleteWithNoQuery'));
     }
 
     /**
@@ -1675,7 +1669,7 @@ abstract class CompatibilityTests extends ::PHPUnit_Framework_TestCase
     /**
      * @since Method available since Release 0.7.0
      */
-    public function testSetCharsetByDSN() {}
+    public function testSetCharsetByDsn() {}
 
     /**
      * @since Method available since Release 0.8.0

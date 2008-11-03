@@ -1,5 +1,13 @@
 // $Id$
 
+method findAllWithEmployees {
+    association {
+        table employees
+        type manyToMany
+        property employees
+    }
+}
+
 /*
  * Local Variables:
  * mode: c

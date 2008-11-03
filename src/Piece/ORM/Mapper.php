@@ -117,6 +117,10 @@ class Mapper
             return $this->_findObjects($methodName, $criteria);
         }
 
+        if (QueryType::isFindOne($methodName)) {
+            return $this->_findValue($methodName, $criteria);
+        }
+
         if (QueryType::isFind($methodName)) {
             return $this->_findObject($methodName, $criteria);
         }
@@ -138,13 +142,15 @@ class Mapper
     // {{{ __construct()
 
     /**
-     * Sets the ID of the mapper.
+     * Sets the ID and methods of the mapper.
      *
      * @param string $mapperID
+     * @param array  $methods
      */
-    public function __construct($mapperID)
+    public function __construct($mapperID, array $methods)
     {
         $this->mapperID = $mapperID;
+        $this->_methods = $methods;
     }
 
     // }}}
@@ -563,18 +569,6 @@ class Mapper
     public function setMetadata(Metadata $metadata)
     {
         $this->_metadata = $metadata;
-    }
-
-    // }}}
-    // {{{ addMethod()
-
-    /**
-     * @param Piece::ORM::Mapper::Method $method
-     * @since Method available since Release 2.0.0dev1
-     */
-    public function addMethod(Method $method)
-    {
-        $this->_methods[ $method->getName() ] = $method;
     }
 
     // }}}
