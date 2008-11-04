@@ -42,6 +42,8 @@ use Piece::ORM::Exception;
 // {{{ Piece::ORM::Mapper::Parser::AST
 
 /**
+ * The class representing abstract syntax tree for the Mapper DSL.
+ *
  * @package    Piece_ORM
  * @copyright  2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License (revised)
@@ -79,6 +81,8 @@ class AST extends DOMDocument
     // {{{ addMethod()
 
     /**
+     * Adds a method element.
+     *
      * @param string $name
      * @param string $query
      * @param string $orderBy
@@ -86,10 +90,12 @@ class AST extends DOMDocument
      */
     public function addMethod($name, $query = null, $orderBy = null, $associations = null)
     {
+        $id = strtolower($name);
         $xpath = new DOMXPath($this);
-        $methodNodeList = $xpath->query("//method[@name='$name']");
+        $methodNodeList = $xpath->query("//method[@id='$id']");
         if (!$methodNodeList->length) {
             $methodElement = $this->appendChild(new DOMElement('method'));
+            $methodElement->setAttribute('id', $id);
             $methodElement->setAttribute('name', $name);
         } else {
             $methodElement = $methodNodeList->item(0);
@@ -139,6 +145,31 @@ class AST extends DOMDocument
         }
 
         return $associationElement;
+    }
+
+    // }}}
+    // {{{ addAssociation()
+
+    /**
+     * Adds an association element.
+     *
+     * @param string $name
+     * @param array  $associations
+     */
+    public function addAssociation($name, array $associations)
+    {
+        $id = strtolower($name);
+        $xpath = new DOMXPath($this);
+        $associationNodeList = $xpath->query("//association[@id='$id']");
+        if ($associationNodeList->length) {
+            return;
+        }
+
+        $associationElement = $this->createAssociation($associations);
+        $associationElement->setAttribute('id', $id);
+        $associationElement->setAttribute('name', $name);
+
+        $this->appendChild($associationElement);
     }
 
     /**#@-*/
