@@ -37,6 +37,8 @@
 
 namespace Piece::ORM::Mapper::Parser;
 
+use Piece::ORM::Exception;
+
 // {{{ Piece::ORM::Mapper::Parser::AST
 
 /**
@@ -104,6 +106,39 @@ class AST extends DOMDocument
                 $methodElement->appendChild($associationElement);
             }
         }
+    }
+
+    // }}}
+    // {{{ createAssociation()
+
+    /**
+     * Creates a DOMElement object representing an association element.
+     *
+     * @param array $associations
+     * @return DOMElement
+     * @throws Piece::ORM::Exception
+     */
+    public function createAssociation($associations)
+    {
+        $requiredKeys = array('table', 'type', 'property');
+        foreach ($requiredKeys as $requiredKey) {
+            if (!array_key_exists($requiredKey, $associations)) {
+                throw new Exception("The [ $requiredKey ] statement was not found in the 'association' statement on line {$this->_mapperLexer->line}. An 'association' statement must contain the 'table', 'type', and 'property' statements.");
+            }
+        }
+
+        $associationElement = $this->createElement('association');
+
+        foreach (array_keys((array)$associations) as $key) {
+            if ($key == 'linkTable') {
+                $associationElement->appendChild($associations[$key]);
+                continue;
+            }
+
+            $associationElement->setAttribute($key, $associations[$key]);
+        }
+
+        return $associationElement;
     }
 
     /**#@-*/
