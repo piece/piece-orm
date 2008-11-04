@@ -197,7 +197,10 @@ class MapperLoader
      */
     private function _createMapper()
     {
-        $this->_mapper = new Mapper($this->_mapperID, $this->_methods);
+        $this->_mapper = new Mapper($this->_mapperID);
+        foreach ($this->_methods as $method) {
+            $this->_mapper->addMethod($method);
+        }
     }
 
     // }}}
