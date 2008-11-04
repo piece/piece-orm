@@ -103,6 +103,8 @@ class Mapper
     // {{{ __call()
 
     /**
+     * Dispatches a virtual method call to the appropriate real method call.
+     *
      * @param string $methodName
      * @param array  $arguments
      * @throw Piece::ORM::Exception
@@ -146,7 +148,7 @@ class Mapper
     // {{{ __construct()
 
     /**
-     * Sets the ID and methods of the mapper.
+     * Sets the ID of the mapper.
      *
      * @param string $mapperID
      */
