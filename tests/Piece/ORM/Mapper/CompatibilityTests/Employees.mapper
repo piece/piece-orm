@@ -1,5 +1,11 @@
 // $Id$
 
+association skills {
+    table skills
+    type manyToMany
+    property skills
+}
+
 method findByIdAndNote {
     query "SELECT * FROM $__table WHERE id = $id AND note = $note"
 }

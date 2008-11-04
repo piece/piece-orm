@@ -92,6 +92,7 @@ topStatementList ::= topStatementList topStatement.
 topStatementList ::= .
 
 topStatement ::= method.
+topStatement ::= association.
 
 method ::= METHOD ID(A) LCURLY methodStatementList(B) RCURLY. {
         $this->_ast->addMethod(A, @B['query'], @B['orderBy'], @B['associations']);
@@ -114,28 +115,14 @@ methodStatementList ::= .
 
 methodStatement(X) ::= query(A). { X['query'] = trim(A, '"'); }
 methodStatement(X) ::= orderBy(A). { X['orderBy'] = trim(A, '"'); }
-methodStatement(X) ::= association(A). { X['association'] = A; }
+methodStatement(X) ::= innserAssociation(A). { X['association'] = A; }
 
 query(X) ::= QUERY STRING(A). { X = A; }
 
 orderBy(X) ::= ORDER_BY STRING(A). { X = A; }
 
-association(X) ::= ASSOCIATION LCURLY associationStatementList(A) RCURLY. {
-        $requiredKeys = array('table', 'type', 'property');
-        foreach ($requiredKeys as $requiredKey) {
-            if (!array_key_exists($requiredKey, A)) {
-                throw new Exception("The [ $requiredKey ] statement was not found in the 'association' statement on line {$this->_mapperLexer->line}. An 'association' statement must contain the 'table', 'type', and 'property' statements.");
-            }
-        }
-        $association = $this->_ast->createElement('association');
-        foreach (array_keys((array)A) as $key) {
-            if ($key == 'linkTable') {
-                $association->appendChild(A[$key]);
-                continue;
-            }
-            $association->setAttribute($key, A[$key]);
-        }
-        X = $association;
+innserAssociation(X) ::= ASSOCIATION LCURLY associationStatementList(A) RCURLY. {
+        X = $this->_ast->createAssociation(A);
 }
 
 associationStatementList(X) ::= associationStatementList(A) associationStatement(B). {
@@ -204,3 +191,9 @@ column(X) ::= COLUMN ID(A). { X = A; }
 referencedColumn(X) ::= REFERENCED_COLUMN ID(A). { X = A; }
 
 inverseColumn(X) ::= INVERSE_COLUMN ID(A). { X = A; }
+
+association ::= ASSOCIATION ID(A) LCURLY associationStatementList(B) RCURLY. {
+        $association = $this->_ast->createAssociation(B);
+        $association->setAttribute('name', A);
+        $this->_ast->appendChild($association);
+}
