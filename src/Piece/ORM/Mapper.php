@@ -52,6 +52,9 @@ use Piece::ORM::Mapper::QueryType;
 // {{{ Piece::ORM::Mapper
 
 /**
+ * A class that provides the mapper interface to transfer data between the objects
+ * and the database.
+ *
  * @package    Piece_ORM
  * @copyright  2007-2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License (revised)
@@ -111,30 +114,31 @@ class Mapper
             throw new Exception("The method [ $methodName ] was not defined");
         }
 
+        $originalMethodName = $this->_getMethod($methodName)->getName();
         $criteria = count($arguments) ? $arguments[0] : null;
 
-        if (QueryType::isFindAll($methodName)) {
-            return $this->_findObjects($methodName, $criteria);
+        if (QueryType::isFindAll($originalMethodName)) {
+            return $this->_findObjects($originalMethodName, $criteria);
         }
 
-        if (QueryType::isFindOne($methodName)) {
-            return $this->_findValue($methodName, $criteria);
+        if (QueryType::isFindOne($originalMethodName)) {
+            return $this->_findValue($originalMethodName, $criteria);
         }
 
-        if (QueryType::isFind($methodName)) {
-            return $this->_findObject($methodName, $criteria);
+        if (QueryType::isFind($originalMethodName)) {
+            return $this->_findObject($originalMethodName, $criteria);
         }
 
-        if (QueryType::isInsert($methodName)) {
-            return $this->_insertObject($methodName, $criteria);
+        if (QueryType::isInsert($originalMethodName)) {
+            return $this->_insertObject($originalMethodName, $criteria);
         }
 
-        if (QueryType::isUpdate($methodName)) {
-            return $this->_updateObjects($methodName, $criteria);
+        if (QueryType::isUpdate($originalMethodName)) {
+            return $this->_updateObjects($originalMethodName, $criteria);
         }
 
-        if (QueryType::isDelete($methodName)) {
-            return $this->_deleteObjects($methodName, $criteria);
+        if (QueryType::isDelete($originalMethodName)) {
+            return $this->_deleteObjects($originalMethodName, $criteria);
         }
     }
 
@@ -145,12 +149,10 @@ class Mapper
      * Sets the ID and methods of the mapper.
      *
      * @param string $mapperID
-     * @param array  $methods
      */
-    public function __construct($mapperID, array $methods)
+    public function __construct($mapperID)
     {
         $this->mapperID = $mapperID;
-        $this->_methods = $methods;
     }
 
     // }}}
@@ -373,7 +375,7 @@ class Mapper
         }
 
         $queryExecutor = new QueryExecutor($this, $isManip);
-        return $queryExecutor->executeWithCriteria($methodName, $criteria);
+        return $queryExecutor->executeWithCriteria($this->_getMethod($methodName)->getName(), $criteria);
     }
 
     // }}}
@@ -456,7 +458,7 @@ class Mapper
             throw new Exception("The method [ $methodName ] was not defined");
         }
 
-        return $this->_methods[$methodName]->getQuery();
+        return $this->_getMethod($methodName)->getQuery();
     }
 
     // }}}
@@ -507,7 +509,7 @@ class Mapper
             return ' ORDER BY ' . implode(', ', $this->_orders);
         }
 
-        $orderBy = $this->_methods[$methodName]->getOrderBy();
+        $orderBy = $this->_getMethod($methodName)->getOrderBy();
         if (is_null($orderBy)) {
             return;
         }
@@ -575,13 +577,29 @@ class Mapper
     // {{{ hasMethod()
 
     /**
+     * Returns whether the given method exists in the mapper or not.
+     *
      * @param string $methodName
      * @return boolean
      * @since Method available since Release 2.0.0dev1
      */
     public function hasMethod($methodName)
     {
-        return array_key_exists($methodName, $this->_methods);
+        return array_key_exists(strtolower($methodName), $this->_methods);
+    }
+
+    // }}}
+    // {{{ addMethod()
+
+    /**
+     * Adds a Piece::ORM::Mapper::Method object to the mapper.
+     *
+     * @param Piece::ORM::Mapper::Method $method
+     * @since Method available since Release 2.0.0dev1
+     */
+    public function addMethod(Method $method)
+    {
+        $this->_methods[ strtolower($method->getName()) ] = $method;
     }
 
     /**#@-*/
@@ -627,7 +645,7 @@ class Mapper
      */
     private function _createCriteria($methodName, $criterion)
     {
-        if (!preg_match('/By(.+)$/', $methodName, $matches)) {
+        if (!preg_match('/By(.+)$/i', $methodName, $matches)) {
             throw new Exception("An unexpected value detected. $methodName() can only receive object or null. Or the method name does not contain the appropriate field name.");
         }
 
@@ -694,7 +712,7 @@ class Mapper
         }
 
         if (!is_object($criteria)) {
-            if ($methodName == 'findAll') {
+            if (strtolower($methodName) == strtolower('findAll')) {
                 throw new Exception('An unexpected value detected. findAll() can only receive object or null.');
             }
 
@@ -703,7 +721,7 @@ class Mapper
 
         $result = $this->executeQueryWithCriteria($methodName, $criteria);
         return $this->_loadAllObjects($result,
-                                      $this->_methods[$methodName]->getAssociations()
+                                      $this->_getMethod($methodName)->getAssociations()
                                       );
     }
 
@@ -747,7 +765,7 @@ class Mapper
     {
         $persister = new ObjectPersister($this,
                                          $subject,
-                                         $this->_methods[$methodName]->getAssociations()
+                                         $this->_getMethod($methodName)->getAssociations()
                                          );
         return $persister->insert($methodName);
     }
@@ -766,7 +784,7 @@ class Mapper
     {
         $persister = new ObjectPersister($this,
                                          $subject,
-                                         $this->_methods[$methodName]->getAssociations()
+                                         $this->_getMethod($methodName)->getAssociations()
                                          );
         return $persister->delete($methodName);
     }
@@ -785,9 +803,24 @@ class Mapper
     {
         $persister = new ObjectPersister($this,
                                          $subject,
-                                         $this->_methods[$methodName]->getAssociations()
+                                         $this->_getMethod($methodName)->getAssociations()
                                          );
         return $persister->update($methodName);
+    }
+
+    // }}}
+    // {{{ _getMethod()
+
+    /**
+     * Gets a Piece::ORM::Mapper::Method object for the given name.
+     *
+     * @param string $methodName
+     * @return Piece::ORM::Mapper::Method
+     * @since Method available since Release 2.0.0dev1
+     */
+    public function _getMethod($methodName)
+    {
+        return $this->_methods[ strtolower($methodName) ];
     }
 
     /**#@-*/
