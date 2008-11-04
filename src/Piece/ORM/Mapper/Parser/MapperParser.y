@@ -208,8 +208,5 @@ association ::= ASSOCIATION ID(A) LCURLY associationStatementList(B) RCURLY. {
         }
 
         $this->_associationDeclarations[ strtolower(A) ] = $this->_mapperLexer->line;
-
-        $association = $this->_ast->createAssociation(B);
-        $association->setAttribute('name', A);
-        $this->_ast->appendChild($association);
+        $this->_ast->addAssociation(A, B);
 }

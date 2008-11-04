@@ -130,7 +130,7 @@ class MapperParseryyStackEntry
  * @package    Piece_ORM
  * @copyright  2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License (revised)
- * @version    SVN: $Id: MapperParser.y 608 2008-11-04 15:23:27Z iteman $
+ * @version    SVN: $Id: MapperParser.y 609 2008-11-04 15:36:14Z iteman $
  * @since      File available since Release 2.0.0dev1
  */
 
@@ -1067,12 +1067,9 @@ static public $yy_action = array(
         }
 
         $this->_associationDeclarations[ strtolower($this->yystack[$this->yyidx + -3]->minor) ] = $this->_mapperLexer->line;
-
-        $association = $this->_ast->createAssociation($this->yystack[$this->yyidx + -1]->minor);
-        $association->setAttribute('name', $this->yystack[$this->yyidx + -3]->minor);
-        $this->_ast->appendChild($association);
+        $this->_ast->addAssociation($this->yystack[$this->yyidx + -3]->minor, $this->yystack[$this->yyidx + -1]->minor);
     }
-#line 1081 "src/Piece/ORM/Mapper/Parser/MapperParser.php"
+#line 1078 "src/Piece/ORM/Mapper/Parser/MapperParser.php"
 
     /**
      * placeholder for the left hand side in a reduce operation.
@@ -1196,7 +1193,7 @@ static public $yy_action = array(
                         implode(',', $expectedTokens) .
                         " in {$this->_configFile} on line {$this->_mapperLexer->line}"
                         );
-#line 1206 "src/Piece/ORM/Mapper/Parser/MapperParser.php"
+#line 1203 "src/Piece/ORM/Mapper/Parser/MapperParser.php"
     }
 
     /**
