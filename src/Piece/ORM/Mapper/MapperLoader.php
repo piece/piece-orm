@@ -171,7 +171,7 @@ class MapperLoader
     private function _loadAST()
     {
         $mapperLexer = new MapperLexer(file_get_contents($this->_configFile));
-        $mapperParser = new MapperParser($mapperLexer, $this->_ast);
+        $mapperParser = new MapperParser($mapperLexer, $this->_ast, $this->_configFile);
 
         while ($mapperLexer->yylex()) {
             $mapperParser->doParse($mapperLexer->token, $mapperLexer->value);

@@ -78,11 +78,15 @@ use Piece::ORM::Mapper::Parser::AST;
 %include_class {
     private $_mapperLexer;
     private $_ast;
+    private $_configFile;
+    private $_methodDeclarations = array();
+    private $_associationDeclarations = array();
 
-    public function __construct(MapperLexer $mapperLexer, AST $ast)
+    public function __construct(MapperLexer $mapperLexer, AST $ast, $configFile)
     {
         $this->_mapperLexer = $mapperLexer;
         $this->_ast = $ast;
+        $this->_configFile = $configFile;
     }
 }
 
@@ -95,6 +99,15 @@ topStatement ::= method.
 topStatement ::= association.
 
 method ::= METHOD ID(A) LCURLY methodStatementList(B) RCURLY. {
+        if (array_key_exists(strtolower(A), $this->_methodDeclarations)) {
+            throw new Exception("Cannot redeclare the method [ {A} ] (previously declared in {$this->_configFile}" .
+                                ':' .
+                                $this->_methodDeclarations[ strtolower(A) ] .
+                                ") on line {$this->_mapperLexer->line}"
+                                );
+        }
+
+        $this->_methodDeclarations[ strtolower(A) ] = $this->_mapperLexer->line;
         $this->_ast->addMethod(A, @B['query'], @B['orderBy'], @B['associations']);
 }
 
@@ -193,6 +206,16 @@ referencedColumn(X) ::= REFERENCED_COLUMN ID(A). { X = A; }
 inverseColumn(X) ::= INVERSE_COLUMN ID(A). { X = A; }
 
 association ::= ASSOCIATION ID(A) LCURLY associationStatementList(B) RCURLY. {
+        if (array_key_exists(strtolower(A), $this->_associationDeclarations)) {
+            throw new Exception("Cannot redeclare the association [ {A} ] (previously declared in {$this->_configFile}" .
+                                ':' .
+                                $this->_associationDeclarations[ strtolower(A) ] .
+                                ") on line {$this->_mapperLexer->line}"
+                                );
+        }
+
+        $this->_associationDeclarations[ strtolower(A) ] = $this->_mapperLexer->line;
+
         $association = $this->_ast->createAssociation(B);
         $association->setAttribute('name', A);
         $this->_ast->appendChild($association);
