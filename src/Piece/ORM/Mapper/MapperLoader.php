@@ -176,6 +176,7 @@ class MapperLoader
         while ($mapperLexer->yylex()) {
             $mapperParser->doParse($mapperLexer->token, $mapperLexer->value);
         }
+
         $mapperParser->doParse(0, 0);
     }
 
