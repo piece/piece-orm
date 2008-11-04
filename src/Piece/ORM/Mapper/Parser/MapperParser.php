@@ -130,7 +130,7 @@ class MapperParseryyStackEntry
  * @package    Piece_ORM
  * @copyright  2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License (revised)
- * @version    SVN: $Id: MapperParser.y 607 2008-11-04 14:40:41Z iteman $
+ * @version    SVN: $Id: MapperParser.y 608 2008-11-04 15:23:27Z iteman $
  * @since      File available since Release 2.0.0dev1
  */
 
@@ -156,7 +156,7 @@ class MapperParser
 {
 /* First off, code is included which follows the "include_class" declaration
 ** in the input file. */
-#line 75 "src/Piece/ORM/Mapper/Parser/MapperParser.y"
+#line 70 "src/Piece/ORM/Mapper/Parser/MapperParser.y"
 
     private $_mapperLexer;
     private $_ast;
@@ -960,21 +960,20 @@ static public $yy_action = array(
     **   function yy_r0($yymsp){ ... }           // User supplied code
     **  #line <lineno> <thisfile>
     */
-#line 98 "src/Piece/ORM/Mapper/Parser/MapperParser.y"
+#line 93 "src/Piece/ORM/Mapper/Parser/MapperParser.y"
     function yy_r5(){
         if (array_key_exists(strtolower($this->yystack[$this->yyidx + -3]->minor), $this->_methodDeclarations)) {
-            throw new Exception("Cannot redeclare the method [ {$this->yystack[$this->yyidx + -3]->minor} ] (previously declared in {$this->_configFile}" .
-                                ':' .
+            throw new Exception("Cannot redeclare the method [ {$this->yystack[$this->yyidx + -3]->minor} ] (previously declared on line " .
                                 $this->_methodDeclarations[ strtolower($this->yystack[$this->yyidx + -3]->minor) ] .
-                                ") on line {$this->_mapperLexer->line}"
+                                ") in {$this->_configFile} on line {$this->_mapperLexer->line}"
                                 );
         }
 
         $this->_methodDeclarations[ strtolower($this->yystack[$this->yyidx + -3]->minor) ] = $this->_mapperLexer->line;
         $this->_ast->addMethod($this->yystack[$this->yyidx + -3]->minor, @$this->yystack[$this->yyidx + -1]->minor['query'], @$this->yystack[$this->yyidx + -1]->minor['orderBy'], @$this->yystack[$this->yyidx + -1]->minor['associations']);
     }
-#line 982 "src/Piece/ORM/Mapper/Parser/MapperParser.php"
-#line 111 "src/Piece/ORM/Mapper/Parser/MapperParser.y"
+#line 981 "src/Piece/ORM/Mapper/Parser/MapperParser.php"
+#line 105 "src/Piece/ORM/Mapper/Parser/MapperParser.y"
     function yy_r6(){
         if (!is_array($this->yystack[$this->yyidx + -1]->minor)) {
             $this->yystack[$this->yyidx + -1]->minor = array();
@@ -988,25 +987,25 @@ static public $yy_action = array(
             $this->_retvalue[$key] = $this->yystack[$this->yyidx + 0]->minor[$key];
         }
     }
-#line 997 "src/Piece/ORM/Mapper/Parser/MapperParser.php"
-#line 126 "src/Piece/ORM/Mapper/Parser/MapperParser.y"
+#line 996 "src/Piece/ORM/Mapper/Parser/MapperParser.php"
+#line 120 "src/Piece/ORM/Mapper/Parser/MapperParser.y"
     function yy_r8(){ $this->_retvalue['query'] = trim($this->yystack[$this->yyidx + 0]->minor, '"');     }
-#line 1000 "src/Piece/ORM/Mapper/Parser/MapperParser.php"
-#line 127 "src/Piece/ORM/Mapper/Parser/MapperParser.y"
+#line 999 "src/Piece/ORM/Mapper/Parser/MapperParser.php"
+#line 121 "src/Piece/ORM/Mapper/Parser/MapperParser.y"
     function yy_r9(){ $this->_retvalue['orderBy'] = trim($this->yystack[$this->yyidx + 0]->minor, '"');     }
-#line 1003 "src/Piece/ORM/Mapper/Parser/MapperParser.php"
-#line 128 "src/Piece/ORM/Mapper/Parser/MapperParser.y"
+#line 1002 "src/Piece/ORM/Mapper/Parser/MapperParser.php"
+#line 122 "src/Piece/ORM/Mapper/Parser/MapperParser.y"
     function yy_r10(){ $this->_retvalue['association'] = $this->yystack[$this->yyidx + 0]->minor;     }
-#line 1006 "src/Piece/ORM/Mapper/Parser/MapperParser.php"
-#line 130 "src/Piece/ORM/Mapper/Parser/MapperParser.y"
+#line 1005 "src/Piece/ORM/Mapper/Parser/MapperParser.php"
+#line 124 "src/Piece/ORM/Mapper/Parser/MapperParser.y"
     function yy_r11(){ $this->_retvalue = $this->yystack[$this->yyidx + 0]->minor;     }
-#line 1009 "src/Piece/ORM/Mapper/Parser/MapperParser.php"
-#line 134 "src/Piece/ORM/Mapper/Parser/MapperParser.y"
+#line 1008 "src/Piece/ORM/Mapper/Parser/MapperParser.php"
+#line 128 "src/Piece/ORM/Mapper/Parser/MapperParser.y"
     function yy_r13(){
         $this->_retvalue = $this->_ast->createAssociation($this->yystack[$this->yyidx + -1]->minor);
     }
-#line 1014 "src/Piece/ORM/Mapper/Parser/MapperParser.php"
-#line 138 "src/Piece/ORM/Mapper/Parser/MapperParser.y"
+#line 1013 "src/Piece/ORM/Mapper/Parser/MapperParser.php"
+#line 132 "src/Piece/ORM/Mapper/Parser/MapperParser.y"
     function yy_r14(){
         if (!is_array($this->yystack[$this->yyidx + -1]->minor)) {
             $this->yystack[$this->yyidx + -1]->minor = array();
@@ -1016,33 +1015,33 @@ static public $yy_action = array(
             $this->_retvalue[$key] = $this->yystack[$this->yyidx + 0]->minor[$key];
         }
     }
-#line 1025 "src/Piece/ORM/Mapper/Parser/MapperParser.php"
-#line 147 "src/Piece/ORM/Mapper/Parser/MapperParser.y"
+#line 1024 "src/Piece/ORM/Mapper/Parser/MapperParser.php"
+#line 141 "src/Piece/ORM/Mapper/Parser/MapperParser.y"
     function yy_r15(){
         foreach (array_keys($this->yystack[$this->yyidx + 0]->minor) as $key) {
             $this->_retvalue[$key] = $this->yystack[$this->yyidx + 0]->minor[$key];
         }
     }
-#line 1032 "src/Piece/ORM/Mapper/Parser/MapperParser.php"
-#line 153 "src/Piece/ORM/Mapper/Parser/MapperParser.y"
+#line 1031 "src/Piece/ORM/Mapper/Parser/MapperParser.php"
+#line 147 "src/Piece/ORM/Mapper/Parser/MapperParser.y"
     function yy_r16(){ $this->_retvalue['table'] = $this->yystack[$this->yyidx + 0]->minor;     }
-#line 1035 "src/Piece/ORM/Mapper/Parser/MapperParser.php"
-#line 154 "src/Piece/ORM/Mapper/Parser/MapperParser.y"
+#line 1034 "src/Piece/ORM/Mapper/Parser/MapperParser.php"
+#line 148 "src/Piece/ORM/Mapper/Parser/MapperParser.y"
     function yy_r17(){ $this->_retvalue['type'] = $this->yystack[$this->yyidx + 0]->minor;     }
-#line 1038 "src/Piece/ORM/Mapper/Parser/MapperParser.php"
-#line 155 "src/Piece/ORM/Mapper/Parser/MapperParser.y"
+#line 1037 "src/Piece/ORM/Mapper/Parser/MapperParser.php"
+#line 149 "src/Piece/ORM/Mapper/Parser/MapperParser.y"
     function yy_r18(){ $this->_retvalue['property'] = $this->yystack[$this->yyidx + 0]->minor;     }
-#line 1041 "src/Piece/ORM/Mapper/Parser/MapperParser.php"
-#line 156 "src/Piece/ORM/Mapper/Parser/MapperParser.y"
+#line 1040 "src/Piece/ORM/Mapper/Parser/MapperParser.php"
+#line 150 "src/Piece/ORM/Mapper/Parser/MapperParser.y"
     function yy_r19(){ $this->_retvalue['column'] = $this->yystack[$this->yyidx + 0]->minor;     }
-#line 1044 "src/Piece/ORM/Mapper/Parser/MapperParser.php"
-#line 157 "src/Piece/ORM/Mapper/Parser/MapperParser.y"
+#line 1043 "src/Piece/ORM/Mapper/Parser/MapperParser.php"
+#line 151 "src/Piece/ORM/Mapper/Parser/MapperParser.y"
     function yy_r20(){ $this->_retvalue['referencedColumn'] = $this->yystack[$this->yyidx + 0]->minor;     }
-#line 1047 "src/Piece/ORM/Mapper/Parser/MapperParser.php"
-#line 159 "src/Piece/ORM/Mapper/Parser/MapperParser.y"
+#line 1046 "src/Piece/ORM/Mapper/Parser/MapperParser.php"
+#line 153 "src/Piece/ORM/Mapper/Parser/MapperParser.y"
     function yy_r22(){ $this->_retvalue['linkTable'] = $this->yystack[$this->yyidx + 0]->minor;     }
-#line 1050 "src/Piece/ORM/Mapper/Parser/MapperParser.php"
-#line 161 "src/Piece/ORM/Mapper/Parser/MapperParser.y"
+#line 1049 "src/Piece/ORM/Mapper/Parser/MapperParser.php"
+#line 155 "src/Piece/ORM/Mapper/Parser/MapperParser.y"
     function yy_r23(){
         if (!array_key_exists('table', $this->yystack[$this->yyidx + -1]->minor)) {
             throw new Exception("The [ table ] statement was not found in the 'linkTable' statement on line {$this->_mapperLexer->line}. An 'association' statement must contain the 'table' statement.");
@@ -1054,17 +1053,16 @@ static public $yy_action = array(
         }
         $this->_retvalue = $linkTable;
     }
-#line 1063 "src/Piece/ORM/Mapper/Parser/MapperParser.php"
-#line 191 "src/Piece/ORM/Mapper/Parser/MapperParser.y"
+#line 1062 "src/Piece/ORM/Mapper/Parser/MapperParser.php"
+#line 185 "src/Piece/ORM/Mapper/Parser/MapperParser.y"
     function yy_r29(){ $this->_retvalue['inverseColumn'] = $this->yystack[$this->yyidx + 0]->minor;     }
-#line 1066 "src/Piece/ORM/Mapper/Parser/MapperParser.php"
-#line 205 "src/Piece/ORM/Mapper/Parser/MapperParser.y"
+#line 1065 "src/Piece/ORM/Mapper/Parser/MapperParser.php"
+#line 199 "src/Piece/ORM/Mapper/Parser/MapperParser.y"
     function yy_r36(){
         if (array_key_exists(strtolower($this->yystack[$this->yyidx + -3]->minor), $this->_associationDeclarations)) {
-            throw new Exception("Cannot redeclare the association [ {$this->yystack[$this->yyidx + -3]->minor} ] (previously declared in {$this->_configFile}" .
-                                ':' .
+            throw new Exception("Cannot redeclare the association [ {$this->yystack[$this->yyidx + -3]->minor} ] (previously declared on line " .
                                 $this->_associationDeclarations[ strtolower($this->yystack[$this->yyidx + -3]->minor) ] .
-                                ") on line {$this->_mapperLexer->line}"
+                                ") in {$this->_configFile} on line {$this->_mapperLexer->line}"
                                 );
         }
 
@@ -1074,7 +1072,7 @@ static public $yy_action = array(
         $association->setAttribute('name', $this->yystack[$this->yyidx + -3]->minor);
         $this->_ast->appendChild($association);
     }
-#line 1083 "src/Piece/ORM/Mapper/Parser/MapperParser.php"
+#line 1081 "src/Piece/ORM/Mapper/Parser/MapperParser.php"
 
     /**
      * placeholder for the left hand side in a reduce operation.
@@ -1188,22 +1186,17 @@ static public $yy_action = array(
     {
 #line 57 "src/Piece/ORM/Mapper/Parser/MapperParser.y"
 
-    echo "Syntax Error on line {$this->_mapperLexer->line}: token '{$this->_mapperLexer->value}' while parsing rule:";
-
-    foreach ($this->yystack as $entry) {
-        echo $this->tokenName($entry->major) . ' ';
-    }
-
     $expectedTokens = array();
     foreach ($this->yy_get_expected_tokens($yymajor) as $token) {
         $expectedTokens[] = self::$yyTokenName[$token];
     }
 
     throw new Exception('Unexpected ' . $this->tokenName($yymajor) .
-                        "($TOKEN), expected one of: " .
-                        implode(',', $expectedTokens)
+                        " [ $TOKEN ], expected one of: " .
+                        implode(',', $expectedTokens) .
+                        " in {$this->_configFile} on line {$this->_mapperLexer->line}"
                         );
-#line 1213 "src/Piece/ORM/Mapper/Parser/MapperParser.php"
+#line 1206 "src/Piece/ORM/Mapper/Parser/MapperParser.php"
     }
 
     /**

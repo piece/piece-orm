@@ -58,20 +58,15 @@ use Piece::ORM::Mapper::Parser::AST;
 }
 
 %syntax_error {
-    echo "Syntax Error on line {$this->_mapperLexer->line}: token '{$this->_mapperLexer->value}' while parsing rule:";
-
-    foreach ($this->yystack as $entry) {
-        echo $this->tokenName($entry->major) . ' ';
-    }
-
     $expectedTokens = array();
     foreach ($this->yy_get_expected_tokens($yymajor) as $token) {
         $expectedTokens[] = self::$yyTokenName[$token];
     }
 
     throw new Exception('Unexpected ' . $this->tokenName($yymajor) .
-                        "($TOKEN), expected one of: " .
-                        implode(',', $expectedTokens)
+                        " [ $TOKEN ], expected one of: " .
+                        implode(',', $expectedTokens) .
+                        " in {$this->_configFile} on line {$this->_mapperLexer->line}"
                         );
 }
 
@@ -100,10 +95,9 @@ topStatement ::= association.
 
 method ::= METHOD ID(A) LCURLY methodStatementList(B) RCURLY. {
         if (array_key_exists(strtolower(A), $this->_methodDeclarations)) {
-            throw new Exception("Cannot redeclare the method [ {A} ] (previously declared in {$this->_configFile}" .
-                                ':' .
+            throw new Exception("Cannot redeclare the method [ {A} ] (previously declared on line " .
                                 $this->_methodDeclarations[ strtolower(A) ] .
-                                ") on line {$this->_mapperLexer->line}"
+                                ") in {$this->_configFile} on line {$this->_mapperLexer->line}"
                                 );
         }
 
@@ -207,10 +201,9 @@ inverseColumn(X) ::= INVERSE_COLUMN ID(A). { X = A; }
 
 association ::= ASSOCIATION ID(A) LCURLY associationStatementList(B) RCURLY. {
         if (array_key_exists(strtolower(A), $this->_associationDeclarations)) {
-            throw new Exception("Cannot redeclare the association [ {A} ] (previously declared in {$this->_configFile}" .
-                                ':' .
+            throw new Exception("Cannot redeclare the association [ {A} ] (previously declared on line " .
                                 $this->_associationDeclarations[ strtolower(A) ] .
-                                ") on line {$this->_mapperLexer->line}"
+                                ") in {$this->_configFile} on line {$this->_mapperLexer->line}"
                                 );
         }
 
