@@ -92,7 +92,7 @@ class Method
     public function __construct($name)
     {
         if (!$this->_validateName($name)) {
-            throw new Exception("Cannot use the method [ $name ] since it is a reserved for internal use only.");
+            throw new Exception("Cannot use the method [ $name ] since it is a reserved for internal use only");
         }
 
         $this->_name = $name;

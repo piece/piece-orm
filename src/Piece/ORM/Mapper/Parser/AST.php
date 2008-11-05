@@ -109,6 +109,15 @@ class AST extends DOMDocument
 
         if (!is_null($associations)) {
             foreach ($associations as $associationElement) {
+                if ($associationElement->hasAttribute('referencedAssociationID')) {
+                    $referencedAssociationID = $associationElement->getAttribute('referencedAssociationID');
+                    $referencedAssociation = $associationElement->getAttribute('referencedAssociation');
+                    $associationNodeList = $xpath->query("//method[@id='$id']/association[@referencedAssociationID='$referencedAssociationID']");
+                    if ($associationNodeList->length) {
+                        throw new Exception("Cannot redeclare the association reference [ $referencedAssociation ] in the method statement");
+                    }
+                }
+
                 $methodElement->appendChild($associationElement);
             }
         }
@@ -129,7 +138,7 @@ class AST extends DOMDocument
         $requiredKeys = array('table', 'type', 'property');
         foreach ($requiredKeys as $requiredKey) {
             if (!array_key_exists($requiredKey, $associations)) {
-                throw new Exception("The [ $requiredKey ] statement was not found in the 'association' statement on line {$this->_mapperLexer->line}. An 'association' statement must contain the 'table', 'type', and 'property' statements.");
+                throw new Exception("The [ $requiredKey ] statement was not found in the association statement. An association statement must contain the table, type, and property statements.");
             }
         }
 

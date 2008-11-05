@@ -167,14 +167,23 @@ class MapperLoader
     // {{{ _loadAST()
 
     /**
+     * Loads the AST based on a DSL script.
+     *
+     * @throws Piece::ORM::Exception
      */
     private function _loadAST()
     {
         $mapperLexer = new MapperLexer(file_get_contents($this->_configFile));
         $mapperParser = new MapperParser($mapperLexer, $this->_ast, $this->_configFile);
 
-        while ($mapperLexer->yylex()) {
-            $mapperParser->doParse($mapperLexer->token, $mapperLexer->value);
+        try {
+            while ($mapperLexer->yylex()) {
+                $mapperParser->doParse($mapperLexer->token, $mapperLexer->value);
+            }
+        } catch (Exception $e) {
+            throw new Exception($e->getMessage() .
+                                " in {$this->_configFile} on line {$mapperLexer->line}"
+                                );
         }
 
         $mapperParser->doParse(0, 0);
@@ -184,10 +193,17 @@ class MapperLoader
     // {{{ _loadSymbols()
 
     /**
+     * Loads the symbols based on a DSL script.
+     *
+     * @throws Piece::ORM::Exception
      */
     private function _loadSymbols()
     {
-        $this->_loadMethods();
+        try {
+            $this->_loadMethods();
+        } catch (Exception $e) {
+            throw new Exception($e->getMessage() . " in {$this->_configFile}");
+        }
     }
 
     // }}}
@@ -242,7 +258,7 @@ class MapperLoader
                 $this->_methods[$name]->setOrderBy($orderBy);
             }
 
-            $associations = $this->_createAssociations($name);
+            $associations = $this->_createAssociations($methodElement->getAttribute('id'));
             foreach ($associations as $association) {
                 $this->_methods[$name]->addAssociation($association);
             }
@@ -253,21 +269,21 @@ class MapperLoader
     // {{{ _createAssociations()
 
     /**
-     * @param string $methodName
+     * @param string $methodID
      * @throws Piece::ORM::Exception
      */
-    private function _createAssociations($methodName)
+    private function _createAssociations($methodID)
     {
-        $methodID = strtolower($methodName);
         $associations = array();
         $associationNodeList =
             $this->_xpath->query("//method[@id='$methodID']/association");
         foreach ($associationNodeList as $associationElement) {
-            if ($associationElement->hasAttribute('referencedAssociation')) {
+            if ($associationElement->hasAttribute('referencedAssociationID')) {
+                $referencedAssociationID = $associationElement->getAttribute('referencedAssociationID');
                 $referencedAssociation = $associationElement->getAttribute('referencedAssociation');
-                $associationNodeList = $this->_xpath->query("//association[@id='" . strtolower($referencedAssociation) . "']");
+                $associationNodeList = $this->_xpath->query("//association[@id='$referencedAssociationID']");
                 if (!$associationNodeList->length) {
-                    throw new Exception("The referencedAssociation [ $referencedAssociation ] was not found in {$this->_configFile}");
+                    throw new Exception("The referencedAssociation [ $referencedAssociation ] was not found");
                 }
 
                 foreach ($associationNodeList as $associationElement) {}
@@ -288,7 +304,7 @@ class MapperLoader
                 if (!$metadata->getPrimaryKey()) {
                     throw new Exception('A single primary key field is required in the table [ ' .
                                         $metadata->getTableName(true) .
-                                        ' ].'
+                                        ' ]'
                                         );
                 }
             }
@@ -297,7 +313,7 @@ class MapperLoader
             if (!strlen($column)) {
                 $primaryKey = $metadata->getPrimaryKey();
                 if (!$primaryKey) {
-                    throw new Exception('A single primary key field is required, if the [ column ] statement in the [ association ] statement omit.');
+                    throw new Exception('A single primary key field is required, if the column statement in the association statement omit');
                 }
 
                 if ($type == Association::ASSOCIATIONTYPE_MANYTOMANY
@@ -312,7 +328,7 @@ class MapperLoader
             if (!$metadata->hasField($column)) {
                 throw new Exception("The field [ $column ] was not found in the table [ " .
                                     $metadata->getTableName(true) .
-                                    ' ].'
+                                    ' ]'
                                     );
             }
 
@@ -327,7 +343,7 @@ class MapperLoader
                 case Association::ASSOCIATIONTYPE_MANYTOONE:
                     $primaryKey = $metadata->getPrimaryKey();
                     if (!$primaryKey) {
-                        throw new Exception('A single primary key field is required, if the [ referencedColumn ] statement in the [ association ] statement omit.');
+                        throw new Exception('A single primary key field is required, if the referencedColumn statement in the association statement omit');
                     }
 
                     $referencedColumn = $metadata->getTableName(true) . "_$primaryKey";
@@ -336,7 +352,7 @@ class MapperLoader
                 case Association::ASSOCIATIONTYPE_ONETOONE:
                     $primaryKey = $metadata->getPrimaryKey();
                     if (!$primaryKey) {
-                        throw new Exception('A single primary key field is required, if the [ referencedColumn ] statement in the [ association ] statement omit.');
+                        throw new Exception('A single primary key field is required, if the referencedColumn statement in the association statement omit');
                     }
 
                     $referencedColumn = $primaryKey;
@@ -349,7 +365,7 @@ class MapperLoader
                 ) {
                 throw new Exception("The field [ $referencedColumn ] was not found in the table [ " .
                                     $this->_metadata->getTableName(true) .
-                                    ' ].'
+                                    ' ]'
                                     );
             }
 
@@ -417,7 +433,7 @@ class MapperLoader
             }
 
             if (is_null($linkTableMetadata)) {
-                throw new Exception("The table [ $expectedTable1 ] or [ $expectedTable2 ] must exists in the database, if the [ table ] statement in the [ linkTable ] statement omit.");
+                throw new Exception("The table [ $expectedTable1 ] or [ $expectedTable2 ] must exists in the database, if the table statement in the linkTable statement omit");
             }
         }
 
@@ -428,7 +444,7 @@ class MapperLoader
         if (!strlen($column)) {
             $primaryKey = $this->_metadata->getPrimaryKey();
             if (!$primaryKey) {
-                throw new Exception('A single primary key field is required, if the [ column ] statement in the [ linkTable ] statement omit.');
+                throw new Exception('A single primary key field is required, if the column statement in the linkTable statement omit');
             }
 
             $column = $this->_metadata->getTableName(true) . "_$primaryKey";
@@ -437,7 +453,7 @@ class MapperLoader
         if (!$linkTableMetadata->hasField($column)) {
             throw new Exception("The field [ $column ] was not found in the table [ " .
                                 $linkTableMetadata->getTableName(true) .
-                                ' ].'
+                                ' ]'
                                 );
         }
 
@@ -446,7 +462,7 @@ class MapperLoader
         if (!strlen($referencedColumn)) {
             $primaryKey = $this->_metadata->getPrimaryKey();
             if (!$primaryKey) {
-                throw new Exception('A single primary key field is required, if the [ referencedColumn ] statement in the [ linkTable ] statement omit.');
+                throw new Exception('A single primary key field is required, if the referencedColumn statement in the linkTable statement omit');
             }
 
             $referencedColumn = $primaryKey;
@@ -455,7 +471,7 @@ class MapperLoader
         if (!$this->_metadata->hasField($referencedColumn)) {
             throw new Exception("The field [ $referencedColumn ] was not found in the table [ " .
                                 $this->_metadata->getTableName(true) .
-                                ' ].'
+                                ' ]'
                                 );
         }
 
@@ -464,16 +480,16 @@ class MapperLoader
         if (!strlen($inverseColumn)) {
             $primaryKey = $associationMetadata->getPrimaryKey();
             if (!$primaryKey) {
-                throw new Exception('A single primary key field is required, if the [ column ] statement in the [ linkTable ] statement omit.');
+                throw new Exception('A single primary key field is required, if the column statement in the linkTable statement omit');
             }
 
             $inverseColumn = $associationMetadata->getTableName(true) . "_$primaryKey";
         } 
 
         if (!$linkTableMetadata->hasField($inverseColumn)) {
-            throw new Exception("The field [ $inverseColumn ] was not found in the table [ " .
+            throw new Exception("The field $inverseColumn was not found in the table [ " .
                                 $linkTableMetadata->getTableName(true) .
-                                ' ].'
+                                ' ]'
                                 );
         }
 

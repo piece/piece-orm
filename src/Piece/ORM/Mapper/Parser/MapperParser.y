@@ -65,8 +65,7 @@ use Piece::ORM::Mapper::Parser::AST;
 
     throw new Exception('Unexpected ' . $this->tokenName($yymajor) .
                         " [ $TOKEN ], expected one of: " .
-                        implode(',', $expectedTokens) .
-                        " in {$this->_configFile} on line {$this->_mapperLexer->line}"
+                        implode(',', $expectedTokens)
                         );
 }
 
@@ -97,7 +96,7 @@ method ::= METHOD ID(A) LCURLY methodStatementList(B) RCURLY. {
         if (array_key_exists(strtolower(A), $this->_methodDeclarations)) {
             throw new Exception("Cannot redeclare the method [ {A} ] (previously declared on line " .
                                 $this->_methodDeclarations[ strtolower(A) ] .
-                                ") in {$this->_configFile} on line {$this->_mapperLexer->line}"
+                                ')'
                                 );
         }
 
@@ -163,7 +162,7 @@ associationStatement(X) ::= linkTable(A). { X['linkTable'] = A; }
 
 linkTable(X) ::= LINK_TABLE LCURLY linkTableStatementList(A) RCURLY. {
         if (!array_key_exists('table', A)) {
-            throw new Exception("The [ table ] statement was not found in the 'linkTable' statement on line {$this->_mapperLexer->line}. An 'association' statement must contain the 'table' statement.");
+            throw new Exception("The [ table ] statement was not found in the linkTable statement. An association statement must contain the table statement.");
         }
 
         $linkTable = $this->_ast->createElement('linkTable');
@@ -212,7 +211,7 @@ association ::= ASSOCIATION ID(A) LCURLY associationStatementList(B) RCURLY. {
         if (array_key_exists(strtolower(A), $this->_associationDeclarations)) {
             throw new Exception("Cannot redeclare the association [ {A} ] (previously declared on line " .
                                 $this->_associationDeclarations[ strtolower(A) ] .
-                                ") in {$this->_configFile} on line {$this->_mapperLexer->line}"
+                                ')'
                                 );
         }
 
@@ -222,6 +221,7 @@ association ::= ASSOCIATION ID(A) LCURLY associationStatementList(B) RCURLY. {
 
 associationReference(X) ::= ASSOCIATION ID(A). {
         $association = $this->_ast->createElement('association');
+        $association->setAttribute('referencedAssociationID', strtolower(A));
         $association->setAttribute('referencedAssociation', A);
         X = $association;
 }
