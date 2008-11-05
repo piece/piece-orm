@@ -1,19 +1,17 @@
 // $Id$
 
+association baz {
+    table unusualname_12
+    type manyToMany
+    property baz
+}
+
 method findAll {
-    association {
-        table unusualname_12
-        type manyToMany
-        property baz
-    }
+    association baz
 }            
 
 method insert {
-    association {
-        table unusualname_12
-        type manyToMany
-        property baz
-    }
+    association baz
 }
 
 /*

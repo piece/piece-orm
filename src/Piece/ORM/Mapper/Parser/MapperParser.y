@@ -109,12 +109,15 @@ methodStatementList(X) ::= methodStatementList(A) methodStatement(B). {
         if (!is_array(A)) {
             A = array();
         }
+
         X = A;
+
         foreach (array_keys(B) as $key) {
-            if ($key == 'association') {
+            if ($key == 'association' || $key == 'associationReference') {
                 X['associations'][] = B[$key];
                 continue;
             }
+
             X[$key] = B[$key];
         }
 }
@@ -123,6 +126,7 @@ methodStatementList ::= .
 methodStatement(X) ::= query(A). { X['query'] = trim(A, '"'); }
 methodStatement(X) ::= orderBy(A). { X['orderBy'] = trim(A, '"'); }
 methodStatement(X) ::= innserAssociation(A). { X['association'] = A; }
+methodStatement(X) ::= associationReference(A). { X['associationReference'] = A; }
 
 query(X) ::= QUERY STRING(A). { X = A; }
 
@@ -136,7 +140,9 @@ associationStatementList(X) ::= associationStatementList(A) associationStatement
         if (!is_array(A)) {
             A = array();
         }
+
         X = A;
+
         foreach (array_keys(B) as $key) {
             X[$key] = B[$key];
         }
@@ -164,6 +170,7 @@ linkTable(X) ::= LINK_TABLE LCURLY linkTableStatementList(A) RCURLY. {
         foreach (array_keys(A) as $key) {
             $linkTable->setAttribute($key, A[$key]);
         }
+
         X = $linkTable;
 }
 
@@ -171,7 +178,9 @@ linkTableStatementList(X) ::= linkTableStatementList(A) linkTableStatement(B). {
         if (!is_array(A)) {
             A = array();
         }
+
         X = A;
+
         foreach (array_keys(B) as $key) {
             X[$key] = B[$key];
         }
@@ -209,4 +218,10 @@ association ::= ASSOCIATION ID(A) LCURLY associationStatementList(B) RCURLY. {
 
         $this->_associationDeclarations[ strtolower(A) ] = $this->_mapperLexer->line;
         $this->_ast->addAssociation(A, B);
+}
+
+associationReference(X) ::= ASSOCIATION ID(A). {
+        $association = $this->_ast->createElement('association');
+        $association->setAttribute('referencedAssociation', A);
+        X = $association;
 }

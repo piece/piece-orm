@@ -6,16 +6,18 @@ association skills {
     property skills
 }
 
+association computer {
+    table computers
+    type oneToOne
+    property computer
+}
+
 method findByIdAndNote {
     query "SELECT * FROM $__table WHERE id = $id AND note = $note"
 }
 
 method findAllWithSkills1 {
-    association {
-        table skills
-        type manyToMany
-        property skills
-    }
+    association skills
 }
 
 method findAllWithSkills2 {
@@ -34,24 +36,12 @@ method findAllWithSkills2 {
 }
 
 method insert {
-    association {
-        table skills
-        type manyToMany
-        property skills
-    }
-    association {
-        table computers
-        type oneToOne
-        property computer
-    }
+    association skills
+    association computer
 }
 
 method findAllByFirstName {
-    association {
-        table skills
-        type manyToMany
-        property skills
-    }
+    association skills
 }
 
 method findAllWithDepartment1 {
@@ -73,11 +63,7 @@ method findAllWithDepartment2 {
 }
 
 method findAllWithComputer1 {
-    association {
-        table computers
-        type oneToOne
-        property computer
-    }
+    association computer
 }
 
 method findAllWithComputer2 {
@@ -119,46 +105,22 @@ method findWithOrderedSkills {
 
 method findWithSkillsByFirstName {
     query "SELECT * FROM $__table WHERE first_name = $firstName"
-    association {
-        table skills
-        type manyToMany
-        property skills
-    }
+    association skills
 }
 
 method update {
-    association {
-        table skills
-        type manyToMany
-        property skills
-    }
-    association {
-        table computers
-        type oneToOne
-        property computer
-    }
+    association skills
+    association computer
 }
 
 method findWithComputerByFirstName {
     query "SELECT * FROM $__table WHERE first_name = $firstName"
-    association {
-        table computers
-        type oneToOne
-        property computer
-    }
+    association computer
 }
 
 method delete {
-    association {
-        table skills
-        type manyToMany
-        property skills
-    }
-    association {
-        table computers
-        type oneToOne
-        property computer
-    }
+    association skills
+    association computer
 }
 
 method findOneForFirstNameByFirstName {

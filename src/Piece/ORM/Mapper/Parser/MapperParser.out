@@ -26,22 +26,22 @@ State 1:
           column ::= * COLUMN ID
           referencedColumn ::= * REFERENCED_COLUMN ID
 
-                      ORDER_BY shift  19
-                    LINK_TABLE shift  13
-                         TABLE shift  10
-              ASSOCIATION_TYPE shift  14
-                      PROPERTY shift  21
-                        COLUMN shift  12
-             REFERENCED_COLUMN shift  15
-                       orderBy shift  49
+                      ORDER_BY shift  16
+                    LINK_TABLE shift  14
+                         TABLE shift  12
+              ASSOCIATION_TYPE shift  17
+                      PROPERTY shift  20
+                        COLUMN shift  15
+             REFERENCED_COLUMN shift  13
+                       orderBy shift  51
       associationStatementList shift  4
           associationStatement shift  35
-                         table shift  55
-               associationType shift  56
-                      property shift  53
-                        column shift  52
-              referencedColumn shift  48
-                     linkTable shift  36
+                         table shift  57
+               associationType shift  58
+                      property shift  55
+                        column shift  54
+              referencedColumn shift  50
+                     linkTable shift  37
 
 State 2:
           orderBy ::= * ORDER_BY STRING
@@ -62,22 +62,22 @@ State 2:
           referencedColumn ::= * REFERENCED_COLUMN ID
           association ::= ASSOCIATION ID LCURLY * associationStatementList RCURLY
 
-                      ORDER_BY shift  19
-                    LINK_TABLE shift  13
-                         TABLE shift  10
-              ASSOCIATION_TYPE shift  14
-                      PROPERTY shift  21
-                        COLUMN shift  12
-             REFERENCED_COLUMN shift  15
-                       orderBy shift  49
+                      ORDER_BY shift  16
+                    LINK_TABLE shift  14
+                         TABLE shift  12
+              ASSOCIATION_TYPE shift  17
+                      PROPERTY shift  20
+                        COLUMN shift  15
+             REFERENCED_COLUMN shift  13
+                       orderBy shift  51
       associationStatementList shift  3
           associationStatement shift  35
-                         table shift  55
-               associationType shift  56
-                      property shift  53
-                        column shift  52
-              referencedColumn shift  48
-                     linkTable shift  36
+                         table shift  57
+               associationType shift  58
+                      property shift  55
+                        column shift  54
+              referencedColumn shift  50
+                     linkTable shift  37
 
 State 3:
           orderBy ::= * ORDER_BY STRING
@@ -98,21 +98,21 @@ State 3:
           association ::= ASSOCIATION ID LCURLY associationStatementList * RCURLY
 
                         RCURLY shift  27
-                      ORDER_BY shift  19
-                    LINK_TABLE shift  13
-                         TABLE shift  10
-              ASSOCIATION_TYPE shift  14
-                      PROPERTY shift  21
-                        COLUMN shift  12
-             REFERENCED_COLUMN shift  15
-                       orderBy shift  49
-          associationStatement shift  54
-                         table shift  55
-               associationType shift  56
-                      property shift  53
-                        column shift  52
-              referencedColumn shift  48
-                     linkTable shift  36
+                      ORDER_BY shift  16
+                    LINK_TABLE shift  14
+                         TABLE shift  12
+              ASSOCIATION_TYPE shift  17
+                      PROPERTY shift  20
+                        COLUMN shift  15
+             REFERENCED_COLUMN shift  13
+                       orderBy shift  51
+          associationStatement shift  56
+                         table shift  57
+               associationType shift  58
+                      property shift  55
+                        column shift  54
+              referencedColumn shift  50
+                     linkTable shift  37
 
 State 4:
           orderBy ::= * ORDER_BY STRING
@@ -132,22 +132,22 @@ State 4:
           column ::= * COLUMN ID
           referencedColumn ::= * REFERENCED_COLUMN ID
 
-                        RCURLY shift  47
-                      ORDER_BY shift  19
-                    LINK_TABLE shift  13
-                         TABLE shift  10
-              ASSOCIATION_TYPE shift  14
-                      PROPERTY shift  21
-                        COLUMN shift  12
-             REFERENCED_COLUMN shift  15
-                       orderBy shift  49
-          associationStatement shift  54
-                         table shift  55
-               associationType shift  56
-                      property shift  53
-                        column shift  52
-              referencedColumn shift  48
-                     linkTable shift  36
+                        RCURLY shift  49
+                      ORDER_BY shift  16
+                    LINK_TABLE shift  14
+                         TABLE shift  12
+              ASSOCIATION_TYPE shift  17
+                      PROPERTY shift  20
+                        COLUMN shift  15
+             REFERENCED_COLUMN shift  13
+                       orderBy shift  51
+          associationStatement shift  56
+                         table shift  57
+               associationType shift  58
+                      property shift  55
+                        column shift  54
+              referencedColumn shift  50
+                     linkTable shift  37
 
 State 5:
           linkTable ::= LINK_TABLE LCURLY * linkTableStatementList RCURLY
@@ -162,16 +162,16 @@ State 5:
           referencedColumn ::= * REFERENCED_COLUMN ID
           inverseColumn ::= * INVERSE_COLUMN ID
 
-                         TABLE shift  10
-                        COLUMN shift  12
-             REFERENCED_COLUMN shift  15
+                         TABLE shift  12
+                        COLUMN shift  15
+             REFERENCED_COLUMN shift  13
                 INVERSE_COLUMN shift  11
-                         table shift  57
-                        column shift  30
-              referencedColumn shift  24
+                         table shift  59
+                        column shift  34
+              referencedColumn shift  25
         linkTableStatementList shift  6
-            linkTableStatement shift  31
-                 inverseColumn shift  25
+            linkTableStatement shift  30
+                 inverseColumn shift  24
 
 State 6:
           linkTable ::= LINK_TABLE LCURLY linkTableStatementList * RCURLY
@@ -185,16 +185,16 @@ State 6:
           referencedColumn ::= * REFERENCED_COLUMN ID
           inverseColumn ::= * INVERSE_COLUMN ID
 
-                        RCURLY shift  50
-                         TABLE shift  10
-                        COLUMN shift  12
-             REFERENCED_COLUMN shift  15
+                        RCURLY shift  52
+                         TABLE shift  12
+                        COLUMN shift  15
+             REFERENCED_COLUMN shift  13
                 INVERSE_COLUMN shift  11
-                         table shift  57
-                        column shift  30
-              referencedColumn shift  24
-            linkTableStatement shift  51
-                 inverseColumn shift  25
+                         table shift  59
+                        column shift  34
+              referencedColumn shift  25
+            linkTableStatement shift  53
+                 inverseColumn shift  24
 
 State 7:
           method ::= METHOD ID LCURLY methodStatementList * RCURLY
@@ -202,18 +202,21 @@ State 7:
           methodStatement ::= * query
           methodStatement ::= * orderBy
           methodStatement ::= * innserAssociation
+          methodStatement ::= * associationReference
           query ::= * QUERY STRING
           orderBy ::= * ORDER_BY STRING
           innserAssociation ::= * ASSOCIATION LCURLY associationStatementList RCURLY
+          associationReference ::= * ASSOCIATION ID
 
-                        RCURLY shift  42
-                         QUERY shift  23
-                      ORDER_BY shift  19
-                   ASSOCIATION shift  16
-               methodStatement shift  41
-                         query shift  37
+                        RCURLY shift  47
+                         QUERY shift  21
+                      ORDER_BY shift  16
+                   ASSOCIATION shift  10
+               methodStatement shift  43
+                         query shift  42
                        orderBy shift  38
              innserAssociation shift  39
+          associationReference shift  40
 
 State 8:
       (0) start ::= topStatementList *
@@ -223,11 +226,11 @@ State 8:
           method ::= * METHOD ID LCURLY methodStatementList RCURLY
           association ::= * ASSOCIATION ID LCURLY associationStatementList RCURLY
 
-                        METHOD shift  22
-                   ASSOCIATION shift  20
-                  topStatement shift  43
-                        method shift  44
-                   association shift  45
+                        METHOD shift  23
+                   ASSOCIATION shift  22
+                  topStatement shift  44
+                        method shift  45
+                   association shift  46
                      {default} reduce 0
 
 State 9:
@@ -239,44 +242,46 @@ State 9:
                      {default} reduce 7
 
 State 10:
-          table ::= TABLE * ID
+          innserAssociation ::= ASSOCIATION * LCURLY associationStatementList RCURLY
+          associationReference ::= ASSOCIATION * ID
 
-                            ID shift  26
+                            ID shift  36
+                        LCURLY shift  1
 
 State 11:
           inverseColumn ::= INVERSE_COLUMN * ID
 
-                            ID shift  32
+                            ID shift  29
 
 State 12:
-          column ::= COLUMN * ID
+          table ::= TABLE * ID
 
-                            ID shift  28
+                            ID shift  26
 
 State 13:
+          referencedColumn ::= REFERENCED_COLUMN * ID
+
+                            ID shift  33
+
+State 14:
           linkTable ::= LINK_TABLE * LCURLY linkTableStatementList RCURLY
 
                         LCURLY shift  5
 
-State 14:
-          associationType ::= ASSOCIATION_TYPE * ID
-
-                            ID shift  29
-
 State 15:
-          referencedColumn ::= REFERENCED_COLUMN * ID
+          column ::= COLUMN * ID
 
-                            ID shift  34
+                            ID shift  28
 
 State 16:
-          innserAssociation ::= ASSOCIATION * LCURLY associationStatementList RCURLY
+          orderBy ::= ORDER_BY * STRING
 
-                        LCURLY shift  1
+                        STRING shift  48
 
 State 17:
-          method ::= METHOD ID * LCURLY methodStatementList RCURLY
+          associationType ::= ASSOCIATION_TYPE * ID
 
-                        LCURLY shift  9
+                            ID shift  31
 
 State 18:
           association ::= ASSOCIATION ID * LCURLY associationStatementList RCURLY
@@ -284,99 +289,99 @@ State 18:
                         LCURLY shift  2
 
 State 19:
-          orderBy ::= ORDER_BY * STRING
+          method ::= METHOD ID * LCURLY methodStatementList RCURLY
 
-                        STRING shift  46
+                        LCURLY shift  9
 
 State 20:
+          property ::= PROPERTY * ID
+
+                            ID shift  32
+
+State 21:
+          query ::= QUERY * STRING
+
+                        STRING shift  41
+
+State 22:
           association ::= ASSOCIATION * ID LCURLY associationStatementList RCURLY
 
                             ID shift  18
 
-State 21:
-          property ::= PROPERTY * ID
-
-                            ID shift  33
-
-State 22:
+State 23:
           method ::= METHOD * ID LCURLY methodStatementList RCURLY
 
-                            ID shift  17
-
-State 23:
-          query ::= QUERY * STRING
-
-                        STRING shift  40
+                            ID shift  19
 
 State 24:
-     (28) linkTableStatement ::= referencedColumn *
+     (30) linkTableStatement ::= inverseColumn *
 
-                     {default} reduce 28
+                     {default} reduce 30
 
 State 25:
-     (29) linkTableStatement ::= inverseColumn *
+     (29) linkTableStatement ::= referencedColumn *
 
                      {default} reduce 29
 
 State 26:
-     (30) table ::= TABLE ID *
-
-                     {default} reduce 30
-
-State 27:
-     (36) association ::= ASSOCIATION ID LCURLY associationStatementList RCURLY *
-
-                     {default} reduce 36
-
-State 28:
-     (33) column ::= COLUMN ID *
-
-                     {default} reduce 33
-
-State 29:
-     (31) associationType ::= ASSOCIATION_TYPE ID *
+     (31) table ::= TABLE ID *
 
                      {default} reduce 31
 
-State 30:
-     (27) linkTableStatement ::= column *
+State 27:
+     (37) association ::= ASSOCIATION ID LCURLY associationStatementList RCURLY *
 
-                     {default} reduce 27
+                     {default} reduce 37
 
-State 31:
-     (25) linkTableStatementList ::= linkTableStatement *
-
-                     {default} reduce 25
-
-State 32:
-     (35) inverseColumn ::= INVERSE_COLUMN ID *
-
-                     {default} reduce 35
-
-State 33:
-     (32) property ::= PROPERTY ID *
-
-                     {default} reduce 32
-
-State 34:
-     (34) referencedColumn ::= REFERENCED_COLUMN ID *
+State 28:
+     (34) column ::= COLUMN ID *
 
                      {default} reduce 34
 
-State 35:
-     (15) associationStatementList ::= associationStatement *
+State 29:
+     (36) inverseColumn ::= INVERSE_COLUMN ID *
 
-                     {default} reduce 15
+                     {default} reduce 36
+
+State 30:
+     (26) linkTableStatementList ::= linkTableStatement *
+
+                     {default} reduce 26
+
+State 31:
+     (32) associationType ::= ASSOCIATION_TYPE ID *
+
+                     {default} reduce 32
+
+State 32:
+     (33) property ::= PROPERTY ID *
+
+                     {default} reduce 33
+
+State 33:
+     (35) referencedColumn ::= REFERENCED_COLUMN ID *
+
+                     {default} reduce 35
+
+State 34:
+     (28) linkTableStatement ::= column *
+
+                     {default} reduce 28
+
+State 35:
+     (16) associationStatementList ::= associationStatement *
+
+                     {default} reduce 16
 
 State 36:
-     (22) associationStatement ::= linkTable *
+     (38) associationReference ::= ASSOCIATION ID *
 
-                     {default} reduce 22
+                     {default} reduce 38
 
 State 37:
-      (8) methodStatement ::= query *
+     (23) associationStatement ::= linkTable *
 
-                     {default} reduce 8
+                     {default} reduce 23
 
 State 38:
       (9) methodStatement ::= orderBy *
@@ -389,92 +394,102 @@ State 39:
                      {default} reduce 10
 
 State 40:
-     (11) query ::= QUERY STRING *
+     (11) methodStatement ::= associationReference *
 
                      {default} reduce 11
 
 State 41:
+     (12) query ::= QUERY STRING *
+
+                     {default} reduce 12
+
+State 42:
+      (8) methodStatement ::= query *
+
+                     {default} reduce 8
+
+State 43:
       (6) methodStatementList ::= methodStatementList methodStatement *
 
                      {default} reduce 6
 
-State 42:
-      (5) method ::= METHOD ID LCURLY methodStatementList RCURLY *
-
-                     {default} reduce 5
-
-State 43:
+State 44:
       (1) topStatementList ::= topStatementList topStatement *
 
                      {default} reduce 1
 
-State 44:
+State 45:
       (3) topStatement ::= method *
 
                      {default} reduce 3
 
-State 45:
+State 46:
       (4) topStatement ::= association *
 
                      {default} reduce 4
 
-State 46:
-     (12) orderBy ::= ORDER_BY STRING *
-
-                     {default} reduce 12
-
 State 47:
-     (13) innserAssociation ::= ASSOCIATION LCURLY associationStatementList RCURLY *
+      (5) method ::= METHOD ID LCURLY methodStatementList RCURLY *
+
+                     {default} reduce 5
+
+State 48:
+     (13) orderBy ::= ORDER_BY STRING *
 
                      {default} reduce 13
 
-State 48:
-     (20) associationStatement ::= referencedColumn *
-
-                     {default} reduce 20
-
 State 49:
-     (21) associationStatement ::= orderBy *
-
-                     {default} reduce 21
-
-State 50:
-     (23) linkTable ::= LINK_TABLE LCURLY linkTableStatementList RCURLY *
-
-                     {default} reduce 23
-
-State 51:
-     (24) linkTableStatementList ::= linkTableStatementList linkTableStatement *
-
-                     {default} reduce 24
-
-State 52:
-     (19) associationStatement ::= column *
-
-                     {default} reduce 19
-
-State 53:
-     (18) associationStatement ::= property *
-
-                     {default} reduce 18
-
-State 54:
-     (14) associationStatementList ::= associationStatementList associationStatement *
+     (14) innserAssociation ::= ASSOCIATION LCURLY associationStatementList RCURLY *
 
                      {default} reduce 14
 
-State 55:
-     (16) associationStatement ::= table *
+State 50:
+     (21) associationStatement ::= referencedColumn *
 
-                     {default} reduce 16
+                     {default} reduce 21
+
+State 51:
+     (22) associationStatement ::= orderBy *
+
+                     {default} reduce 22
+
+State 52:
+     (24) linkTable ::= LINK_TABLE LCURLY linkTableStatementList RCURLY *
+
+                     {default} reduce 24
+
+State 53:
+     (25) linkTableStatementList ::= linkTableStatementList linkTableStatement *
+
+                     {default} reduce 25
+
+State 54:
+     (20) associationStatement ::= column *
+
+                     {default} reduce 20
+
+State 55:
+     (19) associationStatement ::= property *
+
+                     {default} reduce 19
 
 State 56:
-     (17) associationStatement ::= associationType *
+     (15) associationStatementList ::= associationStatementList associationStatement *
+
+                     {default} reduce 15
+
+State 57:
+     (17) associationStatement ::= table *
 
                      {default} reduce 17
 
-State 57:
-     (26) linkTableStatement ::= table *
+State 58:
+     (18) associationStatement ::= associationType *
 
-                     {default} reduce 26
+                     {default} reduce 18
+
+State 59:
+     (27) linkTableStatement ::= table *
+
+                     {default} reduce 27
 

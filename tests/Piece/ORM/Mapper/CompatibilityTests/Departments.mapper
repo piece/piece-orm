@@ -1,11 +1,20 @@
 // $Id$
 
+association employees {
+    table employees
+    type oneToMany
+    property employees
+}
+
+association descOrderedEmployees {
+    table employees
+    type oneToMany
+    property employees
+    orderBy "id DESC"
+}
+
 method findAllWithEmployees1 {
-    association {
-        table employees
-        type oneToMany
-        property employees
-    }
+    association employees
 }
 
 method findAllWithEmployees2 {
@@ -19,38 +28,20 @@ method findAllWithEmployees2 {
 }
 
 method findAllWithOrderedEmployees {
-    association {
-        table employees
-        type oneToMany
-        property employees
-        orderBy "id DESC"
-    }
+    association descOrderedEmployees
 }
 
 method findWithEmployeesByName {
     query "SELECT * FROM $__table WHERE name = $name"
-    association {
-        table employees
-        type oneToMany
-        property employees
-        orderBy "id DESC"
-    }
+    association descOrderedEmployees
 }
 
 method update {
-    association {
-        table employees
-        type oneToMany
-        property employees
-    }
+    association employees
 }
 
 method delete {
-    association {
-        table employees
-        type oneToMany
-        property employees
-    }
+    association employees
 }
 
 /*

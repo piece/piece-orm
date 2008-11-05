@@ -258,10 +258,21 @@ class MapperLoader
      */
     private function _createAssociations($methodName)
     {
+        $methodID = strtolower($methodName);
         $associations = array();
         $associationNodeList =
-            $this->_xpath->query("//method[@name='$methodName']/association");
+            $this->_xpath->query("//method[@id='$methodID']/association");
         foreach ($associationNodeList as $associationElement) {
+            if ($associationElement->hasAttribute('referencedAssociation')) {
+                $referencedAssociation = $associationElement->getAttribute('referencedAssociation');
+                $associationNodeList = $this->_xpath->query("//association[@id='" . strtolower($referencedAssociation) . "']");
+                if (!$associationNodeList->length) {
+                    throw new Exception("The referencedAssociation [ $referencedAssociation ] was not found in {$this->_configFile}");
+                }
+
+                foreach ($associationNodeList as $associationElement) {}
+            }
+
             $table = $associationElement->getAttribute('table');
             $type = $associationElement->getAttribute('type');
 
@@ -355,7 +366,7 @@ class MapperLoader
             $association->setOrderBy($orderBy);
 
             if ($associationElement->getAttribute('type') == Association::ASSOCIATIONTYPE_MANYTOMANY) {
-                $association->setLinkTable($this->_createLinkTable($methodName, $association));
+                $association->setLinkTable($this->_createLinkTable($methodID, $association));
             }
 
             $associations[] = $association;
@@ -368,11 +379,11 @@ class MapperLoader
     // {{{ _createLinkTable()
 
     /**
-     * @param string                          $methodName
+     * @param string                          $methodID
      * @param Piece::ORM::Mapper::Association $association
      * @throws Piece::ORM::Exception
      */
-    private function _createLinkTable($methodName, Association $association)
+    private function _createLinkTable($methodID, Association $association)
     {
         $table = null;
         $column = null;
@@ -380,7 +391,7 @@ class MapperLoader
         $inverseColumn = null;
         $associationMetadata = MetadataFactory::factory($association->getTable());
 
-        $linkTableNodeList = $this->_xpath->query("//method[@name='$methodName']/association/linkTable");
+        $linkTableNodeList = $this->_xpath->query("//method[@id='$methodID']/association/linkTable");
         foreach ($linkTableNodeList as $linkTableElement) {
             $table = $linkTableElement->getAttribute('table');
             $column = $linkTableElement->getAttribute('property');
