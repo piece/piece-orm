@@ -9,7 +9,7 @@ State 0:
 
 State 1:
           orderBy ::= * ORDER_BY STRING
-          innserAssociation ::= ASSOCIATION LCURLY * associationStatementList RCURLY
+          innerAssociation ::= ASSOCIATION LCURLY * associationStatementList RCURLY
           associationStatementList ::= * associationStatementList associationStatement
           associationStatementList ::= * associationStatement
           associationStatement ::= * table
@@ -116,7 +116,7 @@ State 3:
 
 State 4:
           orderBy ::= * ORDER_BY STRING
-          innserAssociation ::= ASSOCIATION LCURLY associationStatementList * RCURLY
+          innerAssociation ::= ASSOCIATION LCURLY associationStatementList * RCURLY
           associationStatementList ::= associationStatementList * associationStatement
           associationStatement ::= * table
           associationStatement ::= * associationType
@@ -201,11 +201,11 @@ State 7:
           methodStatementList ::= methodStatementList * methodStatement
           methodStatement ::= * query
           methodStatement ::= * orderBy
-          methodStatement ::= * innserAssociation
+          methodStatement ::= * innerAssociation
           methodStatement ::= * associationReference
           query ::= * QUERY STRING
           orderBy ::= * ORDER_BY STRING
-          innserAssociation ::= * ASSOCIATION LCURLY associationStatementList RCURLY
+          innerAssociation ::= * ASSOCIATION LCURLY associationStatementList RCURLY
           associationReference ::= * ASSOCIATION ID
 
                         RCURLY shift  47
@@ -215,7 +215,7 @@ State 7:
                methodStatement shift  43
                          query shift  42
                        orderBy shift  38
-             innserAssociation shift  39
+              innerAssociation shift  39
           associationReference shift  40
 
 State 8:
@@ -242,7 +242,7 @@ State 9:
                      {default} reduce 7
 
 State 10:
-          innserAssociation ::= ASSOCIATION * LCURLY associationStatementList RCURLY
+          innerAssociation ::= ASSOCIATION * LCURLY associationStatementList RCURLY
           associationReference ::= ASSOCIATION * ID
 
                             ID shift  36
@@ -389,7 +389,7 @@ State 38:
                      {default} reduce 9
 
 State 39:
-     (10) methodStatement ::= innserAssociation *
+     (10) methodStatement ::= innerAssociation *
 
                      {default} reduce 10
 
@@ -439,7 +439,7 @@ State 48:
                      {default} reduce 13
 
 State 49:
-     (14) innserAssociation ::= ASSOCIATION LCURLY associationStatementList RCURLY *
+     (14) innerAssociation ::= ASSOCIATION LCURLY associationStatementList RCURLY *
 
                      {default} reduce 14
 

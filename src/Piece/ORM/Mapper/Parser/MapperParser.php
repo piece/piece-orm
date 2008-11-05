@@ -130,7 +130,7 @@ class MapperParseryyStackEntry
  * @package    Piece_ORM
  * @copyright  2008 KUBO Atsuhiro <iteman@users.sourceforge.net>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License (revised)
- * @version    SVN: $Id: MapperParser.y 616 2008-11-05 13:08:50Z iteman $
+ * @version    SVN: $Id: MapperParser.y 617 2008-11-05 13:59:21Z iteman $
  * @since      File available since Release 2.0.0dev1
  */
 
@@ -466,7 +466,7 @@ static public $yy_action = array(
   'PROPERTY',      'COLUMN',        'REFERENCED_COLUMN',  'INVERSE_COLUMN',
   'error',         'start',         'topStatementList',  'topStatement',
   'method',        'association',   'methodStatementList',  'methodStatement',
-  'query',         'orderBy',       'innserAssociation',  'associationReference',
+  'query',         'orderBy',       'innerAssociation',  'associationReference',
   'associationStatementList',  'associationStatement',  'table',         'associationType',
   'property',      'column',        'referencedColumn',  'linkTable',   
   'linkTableStatementList',  'linkTableStatement',  'inverseColumn',
@@ -487,11 +487,11 @@ static public $yy_action = array(
  /*   7 */ "methodStatementList ::=",
  /*   8 */ "methodStatement ::= query",
  /*   9 */ "methodStatement ::= orderBy",
- /*  10 */ "methodStatement ::= innserAssociation",
+ /*  10 */ "methodStatement ::= innerAssociation",
  /*  11 */ "methodStatement ::= associationReference",
  /*  12 */ "query ::= QUERY STRING",
  /*  13 */ "orderBy ::= ORDER_BY STRING",
- /*  14 */ "innserAssociation ::= ASSOCIATION LCURLY associationStatementList RCURLY",
+ /*  14 */ "innerAssociation ::= ASSOCIATION LCURLY associationStatementList RCURLY",
  /*  15 */ "associationStatementList ::= associationStatementList associationStatement",
  /*  16 */ "associationStatementList ::= associationStatement",
  /*  17 */ "associationStatement ::= table",

@@ -124,14 +124,14 @@ methodStatementList ::= .
 
 methodStatement(X) ::= query(A). { X['query'] = trim(A, '"'); }
 methodStatement(X) ::= orderBy(A). { X['orderBy'] = trim(A, '"'); }
-methodStatement(X) ::= innserAssociation(A). { X['association'] = A; }
+methodStatement(X) ::= innerAssociation(A). { X['association'] = A; }
 methodStatement(X) ::= associationReference(A). { X['associationReference'] = A; }
 
 query(X) ::= QUERY STRING(A). { X = A; }
 
 orderBy(X) ::= ORDER_BY STRING(A). { X = A; }
 
-innserAssociation(X) ::= ASSOCIATION LCURLY associationStatementList(A) RCURLY. {
+innerAssociation(X) ::= ASSOCIATION LCURLY associationStatementList(A) RCURLY. {
         X = $this->_ast->createAssociation(A);
 }
 
