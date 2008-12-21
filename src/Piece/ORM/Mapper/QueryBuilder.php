@@ -129,11 +129,11 @@ class QueryBuilder
         extract((array)$this->_quotedCriteria);
         $this->_query = $this->_mapper->getQuery($this->_methodName);
 
-        $oldLevel = error_reporting(0);
+        $oldErrorReportingLevel = error_reporting(0);
         ini_set('track_errors', true);
         $message = eval("\$builtQuery = \"{$this->_query}\"; return \$php_errormsg;");
         ini_restore('track_errors');
-        error_reporting($oldLevel);
+        error_reporting($oldErrorReportingLevel);
         if (!is_null($message)) {
             throw new Exception("Failed to build a query for the method [ {$this->_methodName} ] for any reasons. See below for more details.
  $message");
