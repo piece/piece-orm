@@ -106,18 +106,18 @@ class Mapper
      * Dispatches a virtual method call to the appropriate real method call.
      *
      * @param string $methodName
-     * @param array  $arguments
+     * @param array  $args
      * @throw Piece::ORM::Exception
      * @since Method available since Release 2.0.0dev1
      */
-    public function __call($methodName, $arguments)
+    public function __call($methodName, $args)
     {
         if (!$this->hasMethod($methodName)) {
             throw new Exception("The method [ $methodName ] was not defined");
         }
 
         $originalMethodName = $this->_getMethod($methodName)->getName();
-        $criteria = count($arguments) ? $arguments[0] : null;
+        $criteria = count($args) ? $args[0] : null;
 
         if (QueryType::isFindAll($originalMethodName)) {
             return $this->_findObjects($originalMethodName, $criteria);
@@ -284,7 +284,7 @@ class Mapper
     /**
      * Sets arguments which will be pass to a preload callback.
      *
-     * @param array $args
+     * @return array
      */
     public function getPreloadCallbackArgs()
     {
